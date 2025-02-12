@@ -1,5 +1,5 @@
 
-<h1 align="center">Town of Host: Edited (TOHE)</h1>
+<h1 align="center">Town of Next: Edited (TONE)</h1>
 
 <br>
 
