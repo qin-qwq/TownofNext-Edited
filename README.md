@@ -34,6 +34,10 @@
 > 
 > - Town of Host: Enhanced was forked from Town of Host: Re-Edited.
 >
+### :star: [TOHO](https://github.com/TOHOptimized/TownofHost-Optimized)) 
+> 
+> - 未来的某一天借鉴一下这个模组
+> 
 ### :star: [TOHE](https://github.com/KARPED1EM/TownOfHostEdited) :
 > 
 > - Town of Host: Re-Edited was forked from Town of Host: Edited. (TONX)
