@@ -34,7 +34,7 @@
 > 
 > - Town of Host: Enhanced was forked from Town of Host: Re-Edited.
 >
->### :star: [NOS]((https://github.com/Dolly1016/Nebula))
+### star: [NOS]((https://github.com/Dolly1016/Nebula))
 > 
 > - 一些图标
 >
