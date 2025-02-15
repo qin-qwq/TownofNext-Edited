@@ -38,10 +38,6 @@
 > 
 > - 一些图标
 >
-### :star: [Super Sus](https://spaceparty.cn)
-> 
-> - 一些职业想法
->
 ### :star: [TOHO](https://github.com/TOHOptimized/TownofHost-Optimized) 
 > 
 > - 未来的某一天借鉴一下这个模组
