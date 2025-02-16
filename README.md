@@ -40,7 +40,7 @@
 >
 ### :star: [TOHO](https://github.com/TOHOptimized/TownofHost-Optimized) 
 > 
-> - 未来的某一天借鉴一下这个模组
+> - 一些角色想法
 > 
 ### :star: [TOHE](https://github.com/KARPED1EM/TownOfHostEdited) :
 > 
