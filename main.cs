@@ -30,7 +30,7 @@ public class Main : BasePlugin
     // == Program Config ==
     public const string OriginalForkId = "OriginalTOH";
 
-    public static readonly string ModName = "TOHE";
+    public static readonly string ModName = "TONE";
     public static readonly string ForkId = "TOHE";
     public static readonly string ModColor = "#ffc0cb";
     public static readonly bool AllowPublicRoom = true;
@@ -42,14 +42,14 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
-    public const string PluginVersion = "2024.1103.211.9999"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "2.1.1";
-    public const string SupportedVersionAU = "2024.8.13"; // Also 2024.9.4 and 2024.10.29
+    public const string PluginVersion = "2025.0301.420.9999"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "4.2.0";
+    public const string SupportedVersionAU = "2024.10.29"; // Changed becasue Dark theme works at this version.
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V2.1.0 Alpha 16 Hotfix 1
-    public static readonly bool canaryRelease = false; // Latest: V2.1.0 Beta 3
-    public static readonly bool fullRelease = true; // Latest: V2.1.1
+    public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
+    public static readonly bool canaryRelease = false; // Latest: V4.2.0 Beta 10
+    public static readonly bool fullRelease = true; // Latest: V4.2.0
 
     public static bool hasAccess = true;
 
