@@ -371,7 +371,7 @@ class TaskPanelBehaviourPatch
 
                     AllText += $"\r\n\r\n<size=80%>{SpeedRun.GetGameState()}</size>";
 
-                    break;                   
+                    break;
             }
 
             __instance.taskText.text = AllText;

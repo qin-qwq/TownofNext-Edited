@@ -1,4 +1,4 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
 using TOHE.Roles.Core;
@@ -30,12 +30,12 @@ public abstract class RoleBase
     public void OnAdd(byte playerid) // The player with the class executes this
     {
         _state = Main.PlayerStates.GetValueOrDefault(playerid);
-    
+        
         if (_state == null)
         {
             Logger.Warn($"Player state {playerid} is null", "RoleBase.OnAdd");
         }
-
+        
         try
         {
             CustomRoleManager.RoleClass.FirstOrDefault(r => r.Key == _state.MainRole).Value.IsEnable = true;

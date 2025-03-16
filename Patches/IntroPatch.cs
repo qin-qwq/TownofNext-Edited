@@ -601,7 +601,7 @@ class BeginCrewmatePatch
         {
             __instance.TeamTitle.text = GetString("TeamEgoist");
             __instance.TeamTitle.color = __instance.BackgroundBar.material.color = new Color32(86, 0, 255, byte.MaxValue);
-            PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Crewmate);
+            PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Shapeshifter);
             __instance.ImpostorText.gameObject.SetActive(true);
             __instance.ImpostorText.text = GetString("SubText.Egoist");
         }
@@ -876,13 +876,12 @@ class IntroCutsceneDestroyPatch
                 }
             }
 
-
             if (Options.CurrentGameMode is CustomGameMode.SpeedRun)
             {
                 SpeedRun.StartedAt = Utils.GetTimeStamp();
                 SpeedRun.RpcSyncSpeedRunStates();
             }
-            
+
             foreach (var player in Main.AllPlayerControls)
             {
                 if (player.Is(CustomRoles.GM) && !AntiBlackout.IsCached)

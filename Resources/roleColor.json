@@ -173,7 +173,7 @@
   "Youtuber": "#fb749b",
   "Egoist": "#5600ff",
   "Stealer": "#ff1919",
-  "Schizophrenic": "#3a648f",
+  "Paranoia": "#3a648f",
   "Mimic": "#ff1919",
   "Guesser": "#f8cd46",
   "Necroview": "#663399",
@@ -246,16 +246,5 @@
   "Eavesdropper": "#ffe6bf",
   "Shocker": "#CCCC00",
   "Revenant": "#cc9329",
-  "Roaster": "#ffc0cb",
-  "Brave": "#007FFF",
-  "Thief": "#ab14e3",
-  "Box": "#fe8d00",
-  "YF": "#e6e298",
-  "SoulReaper": "#b149f1",
-  "Runner": "#fffb00",
-  "Paranoia": "#c993f5",
-  "Crewmater": "#8cffff",
-  "Soldier": "#2e5632",
-  "InjusticeSpirit": "#00ff7f",
-  "Revealed": "#ff0000"
+  "Runner": "#fffb00"
 }

@@ -8,7 +8,7 @@ public static class CriticalErrorManager
     private static bool IsError = false;
     private static bool ErrorFromRpc = false;
     private static byte ModdedPlayerId = byte.MinValue;
-    
+
     public static void Initialize()
     {
         IsError = false;

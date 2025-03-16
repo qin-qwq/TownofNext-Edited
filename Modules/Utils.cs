@@ -1092,16 +1092,16 @@ public static class Utils
 
         if (AmongUsClient.Instance.NetworkMode != NetworkModes.OnlineGame)
         {
-            name = "本地";
+            name = "Local Games";
             return name;
         }
 
         if (region.PingServer.EndsWith("among.us", StringComparison.Ordinal))
         {
             // Official server
-            if (name == "North America") name = "北美洲";
-            else if (name == "Europe") name = "欧洲";
-            else if (name == "Asia") name = "亚洲";
+            if (name == "North America") name = "NA";
+            else if (name == "Europe") name = "EU";
+            else if (name == "Asia") name = "AS";
 
             return name;
         }
@@ -1224,14 +1224,14 @@ public static class Utils
     public static void ShowHelpToClient(byte ID)
     {
         SendMessage(
-            "<color=#c06fe8>" + GetString("CommandList")
+            GetString("CommandList")
             + $"\n  ○ /n {GetString("Command.now")}"
             + $"\n  ○ /r {GetString("Command.roles")}"
             + $"\n  ○ /m {GetString("Command.myrole")}"
             + $"\n  ○ /xf {GetString("Command.solvecover")}"
             + $"\n  ○ /l {GetString("Command.lastresult")}"
             + $"\n  ○ /win {GetString("Command.winner")}"
-            + "\n\n" + "<color=#12bee4>" + GetString("CommandOtherList")
+            + "\n\n" + GetString("CommandOtherList")
             + $"\n  ○ /color {GetString("Command.color")}"
             + $"\n  ○ /qt {GetString("Command.quit")}"
             + $"\n ○ /death {GetString("Command.death")}"
@@ -1241,19 +1241,19 @@ public static class Utils
     public static void ShowHelp(byte ID)
     {
         SendMessage(
-            "<color=#c06fe8>" + GetString("CommandList")
+            GetString("CommandList")
             + $"\n  ○ /n {GetString("Command.now")}"
             + $"\n  ○ /r {GetString("Command.roles")}"
             + $"\n  ○ /m {GetString("Command.myrole")}"
             + $"\n  ○ /l {GetString("Command.lastresult")}"
             + $"\n  ○ /win {GetString("Command.winner")}"
-            + "\n\n" + "<color=#12bee4>" + GetString("CommandOtherList")
+            + "\n\n" + GetString("CommandOtherList")
             + $"\n  ○ /color {GetString("Command.color")}"
             + $"\n  ○ /rn {GetString("Command.rename")}"
             + $"\n  ○ /qt {GetString("Command.quit")}"
             + $"\n  ○ /icons {GetString("Command.iconinfo")}"
             + $"\n  ○ /death {GetString("Command.death")}"
-            + "\n\n" + "<color=#f14d57>" + GetString("CommandHostList")
+            + "\n\n" + GetString("CommandHostList")
             + $"\n  ○ /s {GetString("Command.say")}"
             + $"\n  ○ /rn {GetString("Command.rename")}"
             + $"\n  ○ /poll {GetString("Command.Poll")}"
@@ -1592,7 +1592,7 @@ public static class Utils
         {
             name = Options.GetSuffixMode() switch
             {
-                SuffixModes.TONE => name += $"\r\n<color={Main.ModColor}>TONE v{Main.PluginDisplayVersion}</color>",
+                SuffixModes.TOHE => name += $"\r\n<color={Main.ModColor}>TOHE v{Main.PluginDisplayVersion}</color>",
                 SuffixModes.Streaming => name += $"\r\n<size=1.7><color={Main.ModColor}>{GetString("SuffixMode.Streaming")}</color></size>",
                 SuffixModes.Recording => name += $"\r\n<size=1.7><color={Main.ModColor}>{GetString("SuffixMode.Recording")}</color></size>",
                 SuffixModes.RoomHost => name += $"\r\n<size=1.7><color={Main.ModColor}>{GetString("SuffixMode.RoomHost")}</color></size>",
@@ -1847,7 +1847,7 @@ public static class Utils
                         SelfMark.Append(CustomRoleManager.GetMarkOthers(seer, seer, isForMeeting: isForMeeting));
 
                         if (seer.Is(CustomRoles.Lovers))
-                            SelfMark.Append(CustomRoles.Lovers.GetColoredTextByRole("♡"));
+                            SelfMark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
 
                         if (seer.Is(CustomRoles.Cyber) && Cyber.CyberKnown.GetBool())
                             SelfMark.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
@@ -1869,6 +1869,7 @@ public static class Utils
                 var SeerRealName = new StringBuilder(seer.GetRealName(isForMeeting));
 
                 // ====== Combine SelfRoleName, SelfTaskText, SelfName, SelfDeathReason for seer ======
+
                 SelfTaskText.Clear().Append(GetProgressText(seer));
                 SelfRoleName.Clear().Append($"<size={fontSize}>{seer.GetDisplayRoleAndSubName(seer, isForMeeting, false)}{SelfTaskText}</size>");
                 SelfDeathReason.Clear().Append(seer.KnowDeathReason(seer) ? $"\n<size={fontSizeDeathReason}>『{CustomRoles.Doctor.GetColoredTextByRole(GetVitalText(seer.PlayerId))}』</size>" : string.Empty);
@@ -1881,6 +1882,7 @@ public static class Utils
                 }
 
                 bool IsDisplayInfo = false;
+
                 if (Options.CurrentGameMode is CustomGameMode.Standard)
                 {
                     if (MeetingStates.FirstMeeting && Options.ChangeNameToRoleInfo.GetBool() && !isForMeeting)
@@ -2008,11 +2010,11 @@ public static class Utils
 
                                 if (seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
                                 {
-                                    TargetMark.Append(CustomRoles.Lovers.GetColoredTextByRole("♡"));
+                                    TargetMark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
                                 }
                                 else if (seer.Data.IsDead && !seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
                                 {
-                                    TargetMark.Append(CustomRoles.Lovers.GetColoredTextByRole("♡"));
+                                    TargetMark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
                                 }
 
                                 TargetSuffix.Append(CustomRoleManager.GetLowerTextOthers(seer, target, isForMeeting: isForMeeting));
@@ -2034,6 +2036,7 @@ public static class Utils
 
                         TargetRoleName.Clear().Append(KnowRoleTarget
                                 ? $"<size={fontSize}>{seer.GetDisplayRoleAndSubName(target, isForMeeting, false)}{GetProgressText(target)}</size>\r\n" : string.Empty);
+
 
                         if (seer.IsAlive() && Overseer.IsRevealedPlayer(seer, target))
                         {
@@ -2072,6 +2075,7 @@ public static class Utils
                         if (isForMeeting)
                         {
                             var GetTragetId = new StringBuilder($"{seerRole.GetColoredTextByRole(target.PlayerId.ToString())} {TargetPlayerName}");
+
                             // Guesser Mode is On ID
                             if (Options.GuesserMode.GetBool())
                             {
@@ -2083,7 +2087,6 @@ public static class Utils
                                     {
                                         TargetPlayerName.Clear().Append(GetTragetId);
                                     }
-
                                     else if (seer.Is(CustomRoles.NiceGuesser) && !Options.CrewmatesCanGuess.GetBool())
                                     {
                                         TargetPlayerName.Clear().Append(GetTragetId);
@@ -2180,6 +2183,7 @@ public static class Utils
                                 .Append(TargetMark)
                                 .Append(TargetSuffix);
                         }
+
                         realTarget.RpcSetNamePrivate(TargetName.ToString(), seer, force: NoCache);
                     }
                 }
@@ -2313,11 +2317,12 @@ public static class Utils
         PhantomRolePatch.AfterMeeting();
         ChatManager.ClearLastSysMsg();
         FallFromLadder.Reset();
+
         if (Diseased.IsEnable) Diseased.AfterMeetingTasks();
         if (Antidote.IsEnable) Antidote.AfterMeetingTasks();
 
         AntiBlackout.AfterMeetingTasks();
-        
+
         try
         {
             CovenManager.CheckNecroVotes();

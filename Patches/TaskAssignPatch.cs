@@ -215,7 +215,7 @@ class RpcSetTasksPatch
         {
             defaultcommoncount = SpeedRun.SpeedRun_NumCommonTasks.GetInt();
         }
-        
+
         int commonTasksNum = System.Math.Min(commonTasks.Count, defaultcommoncount);
 
         // Setting task num to 0 will make role description disappear from task panel for vanilla players and mod crews

@@ -120,7 +120,7 @@ internal class Vampire : RoleBase
     {
         if (target.Data.Disconnected) return;
         if (target.IsTransformedNeutralApocalypse()) return;
-        
+
         if (target.IsAlive())
         {
             target.SetDeathReason(PlayerState.DeathReason.Bite);

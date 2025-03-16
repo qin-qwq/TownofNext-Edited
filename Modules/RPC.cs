@@ -16,7 +16,7 @@ using static TOHE.Translator;
 namespace TOHE;
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 176/255 USED
+public enum CustomRPC : byte // 174/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -24,6 +24,7 @@ public enum CustomRPC : byte // 176/255 USED
     // Adding Role rpcs that overrides TOHE section and changing BetterCheck will be rejected
     // Sync Role Skill can be used under most cases so you should not make a new rpc unless it's necessary
     // NOTE: Set RPC's that are spammed to "ExtendedPlayerControl.RpcSendOption" to prevent kick due innersloth anti-cheat
+
     VersionCheck = 80,
     RequestRetryVersionCheck = 81,
     SyncCustomSettings = 100, // AUM use 101 rpc
@@ -64,7 +65,7 @@ public enum CustomRPC : byte // 176/255 USED
     SyncDeadPassedMeetingList,
     SyncAbilityUseLimit,
 
-    //Roles
+    //Roles 
     SyncRoleSkill,
     SetBountyTarget,
     SyncPuppet,
@@ -98,13 +99,11 @@ public enum CustomRPC : byte // 176/255 USED
     SetMarkedPlayer,
     PresidentEnd,
     PresidentReveal,
-    GodfatherEnd,
     SetInvestgatorLimit,
     SetOverseerRevealedPlayer,
     SetOverseerTimer,
     SetChameleonTimer,
     SyncAdmiredList,
-    SyncBraveStage,
     DictatorRPC,
     Necronomicon,
 
@@ -154,7 +153,6 @@ internal class RPCHandlerPatch
         or CustomRPC.RetributionistRevenge
         or CustomRPC.Guess
         or CustomRPC.PresidentEnd
-        or CustomRPC.GodfatherEnd
         or CustomRPC.SetSwapperVotes
         or CustomRPC.DumpLog
         or CustomRPC.SetFriendCode
@@ -488,9 +486,6 @@ internal class RPCHandlerPatch
             case CustomRPC.SyncAdmiredList:
                 Admirer.ReceiveRPC(reader);
                 break;
-            case CustomRPC.SyncBraveStage:
-                Brave.ReceiveRPC(reader);
-                break;
             case CustomRPC.PlayCustomSound:
                 CustomSoundsManager.ReceiveRPC(reader);
                 break;
@@ -585,9 +580,6 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.PresidentReveal:
                 President.ReceiveRPC(reader, __instance, isEnd: false);
-                break;
-            case CustomRPC.GodfatherEnd:
-                Godfather.ReceiveRPC(reader, __instance);
                 break;
             case CustomRPC.CouncillorJudge:
                 Councillor.ReceiveRPC_Custom(reader, __instance);

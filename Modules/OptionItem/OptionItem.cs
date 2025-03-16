@@ -147,7 +147,7 @@ public abstract class OptionItem
                 break;
             }
         }
-         
+
         i.Parent = parent;
         parent.SetChild(i);
     });

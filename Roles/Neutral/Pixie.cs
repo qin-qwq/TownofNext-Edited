@@ -125,7 +125,7 @@ internal class Pixie : RoleBase
         NotifyRoles(SpecifySeer: killer, ForceLoop: true);
         if (!DisableShieldAnimations.GetBool()) killer.RpcGuardAndKill(killer);
         SetKillCooldown(killer.PlayerId);
-        
+
         return false;
     }
 

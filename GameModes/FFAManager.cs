@@ -22,7 +22,7 @@ internal static class FFAManager
 
     //Options
     public static OptionItem FFA_GameTime;
-    //public static OptionItem FFA_ShowChatInGame;
+    public static OptionItem FFA_ShowChatInGame;
     public static OptionItem FFA_KCD;
     public static OptionItem FFA_LowerVision;
     public static OptionItem FFA_IncreasedSpeed;
@@ -431,7 +431,7 @@ internal static class FFAManager
         builder.Append(string.Format(GetString("Remaining.FFAKiller"), AliveFFAKiller));
         builder.Append(string.Format("\n\r" + GetString("Remaining.FFASpectator"), DeadFFASpectator));
     }
-    
+
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     class FixedUpdateInGameModeFFAPatch
     {

@@ -141,7 +141,6 @@ public class RoleAssign
             {
                 case CustomRoles.Stalker when GameStates.FungleIsActive:
                 //case CustomRoles.Lighter when GameStates.FungleIsActive:
-                case CustomRoles.Trickster when GameStates.FungleIsActive && Trickster.CanTurnOffLinghts.GetBool():
                 case CustomRoles.Doctor when Options.EveryoneCanSeeDeathReason.GetBool():
                 case CustomRoles.VengefulRomantic:
                 case CustomRoles.RuthlessRomantic:
@@ -353,9 +352,8 @@ public class RoleAssign
                 break;
         }
 
-
         playerCount = AllPlayers.Count;
-        
+
         // Impostor Roles
         {
             List<CustomRoles> AlwaysImpRoles = [];

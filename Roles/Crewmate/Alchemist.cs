@@ -434,7 +434,7 @@ internal class Alchemist : RoleBase
 
         if (PotionID != 10 || FixNextSabo) 
             str.Append(Utils.ColorString(Color.white, " - "));
-            
+
         switch (PotionID)
         {
             case 1: // Shield

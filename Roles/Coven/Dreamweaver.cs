@@ -14,7 +14,7 @@ internal class Dreamweaver : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Dreamweaver;
-    private const int Id = 32200;
+    private const int Id = 31100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenTrickery;
@@ -145,6 +145,7 @@ internal class Dreamweaver : CovenManager
         target.Notify(GetString("Dreamweaver.InsomniaNotification"));
         target.SetAbilityUseLimit(0);
         target.SetKillCooldownV3(999);
+        target.ResetKillCooldown();
     }
     private static bool IsDreamwoven(byte target)
     {
@@ -193,8 +194,8 @@ internal class Dreamweaver : CovenManager
             {
                 foreach (var target in DreamwovenList[player])
                 {
-                    DreamwovenList[player].Remove(target);
                     SetInsomnia(GetPlayerById(player), GetPlayerById(target));
+                    DreamwovenList[player].Remove(target);
                 }
             }   
         }
@@ -209,7 +210,10 @@ internal class Dreamweaver : CovenManager
                 continue; 
             }
             if (targetPc.GetAbilityUseLimit() > 0) targetPc.SetAbilityUseLimit(0);
-            if (target.GetKillTimer() > 0) targetPc.SetKillCooldownV3(999);
+            if (targetPc.GetKillTimer() < 1) { 
+                targetPc.SetKillCooldownV3(999); 
+                targetPc.ResetKillCooldown(); 
+            }
         }
     }
     private void ResetInsomnia(byte dreamweaver)
@@ -237,3 +241,4 @@ internal class Dreamweaver : CovenManager
         }
     }
 }
+

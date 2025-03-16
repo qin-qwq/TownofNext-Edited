@@ -37,7 +37,6 @@ internal class Lawyer : RoleBase
     private enum ChangeRolesSelectList
     {
         Role_Crewmate,
-        Role_Pursuer,
         Role_Amnesiac,
         Role_Jester,
         Role_Opportunist,
@@ -57,7 +56,6 @@ internal class Lawyer : RoleBase
     public static readonly CustomRoles[] CRoleChangeRoles =
     [
         CustomRoles.CrewmateTOHE,
-        CustomRoles.Pursuer,
         CustomRoles.Amnesiac,
         CustomRoles.Jester,
         CustomRoles.Opportunist,

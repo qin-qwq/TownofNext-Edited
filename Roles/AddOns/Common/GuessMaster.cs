@@ -1,32 +1,34 @@
 using static TOHE.Translator;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TOHE.Roles.Crewmate;
 
-internal class GuessMaster : IAddon
+internal class GuessMaster : RoleBase
 {
     //===========================SETUP================================\\
-    public CustomRoles Role => CustomRoles.GuessMaster;
+    public override CustomRoles Role => CustomRoles.GuessMaster;
     private const int Id = 26800;
     private static readonly HashSet<byte> playerIdList = [];
     public static bool HasEnabled => playerIdList.Any();
-    public AddonTypes Type => AddonTypes.Guesser;
+
+    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\
 
-    public void SetupCustomOption()
+    public override void SetupCustomOption()
     {
-        Options.SetupAdtRoleOptions(Id, CustomRoles.GuessMaster, canSetNum: true, tab: TabGroup.Addons, teamSpawnOptions: true);
+        Options.SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.GuessMaster);
     }
 
-    public void Init()
+    public override void Init()
     {
         playerIdList.Clear();
     }
-    public void Add(byte playerId,bool gameIsLoading = true)
+    public override void Add(byte playerId)
     {
         if (!playerIdList.Contains(playerId))
             playerIdList.Add(playerId);
     }
-    public void Remove(byte playerId)
+    public override void Remove(byte playerId)
     {
         playerIdList.Remove(playerId);
     }
