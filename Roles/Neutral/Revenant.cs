@@ -45,6 +45,8 @@ internal class Revenant : RoleBase
         target.RpcSetCustomRole(role);
         target.GetRoleClass()?.OnAdd(target.PlayerId);
 
+        killer.ResetKillCooldown();
+        killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
         target.ResetKillCooldown();
         target.SetKillCooldown(forceAnime: true);
 
