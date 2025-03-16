@@ -1,9 +1,8 @@
-using System;
-
 namespace TOHE.Roles.AddOns.Common;
 
 public class Susceptible : IAddon
 {
+    public CustomRoles Role => CustomRoles.Susceptible;
     private const int Id = 27100;
     public AddonTypes Type => AddonTypes.Mixed;
     private static OptionItem EnabledDeathReasons;
@@ -24,7 +23,7 @@ public class Susceptible : IAddon
     private static void ChangeRandomDeath()
     {
         PlayerState.DeathReason[] deathReasons = EnumHelper.GetAllValues<PlayerState.DeathReason>();
-        Random random = new();
+        var random = IRandom.Instance;
         int randomIndex = random.Next(deathReasons.Length);
         randomReason = deathReasons[randomIndex];
     }

@@ -1,4 +1,4 @@
-﻿using Hazel;
+using Hazel;
 using InnerNet;
 using System.Text;
 using TOHE.Roles.Core;
@@ -11,6 +11,7 @@ namespace TOHE.Roles.Impostor;
 internal class Swooper : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Swooper;
     private const int Id = 4700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swooper);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
@@ -47,7 +48,7 @@ internal class Swooper : RoleBase
     private void SendRPC(PlayerControl pc)
     {
         if (!pc.IsNonHostModdedClient()) return;
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncRoleSkill, SendOption.Reliable, pc.GetClientId());
+        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncRoleSkill, ExtendedPlayerControl.RpcSendOption, pc.GetClientId());
         writer.WriteNetObject(_Player);
         writer.Write(InvisCooldown.GetValueOrDefault(pc.PlayerId, -1).ToString());
         writer.Write(InvisDuration.GetValueOrDefault(pc.PlayerId, -1).ToString());
@@ -88,7 +89,7 @@ internal class Swooper : RoleBase
         var swooperId = swooper.PlayerId;
 
         if (!AmongUsClient.Instance.AmHost || IsInvis(swooperId)) return;
-        
+
         _ = new LateTask(() =>
         {
             if (CanGoInvis(swooperId))
@@ -101,7 +102,7 @@ internal class Swooper : RoleBase
                 InvisDuration.Remove(swooperId);
                 InvisDuration.Add(swooperId, Utils.GetTimeStamp());
                 SendRPC(swooper);
-                
+
                 swooper.Notify(GetString("SwooperInvisState"), SwooperDuration.GetFloat());
             }
             else
@@ -115,7 +116,7 @@ internal class Swooper : RoleBase
         }, 0.8f, "Swooper Vent");
     }
 
-    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime)
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
         if (lowLoad) return;
         var playerId = player.PlayerId;
@@ -212,7 +213,7 @@ internal class Swooper : RoleBase
     {
         // Only for modded
         if (seer == null || !isForHud || isForMeeting || !seer.IsAlive()) return string.Empty;
-        
+
         var str = new StringBuilder();
         var seerId = seer.PlayerId;
 

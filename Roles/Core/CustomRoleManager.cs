@@ -1,10 +1,11 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using System;
 using System.Text;
 using TOHE.Roles.AddOns;
 using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Crewmate;
 using TOHE.Roles.AddOns.Impostor;
+using TOHE.Roles.Coven;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Impostor;
 using TOHE.Roles.Neutral;
@@ -16,7 +17,20 @@ public static class CustomRoleManager
 {
     public static readonly Dictionary<CustomRoles, RoleBase> RoleClass = [];
     public static readonly Dictionary<CustomRoles, IAddon> AddonClasses = [];
-    public static RoleBase GetStaticRoleClass(this CustomRoles role) => RoleClass.TryGetValue(role, out var roleClass) & roleClass != null ? roleClass : new DefaultSetup();
+    public static RoleBase GetStaticRoleClass(this CustomRoles role)
+    {
+        var roleClass = RoleClass.FirstOrDefault(x => x.Key == role).Value;
+
+        if (!role.IsVanilla() && !role.IsAdditionRole()
+            && role is not CustomRoles.Apocalypse and not CustomRoles.Mini and not CustomRoles.NotAssigned and not CustomRoles.SpeedBooster and not CustomRoles.Killer and not CustomRoles.GM)
+        {
+            if (RoleClass.Where(x => x.Value.Role == role).Count() > 1)
+                Logger.Error($"RoleClass for {role} is not unique.", "GetStaticRoleClass");
+            if (roleClass == null)
+                Logger.Error($"RoleClass for {role} is null.", "GetStaticRoleClass");
+        }
+        return roleClass ?? new DefaultSetup();
+    }
     public static List<RoleBase> AllEnabledRoles => Main.PlayerStates.Values.Select(x => x.RoleClass).ToList(); //Since there are classes which use object attributes and playerstate is not removed.
     public static bool HasEnabled(this CustomRoles role) => role.GetStaticRoleClass().IsEnable;
 
@@ -52,6 +66,10 @@ public static class CustomRoleManager
                 roles = RoleClass.Where(r => r.Value.IsExperimental && r.Key.IsNeutralTeamV2()).Select(r => r.Value).ToList();
                 break;
 
+            case Custom_Team.Coven:
+                roles = RoleClass.Where(r => r.Value.IsExperimental && r.Key.IsCoven()).Select(r => r.Value).ToList();
+                break;
+
             default:
                 Logger.Info("Unsupported team was sent.", "GetExperimentalOptions");
                 break;
@@ -62,7 +80,7 @@ public static class CustomRoleManager
     public static RoleBase GetRoleClass(this PlayerControl player) => GetRoleClassById(player.PlayerId);
     public static RoleBase GetRoleClassById(this byte playerId) => Main.PlayerStates.TryGetValue(playerId, out var statePlayer) && statePlayer != null ? statePlayer.RoleClass : new DefaultSetup();
 
-    public static RoleBase CreateRoleClass(this CustomRoles role) 
+    public static RoleBase CreateRoleClass(this CustomRoles role)
     {
         return (RoleBase)Activator.CreateInstance(role.GetStaticRoleClass().GetType()); // Converts this.RoleBase back to its type and creates an unique one.
     }
@@ -70,7 +88,7 @@ public static class CustomRoleManager
     public static bool HasDesyncRole(this PlayerControl player) => player != null && (player.GetRoleClass().IsDesyncRole || Main.DesyncPlayerList.Contains(player.Data.PlayerId) || player.Is(CustomRoles.Killer));
 
     /// <summary>
-    /// If the role protect others players
+    /// If the role protects others players
     /// </summary>
     public static bool OnCheckMurderAsTargetOnOthers(PlayerControl killer, PlayerControl target)
     {
@@ -106,10 +124,13 @@ public static class CustomRoleManager
         }
 
         if (Grenadier.HasEnabled) Grenadier.ApplyGameOptionsForOthers(opt, player);
-        if (Dazzler.HasEnabled) Dazzler.SetDazzled(player, opt);
-        if (Deathpact.HasEnabled) Deathpact.SetDeathpactVision(player, opt);
+        if (CustomRoles.Dazzler.RoleExist()) Dazzler.SetDazzled(player, opt);
+        if (CustomRoles.Deathpact.RoleExist()) Deathpact.SetDeathpactVision(player, opt);
         if (Spiritcaller.HasEnabled) Spiritcaller.ReduceVision(opt, player);
-        if (Pitfall.HasEnabled) Pitfall.SetPitfallTrapVision(opt, player);
+        if (CustomRoles.Pitfall.RoleExist()) Pitfall.SetPitfallTrapVision(opt, player);
+        if (CustomRoles.Medusa.RoleExist()) Medusa.SetStoned(player, opt);
+        if (CustomRoles.Sacrifist.RoleExist()) Sacrifist.SetVision(player, opt);
+
 
         var playerSubRoles = player.GetCustomSubRoles();
 
@@ -155,7 +176,7 @@ public static class CustomRoleManager
     }
 
     /// <summary>
-    /// Check Murder as Killer in target
+    /// Check Murder as Killer in Target
     /// </summary>
     public static bool OnCheckMurder(ref PlayerControl killer, ref PlayerControl target, ref bool __state)
     {
@@ -175,12 +196,12 @@ public static class CustomRoleManager
         var killerRoleClass = killer.GetRoleClass();
         var killerSubRoles = killer.GetCustomSubRoles();
 
-        // If Target is possessed by Dollmaster swap controllers.
-        target = DollMaster.SwapPlayerInfo(target);   
+        // If Target is possessed by Dollmaster swap controllers
+        target = DollMaster.SwapPlayerInfo(target);
 
         Logger.Info("Start", "PlagueBearer.CheckAndInfect");
 
-        if (PlagueBearer.HasEnabled && !killer.Is(CustomRoles.PlagueBearer))
+        if (CustomRoles.PlagueBearer.RoleExist(true) && !killer.Is(CustomRoles.PlagueBearer))
         {
             PlagueBearer.CheckAndInfect(killer, target);
         }
@@ -197,7 +218,7 @@ public static class CustomRoleManager
 
         Logger.Info("Start", "OnCheckMurder.RpcCheckAndMurder");
 
-        // Check in target
+        // Check in Target
         if (killer.RpcCheckAndMurder(target, true) == false)
         {
             __state = true;
@@ -246,11 +267,11 @@ public static class CustomRoleManager
 
         Logger.Info("Start", "OnCheckMurderAsKiller");
 
-        // Check murder as killer
+        // Check murder as Killer
         if (killerRoleClass.OnCheckMurderAsKiller(killer, target) == false)
         {
             __state = true;
-            if (cancelbutkill && target.IsAlive() 
+            if (cancelbutkill && target.IsAlive()
                 && !DoubleTrigger.FirstTriggerTimer.TryGetValue(killer.PlayerId, out _)) // some roles have an internal rpcmurderplayer, but still had to cancel
             {
                 target.RpcMurderPlayer(target);
@@ -262,13 +283,13 @@ public static class CustomRoleManager
             return false;
         }
 
-        // Swap controllers if Sheriff shots Dollmasters main body.
+        // Swap controllers if Sheriff shoots Dollmasters main body
         if (DollMaster.HasEnabled && killer.Is(CustomRoles.Sheriff) && target == DollMaster.DollMasterTarget)
         {
             target = DollMaster.SwapPlayerInfo(target);
         }
 
-        // Check if killer is a true killing role and Target is possessed by Dollmaster
+        // Check if Killer is a true killing role and Target is possessed by Dollmaster
         if (DollMaster.HasEnabled && DollMaster.IsControllingPlayer)
             if (!(DollMaster.DollMasterTarget == null || DollMaster.controllingTarget == null))
                 if (target == DollMaster.DollMasterTarget || target == DollMaster.controllingTarget)
@@ -287,21 +308,21 @@ public static class CustomRoleManager
             Oiiai.OnMurderPlayer(killer, target);
             return false;
         }
-                
+
         return true;
     }
     /// <summary>
-    /// Tasks after killer murder target
+    /// Tasks after Killer murders Target
     /// </summary>
-    public static void OnMurderPlayer(PlayerControl killer, PlayerControl target, bool inMeeting)
+    public static void OnMurderPlayer(PlayerControl killer, PlayerControl target, bool inMeeting, bool fromRole)
     {
-        // ############-INFO-##############
-        // When using this code, keep in mind that killer and target can be equal (Suicide)
+        // ##################################-INFO-########################################
+        // When using this code, keep in mind that Killer and Target can be equal (Suicide)
         // And the player can also die during the Meeting
-        // ################################
+        // ################################################################################
 
-        PlayerControl trueDMKiller = killer; // Save real killer.
-        killer = DollMaster.SwapPlayerInfo(killer); // If "killer" is possessed by the Dollmaster swap each other's controllers.
+        PlayerControl trueDMKiller = killer; // Save real Killer
+        killer = DollMaster.SwapPlayerInfo(killer); // If Killer is possessed by the Dollmaster swap each other's controllers
 
         var killerRoleClass = killer.GetRoleClass();
         var targetRoleClass = target.GetRoleClass();
@@ -309,13 +330,13 @@ public static class CustomRoleManager
         var killerSubRoles = killer.GetCustomSubRoles();
         var targetSubRoles = target.GetCustomSubRoles();
 
-        // Check suicide
+        // Check Suicide
         var isSuicide = killer.PlayerId == target.PlayerId;
 
-        // target was murder by killer
+        // Target was murdered by Killer
         targetRoleClass.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
 
-        // Check target add-ons
+        // Check Target Add-ons
         if (targetSubRoles.Any())
             foreach (var subRole in targetSubRoles.ToArray())
             {
@@ -325,23 +346,23 @@ public static class CustomRoleManager
                         Cyber.AfterCyberDeadTask(target, inMeeting);
                         break;
 
-                    case CustomRoles.Bait when !inMeeting:
+                    case CustomRoles.Bait when !inMeeting && !fromRole:
                         Bait.BaitAfterDeathTasks(trueDMKiller, target); // Use trueDMKiller to any roles that needs the Dollmaster to be the killer!
                         break;
 
-                    case CustomRoles.Trapper when !inMeeting && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
+                    case CustomRoles.Trapper when !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
                         killer.TrapperKilled(target);
                         break;
 
-                    case CustomRoles.Avanger when !inMeeting && !isSuicide:
+                    case CustomRoles.Avanger when !inMeeting && !fromRole && !isSuicide:
                         Avanger.OnMurderPlayer(target);
                         break;
 
-                    case CustomRoles.Burst when killer.IsAlive() && !inMeeting && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
+                    case CustomRoles.Burst when killer.IsAlive() && !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
                         Burst.AfterBurstDeadTasks(killer, target);
                         break;
 
-                    case CustomRoles.Oiiai when !isSuicide:
+                    case CustomRoles.Oiiai when !fromRole && !isSuicide:
                         Oiiai.OnMurderPlayer(killer, target);
                         break;
 
@@ -356,10 +377,10 @@ public static class CustomRoleManager
                 }
             }
 
-        // Killer murder target
+        // Killer murder Target
         killerRoleClass.OnMurderPlayerAsKiller(killer, target, inMeeting, isSuicide);
 
-        // Check killer add-ons
+        // Check Killer Add-ons
         if (killerSubRoles.Any())
             foreach (var subRole in killerSubRoles.ToArray())
             {
@@ -384,13 +405,12 @@ public static class CustomRoleManager
             FixedUpdateInNormalGamePatch.LoversSuicide(target.PlayerId, inMeeting);
         }
     }
-    
+
     /// <summary>
-    /// Check if this task is marked by a role and do something.
+    /// Check if this task is marked by a role and do something
     /// </summary>
-    public static void OthersCompleteThisTask(PlayerControl player, PlayerTask task)
-        => AllEnabledRoles.Do(RoleClass => RoleClass.OnOthersTaskComplete(player, task)); //
-    
+    public static void OthersCompleteThisTask(PlayerControl player, PlayerTask task, bool playerIsOverridden, PlayerControl realPlayer)
+        => AllEnabledRoles.Do(RoleClass => RoleClass.OnOthersTaskComplete(player, task, playerIsOverridden, realPlayer));
 
     public static HashSet<Action<PlayerControl, PlayerControl, bool>> CheckDeadBodyOthers = [];
     /// <summary>
@@ -412,9 +432,9 @@ public static class CustomRoleManager
     /// For interfering with other roles
     /// Registered with OnFixedUpdateOthers+= at initialization
     /// </summary>
-    public static void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime)
+    public static void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        player.GetRoleClass()?.OnFixedUpdate(player, lowLoad, nowTime);
+        player.GetRoleClass()?.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
 
         if (!OnFixedUpdateOthers.Any()) return;
         //Execute other viewpoint processing if any
@@ -425,7 +445,7 @@ public static class CustomRoleManager
     }
 
     /// <summary>
-    /// When others players on entered to vent
+    /// When others players on enter Vent
     /// </summary>
     public static bool OthersCoEnterVent(PlayerPhysics physics, int ventId)
     {
@@ -434,7 +454,7 @@ public static class CustomRoleManager
 
     private static HashSet<Func<PlayerControl, PlayerControl, bool, string>> MarkOthers = [];
     /// <summary>
-    /// If seer == seen then GetMarkOthers called from FixedUpadte or MeetingHud or NotifyRoles
+    /// If Seer == seen then GetMarkOthers called from FixedUpadte or MeetingHud or NotifyRoles
     /// </summary>
     public static string GetMarkOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
@@ -448,7 +468,7 @@ public static class CustomRoleManager
 
     private static HashSet<Func<PlayerControl, PlayerControl, bool, bool, string>> LowerOthers = [];
     /// <summary>
-    /// If seer == seen then GetMarkOthers called from FixedUpadte or NotifyRoles
+    /// If Seer == seen then GetMarkOthers called from FixedUpadte or NotifyRoles
     /// </summary>
     public static string GetLowerTextOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false, bool isForHud = false)
     {
@@ -463,7 +483,7 @@ public static class CustomRoleManager
 
     private static HashSet<Func<PlayerControl, PlayerControl, bool, string>> SuffixOthers = [];
     /// <summary>
-    /// If seer == seen then GetMarkOthers called from FixedUpadte or NotifyRoles
+    /// If Seer == seen then GetMarkOthers called from FixedUpadte or NotifyRoles
     /// </summary>
     public static string GetSuffixOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
@@ -496,9 +516,9 @@ public static class CustomRoleManager
         OtherCollectionsSet = true;
     }
 
-    // ADDONS ////////////////////////////
-
-    public static void OnFixedAddonUpdate(this PlayerControl pc, bool lowload) => pc.GetCustomSubRoles().Do(x => {
+    // ADDONS //
+    public static void OnFixedAddonUpdate(this PlayerControl pc, bool lowload) => pc.GetCustomSubRoles().Do(x =>
+    {
         if (AddonClasses.TryGetValue(x, out var IAddon) && IAddon != null)
             IAddon.OnFixedUpdate(pc);
         else return;

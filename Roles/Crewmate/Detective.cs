@@ -1,7 +1,7 @@
-﻿using System.Text;
+using System.Text;
 using TOHE.Roles.Core;
-using static TOHE.Options;
 using static TOHE.MeetingHudStartPatch;
+using static TOHE.Options;
 using static TOHE.Translator;
 
 namespace TOHE.Roles.Crewmate;
@@ -9,18 +9,16 @@ namespace TOHE.Roles.Crewmate;
 internal class Detective : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Detective;
     private const int Id = 7900;
-    private static readonly HashSet<byte> playerIdList = [];
-    public static bool HasEnabled => playerIdList.Any();
-
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
 
     private static OptionItem DetectiveCanknowKiller;
 
-    private static readonly Dictionary<byte, string> DetectiveNotify = [];
-    private static readonly Dictionary<byte, string> InfoAboutDeadPlayerAndKiller = [];
+    private string Notify;
+    private readonly Dictionary<byte, string> InfoAboutDeadPlayerAndKiller = [];
 
     public override void SetupCustomOption()
     {
@@ -31,24 +29,17 @@ internal class Detective : RoleBase
 
     public override void Init()
     {
-        playerIdList.Clear();
-        DetectiveNotify.Clear();
+        Notify = string.Empty;
         InfoAboutDeadPlayerAndKiller.Clear();
     }
 
     public override void Add(byte playerId)
     {
-        playerIdList.Add(playerId);
         CustomRoleManager.CheckDeadBodyOthers.Add(GetInfoFromDeadBody);
-    }
-    public override void Remove(byte playerId)
-    {
-        playerIdList.Remove(playerId);
-        CustomRoleManager.CheckDeadBodyOthers.Remove(GetInfoFromDeadBody);
     }
     private void GetInfoFromDeadBody(PlayerControl killer, PlayerControl target, bool inMeeting)
     {
-        if ((target.IsDisconnected() && killer.PlayerId == target.PlayerId) || inMeeting) return;
+        if (!_Player.IsAlive() || inMeeting || (target.IsDisconnected() && killer.PlayerId == target.PlayerId)) return;
 
         InfoAboutDeadPlayerAndKiller[killer.PlayerId] = Utils.GetRoleName(killer.GetCustomRole());
         InfoAboutDeadPlayerAndKiller[target.PlayerId] = Utils.GetRoleName(target.GetCustomRole());
@@ -60,33 +51,46 @@ internal class Detective : RoleBase
         if (player != null && player.Is(CustomRoles.Detective) && player.PlayerId != deadBody.PlayerId)
         {
             var msg = new StringBuilder();
-            _ = InfoAboutDeadPlayerAndKiller.TryGetValue(deadBody.PlayerId, out var RoleDeadBodyInfo);
+            var RoleDeadBodyInfo = InfoAboutDeadPlayerAndKiller.GetValueOrDefault(deadBody.PlayerId);
             msg.Append(string.Format(GetString("DetectiveNoticeVictim"), deadBody.PlayerName, RoleDeadBodyInfo));
 
             if (DetectiveCanknowKiller.GetBool())
             {
                 var realKiller = deadBody.PlayerId.GetRealKillerById();
-                if (realKiller == null) msg.Append($"；\n{GetString("DetectiveNoticeKillerNotFound")}");
+
+                if (realKiller == null 
+                    || realKiller.Data == null 
+                    || deadBody.PlayerId == realKiller.Data.PlayerId)
+                    msg.Append($"；\n{GetString("DetectiveNoticeKillerNotFound")}");
+
                 else
                 {
-                    _ = InfoAboutDeadPlayerAndKiller.TryGetValue(realKiller.Data.PlayerId, out var RoleKillerInfo);
+                    var RoleKillerInfo = InfoAboutDeadPlayerAndKiller.GetValueOrDefault(realKiller.Data.PlayerId);
+                    if (string.IsNullOrEmpty(RoleKillerInfo))
+                    {
+                        RoleKillerInfo = Main.PlayerStates.TryGetValue(realKiller.Data.PlayerId, out var killerState) 
+                            ? Utils.GetRoleName(killerState.MainRole) : string.Empty;
+
+                        if (string.IsNullOrEmpty(RoleKillerInfo))
+                            Logger.Warn($"Killer role still empty - role: {killerState?.MainRole} - from translations: {Utils.GetRoleName(killerState.MainRole) ?? string.Empty}", "Detective");
+                    }
                     msg.Append($"；\n{string.Format(GetString("DetectiveNoticeKiller"), RoleKillerInfo)}");
                 }
             }
-            DetectiveNotify.Remove(player.PlayerId);
-            DetectiveNotify.Add(player.PlayerId, msg.ToString());
+            Notify = msg.ToString();
         }
         InfoAboutDeadPlayerAndKiller.Clear();
     }
 
     public override void OnMeetingHudStart(PlayerControl pc)
     {
-        if (DetectiveNotify.ContainsKey(pc.PlayerId))
-            AddMsg(DetectiveNotify[pc.PlayerId], pc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Detective), GetString("DetectiveNoticeTitle")));
+        if (!_Player.IsAlive() || _Player.PlayerId != pc.PlayerId || string.IsNullOrEmpty(Notify)) return;
+
+        AddMsg(Notify, pc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Detective), GetString("DetectiveNoticeTitle")));
     }
     public override void MeetingHudClear()
     {
-        DetectiveNotify.Clear();
+        Notify = string.Empty;
         InfoAboutDeadPlayerAndKiller.Clear();
     }
 }

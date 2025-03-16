@@ -1,7 +1,4 @@
-﻿using AmongUs.GameOptions;
-using UnityEngine;
-using System;
-using System.Text;
+using AmongUs.GameOptions;
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using static TOHE.Options;
@@ -13,10 +10,11 @@ namespace TOHE.Roles.Neutral;
 internal class Troller : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Troller;
     private const int Id = 28700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Troller);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
     //==================================================================\\
 
     private static OptionItem TrollsPerRound;
@@ -25,6 +23,7 @@ internal class Troller : RoleBase
     private SystemTypes CurrentActiveSabotage = SystemTypes.Hallway;
     private List<Events> AllEvents = [];
 
+    [Obfuscation(Exclude = true)]
     enum Events
     {
         LowSpeed,
@@ -76,9 +75,9 @@ internal class Troller : RoleBase
     }
     public override void Remove(byte playerId)
     {
-        AbilityLimit = 0;
+        playerId.SetAbilityUseLimit(0);
     }
-    private void ResetAbility() => AbilityLimit = TrollsPerRound.GetInt();
+    private void ResetAbility() => _state.PlayerId.SetAbilityUseLimit(TrollsPerRound.GetInt());
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => !ForRecompute;
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -89,9 +88,9 @@ internal class Troller : RoleBase
     public override void AfterMeetingTasks() => ResetAbility();
     public override bool OnTaskComplete(PlayerControl troller, int completedTaskCount, int totalTaskCount)
     {
-        if (!troller.IsAlive() || AbilityLimit <= 0) return true;
+        if (!troller.IsAlive() || troller.GetAbilityUseLimit() <= 0) return true;
 
-        AbilityLimit--;
+        troller.RpcRemoveAbilityUse();
 
         if (IsActive(SystemTypes.MushroomMixupSabotage) || IsActive(SystemTypes.Electrical))
         {
@@ -300,17 +299,5 @@ internal class Troller : RoleBase
         {
             CurrentActiveSabotage = systemType;
         }
-    }
-    public override string GetProgressText(byte playerId, bool comms)
-    {
-        var ProgressText = new StringBuilder();
-        var taskState8 = Main.PlayerStates?[playerId].TaskState;
-        Color TextColor8;
-        var NonCompleteColor8 = Color.white;
-        TextColor8 = comms ? Color.gray : NonCompleteColor8;
-        string Completed8 = comms ? "?" : $"{taskState8.CompletedTasksCount}";
-        ProgressText.Append(ColorString(TextColor8, $"({Completed8}/{taskState8.AllTasksCount}) "));
-        ProgressText.Append(ColorString((AbilityLimit > 0) ? GetRoleColor(CustomRoles.Troller).ShadeColor(0.25f) : Color.gray, $" <color=#ffffff>-</color> {Math.Round(AbilityLimit, 1)}"));
-        return ProgressText.ToString();
     }
 }

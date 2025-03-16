@@ -42,7 +42,7 @@ class PingTrackerUpdatePatch
             else if (ping < 100) pingcolor = "#7bc690";
             else if (ping < 200) pingcolor = "#f3920e";
             else if (ping < 400) pingcolor = "#ff146e";
-            sb.Append($"\r\n<color={pingcolor}>Ping: {ping} ms</color>\r\n<color=#a54aff>Server: <color=#f34c50>{Utils.GetRegionName()}</color>");
+            sb.Append($"\r\n<color={pingcolor}>Ping: {ping} ms</color>\r\n<color=#a54aff>服务器： <color=#f34c50>{Utils.GetRegionName()}</color>");
 
             if (!GameStates.IsModHost)
             {
@@ -76,7 +76,6 @@ class PingTrackerUpdatePatch
 
             __instance.aspectPosition.DistanceFromEdge = GetPingPosition();
             __instance.text.text = sb.ToString();
-
             return false;
         }
         catch
@@ -158,9 +157,9 @@ class VersionShowerStartPatch
 #endif
 
 #if DEBUG
-            Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
-            Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
-            buildtype = "Debug";
+        Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
+        Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
+        buildtype = "Debug";
 #endif
         Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TOHE version");
 
@@ -213,7 +212,6 @@ class ModManagerLateUpdatePatch
         __instance.ShowModStamp();
 
         LateTask.Update(Time.deltaTime);
-        CheckMurderPatch.Update();
     }
     public static void Postfix(ModManager __instance)
     {

@@ -1,8 +1,9 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using Hazel;
 using System;
 using System.Runtime.CompilerServices;
 using TOHE.Modules;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core;
 
 namespace TOHE;
@@ -10,7 +11,7 @@ namespace TOHE;
 public static class AntiBlackout
 {
     ///<summary>
-    /// Check num alive Impostors & Crewmates & NeutralKillers
+    /// Check num alive Impostors & Crewmates & NeutralKillers & Coven
     ///</summary>
     public static bool BlackOutIsActive => false; /*!Options.DisableAntiBlackoutProtects.GetBool() && CheckBlackOut();*/
 
@@ -26,6 +27,7 @@ public static class AntiBlackout
         HashSet<byte> Impostors = [];
         HashSet<byte> Crewmates = [];
         HashSet<byte> NeutralKillers = [];
+        HashSet<byte> Coven = [];
 
         var lastExiled = ExileControllerWrapUpPatch.AntiBlackout_LastExiled;
         foreach (var pc in Main.AllAlivePlayerControls)
@@ -34,12 +36,16 @@ public static class AntiBlackout
             if (lastExiled != null && pc.PlayerId == lastExiled.PlayerId) continue;
 
             // Impostors
-            if (pc.Is(Custom_Team.Impostor))
+            if (pc.Is(Custom_Team.Impostor) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
                 Impostors.Add(pc.PlayerId);
 
             // Only Neutral killers
-            else if (pc.IsNeutralKiller() || pc.IsNeutralApocalypse()) 
+            else if ((pc.IsNeutralKiller() || pc.IsNeutralApocalypse()) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
                 NeutralKillers.Add(pc.PlayerId);
+
+            //Coven
+            if (pc.Is(Custom_Team.Coven) || Main.PlayerStates[pc.PlayerId].IsNecromancer)
+                Coven.Add(pc.PlayerId);
 
             // Crewmate
             else Crewmates.Add(pc.PlayerId);
@@ -48,10 +54,12 @@ public static class AntiBlackout
         var numAliveImpostors = Impostors.Count;
         var numAliveCrewmates = Crewmates.Count;
         var numAliveNeutralKillers = NeutralKillers.Count;
+        var numAliveCoven = Coven.Count;
 
         Logger.Info($" {numAliveImpostors}", "AntiBlackout Num Alive Impostors");
         Logger.Info($" {numAliveCrewmates}", "AntiBlackout Num Alive Crewmates");
         Logger.Info($" {numAliveNeutralKillers}", "AntiBlackout Num Alive Neutral Killers");
+        Logger.Info($" {numAliveCoven}", "AntiBlackout Num Alive Coven");
 
         var BlackOutIsActive = false;
 
@@ -61,11 +69,19 @@ public static class AntiBlackout
 
         // Alive Impostors > or = others team count
         if (!BlackOutIsActive)
-            BlackOutIsActive = (numAliveNeutralKillers + numAliveCrewmates) <= numAliveImpostors;
+            BlackOutIsActive = (numAliveNeutralKillers + numAliveCrewmates + numAliveCoven) <= numAliveImpostors;
 
         // One Impostor and one Neutral Killer is alive, and living Crewmates very few
         if (!BlackOutIsActive)
             BlackOutIsActive = numAliveNeutralKillers == 1 && numAliveImpostors == 1 && numAliveCrewmates <= 2;
+
+        // One Neutral Killer and one Coven is alive, and living Crewmates very few
+        if (!BlackOutIsActive)
+            BlackOutIsActive = numAliveNeutralKillers == 1 && numAliveCoven == 1 && numAliveCrewmates <= 2;
+
+        // One Coven and one Impostor is alive, and living Crewmates very few
+        if (!BlackOutIsActive)
+            BlackOutIsActive = numAliveCoven == 1 && numAliveImpostors == 1 && numAliveCrewmates <= 2;
 
         Logger.Info($" {BlackOutIsActive}", "BlackOut Is Active");
         return BlackOutIsActive;
@@ -100,17 +116,43 @@ public static class AntiBlackout
         if (CustomWinnerHolder.WinnerTeam != CustomWinner.Default) return;
 
         PlayerControl dummyImp = Main.AllAlivePlayerControls.FirstOrDefault(x => x.PlayerId != ExilePlayerId);
-        if (dummyImp == null) return;
 
-        foreach (var seer in Main.AllPlayerControls)
+        if (dummyImp == null)
         {
-            if (seer.IsModded()) continue;
-            foreach (var target in Main.AllPlayerControls)
-            {
-                RoleTypes targetRoleType = target.PlayerId == dummyImp.PlayerId ? RoleTypes.Impostor : RoleTypes.Crewmate;
+            Logger.Warn("Cant find a alive dummy Imp, AntiBlackout may break?", "AntiBlackout.RevivePlayersAndSetDummyImp");
+            Logger.SendInGame("Cant find a alive dummy Imp, AntiBlackout may break?");
+            return;
+        }
 
-                target.RpcSetRoleDesync(targetRoleType, seer.GetClientId());
-            }
+        switch (Options.CurrentGameMode)
+        {
+            case CustomGameMode.Standard:
+                foreach (var seer in Main.AllPlayerControls)
+                {
+                    if (seer.IsModded()) continue;
+                    var seerIsAliveAndHasKillButton = seer.HasImpKillButton() && seer.IsAlive();
+                    foreach (var target in Main.AllPlayerControls)
+                    {
+                        if (seer.PlayerId == target.PlayerId && seerIsAliveAndHasKillButton) continue;
+
+                        RoleTypes targetRoleType = !seerIsAliveAndHasKillButton && target.PlayerId == dummyImp.PlayerId
+                            ? RoleTypes.Impostor : RoleTypes.Crewmate;
+
+                        target.RpcSetRoleDesync(targetRoleType, seer.GetClientId());
+                    }
+                }
+                break;
+
+            case CustomGameMode.SpeedRun:
+                foreach (var seer in Main.AllPlayerControls)
+                {
+                    if (seer.IsModded()) continue;
+                    seer.RpcSetRoleDesync(RoleTypes.Impostor, seer.GetClientId());
+                }
+                break;
+
+            case CustomGameMode.FFA:
+                break;
         }
     }
     public static void RestoreIsDead(bool doSend = true, [CallerMemberName] string callerMethodName = "")
@@ -127,7 +169,25 @@ public static class AntiBlackout
         }
         isDeadCache.Clear();
         IsCached = false;
-        if (doSend) SendGameData();
+        if (doSend)
+        {
+            SendGameData();
+            _ = new LateTask(RestoreIsDeadByExile, 0.3f, "AntiBlackOut_RestoreIsDeadByExile");
+        }
+    }
+
+    private static void RestoreIsDeadByExile()
+    {
+        var sender = CustomRpcSender.Create("AntiBlackout RestoreIsDeadByExile", SendOption.Reliable);
+        foreach (var player in Main.AllPlayerControls)
+        {
+            if (player.Data.IsDead && !player.Data.Disconnected)
+            {
+                sender.AutoStartRpc(player.NetId, (byte)RpcCalls.Exiled);
+                sender.EndRpc();
+            }
+        }
+        sender.SendMessage();
     }
 
     public static void SendGameData([CallerMemberName] string callerMethodName = "")
@@ -194,7 +254,7 @@ public static class AntiBlackout
     {
         var timeNotify = 0f;
 
-        if (CheckForEndVotingPatch.TempExileMsg != null && BlackOutIsActive)
+        if (BlackOutIsActive && CheckForEndVotingPatch.TempExileMsg != null)
         {
             timeNotify = 4f;
             foreach (var pc in Main.AllPlayerControls.Where(p => !p.IsModded()).ToArray())
@@ -222,63 +282,89 @@ public static class AntiBlackout
     {
         if (CustomWinnerHolder.WinnerTeam != CustomWinner.Default) return;
 
-        foreach (var ((seerId, targetId), (roletype, _)) in RpcSetRoleReplacer.RoleMap)
+        switch (Options.CurrentGameMode)
         {
-            // skip host
-            if (seerId == 0) continue;
-            
-            var seer = seerId.GetPlayer();
-            var target = targetId.GetPlayer();
-
-            if (seer == null || target == null) continue;
-            if (seer.IsModded()) continue;
-
-            var isSelf = seerId == targetId;
-            var changedRoleType = roletype;
-            if (target.Data.IsDead)
-            {
-                if (isSelf)
+            case CustomGameMode.Standard:
+                foreach (var ((seerId, targetId), (roletype, _)) in RpcSetRoleReplacer.RoleMap)
                 {
-                    target.RpcExile();
+                    // skip host
+                    if (seerId == PlayerControl.LocalPlayer.PlayerId) continue;
 
-                    if (target.HasGhostRole()) changedRoleType = RoleTypes.GuardianAngel;
-                    else if (target.Is(Custom_Team.Impostor) || target.HasDesyncRole()) changedRoleType = RoleTypes.ImpostorGhost;
-                    else changedRoleType = RoleTypes.CrewmateGhost;
+                    var seer = seerId.GetPlayer();
+                    var target = targetId.GetPlayer();
+
+                    if (seer == null || target == null) continue;
+                    if (seer.IsModded()) continue;
+
+                    var isSelf = seerId == targetId;
+                    var isDead = target.Data.IsDead;
+                    var changedRoleType = roletype;
+                    if (isDead)
+                    {
+                        if (isSelf)
+                        {
+                            target.RpcExile();
+
+                            if (target.HasGhostRole()) changedRoleType = RoleTypes.GuardianAngel;
+                            else if (target.Is(Custom_Team.Impostor) || target.HasDesyncRole()) changedRoleType = RoleTypes.ImpostorGhost;
+                            else changedRoleType = RoleTypes.CrewmateGhost;
+                        }
+                        else
+                        {
+                            var seerIsKiller = seer.Is(Custom_Team.Impostor) || seer.HasDesyncRole();
+                            if (!seerIsKiller && target.Is(Custom_Team.Impostor)) changedRoleType = RoleTypes.ImpostorGhost;
+                            else changedRoleType = RoleTypes.CrewmateGhost;
+                        }
+                    }
+
+                    if (!isDead && isSelf && seer.HasImpKillButton()) continue;
+
+                    target.RpcSetRoleDesync(changedRoleType, seer.GetClientId());
                 }
-                else
+                break;
+
+            case CustomGameMode.SpeedRun:
+                foreach (var player in Main.AllPlayerControls)
                 {
-                    var seerIsKiller = seer.Is(Custom_Team.Impostor) || seer.HasDesyncRole();
-                    if (!seerIsKiller && target.Is(Custom_Team.Impostor)) changedRoleType = RoleTypes.ImpostorGhost;
-                    else changedRoleType = RoleTypes.CrewmateGhost;
+                    player.RpcSetRoleDesync(RoleTypes.Crewmate, player.GetClientId());
                 }
-            }
+                break;
 
-            target.RpcSetRoleDesync(changedRoleType, seer.GetClientId());
+            case CustomGameMode.FFA:
+                foreach (var player in Main.AllPlayerControls)
+                {
+                    if (player.Is(CustomRoles.GM))
+                    {
+                        if (!player.IsModded())
+                        {
+                            _ = new LateTask(() =>
+                            {
+                                player.ReactorFlash();
+                                player.RpcSpecificMurderPlayer(player, player);
+                            }, 0.6f, "AntiBlackout Murder Task");
+                        }
+                    }
+                }
+                break;
         }
+
+        ResetAllCooldown();
     }
     private static void ResetAllCooldown()
     {
         foreach (var seer in Main.AllPlayerControls)
         {
-            if (seer.IsAlive())
-            {
-                seer.RpcResetAbilityCooldown();
-                seer.ResetKillCooldown();
-
-                if (Main.AllPlayerKillCooldown.TryGetValue(seer.PlayerId, out var kcd) && kcd >= 2f)
-                    seer.SetKillCooldown(kcd - 2f);
-            }
-            else if (seer.HasGhostRole())
-            {
-                seer.RpcResetAbilityCooldown();
-            }
+            seer.RpcResetAbilityCooldown();
         }
     }
     public static void ResetAfterMeeting()
     {
-        SkipTasks = false;
-        ExilePlayerId = -1;
-        ResetAllCooldown();
+        // add 1 second delay
+        _ = new LateTask(() =>
+        {
+            SkipTasks = false;
+            ExilePlayerId = -1;
+        }, 1f, "Reset Blackout");
     }
     public static void Reset()
     {

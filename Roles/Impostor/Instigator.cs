@@ -1,14 +1,13 @@
-﻿using static TOHE.Options;
+using TOHE.Modules;
+using static TOHE.Options;
 
 namespace TOHE.Roles.Impostor;
 
 internal class Instigator : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Instigator;
     private const int Id = 1700;
-    private static readonly HashSet<byte> playerIdList = [];
-    public static bool HasEnabled => playerIdList.Any();
-    
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
@@ -16,8 +15,6 @@ internal class Instigator : RoleBase
     private static OptionItem KillCooldown;
     private static OptionItem AbilityLimitt;
     private static OptionItem KillsPerAbilityUse;
-
-    private static readonly IRandom rd = IRandom.Instance;
 
     public override void SetupCustomOption()
     {
@@ -29,14 +26,9 @@ internal class Instigator : RoleBase
         KillsPerAbilityUse = IntegerOptionItem.Create(Id + 12, "InstigatorKillsPerAbilityUse", new(1, 15, 1), 1, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Instigator])
             .SetValueFormat(OptionFormat.Times);
     }
-    public override void Init()
-    {
-        playerIdList.Clear();
-    }
     public override void Add(byte playerId)
     {
-        playerIdList.Add(playerId);
-        AbilityLimit = AbilityLimitt.GetInt();
+        playerId.SetAbilityUseLimit(AbilityLimitt.GetInt());
     }
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
@@ -45,7 +37,7 @@ internal class Instigator : RoleBase
     {
         if (exiled == null || !exiled.GetCustomRole().IsCrewmate()) return;
 
-        if (AbilityLimit <= 0) return;
+        if (instigator.GetAbilityUseLimit() <= 0) return;
 
         var killer = _Player;
         if (!killer.IsAlive()) return;
@@ -55,7 +47,7 @@ internal class Instigator : RoleBase
         foreach (var playerVote in votedForExiled)
         {
             var crewPlayer = Main.AllPlayerControls.FirstOrDefault(a => a.PlayerId == playerVote.TargetPlayerId);
-            if (crewPlayer == null || !crewPlayer.GetCustomRole().IsCrewmate()) return;
+            if (crewPlayer == null || !crewPlayer.GetCustomRole().IsCrewmate() || crewPlayer.IsAnySubRole(x => !x.IsCrewmateTeamV2()) || !crewPlayer.IsAlive()) continue;
             killPotentials.Add(crewPlayer);
         }
 
@@ -75,7 +67,6 @@ internal class Instigator : RoleBase
 
         CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Retribution, [.. killPlayers]);
 
-        AbilityLimit--;
-        SendSkillRPC();
+        instigator.RpcRemoveAbilityUse();
     }
 }

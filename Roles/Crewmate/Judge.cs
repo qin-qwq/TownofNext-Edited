@@ -1,23 +1,21 @@
-﻿using Hazel;
+using Hazel;
 using System;
 using System.Text.RegularExpressions;
+using TOHE.Modules;
 using TOHE.Modules.ChatManager;
+using TOHE.Roles.Coven;
 using TOHE.Roles.Double;
 using UnityEngine;
-using static TOHE.Utils;
 using static TOHE.Translator;
-using TOHE.Roles.Core;
-using System.Text;
+using static TOHE.Utils;
 
 namespace TOHE.Roles.Crewmate;
 
 internal class Judge : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Judge;
     private const int Id = 10700;
-    private static readonly HashSet<byte> playerIdList = [];
-    public static bool HasEnabled => playerIdList.Any();
-    
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\
@@ -30,14 +28,17 @@ internal class Judge : RoleBase
     private static OptionItem CanTrialSidekick;
     private static OptionItem CanTrialInfected;
     private static OptionItem CanTrialContagious;
+    private static OptionItem CanTrialEnchanted;
     private static OptionItem CanTrialCrewKilling;
     private static OptionItem CanTrialNeutralB;
     private static OptionItem CanTrialNeutralK;
     private static OptionItem CanTrialNeutralE;
     private static OptionItem CanTrialNeutralC;
     private static OptionItem CanTrialNeutralA;
+    private static OptionItem CanTrialCoven;
 
     private static readonly Dictionary<byte, int> TrialLimitMeeting = [];
+    private static readonly Dictionary<byte, int> TrialLimitGame = [];
 
     public override void SetupCustomOption()
     {
@@ -51,39 +52,54 @@ internal class Judge : RoleBase
         CanTrialSidekick = BooleanOptionItem.Create(Id + 19, "JudgeCanTrialSidekick", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialInfected = BooleanOptionItem.Create(Id + 20, "JudgeCanTrialInfected", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialContagious = BooleanOptionItem.Create(Id + 21, "JudgeCanTrialContagious", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
+        CanTrialEnchanted = BooleanOptionItem.Create(Id + 24, "JudgeCanTrialEnchanted", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialCrewKilling = BooleanOptionItem.Create(Id + 13, "JudgeCanTrialnCrewKilling", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialNeutralB = BooleanOptionItem.Create(Id + 14, "JudgeCanTrialNeutralB", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialNeutralE = BooleanOptionItem.Create(Id + 17, "JudgeCanTrialNeutralE", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialNeutralC = BooleanOptionItem.Create(Id + 18, "JudgeCanTrialNeutralC", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialNeutralK = BooleanOptionItem.Create(Id + 15, "JudgeCanTrialNeutralK", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialNeutralA = BooleanOptionItem.Create(Id + 22, "JudgeCanTrialNeutralA", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
+        CanTrialCoven = BooleanOptionItem.Create(Id + 23, "JudgeCanTrialCoven", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         TryHideMsg = BooleanOptionItem.Create(Id + 11, "JudgeTryHideMsg", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge])
             .SetColor(Color.green);
     }
     public override void Init()
     {
-        playerIdList.Clear();
         TrialLimitMeeting.Clear();
+        TrialLimitGame.Clear();
     }
     public override void Add(byte playerId)
     {
-        playerIdList.Add(playerId);
         TrialLimitMeeting[playerId] = TrialLimitPerMeeting.GetInt();
-        AbilityLimit = TrialLimitPerGame.GetInt();
+        TrialLimitGame[playerId] = TrialLimitPerGame.GetInt();
+        playerId.SetAbilityUseLimit(TrialLimitPerGame.GetInt());
     }
     public override void Remove(byte playerId)
     {
-        playerIdList.Remove(playerId);
         TrialLimitMeeting.Remove(playerId);
+        TrialLimitGame.Remove(playerId);
     }
     public override void OnReportDeadBody(PlayerControl party, NetworkedPlayerInfo dinosaur)
     {
-        foreach (var pid in TrialLimitMeeting.Keys)
+        if (!_Player) return;
+
+        TrialLimitMeeting[_Player.PlayerId] = TrialLimitPerMeeting.GetInt();
+
+        if (TrialLimitGame[_Player.PlayerId] <= TrialLimitPerMeeting.GetInt())
         {
-            TrialLimitMeeting[pid] = TrialLimitPerMeeting.GetInt();
+            _Player.SetAbilityUseLimit(TrialLimitGame[_Player.PlayerId]);
+        }
+        else
+        {
+            _Player.SetAbilityUseLimit(TrialLimitPerMeeting.GetInt());
         }
     }
-    public bool TrialMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override void AfterMeetingTasks()
+    {
+        if (!_Player) return;
+        _Player.SetAbilityUseLimit(TrialLimitGame[_Player.PlayerId]);
+    }
+    public static bool TrialMsg(PlayerControl pc, string msg, bool isUI = false)
     {
         var originMsg = msg;
 
@@ -111,7 +127,7 @@ internal class Judge : RoleBase
         else if (operate == 2)
         {
 
-            if (TryHideMsg.GetBool()) 
+            if (TryHideMsg.GetBool())
             {
                 //if (Options.NewHideMsg.GetBool()) ChatManager.SendPreviousMessagesToAll();
                 //else GuessManager.TryHideMsg();
@@ -135,9 +151,14 @@ internal class Judge : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("JudgeTrialMaxMeetingMsg"));
                     return true;
                 }
-                if (AbilityLimit < 1)
+                if (pc.GetAbilityUseLimit() < 1)
                 {
                     pc.ShowInfoMessage(isUI, GetString("JudgeTrialMaxGameMsg"));
+                }
+                if (target.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target.PlayerId].Count > 0)
+                {
+                    target = GetPlayerById(VoodooMaster.Dolls[target.PlayerId].Where(x => GetPlayerById(x).IsAlive()).ToList().RandomElement());
+                    SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
                 }
                 if (Jailer.IsTarget(target.PlayerId))
                 {
@@ -189,12 +210,14 @@ internal class Judge : RoleBase
                 else if (target.Is(CustomRoles.Infected) && CanTrialInfected.GetBool()) judgeSuicide = false;
                 else if (target.Is(CustomRoles.Contagious) && CanTrialContagious.GetBool()) judgeSuicide = false;
                 else if (target.Is(CustomRoles.Charmed) && CanTrialCharmed.GetBool()) judgeSuicide = false;
+                else if (target.Is(CustomRoles.Enchanted) && CanTrialEnchanted.GetBool()) judgeSuicide = false;
                 else if (target.GetCustomRole().IsCrewKiller() && CanTrialCrewKilling.GetBool()) judgeSuicide = false;
                 else if (target.GetCustomRole().IsNK() && CanTrialNeutralK.GetBool()) judgeSuicide = false;
                 else if (target.GetCustomRole().IsNB() && CanTrialNeutralB.GetBool()) judgeSuicide = false;
                 else if (target.GetCustomRole().IsNE() && CanTrialNeutralE.GetBool()) judgeSuicide = false;
                 else if (target.GetCustomRole().IsNC() && CanTrialNeutralC.GetBool()) judgeSuicide = false;
                 else if (target.GetCustomRole().IsNA() && CanTrialNeutralA.GetBool()) judgeSuicide = false;
+                else if (target.GetCustomRole().IsCoven() && CanTrialCoven.GetBool()) judgeSuicide = false;
                 else if (target.GetCustomRole().IsImpostor()) judgeSuicide = false;
                 else
                 {
@@ -209,8 +232,8 @@ internal class Judge : RoleBase
                 string Name = dp.GetRealName();
 
                 TrialLimitMeeting[pc.PlayerId]--;
-                AbilityLimit--;
-                SendSkillRPC();
+                TrialLimitGame[pc.PlayerId]--;
+                pc.RpcRemoveAbilityUse();
 
                 if (!GameStates.IsProceeding)
                     _ = new LateTask(() =>
@@ -293,10 +316,7 @@ internal class Judge : RoleBase
     {
         byte targetId = reader.ReadByte();
 
-        if (pc.GetRoleClass() is Judge judge)
-        {
-            judge.TrialMsg(pc, $"/tl {targetId}", true);
-        }
+        TrialMsg(pc, $"/tl {targetId}", true);
     }
 
     private static void JudgeOnClick(byte targetId /*, MeetingHud __instance*/)
@@ -304,7 +324,7 @@ internal class Judge : RoleBase
         Logger.Msg($"Click: ID {targetId}", "Judge UI");
         var target = targetId.GetPlayer();
         if (target == null || !target.IsAlive() || !GameStates.IsVoting) return;
-        if (AmongUsClient.Instance.AmHost && PlayerControl.LocalPlayer.GetRoleClass() is Judge judge) judge.TrialMsg(PlayerControl.LocalPlayer, $"/tl {targetId}", true);
+        if (AmongUsClient.Instance.AmHost) TrialMsg(PlayerControl.LocalPlayer, $"/tl {targetId}", true);
         else SendRPC(targetId);
     }
 
@@ -312,20 +332,7 @@ internal class Judge : RoleBase
         => IsForMeeting && seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Judge), target.PlayerId.ToString()) + " " + TargetPlayerName : "";
     public override string PVANameText(PlayerVoteArea pva, PlayerControl seer, PlayerControl target)
         => seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Judge), target.PlayerId.ToString()) + " " + pva.NameText.text : "";
-    public override string GetProgressText(byte playerId, bool comms)
-    {
-        var ProgressText = new StringBuilder();
-        var taskState8 = Main.PlayerStates?[playerId].TaskState;
-        Color TextColor8;
-        var TaskCompleteColor16 = Color.green;
-        var NonCompleteColor16 = Color.yellow;
-        var NormalColor8 = taskState8.IsTaskFinished ? TaskCompleteColor16 : NonCompleteColor16;
-        TextColor8 = comms ? Color.gray : NormalColor8;
-        string Completed8 = comms ? "?" : $"{taskState8.CompletedTasksCount}";
-        ProgressText.Append(ColorString(TextColor8, $"({Completed8}/{taskState8.AllTasksCount})" + " "));
-        ProgressText.Append(ColorString((AbilityLimit > 0) ? GetRoleColor(CustomRoles.Judge).ShadeColor(0.25f) : Color.gray, $"({AbilityLimit})" ?? "Invalid"));
-        return ProgressText.ToString();
-    }
+
     [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
     class StartMeetingPatch
     {

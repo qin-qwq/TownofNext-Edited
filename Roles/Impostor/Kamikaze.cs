@@ -1,6 +1,8 @@
-﻿using TOHE.Roles.Core;
+using Hazel;
+using InnerNet;
+using TOHE.Modules;
+using TOHE.Roles.Core;
 using TOHE.Roles.Double;
-using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 
@@ -9,6 +11,7 @@ namespace TOHE.Roles.Impostor;
 internal class Kamikaze : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Kamikaze;
     private const int Id = 26900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Kamikaze);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
@@ -17,6 +20,7 @@ internal class Kamikaze : RoleBase
 
     private static OptionItem KillCooldown;
     private static OptionItem OptMaxMarked;
+    private static OptionItem CanKillTNA;
 
     private readonly HashSet<byte> KamikazedList = [];
 
@@ -25,21 +29,21 @@ internal class Kamikaze : RoleBase
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Kamikaze);
         KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Kamikaze])
             .SetValueFormat(OptionFormat.Seconds);
-        OptMaxMarked = IntegerOptionItem.Create(Id + 11, "KamikazeMaxMarked", new(1, 14, 1), 14, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Kamikaze])
-           .SetValueFormat(OptionFormat.Times);
-
+        OptMaxMarked = IntegerOptionItem.Create(Id + 11, "KamikazeMaxMarked", new(1, 14, 1), 14, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Kamikaze])
+            .SetValueFormat(OptionFormat.Times);
+        CanKillTNA = BooleanOptionItem.Create(Id + 12, "CanKillTNA", false, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Kamikaze]);
     }
     public override void Add(byte playerId)
     {
-        AbilityLimit = OptMaxMarked.GetInt();
+        playerId.SetAbilityUseLimit(OptMaxMarked.GetInt());
 
         // Double Trigger
         var pc = Utils.GetPlayerById(playerId);
         pc.AddDoubleTrigger();
     }
-    
+
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
-    
+
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
         => KamikazedList.Contains(seen.PlayerId) ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Kamikaze), "∇") : string.Empty;
 
@@ -47,28 +51,26 @@ internal class Kamikaze : RoleBase
     {
         if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
         {
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Kamikaze), GetString("KamikazeHostage"))); 
+            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Kamikaze), GetString("KamikazeHostage")));
             return false;
         }
 
         return killer.CheckDoubleTrigger(target, () =>
         {
-
-            if (AbilityLimit >= 1 && !KamikazedList.Contains(target.PlayerId)) 
+            if (killer.GetAbilityUseLimit() >= 1 && !KamikazedList.Contains(target.PlayerId))
             {
                 KamikazedList.Add(target.PlayerId);
                 killer.RpcGuardAndKill(killer);
                 killer.SetKillCooldown(KillCooldown.GetFloat());
                 Utils.NotifyRoles(SpecifySeer: killer);
-                AbilityLimit--;
-                SendSkillRPC();
-            } 
+                killer.RpcRemoveAbilityUse();
+            }
             else
             {
                 killer.RpcMurderPlayer(target);
             }
         });
-        
+
     }
 
     public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
@@ -79,6 +81,7 @@ internal class Kamikaze : RoleBase
         {
             var pc = Utils.GetPlayerById(BABUSHKA);
             if (!pc.IsAlive()) continue;
+            if (pc.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool()) continue;
 
             pc.SetDeathReason(PlayerState.DeathReason.Targeted);
             if (!inMeeting)
@@ -94,9 +97,53 @@ internal class Kamikaze : RoleBase
             pc.SetRealKiller(_Player);
         }
         KamikazedList.Clear();
+        SendRPC();
     }
 
-    public override string GetProgressText(byte playerId, bool comms)
-        => Utils.ColorString(AbilityLimit >= 1 ? Utils.GetRoleColor(CustomRoles.Kamikaze).ShadeColor(0.25f) : Color.gray, $"({AbilityLimit})");
+    public override void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
+    {
+        if (_Player == null || !exileIds.Contains(_Player.PlayerId)) return;
+        var deathList = new List<byte>();
+        var death = _Player;
+        foreach (var pc in Main.AllAlivePlayerControls)
+        {
+            if (KamikazedList.Contains(pc.PlayerId))
+            {
+                if (!Main.AfterMeetingDeathPlayers.ContainsKey(pc.PlayerId))
+                {
+                    pc.SetRealKiller(death);
+                    deathList.Add(pc.PlayerId);
+                }
+            }
+        }
+        KamikazedList.Clear();
+        SendRPC();
+        CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Targeted, [.. deathList]);
+    }
+
+    private void SendRPC()
+    {
+        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncRoleSkill, SendOption.Reliable);
+        writer.WriteNetObject(_Player);
+        writer.WritePacked(KamikazedList.Count);
+        foreach (var playerId in KamikazedList)
+        {
+            writer.Write(playerId);
+        }
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
+    }
+
+    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
+    {
+        var count = reader.ReadPackedInt32();
+        KamikazedList.Clear();
+        if (count > 0)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                KamikazedList.Add(reader.ReadByte());
+            }
+        }
+    }
 }
 

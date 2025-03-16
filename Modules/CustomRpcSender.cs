@@ -35,7 +35,6 @@ public class CustomRpcSender
     public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe)
     {
         stream = MessageWriter.Get(sendOption);
-
         this.name = name;
         this.sendOption = sendOption;
         this.isUnsafe = isUnsafe;
@@ -183,6 +182,8 @@ public class CustomRpcSender
         stream.Recycle();
     }
 
+    public int Length => stream.Length;
+
     // Write
     #region PublicWriteMethods
     public CustomRpcSender Write(float val) => Write(w => w.Write(val));
@@ -218,7 +219,7 @@ public class CustomRpcSender
 
         return this;
     }
-
+    [Obfuscation(Exclude = true)]
     public enum State
     {
         BeforeInit = 0, //初期化前 何もできない

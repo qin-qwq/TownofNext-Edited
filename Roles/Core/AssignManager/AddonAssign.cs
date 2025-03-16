@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using TOHE.Roles.AddOns.Impostor;
 
 namespace TOHE.Roles.Core.AssignManager;
@@ -17,7 +17,7 @@ public static class AddonAssign
                 return true;
             case CustomRoles.Autopsy when Options.EveryoneCanSeeDeathReason.GetBool():
             case CustomRoles.Madmate when Madmate.MadmateSpawnMode.GetInt() != 0:
-            case CustomRoles.Glow or CustomRoles.Mare when GameStates.FungleIsActive:
+            case CustomRoles.Glow or CustomRoles.Mare or CustomRoles.Torch when GameStates.FungleIsActive:
                 return true;
         }
 
@@ -31,7 +31,7 @@ public static class AddonAssign
 
     public static void StartSelect()
     {
-        if (Options.CurrentGameMode == CustomGameMode.FFA) return;
+        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
 
         AddonRolesList.Clear();
         foreach (var cr in CustomRolesHelper.AllRoles)
@@ -46,7 +46,7 @@ public static class AddonAssign
     }
     public static void StartSortAndAssign()
     {
-        if (Options.CurrentGameMode == CustomGameMode.FFA) return;
+        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
 
         var rd = IRandom.Instance;
         List<CustomRoles> addonsList = [];

@@ -12,9 +12,8 @@ namespace TOHE.Roles.Neutral;
 internal class Follower : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Follower;
     private const int Id = 12800;
-    private static readonly HashSet<byte> playerIdList = [];
-    public static bool HasEnabled => playerIdList.Any();
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
@@ -27,7 +26,6 @@ internal class Follower : RoleBase
     private static OptionItem KnowTargetRole;
     private static OptionItem BetTargetKnowFollower;
 
-    private static readonly Dictionary<byte, int> BetTimes = [];
     public static readonly Dictionary<byte, byte> BetPlayer = [];
 
     public override void SetupCustomOption()
@@ -46,41 +44,36 @@ internal class Follower : RoleBase
     }
     public override void Init()
     {
-        playerIdList.Clear();
-        BetTimes.Clear();
         BetPlayer.Clear();
     }
     public override void Add(byte playerId)
     {
-        playerIdList.Add(playerId);
-        BetTimes.Add(playerId, MaxBetTimes.GetInt());
+        playerId.SetAbilityUseLimit(MaxBetTimes.GetInt());
     }
     private void SendRPC(byte playerId)
     {
         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncRoleSkill, SendOption.Reliable, -1);
         writer.WriteNetObject(_Player); //SyncFollowerTargetAndTimes
         writer.Write(playerId);
-        writer.Write(BetTimes.TryGetValue(playerId, out var times) ? times : MaxBetTimes.GetInt());
         writer.Write(BetPlayer.TryGetValue(playerId, out var player) ? player : byte.MaxValue);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
         byte PlayerId = reader.ReadByte();
-        int Times = reader.ReadInt32();
         byte Target = reader.ReadByte();
-        BetTimes.Remove(PlayerId);
+
         BetPlayer.Remove(PlayerId);
-        BetTimes.Add(PlayerId, Times);
+
         if (Target != byte.MaxValue)
             BetPlayer.Add(PlayerId, Target);
     }
 
-    private static bool CanKillButton(PlayerControl player) => !player.Data.IsDead && (!BetTimes.TryGetValue(player.PlayerId, out var times) || times >= 1);
+    private static bool CanKillButton(PlayerControl player) => player.GetAbilityUseLimit() > 0;
     public override bool CanUseKillButton(PlayerControl player) => CanKillButton(player);
     public override void SetKillCooldown(byte id)
     {
-        if (BetTimes.TryGetValue(id, out var times) && times < 1)
+        if (id.GetAbilityUseLimit() < 1)
         {
             Main.AllPlayerKillCooldown[id] = 300;
             return;
@@ -99,16 +92,16 @@ internal class Follower : RoleBase
     {
         if (killer.PlayerId == target.PlayerId) return true;
         if (BetPlayer.TryGetValue(killer.PlayerId, out var tar) && tar == target.PlayerId) return false;
-        if (!BetTimes.TryGetValue(killer.PlayerId, out var times) || times < 1) return false;
+        if (killer.GetAbilityUseLimit() < 1) return false;
 
-        BetTimes[killer.PlayerId]--;
+        killer.RpcRemoveAbilityUse();
 
         if (BetPlayer.TryGetValue(killer.PlayerId, out var originalTarget) && Utils.GetPlayerById(originalTarget) != null)
         {
             Utils.NotifyRoles(SpecifySeer: killer, SpecifyTarget: Utils.GetPlayerById(originalTarget), ForceLoop: true);
             Utils.NotifyRoles(SpecifySeer: Utils.GetPlayerById(originalTarget), SpecifyTarget: killer, ForceLoop: true);
         }
-        
+
         BetPlayer.Remove(killer.PlayerId);
         BetPlayer.Add(killer.PlayerId, target.PlayerId);
         SendRPC(killer.PlayerId);
@@ -131,18 +124,18 @@ internal class Follower : RoleBase
 
         if (!seer.Is(CustomRoles.Follower))
         {
-            if (!BetTargetKnowFollower.GetBool()) return "";
+            if (!BetTargetKnowFollower.GetBool()) return string.Empty;
             return (BetPlayer.TryGetValue(target.PlayerId, out var x) && seer.PlayerId == x) ?
-                Utils.ColorString(Utils.GetRoleColor(CustomRoles.Follower), "♦") : "";
+                Utils.ColorString(Utils.GetRoleColor(CustomRoles.Follower), "♦") : string.Empty;
         }
         var GetValue = BetPlayer.TryGetValue(seer.PlayerId, out var targetId);
-        return GetValue && targetId == target.PlayerId ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Follower), "♦") : "";
+        return GetValue && targetId == target.PlayerId ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Follower), "♦") : string.Empty;
     }
     public override string GetProgressText(byte playerId, bool coooms)
     {
-        var player = Utils.GetPlayerById(playerId);
-        if (player == null) return null;
-        return Utils.ColorString(CanKillButton(player) ? Utils.GetRoleColor(CustomRoles.Follower) : Color.gray, $"({(BetTimes.TryGetValue(playerId, out var times) ? times : "0")})");
+        var player = playerId.GetPlayer();
+        if (player == null) return string.Empty;
+        return Utils.ColorString(CanKillButton(player) ? Utils.GetRoleColor(CustomRoles.Follower) : Color.gray, $"({playerId.GetAbilityUseLimit()})");
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

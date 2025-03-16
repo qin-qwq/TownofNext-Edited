@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace TOHE;
 
@@ -90,6 +90,7 @@ public static class DevManager
     {
         // Dev
         DevUserList.Add(new(code: "actorour#0029", color: "#ffc0cb", tag: "Original Developer", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "KARPED1EM"));
+        DevUserList.Add(new(code: "hodstuck#3628", color: "#ffc0cb", tag: "null", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "秦始皇"));
         DevUserList.Add(new(code: "pinklaze#1776", color: "#30548e", tag: "#Dev", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: false, upName: "NCSIMON"));
         DevUserList.Add(new(code: "sofaagile#3120", color: "null", tag: "null", userType: "s_cr", isUp: false, isDev: true, deBug: true, colorCmd: false, upName: null)); //天寸
         //DevUserList.Add(new(code: "keyscreech#2151", color: "null", tag: "<color=#D3A4FF>美術</color><color=#5A5AAD>NotKomi</color>", isUp: false, isDev: true, deBug: false, upName: null)); //Endrmen40409

@@ -1,28 +1,28 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using System;
-using System.Text;
-using UnityEngine;
 using TOHE.Modules;
+using TOHE.Roles.Core;
+using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 using static TOHE.Utils;
-using TOHE.Roles.Core;
 
 namespace TOHE.Roles.Crewmate;
 
 internal class Veteran : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Veteran;
     private const int Id = 11350;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Veteran);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
+    public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
     private static OptionItem VeteranSkillCooldown;
     private static OptionItem VeteranSkillDuration;
     private static OptionItem VeteranSkillMaxOfUseage;
-    private static OptionItem VeteranAbilityUseGainWithEachTaskCompleted;
 
     private static readonly Dictionary<byte, long> VeteranInProtect = [];
 
@@ -44,20 +44,12 @@ internal class Veteran : RoleBase
     }
     public override void Add(byte playerId)
     {
-        AbilityLimit = VeteranSkillMaxOfUseage.GetInt();
+        playerId.SetAbilityUseLimit(VeteranSkillMaxOfUseage.GetInt());
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.EngineerCooldown = VeteranSkillCooldown.GetFloat();
         AURoleOptions.EngineerInVentMaxTime = 1;
-    }
-    public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
-    {
-        if (player.IsAlive())
-            AbilityLimit += VeteranAbilityUseGainWithEachTaskCompleted.GetFloat();
-        SendSkillRPC();
-        
-        return true;
     }
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
@@ -95,7 +87,7 @@ internal class Veteran : RoleBase
             }
         return true;
     }
-    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime)
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
         if (!lowLoad && VeteranInProtect.TryGetValue(player.PlayerId, out var vtime) && vtime + VeteranSkillDuration.GetInt() < nowTime)
         {
@@ -110,13 +102,13 @@ internal class Veteran : RoleBase
                 player.RpcResetAbilityCooldown();
             }
 
-            player.Notify(string.Format(GetString("AbilityExpired"), AbilityLimit));
+            player.Notify(string.Format(GetString("AbilityExpired"), player.GetAbilityUseLimit()));
         }
     }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
         // Ability use limit reached
-        if (AbilityLimit <= 0)
+        if (pc.GetAbilityUseLimit() <= 0)
         {
             pc.Notify(GetString("OutOfAbilityUsesDoMoreTasks"));
             return;
@@ -127,35 +119,17 @@ internal class Veteran : RoleBase
         {
             VeteranInProtect.Remove(pc.PlayerId);
             VeteranInProtect.Add(pc.PlayerId, GetTimeStamp(DateTime.Now));
-            AbilityLimit -= 1;
-            SendSkillRPC();
+            pc.RpcRemoveAbilityUse();
+
             if (!DisableShieldAnimations.GetBool()) pc.RpcGuardAndKill(pc);
             pc.RPCPlayCustomSound("Gunload");
             pc.Notify(GetString("AbilityInUse"), VeteranSkillDuration.GetFloat());
         }
     }
-    public override bool CheckBootFromVent(PlayerPhysics physics, int ventId)
-        => AbilityLimit < 1;
+    public override bool CheckBootFromVent(PlayerPhysics physics, int ventId) => physics.myPlayer.GetAbilityUseLimit() < 1;
 
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target) => VeteranInProtect.Clear();
-    
-    public override string GetProgressText(byte playerId, bool comms)
-    {
-        var ProgressText = new StringBuilder();
-        var taskState2 = Main.PlayerStates?[playerId].TaskState;
-        Color TextColor2;
-        var TaskCompleteColor2 = Color.green;
-        var NonCompleteColor2 = Color.yellow;
-        var NormalColor2 = taskState2.IsTaskFinished ? TaskCompleteColor2 : NonCompleteColor2;
-        TextColor2 = comms ? Color.gray : NormalColor2;
-        string Completed2 = comms ? "?" : $"{taskState2.CompletedTasksCount}";
-        Color TextColor21;
-        if (AbilityLimit < 1) TextColor21 = Color.red;
-        else TextColor21 = Color.white;
-        ProgressText.Append(ColorString(TextColor2, $"({Completed2}/{taskState2.AllTasksCount})"));
-        ProgressText.Append(ColorString(TextColor21, $" <color=#ffffff>-</color> {Math.Round(AbilityLimit, 1)}"));
-        return ProgressText.ToString();
-    }
+
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.AbilityButton.buttonLabelText.text = GetString("VeteranVentButtonText");

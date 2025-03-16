@@ -13,6 +13,7 @@ namespace TOHE.Roles.Neutral;
 internal class Shroud : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Shroud;
     private const int Id = 18000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Shroud);
     public override bool IsDesyncRole => true;
@@ -158,7 +159,8 @@ internal class Shroud : RoleBase
         {
             PlayerControl shrouded = shroudedId.GetPlayer();
             if (!shrouded.IsAlive()) continue;
-
+            if (shrouded.IsTransformedNeutralApocalypse()) continue;
+            
             shrouded.SetDeathReason(PlayerState.DeathReason.Shrouded);
             shrouded.RpcMurderPlayer(shrouded);
             shrouded.SetRealKiller(_Player);

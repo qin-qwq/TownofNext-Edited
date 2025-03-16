@@ -9,6 +9,7 @@ namespace TOHE.Roles.Double;
 internal class Mini : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Mini;
     private const int Id = 7000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.EvilMini) || CustomRoleManager.HasEnabled(CustomRoles.NiceMini);
     public override CustomRoles ThisRoleBase => IsEvilMini ? CustomRoles.Impostor : CustomRoles.Crewmate;
@@ -20,13 +21,14 @@ internal class Mini : RoleBase
     private static OptionItem CountMeetingTime;
     private static OptionItem EvilMiniSpawnChances;
     private static OptionItem CanBeEvil;
+    public static OptionItem CanGuessEvil;
     private static OptionItem UpDateAge;
     private static OptionItem MinorCD;
     private static OptionItem MajorCD;
 
 
     public static int Age = new();
-    public static bool IsEvilMini = false;
+    private static bool IsEvilMini = false;
     private static int GrowUpTime = new();
     //private static int GrowUp = new();
     private static long LastFixedUpdate = new();
@@ -41,6 +43,7 @@ internal class Mini : RoleBase
         CanBeEvil = BooleanOptionItem.Create(Id + 106, "CanBeEvil", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Mini]);
         EvilMiniSpawnChances = IntegerOptionItem.Create(Id + 108, "EvilMiniSpawnChances", new(0, 100, 5), 50, TabGroup.CrewmateRoles, false).SetParent(CanBeEvil)
             .SetValueFormat(OptionFormat.Percent);
+        CanGuessEvil = BooleanOptionItem.Create(Id + 104, "EvilMiniCanBeGuessed", true, TabGroup.CrewmateRoles, false).SetParent(CanBeEvil);
         MinorCD = FloatOptionItem.Create(Id + 110, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 45f, TabGroup.CrewmateRoles, false).SetParent(CanBeEvil)
             .SetValueFormat(OptionFormat.Seconds);
         MajorCD = FloatOptionItem.Create(Id + 112, "MajorCooldown", new(0f, 180f, 2.5f), 15f, TabGroup.CrewmateRoles, false).SetParent(CanBeEvil)
@@ -69,7 +72,7 @@ internal class Mini : RoleBase
             SendRPC();
         }
     }
-    public void SendRPC()
+    private void SendRPC()
     {
         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncRoleSkill, SendOption.Reliable, -1);
         writer.WriteNetObject(_Player);
@@ -94,33 +97,32 @@ internal class Mini : RoleBase
         }
         return true;
     }
-    public void OnFixedUpdates(PlayerControl player)
+    public void OnFixedUpdates(PlayerControl player, long nowTime)
     {
-        if (!GameStates.IsInGame) return;
         if (Age >= 18) return;
 
         //Check if nice mini is dead
-        if (!player.IsAlive() && player.Is(CustomRoles.NiceMini))
+        if (player.Is(CustomRoles.NiceMini) && !player.IsAlive())
         {
             if (CustomWinnerHolder.WinnerTeam == CustomWinner.Default && !CustomWinnerHolder.CheckForConvertedWinner(player.PlayerId))
             {
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.NiceMini);
                 CustomWinnerHolder.WinnerIds.Add(player.PlayerId);
             }
-            // ↑ This code will show the mini winning player on the checkout screen, Tommy you shouldn't comment it out!
+            // â†‘ This code will show the mini winning player on the checkout screen, Tommy you shouldn't comment it out!
         } //Is there any need to check this 30 times a second?
 
         if (GameStates.IsMeeting && !CountMeetingTime.GetBool()) return;
 
-        if (LastFixedUpdate == GetTimeStamp()) return;
-        LastFixedUpdate = GetTimeStamp();
+        if (LastFixedUpdate == nowTime) return;
+        LastFixedUpdate = nowTime;
         GrowUpTime++;
 
         if (GrowUpTime >= GrowUpDuration.GetInt() / 18)
         {
             Age += 1;
             GrowUpTime = 0;
-            Logger.Info($"Mini grow up by 1", "Mini");
+            Logger.Info("Mini grow up by 1", "Mini");
             if (player.Is(CustomRoles.EvilMini))
             {
                 player.ResetKillCooldown();
@@ -130,7 +132,7 @@ internal class Mini : RoleBase
 
             if (player.Is(CustomRoles.NiceMini))
                 player.RpcGuardAndKill();
-            
+
             /*Dont show guard animation for evil mini,
             this would simply stop them from murdering.
             Imagine reseting kill cool down every 20 seconds
@@ -168,7 +170,8 @@ internal class Mini : RoleBase
     }
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {
-        if (target.Is(CustomRoles.NiceMini) && Age < 18)
+        if (role is not CustomRoles.NiceMini or CustomRoles.EvilMini) return false;
+        if (Age < 18 && (target.Is(CustomRoles.NiceMini) || !CanGuessEvil.GetBool() && target.Is(CustomRoles.EvilMini)))
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessMini"));
             return true;
@@ -196,7 +199,7 @@ internal class Mini : RoleBase
             {
                 if (isMeetingHud)
                 {
-                    name = string.Format(GetString("ExiledNiceMini"), Main.LastVotedPlayer, GetDisplayRoleAndSubName(exiled.PlayerId, exiled.PlayerId, true));
+                    name = string.Format(GetString("ExiledNiceMini"), Main.LastVotedPlayer, GetDisplayRoleAndSubName(exiled.PlayerId, exiled.PlayerId, false, true));
                 }
                 else
                 {
@@ -215,5 +218,7 @@ internal class Mini : RoleBase
     //    => (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)) && EveryoneCanKnowMini.GetBool() ? Main.roleColors[CustomRoles.Mini] : string.Empty;
 
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)
-            => EveryoneCanKnowMini.GetBool() && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)) ? ColorString(GetRoleColor(CustomRoles.Mini), Age != 18 && UpDateAge.GetBool() ? $"({Age})" : string.Empty) : string.Empty;
+        => EveryoneCanKnowMini.GetBool() && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini))
+            ? CustomRoles.Mini.GetColoredTextByRole(Age != 18 && UpDateAge.GetBool() ? Age.ToString() : string.Empty)
+            : string.Empty;
 }

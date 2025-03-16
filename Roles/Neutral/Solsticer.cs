@@ -1,17 +1,17 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using Hazel;
+using InnerNet;
 using TOHE.Roles.Core;
+using static TOHE.MeetingHudStartPatch;
 using static TOHE.Options;
 using static TOHE.Translator;
-using static TOHE.MeetingHudStartPatch;
-using InnerNet;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
 namespace TOHE.Roles.Neutral;
 
 internal class Solsticer : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Solsticer;
     private const int Id = 26200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Solsticer);
     public override CustomRoles ThisRoleBase => SolsticerCanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
@@ -81,10 +81,10 @@ internal class Solsticer : RoleBase
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
     {
         if (player == null) return true;
-        
+
         // Sycn for modded clients
         SendRPC();
-        
+
         if (patched)
         {
             ResetTasks(player);
@@ -122,7 +122,7 @@ internal class Solsticer : RoleBase
         }
         warningActived = true;
         SendRPC();
-        Utils.NotifyRoles(ForceLoop: true);
+        Utils.NotifyRoles(SpecifyTarget: pc);
     }
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
@@ -165,7 +165,7 @@ internal class Solsticer : RoleBase
         MurderMessage = "";
         patched = false;
     }
-    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime)
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
         if (lowLoad) return;
         if (patched)
@@ -235,9 +235,7 @@ internal class Solsticer : RoleBase
     public void ResetTasks(PlayerControl pc)
     {
         SetShortTasksToAdd();
-        var taskState = pc.GetPlayerTaskState();
-        pc.Data.RpcSetTasks(new Il2CppStructArray<byte>(0)); //Let taskassign patch decide the tasks
-        taskState.CompletedTasksCount = 0;
+        pc.RpcResetTasks(); //Let taskassign patch decide the tasks
         pc.RpcGuardAndKill();
         pc.Notify(GetString("SolsticerTasksReset"));
         Main.AllPlayerControls.Do(x => TargetArrow.Remove(x.PlayerId, pc.PlayerId));

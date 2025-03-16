@@ -1,4 +1,4 @@
-﻿using Il2CppSystem;
+using Il2CppSystem;
 using static CosmeticsLayer;
 
 namespace TOHE.Patches;
@@ -8,7 +8,7 @@ public static class ShouldShowTogglePatch
 {
     public static void Postfix(ref bool __result)
     {
-        __result = true;
+        __result = false;
     }
 }
 #region GameManager Patches
@@ -22,7 +22,7 @@ public static class GetNormalBodyType_Patch
             __result = PlayerBodyTypes.Horse;
             return;
         }
-        if (AprilFoolsMode.ShouldLongAround())
+        if (Main.LongMode.Value)
         {
             __result = PlayerBodyTypes.Long;
             return;
@@ -43,7 +43,7 @@ public static class GetHnsBodyType_Patch
                 __result = PlayerBodyTypes.Horse;
                 return;
             }
-            if (AprilFoolsMode.ShouldLongAround())
+            if (Main.LongMode.Value)
             {
                 __result = PlayerBodyTypes.Long;
                 return;
@@ -61,7 +61,7 @@ public static class GetHnsBodyType_Patch
             __result = PlayerBodyTypes.Horse;
             return;
         }
-        else if (AprilFoolsMode.ShouldLongAround())
+        else if (Main.LongMode.Value)
         {
             if (player.Data.Role.IsImpostor)
             {
@@ -126,7 +126,14 @@ public static class LongBoiPatches
         }
         return false;
     }
-
+    // Fix System.IndexOutOfRangeException: Index was outside the bounds of the array
+    // When colorIndex is 255 them heightsPerColor[255] gets exception
+    [HarmonyPatch(nameof(LongBoiPlayerBody.SetHeightFromColor))]
+    [HarmonyPrefix]
+    public static bool SetHeightFromColor_Prefix(int colorIndex)
+    {
+        return colorIndex != byte.MaxValue;
+    }
     [HarmonyPatch(nameof(LongBoiPlayerBody.SetHeighFromDistanceHnS))]
     [HarmonyPrefix]
     public static bool LongBoyNeckSize_Prefix(LongBoiPlayerBody __instance, ref float distance)
@@ -142,9 +149,9 @@ public static class LongBoiPatches
     [HarmonyPrefix]
     public static bool CheckLongMode_Prefix(out bool __result, ref string cosmeticID)
     {
-        if (Main.HorseMode.Value)
+        if (AprilFoolsMode.ShouldHorseAround())
         {
-            __result = false;
+            __result = true;
             return false;
         }
 

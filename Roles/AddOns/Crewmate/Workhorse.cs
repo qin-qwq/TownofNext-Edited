@@ -6,6 +6,7 @@ namespace TOHE.Roles.AddOns.Crewmate;
 
 public class Workhorse : IAddon
 {
+    public CustomRoles Role => CustomRoles.Workhorse;
     private const int Id = 23730;
     public AddonTypes Type => AddonTypes.Misc;
     private static readonly HashSet<byte> playerIdList = [];
@@ -45,7 +46,8 @@ public class Workhorse : IAddon
     { }
     public static void AddMidGame(byte playerId)
     {
-        playerIdList.Add(playerId);
+        if (!playerIdList.Contains(playerId))
+            playerIdList.Add(playerId);
         IsEnable = true;
     }
     public void Remove(byte playerId)
@@ -59,6 +61,7 @@ public class Workhorse : IAddon
     public static (bool, int, int) TaskData => (false, NumLongTasks, NumShortTasks);
     private static bool IsAssignTarget(PlayerControl pc)
     {
+        if (CurrentGameMode != CustomGameMode.Standard) return false;
         if (!pc.IsAlive() || IsThisRole(pc.PlayerId)) return false;
         if (pc.Is(CustomRoles.Snitch) && !OptionSnitchCanBeWorkhorse.GetBool()) return false;
         if (pc.Is(CustomRoles.LazyGuy) || pc.Is(CustomRoles.Lazy)) return false;
@@ -77,7 +80,7 @@ public class Workhorse : IAddon
         if (!CustomRoles.Workhorse.IsEnable() || playerIdList.Count >= CustomRoles.Workhorse.GetCount()) return true;
         if (!IsAssignTarget(pc)) return true;
 
-        pc.RpcSetCustomRole(CustomRoles.Workhorse);
+        pc.RpcSetCustomRole(CustomRoles.Workhorse, false, false);
         var taskState = pc.GetPlayerTaskState();
         taskState.AllTasksCount += NumLongTasks + NumShortTasks;
         //taskState.CompletedTasksCount++; //Addition for this completion

@@ -1,8 +1,8 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using System;
+using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Double;
-using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 using static TOHE.Utils;
@@ -12,6 +12,7 @@ namespace TOHE.Roles._Ghosts_.Crewmate;
 internal class Hawk : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Hawk;
     private const int Id = 28000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Hawk);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
@@ -23,7 +24,7 @@ internal class Hawk : RoleBase
     public static OptionItem MinimumPlayersAliveToKill;
     public static OptionItem MissChance;
     public static OptionItem IncreaseByOneIfConvert;
-    
+
     public readonly Dictionary<byte, float> KillerChanceMiss = [];
     public int KeepCount = 0;
     public override void SetupCustomOption()
@@ -40,9 +41,9 @@ internal class Hawk : RoleBase
         IncreaseByOneIfConvert = BooleanOptionItem.Create(Id + 14, "IncreaseByOneIfConvert", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Hawk]);
     }
 
-    public override void Add(byte PlayerId)
+    public override void Add(byte playerId)
     {
-        AbilityLimit = HawkCanKillNum.GetInt();
+        playerId.SetAbilityUseLimit(HawkCanKillNum.GetInt());
 
         foreach (var pc in Main.AllPlayerControls)
         {
@@ -54,6 +55,7 @@ internal class Hawk : RoleBase
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
+        if (_Player == null) return;
         int ThisCount = 0;
         foreach (var pc in Main.AllPlayerControls)
         {
@@ -65,7 +67,7 @@ internal class Hawk : RoleBase
         if (ThisCount > KeepCount && IncreaseByOneIfConvert.GetBool())
         {
             KeepCount++;
-            AbilityLimit += ThisCount - KeepCount;
+            _Player.SetAbilityUseLimit(_Player.GetAbilityUseLimit() + ThisCount - KeepCount);
         }
 
     }
@@ -84,21 +86,20 @@ internal class Hawk : RoleBase
             target.SetDeathReason(PlayerState.DeathReason.Slice);
             killer.RpcMurderPlayer(target);
             killer.RpcResetAbilityCooldown();
-            AbilityLimit--;
-            SendSkillRPC();
+            killer.RpcRemoveAbilityUse();
         }
-        else if (AbilityLimit <= 0) killer.Notify(GetString("HawkKillMax"));
+        else if (killer.GetAbilityUseLimit() <= 0) killer.Notify(GetString("HawkKillMax"));
         else if (Main.AllAlivePlayerControls.Length < MinimumPlayersAliveToKill.GetInt()) killer.Notify(GetString("HawkKillTooManyDead"));
         else
         {
             killer.RpcResetAbilityCooldown();
-            AbilityLimit--;
-            SendSkillRPC();
+            killer.RpcRemoveAbilityUse();
             killer.Notify(ColorString(GetRoleColor(CustomRoles.Hawk), GetString("HawkMissed")));
         }
 
         Logger.Info($" {target.GetRealName()}'s DieChance is :{100f - KillerChanceMiss[target.PlayerId]}%", "Hawk");
-        KillerChanceMiss[target.PlayerId] -= Math.Clamp(35, 0, KillerChanceMiss[target.PlayerId] - 10);
+        var temp = KillerChanceMiss.GetValueOrDefault(target.PlayerId, MissChance.GetFloat());
+        KillerChanceMiss[target.PlayerId] -= Math.Clamp(35f, 0f, temp - 10f);
         return false;
     }
 
@@ -107,16 +108,11 @@ internal class Hawk : RoleBase
         var rnd = IRandom.Instance;
 
         return target != null && Main.AllAlivePlayerControls.Length >= MinimumPlayersAliveToKill.GetInt()
-            && AbilityLimit > 0
+            && _Player.GetAbilityUseLimit() > 0
             && rnd.Next(100) >= KillerChanceMiss[target.PlayerId]
             && !target.IsNeutralApocalypse()
             && !target.Is(CustomRoles.Jinx)
             && !target.Is(CustomRoles.CursedWolf)
             && (!target.Is(CustomRoles.NiceMini) || Mini.Age > 18);
     }
-    public override string GetProgressText(byte playerId, bool coms) 
-        => ColorString(AbilityLimit > 0 ? GetRoleColor(CustomRoles.Hawk).ShadeColor(0.25f) : Color.gray, $"({AbilityLimit})");
-
 }
-
-

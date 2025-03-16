@@ -1,8 +1,10 @@
-﻿using Hazel;
+using Hazel;
 using System;
 using System.Text.RegularExpressions;
+using TOHE.Modules;
 using TOHE.Modules.ChatManager;
 using TOHE.Roles.Core;
+using TOHE.Roles.Coven;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Double;
 using UnityEngine;
@@ -13,6 +15,7 @@ namespace TOHE.Roles.Impostor;
 internal class Councillor : RoleBase
 {
     //===========================SETUP================================\\
+    public override CustomRoles Role => CustomRoles.Councillor;
     private const int Id = 1000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Councillor);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
@@ -28,15 +31,15 @@ internal class Councillor : RoleBase
     private static OptionItem SuicideOnJudgeImpTeam;
     private static OptionItem CanMurderTaskDoneSnitch;
     private static OptionItem KillCooldown;
-    
+
     private int MurderLimitMeeting;
 
 
     public override void SetupCustomOption()
     {
         Options.SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Councillor);
-            KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
-                .SetValueFormat(OptionFormat.Seconds);
+        KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
+            .SetValueFormat(OptionFormat.Seconds);
         MurderLimitPerMeeting = IntegerOptionItem.Create(Id + 11, "CouncillorMurderLimitPerMeeting", new(1, 15, 1), 1, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
             .SetValueFormat(OptionFormat.Times);
         MurderLimitPerGame = IntegerOptionItem.Create(Id + 12, "CouncillorMurderLimitPerGame", new(1, 15, 1), 4, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
@@ -52,7 +55,7 @@ internal class Councillor : RoleBase
     public override void Add(byte playerId)
     {
         MurderLimitMeeting = MurderLimitPerMeeting.GetInt();
-        AbilityLimit = MurderLimitPerGame.GetInt();
+        playerId.SetAbilityUseLimit(MurderLimitPerGame.GetInt());
     }
     public override void AfterMeetingTasks()
     {
@@ -61,9 +64,6 @@ internal class Councillor : RoleBase
 
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
         => IsForMeeting && seer.IsAlive() && target.IsAlive() ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Councillor), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
-
-    public override string PVANameText(PlayerVoteArea pva, PlayerControl seer, PlayerControl target)
-        => seer.IsAlive() && target.IsAlive() ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Councillor), target.PlayerId.ToString()) + " " + pva.NameText.text : string.Empty;
 
     public bool MurderMsg(PlayerControl pc, string msg, bool isUI = false)
     {
@@ -115,10 +115,15 @@ internal class Councillor : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("CouncillorMurderMaxMeeting"));
                     return true;
                 }
-                else if (AbilityLimit <= 0)
+                else if (pc.GetAbilityUseLimit() <= 0)
                 {
                     pc.ShowInfoMessage(isUI, GetString("CouncillorMurderMaxGame"));
-                    return true; 
+                    return true;
+                }
+                if (target.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target.PlayerId].Count > 0)
+                {
+                    target = Utils.GetPlayerById(VoodooMaster.Dolls[target.PlayerId].Where(x => Utils.GetPlayerById(x).IsAlive()).ToList().RandomElement());
+                    Utils.SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
                 }
 
                 if (Jailer.IsTarget(target.PlayerId))
@@ -227,6 +232,7 @@ internal class Councillor : RoleBase
                 }
                 else if (target.GetCustomRole().IsCrewmate()) CouncillorSuicide = false;
                 else if (target.GetCustomRole().IsNeutral()) CouncillorSuicide = false;
+                else if (target.GetCustomRole().IsCoven()) CouncillorSuicide = false;
                 else
                 {
                     Logger.Warn("Impossibe to reach here!", "CouncillorTrial");
@@ -240,31 +246,31 @@ internal class Councillor : RoleBase
                 string Name = dp.GetRealName();
 
                 MurderLimitMeeting--;
-                AbilityLimit--;
-                SendSkillRPC();
+                pc.RpcRemoveAbilityUse();
 
                 if (!GameStates.IsProceeding)
-                _ = new LateTask(() =>
-                {
-                    dp.SetDeathReason(PlayerState.DeathReason.Trialed);
-                    dp.SetRealKiller(pc);
-                    GuessManager.RpcGuesserMurderPlayer(dp);
+                    _ = new LateTask(() =>
+                    {
+                        dp.SetDeathReason(PlayerState.DeathReason.Trialed);
+                        dp.SetRealKiller(pc);
+                        GuessManager.RpcGuesserMurderPlayer(dp);
 
-                    Main.PlayersDiedInMeeting.Add(dp.PlayerId);
-                    MurderPlayerPatch.AfterPlayerDeathTasks(pc, dp, true);
+                        Main.PlayersDiedInMeeting.Add(dp.PlayerId);
+                        MurderPlayerPatch.AfterPlayerDeathTasks(pc, dp, true);
 
-                    _ = new LateTask(() => {
-                        if (!MakeEvilJudgeClear.GetBool())
+                        _ = new LateTask(() =>
                         {
-                            Utils.SendMessage(string.Format(GetString("Judge_TrialKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Judge), GetString("Judge_TrialKillTitle")), true);
-                        }
-                        else
-                        {
-                            Utils.SendMessage(string.Format(GetString("Councillor_MurderKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Councillor), GetString("Councillor_MurderKillTitle")), true);
-                        }
-                    }, 0.6f, "Guess Msg");
+                            if (!MakeEvilJudgeClear.GetBool())
+                            {
+                                Utils.SendMessage(string.Format(GetString("Judge_TrialKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Judge), GetString("Judge_TrialKillTitle")), true);
+                            }
+                            else
+                            {
+                                Utils.SendMessage(string.Format(GetString("Councillor_MurderKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Councillor), GetString("Councillor_MurderKillTitle")), true);
+                            }
+                        }, 0.6f, "Guess Msg");
 
-                }, 0.2f, "Murder Kill");
+                    }, 0.2f, "Murder Kill");
             }
         }
         return true;
@@ -278,7 +284,7 @@ internal class Councillor : RoleBase
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         if (int.TryParse(result, out int num))
@@ -287,15 +293,11 @@ internal class Councillor : RoleBase
         }
         else
         {
-            //并不是玩家编号，判断是否颜色
-            //byte color = GetColorFromMsg(msg);
-            //好吧我不知道怎么取某位玩家的颜色，等会了的时候再来把这里补上
             id = byte.MaxValue;
             error = GetString("Councillor_MurderHelp");
             return false;
         }
 
-        //判断选择的玩家是否合理
         PlayerControl target = Utils.GetPlayerById(id);
         if (target == null || target.Data.IsDead)
         {
@@ -376,6 +378,4 @@ internal class Councillor : RoleBase
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => CouncillorOnClick(pva.TargetPlayerId/*, __instance*/)));
         }
     }
-
-    public override string GetProgressText(byte playerId, bool coooms) => Utils.ColorString(AbilityLimit <= 0 ? Color.gray : Utils.GetRoleColor(CustomRoles.Councillor), $"({AbilityLimit})") ?? "Invalid";
 }

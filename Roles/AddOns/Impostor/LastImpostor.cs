@@ -3,11 +3,13 @@ namespace TOHE.Roles.AddOns.Impostor;
 
 public class LastImpostor : IAddon
 {
+    public CustomRoles Role => CustomRoles.LastImpostor;
     private const int Id = 22800;
     public AddonTypes Type => AddonTypes.Impostor;
     public static byte currentId = byte.MaxValue;
 
     private static OptionItem CooldownReduction;
+    private static OptionItem GetGuesser;
 
     public void SetupCustomOption()
     {
@@ -15,6 +17,8 @@ public class LastImpostor : IAddon
         CooldownReduction = FloatOptionItem.Create(Id + 15, "OverclockedReduction", new(5f, 95f, 5f), 50f, TabGroup.Addons, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.LastImpostor])
             .SetValueFormat(OptionFormat.Percent);
+        GetGuesser = BooleanOptionItem.Create(Id + 16, "GetGuesser", true, TabGroup.Addons, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.LastImpostor]);
     }
     public void Init() => currentId = byte.MaxValue;
     public void Add(byte playerId, bool gameIsLoading = true)
@@ -30,18 +34,22 @@ public class LastImpostor : IAddon
         Main.AllPlayerKillCooldown[currentId] -= removeCooldown;
     }
     private static bool CanBeLastImpostor(PlayerControl pc)
-        => pc.IsAlive() && !pc.Is(CustomRoles.LastImpostor)&& !pc.Is(CustomRoles.Overclocked) && pc.Is(Custom_Team.Impostor);
-    
+        => pc.IsAlive() && !pc.Is(CustomRoles.LastImpostor) && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !Main.PlayerStates[pc.PlayerId].IsNecromancer;
+
     public static void SetSubRole()
     {
         if (currentId != byte.MaxValue || !AmongUsClient.Instance.AmHost) return;
-        if (Options.CurrentGameMode == CustomGameMode.FFA || !CustomRoles.LastImpostor.IsEnable() || Main.AliveImpostorCount != 1) return;
+        if (Options.CurrentGameMode != CustomGameMode.Standard || !CustomRoles.LastImpostor.IsEnable() || Main.AliveImpostorCount != 1) return;
 
         foreach (var pc in Main.AllAlivePlayerControls)
         {
             if (CanBeLastImpostor(pc))
             {
                 pc.RpcSetCustomRole(CustomRoles.LastImpostor);
+                if (GetGuesser.GetBool())
+                {
+                    pc.RpcSetCustomRole(CustomRoles.Guesser);
+                }
                 AddMidGame(pc.PlayerId);
                 SetKillCooldown();
                 pc.SyncSettings();

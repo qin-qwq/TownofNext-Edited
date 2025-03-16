@@ -2,7 +2,6 @@ using AmongUs.Data;
 using System;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using static TOHE.Translator;
@@ -76,7 +75,7 @@ public static class TemplateManager
                 return string.Empty;
             }
         }
-};
+    };
 
     public static void Init()
     {
@@ -154,7 +153,7 @@ public static class TemplateManager
         Func<string> playerName = () => "";
         if (playerId != 0xff)
         {
-            playerName = () => Main.AllPlayerNames[playerId];   
+            playerName = () => Main.AllPlayerNames[playerId];
         }
 
         _replaceDictionaryNormalOptions["PlayerName"] = playerName;
@@ -175,19 +174,16 @@ public static class TemplateManager
                 HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, string.Format(GetString("Message.TemplateNotFoundHost"), str, tags.Join(delimiter: ", ")));
             else Utils.SendMessage(string.Format(GetString("Message.TemplateNotFoundClient"), str), playerId, noReplay: true);
         }
-        else foreach (string x in sendList.ToArray())
-            {
-                var title = TryGetTitle(x, out var HasTitle);
-                var rmv = x;
-                if (HasTitle)
+        else for (int i = 0; i < sendList.Count; i++)
+        {
+                if (str == "welcome" && playerId != 0xff)
                 {
-                    rmv = title != "" ? x.Remove(x.IndexOf("<title>"), x.IndexOf("</title>")) : "";
-                    rmv = rmv.Replace("<title>", "");
-                    rmv = rmv.Replace("</title>", "");
+                    var player = Utils.GetPlayerById(playerId);
+                    if (player == null) continue;
+                    Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.GetRealName())));
                 }
-
-                Utils.SendMessage(ApplyReplaceDictionary(rmv), playerId, title, noReplay: true);
-            }
+                else Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId);
+        }
     }
 
     private static string ApplyReplaceDictionary(string text)
@@ -229,7 +225,7 @@ public static class TemplateManager
             title = Text.Substring(start, end);
             title = title.Replace("<title>", "");
             title = title.Replace("</title>", "");
-            
+
         }
 
 

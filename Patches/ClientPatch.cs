@@ -96,12 +96,20 @@ internal class RunLoginPatch
         if (!EOSManager.Instance.loginFlowFinished) return;
 
         var friendcode = EOSManager.Instance.friendCode;
-        Main.Instance.StartCoroutine(dbConnect.Init());
         if (friendcode == null || friendcode == "")
         {
             EOSManager.Instance.attemptAuthAgain = true;
             Logger.Info("friendcode not found", "EOSManager");
             canOnline = false;
+        }
+        try
+        {
+            if (Main.canaryRelease || Main.fullRelease)
+                ModUpdater.ShowAvailableUpdate();
+        }
+        catch (System.Exception error)
+        {
+            Logger.Error(error.ToString(), "ModUpdater.ShowAvailableUpdate");
         }
     }
 }
