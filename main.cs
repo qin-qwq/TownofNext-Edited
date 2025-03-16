@@ -33,7 +33,7 @@ public class Main : BasePlugin
     // == Program Config ==
     public const string OriginalForkId = "OriginalTOH";
 
-    public static readonly string ModName = "TOHE";
+    public static readonly string ModName = "TONE";
     public static readonly string ForkId = "TOHE";
     public static readonly string ModColor = "#ffc0cb";
     public static readonly bool AllowPublicRoom = true;
@@ -46,31 +46,30 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
-    public const string PluginVersion = "2025.0312.230.000030"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "2.3.0 Alpha 3";
+    public const string PluginVersion = "2025.0315.501.000030"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "5.0.1";
     public const string SupportedVersionAU = "2024.10.29"; // Changed becasue Dark theme works at this version.
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V2.3.0 Alpha 2 Hotfix 2
-    public static readonly bool canaryRelease = true; // Latest: V2.2.0 Beta 4
-    public static readonly bool fullRelease = false; // Latest: V2.2.0
+    public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
+    public static readonly bool canaryRelease = false; // Latest: V5.0.1 Beta 1
+    public static readonly bool fullRelease = true; // Latest: V5.0.1
 
     public static bool hasAccess = true;
 
     public static readonly bool ShowUpdateButton = true;
 
     public static readonly bool ShowGitHubButton = true;
-    public static readonly string GitHubInviteUrl = "https://github.com/EnhancedNetwork/TownofHost-Enhanced";
+    public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
 
     public static readonly bool ShowDiscordButton = true;
-    public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
+    public static readonly string DiscordInviteUrl = "http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=y7l6Op99g3iqi0KCXrqs2bOQAxfng2mZ&authKey=yVqZ1v6CPJ0E4DeQqLHuiF4%2F3lzg8mBYiv7SuhQs4cm9EAelFTdlCuKB%2BzLo1XaS&noverify=0&group_code=512442588";
 
-    public static readonly bool ShowWebsiteButton = true;
+    public static readonly bool ShowWebsiteButton = false;
     public static readonly string WebsiteInviteUrl = "https://weareten.ca/";
 
-    public static readonly bool ShowDonationButton = true;
+    public static readonly bool ShowDonationButton = false;
     public static readonly string DonationInviteUrl = "https://weareten.ca/TOHE";
-
     public Harmony Harmony { get; } = new Harmony(PluginGuid);
     public static Version version = Version.Parse(PluginVersion);
     public static BepInEx.Logging.ManualLogSource Logger;
@@ -182,6 +181,7 @@ public class Main : BasePlugin
     public static bool DoBlockNameChange = false;
     public static int updateTime;
     public const float MinSpeed = 0.0001f;
+    public const float MaxSpeed = 2.9999f;
     public static int AliveImpostorCount;
     public static bool VisibleTasksCount = false;
     public static bool AssignRolesIsStarted = false;
@@ -712,6 +712,7 @@ public enum CustomRoles
     EvilMini,
     EvilTracker,
     Fireworker,
+    Fury,
     Gangster,
     Godfather,
     Greedy,
@@ -761,6 +762,7 @@ public enum CustomRoles
     //Crewmate Ghost
     Ghastly,
     Hawk,
+    InjusticeSpirit,
     Warden,
 
     //Crewmate
@@ -771,6 +773,7 @@ public enum CustomRoles
     Bastion,
     Benefactor,
     Bodyguard,
+    Brave,
     Captain,
     Celebrity,
     Chameleon,
@@ -778,6 +781,7 @@ public enum CustomRoles
     Cleanser,
     CopyCat,
     Coroner,
+    Crewmater,
     Crusader,
     Deceiver,
     Deputy,
@@ -788,7 +792,6 @@ public enum CustomRoles
     FortuneTeller,
     Grenadier,
     Guardian,
-    GuessMaster,
     Inspector,
     Investigator,
     Jailer,
@@ -813,13 +816,17 @@ public enum CustomRoles
     Oracle,
     Overseer,
     Pacifist,
+    Paranoia,
     President,
     Psychic,
     Randomizer,
     Retributionist,
     Reverie,
+    Roaster,
     Sheriff,
     Snitch,
+    Soldier,
+    SoulReaper,
     SpeedBooster,
     Spiritualist,
     Spy,
@@ -835,6 +842,7 @@ public enum CustomRoles
     Veteran,
     Vigilante,
     Witness,
+    //YF,
 
     //Neutral
     Agitater,
@@ -845,6 +853,7 @@ public enum CustomRoles
     Bandit,
     Berserker,
     BloodKnight,
+    Box,
     Collector,
     Cultist,
     CursedSoul,
@@ -899,6 +908,7 @@ public enum CustomRoles
     Sunnyboy,
     Taskinator,
     Terrorist,
+    Thief,
     Traitor,
     Troller,
     Vector,
@@ -972,6 +982,7 @@ public enum CustomRoles
     Glow,
     Gravestone,
     Guesser,
+    GuessMaster,
     Hurried,
     Infected,
     Influenced,
@@ -992,13 +1003,14 @@ public enum CustomRoles
     Oiiai,
     Onbound,
     Overclocked,
-    Paranoia,
     Prohibited,
     Radar,
     Rainbow,
     Rascal,
     Reach,
     Rebound,
+    Revealed,
+    Schizophrenic,
     Spurt,
     Recruit,
     Seer,
@@ -1104,6 +1116,7 @@ public enum AdditionalWinners
     Hater = CustomRoles.Hater,
     Provocateur = CustomRoles.Provocateur,
     Sunnyboy = CustomRoles.Sunnyboy,
+    Box = CustomRoles.Box,
     Follower = CustomRoles.Follower,
     Romantic = CustomRoles.Romantic,
     VengefulRomantic = CustomRoles.VengefulRomantic,
@@ -1126,7 +1139,7 @@ public enum AdditionalWinners
 public enum SuffixModes
 {
     None = 0,
-    TOHE,
+    TONE,
     Streaming,
     Recording,
     RoomHost,

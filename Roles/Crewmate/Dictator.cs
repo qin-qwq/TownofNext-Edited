@@ -14,14 +14,26 @@ internal class Dictator : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Dictator;
     private const int Id = 11600;
-    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
+    public override CustomRoles ThisRoleBase => CustomRoles.Tracker;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\
     public static OptionItem ChangeCommandToExpel;
+    private static OptionItem TrackCooldown;
+    private static OptionItem TrackDuration;
+    private static OptionItem TrackDelay;
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Dictator);
         ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator]);
+        TrackCooldown = IntegerOptionItem.Create(Id + 2, GeneralOption.TrackerBase_TrackingCooldown, new(1, 120, 1), 15, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator])
+            .SetValueFormat(OptionFormat.Seconds);
+        TrackDuration = IntegerOptionItem.Create(Id + 3, GeneralOption.TrackerBase_TrackingDuration, new(5, 120, 5), 30, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator])
+            .SetValueFormat(OptionFormat.Seconds);
+        TrackDelay = IntegerOptionItem.Create(Id + 4, GeneralOption.TrackerBase_TrackingDelay, new(0, 10, 1), 1, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator])
+            .SetValueFormat(OptionFormat.Seconds);
     }
 
     public static bool CheckVotingForTarget(PlayerControl pc, PlayerVoteArea pva)

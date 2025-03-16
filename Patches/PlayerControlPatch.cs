@@ -1269,7 +1269,7 @@ class FixedUpdateInNormalGamePatch
                 else if (Main.version.CompareTo(ver.version) == 0)
                 {
                     string tag = ver.tag == $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})"
-                        ? $"<color=#00a5ff><size=1.4>{GetString("ModdedClient")}</size>\n{playerName}</color>"
+                        ? $"<color=#fcc5f8><size=1.4>{GetString("ModdedClient")}</size>\n{playerName}</color>"
                         : $"<color=#ffff00><size=1.4>{ver.tag}</size>\n{playerName}</color>";
                     moddedTag.Append(tag);
                 }
@@ -1417,11 +1417,11 @@ class FixedUpdateInNormalGamePatch
 
                         if (player.Is(CustomRoles.Lovers) && localPlayer.Is(CustomRoles.Lovers))
                         {
-                            Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
+                            Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♡"));
                         }
                         else if (player.Is(CustomRoles.Lovers) && localPlayer.Data.IsDead)
                         {
-                            Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
+                            Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♡"));
                         }
                         break;
                 }
@@ -1843,7 +1843,7 @@ class PlayerControlCheckNamePatch
                 if (player == null || player.PlayerId == __instance.PlayerId || player.Data == null || player.Data.Disconnected) continue;
 
                 Main.AllClientRealNames.TryGetValue(player.OwnerId, out var rName);
-                
+
                 if (rName != null && rName != player.Data.PlayerName)
                 {
                     sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetName, __instance.OwnerId);
@@ -1976,7 +1976,7 @@ public static class PlayerControlDiePatch
         // Fix bug when player was dead due RpcExile while camera uses
         if (reason is DeathReason.Exile)
         {
-            var securityCameraSystem = ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Security, out var systemType) ? systemType.CastFast<SecurityCameraSystemType>() : null;
+            var securityCameraSystem = ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Security, out var systemType) ? systemType.TryCast<SecurityCameraSystemType>() : null;
             if (securityCameraSystem != null && securityCameraSystem.PlayersUsing.Contains(playerId))
             {
                 securityCameraSystem.PlayersUsing.Remove(playerId);

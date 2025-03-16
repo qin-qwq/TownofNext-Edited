@@ -125,6 +125,7 @@ public static class Options
         "CamouflageMode.Random",
         "CamouflageMode.OnlyRandomColor",
         "CamouflageMode.Karpe",
+        "CamouflageMode.Qin",
         "CamouflageMode.Lauryn",
         "CamouflageMode.Moe",
         "CamouflageMode.Pyro",
@@ -180,6 +181,8 @@ public static class Options
     public static OptionItem ShowMadmatesInLeftCommand;
     public static OptionItem ShowApocalypseInLeftCommand;
     public static OptionItem ShowCovenInLeftCommand;
+    public static OptionItem SeeEjectedRolesInMeeting;
+    public static OptionItem ShowBetrayalAddonsOnEject;
 
     public static OptionItem KickLowLevelPlayer;
     public static OptionItem TempBanLowLevelPlayer;
@@ -290,8 +293,6 @@ public static class Options
     public static OptionItem ShowTeamNextToRoleNameOnEject;
     public static OptionItem ConfirmEgoistOnEject;
     public static OptionItem ConfirmLoversOnEject;
-    public static OptionItem SeeEjectedRolesInMeeting;
-    public static OptionItem ShowBetrayalAddonsOnEject;
     //public static OptionItem ConfirmSidekickOnEject;
     //public static OptionItem ExtendedEjections;
 
@@ -702,7 +703,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 31100 last id for roles/add-ons (Next use 31200)
+        // 32300 last id for roles/add-ons (Next use 32400)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1365,10 +1366,10 @@ public static class Options
         ConfirmLoversOnEject = BooleanOptionItem.Create(60445, "ConfirmLoversOnEject", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 238, 232, byte.MaxValue));
-        SeeEjectedRolesInMeeting = BooleanOptionItem.Create(60041, "SeeEjectedRolesInMeeting", true, TabGroup.SystemSettings, false)
+        SeeEjectedRolesInMeeting = BooleanOptionItem.Create(60041, "SeeEjectedRolesInMeeting", true, TabGroup.ModSettings, false)
             .HideInHnS()
             .SetGameMode(CustomGameMode.Standard);
-        ShowBetrayalAddonsOnEject = BooleanOptionItem.Create(60045, "ShowBetrayalAddonsOnEject", true, TabGroup.SystemSettings, false)
+        ShowBetrayalAddonsOnEject = BooleanOptionItem.Create(60045, "ShowBetrayalAddonsOnEject", true, TabGroup.ModSettings, false)
             .HideInHnS()
             .SetGameMode(CustomGameMode.Standard);
 
@@ -1412,6 +1413,7 @@ public static class Options
             .SetColor(Color.cyan);
 
         CanOnlyGuessEnabled = BooleanOptionItem.Create(60696, "CanOnlyGuessEnabled", true, TabGroup.ModSettings, false)
+            .SetColor(Color.cyan)
             .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard);
 

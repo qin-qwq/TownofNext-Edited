@@ -728,7 +728,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Influenced)
                     || pc.Is(CustomRoles.Silent)
                     || pc.Is(CustomRoles.Tiebreaker)
-                    || pc.Is(CustomRoles.Paranoia))
+                    || pc.Is(CustomRoles.Schizophrenic))
                     return false;
                 break;
 
@@ -750,7 +750,8 @@ public static class CustomRolesHelper
             case CustomRoles.Seer:
                 if (pc.Is(CustomRoles.Mortician)
                     || pc.Is(CustomRoles.EvilTracker)
-                    || pc.Is(CustomRoles.GuardianAngelTOHE))
+                    || pc.Is(CustomRoles.GuardianAngelTOHE)
+                    || pc.Is(CustomRoles.Brave))
                     return false;
                 break;
 
@@ -761,6 +762,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Cleaner)
                     || pc.Is(CustomRoles.Medusa)
                     || pc.Is(CustomRoles.Vulture)
+                    || pc.Is(CustomRoles.Altruist)
                     || pc.Is(CustomRoles.Coroner))
                     return false;
                 break;
@@ -1026,7 +1028,7 @@ public static class CustomRolesHelper
                     return false;
                 break;
 
-            case CustomRoles.Paranoia:
+            case CustomRoles.Schizophrenic:
                 if (pc.Is(CustomRoles.Dictator)
                     || pc.Is(CustomRoles.Madmate)
                     || pc.Is(CustomRoles.VoidBallot)
@@ -1034,9 +1036,9 @@ public static class CustomRolesHelper
                     return false;
                 if (!pc.GetCustomRole().IsImpostor() && !pc.GetCustomRole().IsCrewmate() && !pc.GetCustomRole().IsCoven())
                     return false;
-                if ((pc.GetCustomRole().IsImpostor() && !Paranoia.CanBeImp.GetBool()) || (pc.GetCustomRole().IsCrewmate() && !Paranoia.CanBeCrew.GetBool()) || (pc.GetCustomRole().IsCoven() && !Paranoia.CanBeCov.GetBool()))
+                if ((pc.GetCustomRole().IsImpostor() && !Schizophrenic.CanBeImp.GetBool()) || (pc.GetCustomRole().IsCrewmate() && !Schizophrenic.CanBeCrew.GetBool()) || (pc.GetCustomRole().IsCoven() && !Schizophrenic.CanBeCov.GetBool()))
                     return false;
-                if (pc.GetCustomRole().IsNotKnightable() && Paranoia.DualVotes.GetBool())
+                if (pc.GetCustomRole().IsNotKnightable() && Schizophrenic.DualVotes.GetBool())
                     return false;
                 break;
 
@@ -1370,6 +1372,7 @@ public static class CustomRolesHelper
            CustomRoles.SchrodingersCat => CountTypes.None,
            CustomRoles.Solsticer => CountTypes.None,
            CustomRoles.Revenant => CountTypes.None,
+           CustomRoles.Opportunist => CountTypes.None,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,

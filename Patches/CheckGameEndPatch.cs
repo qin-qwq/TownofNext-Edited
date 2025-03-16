@@ -77,6 +77,19 @@ class GameEndCheckerForNormal
                 return false;
         }
 
+        // Speed Run
+        if (Options.CurrentGameMode == CustomGameMode.SpeedRun)
+        {
+            if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
+            {
+                SpeedRun.RpcSyncSpeedRunStates();
+                ShipStatus.Instance.enabled = false;
+                StartEndGame(reason);
+                predicate = null;
+            }
+            return false;
+        }
+
         // Start end game
         if (WinnerTeam != CustomWinner.Default)
         {
@@ -408,6 +421,10 @@ class GameEndCheckerForNormal
                                 WinnerIds.Add(pc.PlayerId);
                                 AdditionalWinnerTeams.Add(AdditionalWinners.Sunnyboy);
                                 break;
+                            case CustomRoles.Box when !pc.IsAlive():
+                                WinnerIds.Add(pc.PlayerId);
+                                AdditionalWinnerTeams.Add(AdditionalWinners.Box);
+                                break;
                             case CustomRoles.Maverick when pc.IsAlive() && pc.GetAbilityUseLimit() >= Maverick.MinKillsForWin.GetInt():
                                 WinnerIds.Add(pc.PlayerId);
                                 AdditionalWinnerTeams.Add(AdditionalWinners.Maverick);
@@ -628,7 +645,7 @@ class GameEndCheckerForNormal
             {
                 if (pc == null) continue;
 
-                dual = Paranoia.IsExistInGame(pc) ? 1 : 0;
+                dual = Schizophrenic.IsExistInGame(pc) ? 1 : 0;
                 var countType = Main.PlayerStates[pc.PlayerId].countTypes;
                 switch (countType)
                 {

@@ -118,6 +118,7 @@ internal class CopyCat : RoleBase
         {
             role = role switch
             {
+                CustomRoles.Lawyer => CustomRoles.Pursuer,
                 CustomRoles.Stealth or CustomRoles.Medusa => CustomRoles.Grenadier,
                 CustomRoles.TimeThief => CustomRoles.TimeManager,
                 CustomRoles.Consigliere => CustomRoles.Overseer,

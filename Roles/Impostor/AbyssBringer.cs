@@ -17,7 +17,7 @@ internal class AbyssBringer : RoleBase
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
-    
+
     private static OptionItem BlackHoleCountLimit;
     private static OptionItem BlackHolePlaceCooldown;
     private static OptionItem BlackHoleDespawnMode;
@@ -103,8 +103,7 @@ internal class AbyssBringer : RoleBase
             return;
         }
         // When no player exists, Instantly spawm and despawn networked object will cause error spam
-
-        if (BlackHoles.Count >= BlackHoleCountLimit.GetInt())
+        if (BlackHoles.Count() >= BlackHoleCountLimit.GetInt())
         {
             return;
         }
@@ -257,6 +256,7 @@ internal class AbyssBringer : RoleBase
             return string.Format(Translator.GetString("Abyssbringer.Suffix.BlackHole"), rn, playersConsumed);
         }
     }
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("BlackHole");
 
     [Obfuscation(Exclude = true)]
     enum DespawnMode

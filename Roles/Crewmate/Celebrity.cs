@@ -10,13 +10,15 @@ internal class Celebrity : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Celebrity;
     private const int Id = 6500;
-    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
+    public override CustomRoles ThisRoleBase => CustomRoles.Noisemaker;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\
 
     private static OptionItem ImpKnowCelebrityDead;
     private static OptionItem NeutralKnowCelebrityDead;
     private static OptionItem CovenKnowCelebrityDead;
+    private static OptionItem ImpostorAlert;
+    private static OptionItem AlertDuration;
 
     private static readonly HashSet<byte> CelebrityDead = [];
 
@@ -29,6 +31,11 @@ internal class Celebrity : RoleBase
             .SetParent(CustomRoleSpawnChances[CustomRoles.Celebrity]);
         CovenKnowCelebrityDead = BooleanOptionItem.Create(Id + 12, "CovenKnowCelebrityDead", false, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Celebrity]);
+        ImpostorAlert = BooleanOptionItem.Create(Id + 2, GeneralOption.NoisemakerBase_ImpostorAlert, false, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Celebrity]);
+        AlertDuration = IntegerOptionItem.Create(Id + 3, GeneralOption.NoisemakerBase_AlertDuration, new(1, 20, 1), 10, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Celebrity])
+            .SetValueFormat(OptionFormat.Seconds);
     }
     public override void Init()
     {

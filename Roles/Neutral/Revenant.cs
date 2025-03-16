@@ -1,4 +1,5 @@
 using TOHE.Roles.Core;
+using static TOHE.Options;
 using static TOHE.Translator;
 
 namespace TOHE.Roles.Neutral;
@@ -29,6 +30,7 @@ internal class Revenant : RoleBase
         killer.RpcMurderPlayer(killer);
         killer.SetRealKiller(target);
 
+        target.GetRoleClass()?.OnRemove(target.PlayerId);
         target.RpcChangeRoleBasis(role);
         target.RpcSetCustomRole(role);
         target.GetRoleClass()?.OnAdd(target.PlayerId);

@@ -62,7 +62,7 @@ internal class Pursuer : RoleBase
         }
         if (target.IsTransformedNeutralApocalypse())
         {
-            Logger.Info("target is Transformed Neutral Apocalypse, ability used count reduced, but target will not die", "Deceiver");
+            Logger.Info("target is Transformed Neutral Apocalypse, ability used count reduced, but target will not die", "Purser");
             return false;
         }
 
