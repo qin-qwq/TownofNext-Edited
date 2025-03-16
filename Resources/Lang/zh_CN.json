@@ -4154,5 +4154,7 @@
   "RevealedInfoLong": "(附加职业):\n因被冤魂揭示而得到的附加职业，揭示者的角色会透露给所有人。",
   "CanTurnOffLinghts": "可以使用关灯",
   "TurnOffLinghtsCooldown": "关灯冷却时间",
-  "TricksteShapeshiftText": "关灯"
+  "TricksteShapeshiftText": "关灯",
+  "CanKillKiller": "可以反杀凶手",
+  "CantSneak": "目标不能偷取"
 }
