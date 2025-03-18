@@ -52,8 +52,8 @@ public class Main : BasePlugin
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
-    public static readonly bool canaryRelease = false; // Latest: V5.0.2 Beta 1
-    public static readonly bool fullRelease = true; // Latest: V5.0.1
+    public static readonly bool canaryRelease = true; // Latest: V5.0.2 Beta 1
+    public static readonly bool fullRelease = false; // Latest: V5.0.1
 
     public static bool hasAccess = true;
 
