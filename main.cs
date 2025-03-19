@@ -923,6 +923,7 @@ public enum CustomRoles
     Coven,
     Conjurer,
     CovenLeader,
+    Harvester,
     Dreamweaver,
     HexMaster,
     Illusionist,

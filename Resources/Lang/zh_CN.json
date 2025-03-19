@@ -4156,5 +4156,21 @@
   "TurnOffLinghtsCooldown": "关灯冷却时间",
   "TricksteShapeshiftText": "关灯",
   "CanKillKiller": "可以反杀凶手",
-  "CantSneak": "目标不能偷取"
+  "CantSneak": "目标不能偷取",
+  "UniqueNeutralRevealScreen": "每个<color=#7f8c8d>中立</color>角色都有自己的开场显示",
+  "Harvester": "收割者",
+  "HarvesterInfo": "交换并偷取附加职业",
+  "HarvesterInfoLong": "(巫师阵营):\n收割者可以使用变形菜单选择两名玩家，下轮会议后这两名玩家的附加职业将被交换。\n当收割者存活时，每个被巫师阵营杀死的玩家都会被偷走一定数量的附加职业。\n<b>当收割者获得死灵之书时，收割者可以击杀，每个被非巫师阵营击杀的玩家都会被偷走一定数量的附加职业交给收割者。</b>",
+  "CovenLeaderKillButton": "训练",
+  "MoonDancerKillButtonText": "传授棒",
+  "MoonDancerNecroKillButtonText": "爆破",
+  "JinxKillButtonText": "厄运",
+  "HarvesterSettings.SwapCooldown": "交换冷却时间",
+  "HarvesterSettings.AmountStolen": "每次偷走的附加职业数量",
+  "HarvesterSettings.MaxAddonsCoven": "<color=#ac42f2>巫师阵营</color>可以获得的最大附加职业数量",
+  "HarvesterSettings.MaxAddonsSelf": "收割者可以获得的最大附加职业数量",
+  "Harvester.SwapListFull": "你的交换清单满了！",
+  "Harvester.PlayerAdded": "{0} 加入了交换清单！",
+  "Harvester.ShapeshiftButton": "交换",
+  "CovenInfo": "<color=#ac42f2>★ 巫师阵营身份 ★ /coveninfo</color>"
 }
