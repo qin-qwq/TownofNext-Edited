@@ -841,7 +841,6 @@ public enum CustomRoles
     Veteran,
     Vigilante,
     Witness,
-    //YF,
 
     //Neutral
     Agitater,
