@@ -4168,7 +4168,7 @@
   "PreventFirstDeadShapeShift": "阻止被保护的玩家使用变形",
   "Requiter": "报复者",
   "RequiterInfo": "为被驱逐的<color=#8cffff>船员</color>报仇",
-  "RequiterInfoLong": "(Crewmates):\n报复者一开始没有子弹。\n每有一名船员被驱逐，报复者就会获得一颗子弹。\n报复者只能在有子弹的时候击杀。",
+  "RequiterInfoLong": "(船员阵营):\n报复者一开始没有子弹。\n每有一名船员被驱逐，报复者就会获得一颗子弹。\n报复者只能在有子弹的时候击杀。",
   "RequiterChance": "<color=#ffc0cb>报复者</color>概率",
   "WinnerRoleText.MoonWolf": "月下狼人胜利！",
   "MoonWolf": "月下狼人",
