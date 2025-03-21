@@ -47,12 +47,12 @@ public class Main : BasePlugin
 
     public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
     public const string PluginVersion = "2025.0322.502.000020"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "5.0.2 Beta 1";
+    public const string PluginDisplayVersion = "5.0.2 Beta 2";
     public const string SupportedVersionAU = "2024.10.29"; // Changed becasue Dark theme works at this version.
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
-    public static readonly bool canaryRelease = true; // Latest: V5.0.2 Beta 1
+    public static readonly bool canaryRelease = true; // Latest: V5.0.2 Beta 2
     public static readonly bool fullRelease = false; // Latest: V5.0.1
 
     public static bool hasAccess = true;
@@ -819,6 +819,7 @@ public enum CustomRoles
     President,
     Psychic,
     Randomizer,
+    Requiter,
     Retributionist,
     Reverie,
     Roaster,
@@ -874,6 +875,7 @@ public enum CustomRoles
     Juggernaut,
     Lawyer,
     Maverick,
+    MoonWolf,
     Opportunist,
     Pelican,
     Pestilence,
@@ -1103,6 +1105,7 @@ public enum CustomWinner
     Shocker = CustomRoles.Shocker,
     Apocalypse = CustomRoles.Apocalypse,
     Coven = CustomRoles.Coven,
+    MoonWolf = CustomRoles.MoonWolf,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners

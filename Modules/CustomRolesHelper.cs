@@ -210,7 +210,8 @@ public static class CustomRolesHelper
             CustomRoles.Jackal or
             CustomRoles.Juggernaut or
             CustomRoles.BloodKnight or
-            CustomRoles.Cultist;
+            CustomRoles.Cultist or
+            CustomRoles.MoonWolf;
     }
     public static bool IsTasklessCrewmate(this CustomRoles role)
     {
@@ -938,7 +939,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Rebound)
                     || pc.Is(CustomRoles.Tired)
                     || pc.Is(CustomRoles.Flash)
-                    || pc.Is(CustomRoles.Sloth))
+                    || pc.Is(CustomRoles.Sloth)
+                    || pc.Is(CustomRoles.KillingMachine))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1373,6 +1375,7 @@ public static class CustomRolesHelper
            CustomRoles.Solsticer => CountTypes.None,
            CustomRoles.Revenant => CountTypes.None,
            CustomRoles.Opportunist => CountTypes.None,
+           CustomRoles.MoonWolf => CountTypes.MoonWolf,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1431,6 +1434,7 @@ public static class CustomRolesHelper
             CustomRoles.Mini => CustomWinner.NiceMini,
             CustomRoles.Doppelganger => CustomWinner.Doppelganger,
             CustomRoles.Shocker => CustomWinner.Shocker,
+            CustomRoles.MoonWolf => CustomWinner.MoonWolf,
             _ => throw new NotImplementedException()
 
         };
@@ -1465,6 +1469,7 @@ public static class CustomRolesHelper
             CountTypes.Arsonist => CustomRoles.Arsonist,
             CountTypes.RuthlessRomantic => CustomRoles.RuthlessRomantic,
             CountTypes.Shocker => CustomRoles.Shocker,
+            CountTypes.MoonWolf => CustomRoles.MoonWolf,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1551,5 +1556,6 @@ public enum CountTypes
     Agitater,
     RuthlessRomantic,
     Shocker,
-    Coven
+    Coven,
+    MoonWolf
 }

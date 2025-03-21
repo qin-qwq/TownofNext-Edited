@@ -11,7 +11,6 @@ internal class Box : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Box;
     private const int Id = 31600;
-    public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
     //==================================================================\\
