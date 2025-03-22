@@ -115,7 +115,11 @@ internal class AbyssBringer : RoleBase
         BlackHoles.Add(blackHoleId, new(new(pos, _state.PlayerId), Utils.TimeStamp, pos, roomName, 0));
         Utils.SendRPC(CustomRPC.SyncRoleSkill, _Player, 1, blackHoleId, pos, roomName);
     }
-    public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
+        hud.AbilityButton.SetUsesRemaining(BlackHoleCountLimit.GetInt() - BlackHoles.Count());
+    }
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
     {
         var abyssbringer = _Player;
