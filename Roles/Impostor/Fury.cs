@@ -102,7 +102,6 @@ internal class Fury : RoleBase
         _ = new LateTask(() =>
         {
             FuryAngry = false;
-            AURoleOptions.ShapeshifterCooldown = AngryCooldown.GetFloat();
             Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed;
             Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKillCooldown;
             player.Notify(GetString("FuryInCalm"), 5f);

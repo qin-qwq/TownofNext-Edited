@@ -208,6 +208,12 @@ class GameEndCheckerForNormal
                             WinnerIds.Add(pc.PlayerId);
                         }
                         break;
+                    case CustomWinner.Disruptor:
+                        if (pc.Is(CustomRoles.Disruptor) && !WinnerIds.Contains(pc.PlayerId))
+                        {
+                            WinnerIds.Add(pc.PlayerId);
+                        }
+                        break;
                 }
             }
 

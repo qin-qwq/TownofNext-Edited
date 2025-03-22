@@ -211,7 +211,8 @@ public static class CustomRolesHelper
             CustomRoles.Juggernaut or
             CustomRoles.BloodKnight or
             CustomRoles.Cultist or
-            CustomRoles.MoonWolf;
+            CustomRoles.MoonWolf or
+            CustomRoles.Disruptor;
     }
     public static bool IsTasklessCrewmate(this CustomRoles role)
     {
@@ -1376,6 +1377,7 @@ public static class CustomRolesHelper
            CustomRoles.Revenant => CountTypes.None,
            CustomRoles.Opportunist => CountTypes.None,
            CustomRoles.MoonWolf => CountTypes.MoonWolf,
+           CustomRoles.Disruptor => CountTypes.Disruptor,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1435,6 +1437,7 @@ public static class CustomRolesHelper
             CustomRoles.Doppelganger => CustomWinner.Doppelganger,
             CustomRoles.Shocker => CustomWinner.Shocker,
             CustomRoles.MoonWolf => CustomWinner.MoonWolf,
+            CustomRoles.Disruptor => CustomWinner.Disruptor,
             _ => throw new NotImplementedException()
 
         };
@@ -1470,6 +1473,7 @@ public static class CustomRolesHelper
             CountTypes.RuthlessRomantic => CustomRoles.RuthlessRomantic,
             CountTypes.Shocker => CustomRoles.Shocker,
             CountTypes.MoonWolf => CustomRoles.MoonWolf,
+            CountTypes.Disruptor => CustomRoles.Disruptor,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1557,5 +1561,6 @@ public enum CountTypes
     RuthlessRomantic,
     Shocker,
     Coven,
-    MoonWolf
+    MoonWolf,
+    Disruptor
 }

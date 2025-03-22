@@ -21,6 +21,7 @@ internal class MoonWolf : RoleBase
     private static OptionItem MoonDuration;
     private static OptionItem CanVent;
     private static OptionItem HasImpostorVision;
+    private static OptionItem CanUsesSabotage;
 
     private bool Moon;
 
@@ -35,6 +36,7 @@ internal class MoonWolf : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CanVent = BooleanOptionItem.Create(Id + 13, GeneralOption.CanVent, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.MoonWolf]);
         HasImpostorVision = BooleanOptionItem.Create(Id + 14, GeneralOption.ImpostorVision, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.MoonWolf]);
+        CanUsesSabotage = BooleanOptionItem.Create(Id + 15, GeneralOption.CanUseSabotage, false, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.MoonWolf]);
     }
 
     public override void Init()
@@ -54,6 +56,7 @@ internal class MoonWolf : RoleBase
         return Moon && pc.IsAlive();
     }
     public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
+    public override bool CanUseSabotage(PlayerControl pc) => CanUsesSabotage.GetBool();
 
     public override void UnShapeShiftButton(PlayerControl player)
     {
@@ -67,7 +70,6 @@ internal class MoonWolf : RoleBase
         _ = new LateTask(() =>
         {
             Moon = false;
-            AURoleOptions.ShapeshifterCooldown = MoonCooldown.GetFloat();
             player.ResetKillCooldown();
             player.SetKillCooldown();
             player.MarkDirtySettings();
