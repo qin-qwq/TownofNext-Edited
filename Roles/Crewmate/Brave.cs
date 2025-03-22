@@ -89,17 +89,19 @@ internal class Brave : RoleBase
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
-        return !HasShield;
+        if(Main.AllAlivePlayerControls.Length <= ShieldPlayerThreshold.GetInt())
+        {
+            return false;
+        }
+        return true;
     }
     public override void SetKillCooldown(byte id)
     {
-        Main.AllPlayerKillCooldown[id] = HasSword ? 300f : KillCooldown.GetFloat();
+        Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     }
 
-    public override bool CanUseKillButton(PlayerControl pc)
-    {
-        return HasSword && pc.IsAlive();
-    }
+    public override bool CanUseKillButton(PlayerControl pc) => Main.AllAlivePlayerControls.Length <= SwordPlayerThreshold.GetInt();
+
     private static void SendRPC(byte playerId, byte stage)
     {
         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncBraveStage, SendOption.Reliable, -1);
