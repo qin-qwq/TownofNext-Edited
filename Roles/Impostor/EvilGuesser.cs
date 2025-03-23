@@ -1,5 +1,7 @@
 using UnityEngine;
 using static TOHE.Options;
+using static TOHE.Translator;
+using TOHE.Roles.Core;
 
 namespace TOHE.Roles.Impostor;
 
@@ -17,14 +19,13 @@ internal class EvilGuesser : RoleBase
     private static OptionItem EGCanGuessAdt;
     //private static OptionItem EGCanGuessTaskDoneSnitch; Not used
     private static OptionItem EGTryHideMsg;
-    /*private static OptionItem EnableAwakening;
-    private static OptionItem AwakeningThreshold;
+    private static OptionItem EnableAwakening;
     private static OptionItem ProgressPerKill;
-    private static OptionItem ProgressPerGuess;
+    private static OptionItem ProgressPerSkill;
     private static OptionItem ProgressPerSecond;
 
-    private static Dictionary<byte, float> AwakeningProgress = [];
-    private static Dictionary<byte, bool> IsAwakened = [];*/
+    private static float AwakeningProgress;
+    private static bool IsAwakened;
 
     public override void SetupCustomOption()
     {
@@ -41,95 +42,77 @@ internal class EvilGuesser : RoleBase
         EGTryHideMsg = BooleanOptionItem.Create(Id + 6, "GuesserTryHideMsg", true, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EvilGuesser])
             .SetColor(Color.green);
-        /*EnableAwakening = BooleanOptionItem.Create(Id + 7, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
+        EnableAwakening = BooleanOptionItem.Create(Id + 7, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
-        AwakeningThreshold = FloatOptionItem.Create(Id + 8, "AwakeningThreshold", new(0f, 100f, 10f), 100f, TabGroup.ImpostorRoles, false)
+        ProgressPerKill = FloatOptionItem.Create(Id + 8, "ProgressPerKill", new(0f, 100f, 10f), 30f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
-        ProgressPerKill = FloatOptionItem.Create(Id + 9, "ProgressPerKill", new(0f, 100f, 10f), 30f, TabGroup.ImpostorRoles, false)
+        ProgressPerSkill = FloatOptionItem.Create(Id + 9, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
-        ProgressPerGuess = FloatOptionItem.Create(Id + 10, "ProgressPerGuess", new(0f, 100f, 10f), 30f, TabGroup.ImpostorRoles, false)
+        ProgressPerSecond = FloatOptionItem.Create(Id + 10, "ProgressPerSecond", new(0.1f, 1f, 0.1f), 0.3f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSecond = FloatOptionItem.Create(Id + 11, "ProgressPerSecond", new(0.001f, 1f, 0.01f), 0.01f, TabGroup.ImpostorRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);*/
     }
 
-    /*public override void Init()
+    public override void Init()
     {
-        AwakeningProgress.Clear();
-        IsAwakened.Clear();
+        AwakeningProgress = 0;
+        IsAwakened = false;
     }
 
     public override void Add(byte playerId)
     {
         if (EnableAwakening.GetBool())
         {
-            AwakeningProgress[playerId] = 0f;
-            IsAwakened[playerId] = false;
+            AwakeningProgress = 0;
+            IsAwakened = false;
         }
     }
 
-    public override void Remove(byte playerId)
+    public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {
-        AwakeningProgress.Remove(playerId);
-        IsAwakened.Remove(playerId);
-    }
-
-    public override string GetProgressText(byte playerId, bool comms)
-    {
-        if (!EnableAwakening.GetBool()) return base.GetProgressText(playerId, comms);
-
-        var player = Utils.GetPlayerById(playerId);
-        var progress = Mathf.Clamp(AwakeningProgress.GetValueOrDefault(playerId), 0f, 100f);
-        var color = IsAwakened.GetValueOrDefault(playerId) ? "#FFA500" : "#FFFF00";
-
-        return $"<color={color}>觉醒进度: {progress:F0}%</color>";
+        if (!EnableAwakening.GetBool() || !seer.Is(CustomRoles.EvilGuesser) || GameStates.IsMeeting || isForMeeting) return string.Empty;
+        else if (AwakeningProgress >= 100 && IsAwakened) return string.Empty;
+        else return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
     }
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        if (!EnableAwakening.GetBool() || 
-            !player.IsAlive() || 
-            IsAwakened.GetValueOrDefault(player.PlayerId))
+        if (!EnableAwakening.GetBool() || !player.IsAlive() || IsAwakened)
             return;
 
-        AwakeningProgress[player.PlayerId] += ProgressPerSecond.GetFloat();
+        AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
         CheckAwakening(player);
     }
 
-    public override void OnMurderPlayerAsKiller(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (!EnableAwakening.GetBool() || isSuicide || IsAwakened[killer.PlayerId]) return;
-
-        AwakeningProgress[killer.PlayerId] += ProgressPerKill.GetFloat();
+        AwakeningProgress += ProgressPerKill.GetFloat();
         CheckAwakening(killer);
+        return true;
     }
 
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {
-
-        if (EnableAwakening.GetBool() &&
-            !IsAwakened.GetValueOrDefault(guesser.PlayerId))
+        if (EnableAwakening.GetBool() && !IsAwakened)
         {
-            AwakeningProgress[guesser.PlayerId] += ProgressPerGuess.GetFloat();
+            AwakeningProgress += ProgressPerSkill.GetFloat();
             CheckAwakening(guesser);
         }
         return true;
     }
 
-    private void CheckAwakening(PlayerControl player)
+    private static void CheckAwakening(PlayerControl player)
     {
-        if (AwakeningProgress[player.PlayerId] >= AwakeningThreshold.GetFloat() && 
-            !IsAwakened[player.PlayerId])
+        if (AwakeningProgress >= 100f && !IsAwakened)
         {
-            IsAwakened[player.PlayerId] = true;
-            Main.PlayerStates[_Player.PlayerId].SubRoles.Add(CustomRoles.DoubleShot);
-            player.Notify("邪恶赌怪已成功觉醒！", 5f);
+            IsAwakened = true;
+            player.RpcSetCustomRole(CustomRoles.DoubleShot, false, false);
+            player.Notify(GetString("SuccessfulAwakening"), 5f);
         }
-    }*/
+    }
+    
     public static bool NeedHideMsg(PlayerControl pc) => pc.Is(CustomRoles.EvilGuesser) && EGTryHideMsg.GetBool();
 
     public static bool HideTabInGuesserUI(int TabId)
