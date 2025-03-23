@@ -44,13 +44,13 @@ internal class EvilGuesser : RoleBase
             .SetColor(Color.green);
         EnableAwakening = BooleanOptionItem.Create(Id + 7, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
-        ProgressPerKill = FloatOptionItem.Create(Id + 8, "ProgressPerKill", new(0f, 100f, 10f), 30f, TabGroup.ImpostorRoles, false)
+        ProgressPerKill = FloatOptionItem.Create(Id + 8, "ProgressPerKill", new(0f, 100f, 10f), 35f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
         ProgressPerSkill = FloatOptionItem.Create(Id + 9, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSecond = FloatOptionItem.Create(Id + 10, "ProgressPerSecond", new(0.1f, 1f, 0.1f), 0.3f, TabGroup.ImpostorRoles, false)
+        ProgressPerSecond = FloatOptionItem.Create(Id + 10, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 0.5f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
     }

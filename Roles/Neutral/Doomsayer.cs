@@ -82,7 +82,7 @@ internal class Doomsayer : RoleBase
         ProgressPerSkill = FloatOptionItem.Create(Id + 31, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.NeutralRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSecond = FloatOptionItem.Create(Id + 32, "ProgressPerSecond", new(0.1f, 1f, 0.1f), 1f, TabGroup.NeutralRoles, false)
+        ProgressPerSecond = FloatOptionItem.Create(Id + 32, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 1.5f, TabGroup.NeutralRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
     }
