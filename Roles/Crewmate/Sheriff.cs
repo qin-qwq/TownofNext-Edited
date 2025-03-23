@@ -40,8 +40,14 @@ internal class Sheriff : RoleBase
     private static OptionItem NonCrewCanKillImp;
     private static OptionItem NonCrewCanKillNeutral;
     private static OptionItem NonCrewCanKillCoven;
+    private static OptionItem EnableAwakening;
+    private static OptionItem KillErrorCooldown;
+    private static OptionItem ProgressPerSkill;
+    private static OptionItem ProgressPerSecond;
 
     private float CurrentKillCooldown;
+    private static float AwakeningProgress;
+    private static bool IsAwakened;
 
     private static readonly Dictionary<CustomRoles, OptionItem> KillTargetOptions = [];
 
@@ -74,18 +80,39 @@ internal class Sheriff : RoleBase
         MisfireOnAdmired = BooleanOptionItem.Create(Id + 32, "SheriffMisfireOnAdmired", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
         CanKillNeutrals = BooleanOptionItem.Create(Id + 16, "SheriffCanKillNeutrals", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
         CanKillNeutralsMode = StringOptionItem.Create(Id + 14, "SheriffCanKillNeutralsMode", EnumHelper.GetAllNames<KillOptionList>(), 0, TabGroup.CrewmateRoles, false).SetParent(CanKillNeutrals);
-        SetUpNeutralOptions(Id + 33);
+        SetUpNeutralOptions(Id + 37);
         SidekickSheriffCanGoBerserk = BooleanOptionItem.Create(Id + 28, "SidekickSheriffCanGoBerserk", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
         SetNonCrewCanKill = BooleanOptionItem.Create(Id + 18, "SheriffSetMadCanKill", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
         NonCrewCanKillImp = BooleanOptionItem.Create(Id + 19, "SheriffMadCanKillImp", true, TabGroup.CrewmateRoles, false).SetParent(SetNonCrewCanKill);
         NonCrewCanKillCrew = BooleanOptionItem.Create(Id + 21, "SheriffMadCanKillCrew", true, TabGroup.CrewmateRoles, false).SetParent(SetNonCrewCanKill);
         NonCrewCanKillNeutral = BooleanOptionItem.Create(Id + 20, "SheriffMadCanKillNeutral", true, TabGroup.CrewmateRoles, false).SetParent(SetNonCrewCanKill);
         NonCrewCanKillCoven = BooleanOptionItem.Create(Id + 31, "SheriffMadCanKillCoven", true, TabGroup.CrewmateRoles, false).SetParent(SetNonCrewCanKill);
+        EnableAwakening = BooleanOptionItem.Create(Id + 33, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
+        KillErrorCooldown = FloatOptionItem.Create(Id + 34, "KillErrorCooldown", new(0f, 120f, 2.5f), 45f, TabGroup.CrewmateRoles, false)
+            .SetParent(EnableAwakening)
+            .SetValueFormat(OptionFormat.Seconds);
+        ProgressPerSkill = FloatOptionItem.Create(Id + 35, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.CrewmateRoles, false)
+            .SetParent(EnableAwakening)
+            .SetValueFormat(OptionFormat.Percent);
+        ProgressPerSecond = FloatOptionItem.Create(Id + 36, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 1.5f, TabGroup.CrewmateRoles, false)
+            .SetParent(EnableAwakening)
+            .SetValueFormat(OptionFormat.Percent);
+    }
+    public override void Init()
+    {
+        AwakeningProgress = 0;
+        IsAwakened = false;
     }
     public override void Add(byte playerId)
     {
         CurrentKillCooldown = KillCooldown.GetFloat();
         playerId.SetAbilityUseLimit(ShotLimitOpt.GetInt());
+        if (EnableAwakening.GetBool())
+        {
+            AwakeningProgress = 0;
+            IsAwakened = false;
+        }
     }
     private static void SetUpNeutralOptions(int Id)
     {
@@ -125,7 +152,20 @@ internal class Sheriff : RoleBase
             {
                 killer.SetKillCooldown();
             }
+            if (EnableAwakening.GetBool() && !IsAwakened)
+            {
+                AwakeningProgress += ProgressPerSkill.GetFloat();
+                CheckAwakening(killer);
+            }
             return true;
+        }
+        if (IsAwakened)
+        {
+            killer.ResetKillCooldown();
+            killer.SetKillCooldown(KillErrorCooldown.GetFloat());
+            killer.RpcGuardAndKill(target);
+            killer.Notify(GetString("TargetCantKill"));
+            return false;
         }
         killer.SetDeathReason(PlayerState.DeathReason.Misfire);
         killer.RpcMurderPlayer(killer);
@@ -179,4 +219,26 @@ internal class Sheriff : RoleBase
         hud.KillButton.OverrideText(GetString("SheriffKillButtonText"));
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Kill");
+    public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
+    {
+        if (!EnableAwakening.GetBool() || !seer.Is(CustomRoles.Sheriff) || GameStates.IsMeeting || isForMeeting) return string.Empty;
+        else if (AwakeningProgress >= 100 && IsAwakened) return string.Empty;
+        else return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
+    }
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (!EnableAwakening.GetBool() || !player.IsAlive() || IsAwakened)
+            return;
+
+        AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
+        CheckAwakening(player);
+    }
+    private static void CheckAwakening(PlayerControl player)
+    {
+        if (AwakeningProgress >= 100f && !IsAwakened)
+        {
+            IsAwakened = true;
+            player.Notify(GetString("SuccessfulAwakening"), 5f);
+        }
+    }
 }

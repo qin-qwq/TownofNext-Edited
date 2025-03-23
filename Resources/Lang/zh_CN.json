@@ -4183,5 +4183,7 @@
   "DisruptorInfo": "制造混乱！",
   "DisruptorInfoLong": "(中立阵营):\n扰乱者使用击杀后，被击杀的玩家的尸体将被传送到随机的一个通风管道。\n根据房主设置，如果目标不能被传送，可能不会杀死目标。",
   "KillTargetWhenCantTP": "直接击杀不能被传送的目标",
-  "WinnerRoleText.Disruptor": "扰乱者胜利！"
+  "WinnerRoleText.Disruptor": "扰乱者胜利！",
+  "TargetCantKill": "目标不能执法！",
+  "KillErrorCooldown": "执法错误冷却时间"
 }
