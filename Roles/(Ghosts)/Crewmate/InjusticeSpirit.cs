@@ -41,7 +41,7 @@ internal class InjusticeSpirit : RoleBase
     public override bool OnCheckProtect(PlayerControl killer, PlayerControl target)
     {
         if (killer.GetAbilityUseLimit() <= 0) return false;
-        if (target.GetCustomRole().IsCrewmate() && !target.Is(CustomRoles.Madmate) && !target.GetCustomRole().IsConverted() && target.Is(CustomRoles.Revealed)) return false;
+        if (target.GetCustomRole().IsCrewmate() && !target.Is(CustomRoles.Madmate) && !target.GetCustomRole().IsConverted()) return false;
         else
         {
             killer.RpcRemoveAbilityUse();
