@@ -46,14 +46,14 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
-    public const string PluginVersion = "2025.0326.503.000000"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "5.0.3";
+    public const string PluginVersion = "2025.0404.510.000010"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "5.1.0 Beta 1";
     public const string SupportedVersionAU = "2025.3.25"; // 16.0.0
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
-    public static readonly bool canaryRelease = false; // Latest: V5.0.3 Beta 1
-    public static readonly bool fullRelease = true; // Latest: V5.0.3
+    public static readonly bool canaryRelease = true; // Latest: V5.1.0 Beta 1
+    public static readonly bool fullRelease = false; // Latest: V5.0.3
 
     public static bool hasAccess = true;
 
