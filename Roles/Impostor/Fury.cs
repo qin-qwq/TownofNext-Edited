@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using TOHE.Roles.Core;
 using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
@@ -13,6 +14,7 @@ internal class Fury : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Fury;
     private const int Id = 32000;
+    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Fury);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

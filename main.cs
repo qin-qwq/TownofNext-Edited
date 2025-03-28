@@ -819,6 +819,7 @@ public enum CustomRoles
     Mole,
     Monarch,
     Mortician,
+    Nezha,
     NiceGuesser,
     NiceMini,
     Observer,

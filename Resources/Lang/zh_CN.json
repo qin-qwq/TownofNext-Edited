@@ -4184,5 +4184,8 @@
   "KillTargetWhenCantTP": "直接击杀不能被传送的目标",
   "WinnerRoleText.Disruptor": "扰乱者胜利！",
   "TargetCantKill": "目标不能执法！",
-  "KillErrorCooldown": "执法错误冷却时间"
+  "KillErrorCooldown": "执法错误冷却时间",
+  "Nezha": "哪吒",
+  "NezhaInfo": "上可九天揽月，下可五洋捉龙",
+  "NezhaInfoLong": "(船员阵营):\n被驱逐时，淘汰自己与所有投票给你的玩家！\n<b>哪吒觉醒：被击杀时，烧死附近所有玩家！</b>"
 }
