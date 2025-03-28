@@ -38,7 +38,7 @@ internal class Thief : RoleBase
     public override bool CanUseKillButton(PlayerControl pc) => true;
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if(target.Is(CustomRoles.Lawyer) || target.Is(CustomRoles.Executioner))
+        if (target.Is(CustomRoles.Lawyer) || target.Is(CustomRoles.Executioner))
         {
             killer.Notify(GetString("CantSneak"), 5f);
             killer.RpcGuardAndKill(target);
