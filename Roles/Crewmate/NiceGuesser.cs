@@ -53,55 +53,42 @@ internal class NiceGuesser : RoleBase
         IsAwakened = false;
     }
 
-    public override void Add(byte playerId)
-    {
-        if (EnableAwakening.GetBool())
-        {
-            AwakeningProgress = 0;
-            IsAwakened = false;
-        }
-    }
-
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {
-        if (!EnableAwakening.GetBool() || !seer.Is(CustomRoles.NiceGuesser) || GameStates.IsMeeting || isForMeeting) return string.Empty;
-        else if (AwakeningProgress >= 100 && IsAwakened) return string.Empty;
-        else return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
+        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100) return string.Empty;
+        return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
     }
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        if (!EnableAwakening.GetBool() || !player.IsAlive() || IsAwakened)
-            return;
-
-        AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
-        CheckAwakening(player);
+        if (AwakeningProgress < 100)
+        {
+            AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
+        }
+        else CheckAwakening(player);
     }
 
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
     {
-        if (EnableAwakening.GetBool() && !IsAwakened)
+        if (!IsAwakened)
         {
             AwakeningProgress += ProgressPerTask.GetFloat();
-            CheckAwakening(player);
         }
         return true;
     }
 
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {
-
-        if (EnableAwakening.GetBool() && !IsAwakened)
+        if (!IsAwakened)
         {
             AwakeningProgress += ProgressPerSkill.GetFloat();
-            CheckAwakening(guesser);
         }
         return true;
     }
 
     private static void CheckAwakening(PlayerControl player)
     {
-        if (AwakeningProgress >= 100f && !IsAwakened)
+        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool())
         {
             IsAwakened = true;
             player.RpcSetCustomRole(CustomRoles.DoubleShot, false, false);

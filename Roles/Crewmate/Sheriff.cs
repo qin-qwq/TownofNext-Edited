@@ -222,6 +222,15 @@ internal class Sheriff : RoleBase
         {
             AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
         }
-        else IsAwakened = true;
+        else CheckAwakening(player);;
+    }
+    private static void CheckAwakening(PlayerControl player)
+    {
+        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool())
+        {
+            IsAwakened = true;
+            if (!DisableShieldAnimations.GetBool()) player.RpcGuardAndKill(player);
+            player.Notify(GetString("SuccessfulAwakening"), 5f);
+        }
     }
 }
