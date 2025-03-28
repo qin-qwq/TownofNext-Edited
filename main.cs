@@ -750,6 +750,7 @@ public enum CustomRoles
     Scavenger,
     ShapeMaster,
     Sniper,
+    Sorcerer,
     SoulCatcher,
     Stealth,
     YinYanger,

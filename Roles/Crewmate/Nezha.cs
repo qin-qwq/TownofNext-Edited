@@ -38,7 +38,7 @@ internal class Nezha : RoleBase
         ProgressPerSecond = FloatOptionItem.Create(Id + 12, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 0.5f, TabGroup.CrewmateRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
-        BomberRadius = FloatOptionItem.Create(Id + 13, "BomberRadius", new(0.5f, 100f, 0.5f), 2f, TabGroup.CrewmateRoles, false)
+        BomberRadius = FloatOptionItem.Create(Id + 13, "BomberRadius", new(0.5f, 100f, 0.5f), 1f, TabGroup.CrewmateRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Multiplier);
     }

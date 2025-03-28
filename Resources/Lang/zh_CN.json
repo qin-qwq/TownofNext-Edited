@@ -4187,5 +4187,9 @@
   "KillErrorCooldown": "执法错误冷却时间",
   "Nezha": "哪吒",
   "NezhaInfo": "上可九天揽月，下可五洋捉龙",
-  "NezhaInfoLong": "(船员阵营):\n被驱逐时，淘汰自己与所有投票给你的玩家！\n<b>哪吒觉醒：被击杀时，烧死附近所有玩家！</b>"
+  "NezhaInfoLong": "(船员阵营):\n被驱逐时，淘汰自己与所有投票给你的玩家！\n<b>哪吒觉醒：被击杀时，烧死附近所有玩家！</b>",
+  "Sorcerer": "巫术师",
+  "SorcererInfo": "唤醒灵魂的力量！",
+  "SorcererInfoLong": "(内鬼阵营):\n巫术师可以使用报告按钮将死亡的玩家复活，并让他们成为叛徒或者逃亡者！",
+  "RevivedChangeMode": "被复活的玩家成为"
 }
