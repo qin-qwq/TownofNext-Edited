@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using UnityEngine;
+using static TOHE.Options;
 using static TOHE.Translator;
 
 namespace TOHE.Roles.Crewmate;
@@ -108,11 +109,6 @@ internal class Sheriff : RoleBase
     {
         CurrentKillCooldown = KillCooldown.GetFloat();
         playerId.SetAbilityUseLimit(ShotLimitOpt.GetInt());
-        if (EnableAwakening.GetBool())
-        {
-            AwakeningProgress = 0;
-            IsAwakened = false;
-        }
     }
     private static void SetUpNeutralOptions(int Id)
     {
@@ -148,14 +144,10 @@ internal class Sheriff : RoleBase
             )
         {
             killer.ResetKillCooldown();
+            AwakeningProgress += ProgressPerSkill.GetFloat();
             if (killer.GetAbilityUseLimit() < 1)
             {
                 killer.SetKillCooldown();
-            }
-            if (EnableAwakening.GetBool() && !IsAwakened)
-            {
-                AwakeningProgress += ProgressPerSkill.GetFloat();
-                CheckAwakening(killer);
             }
             return true;
         }
@@ -221,24 +213,15 @@ internal class Sheriff : RoleBase
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Kill");
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {
-        if (!EnableAwakening.GetBool() || !seer.Is(CustomRoles.Sheriff) || GameStates.IsMeeting || isForMeeting) return string.Empty;
-        else if (AwakeningProgress >= 100 && IsAwakened) return string.Empty;
-        else return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
+        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100) return string.Empty;
+        return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
     }
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        if (!EnableAwakening.GetBool() || !player.IsAlive() || IsAwakened)
-            return;
-
-        AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
-        CheckAwakening(player);
-    }
-    private static void CheckAwakening(PlayerControl player)
-    {
-        if (AwakeningProgress >= 100f && !IsAwakened)
+        if (AwakeningProgress < 100)
         {
-            IsAwakened = true;
-            player.Notify(GetString("SuccessfulAwakening"), 5f);
+            AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
         }
+        else IsAwakened = true;
     }
 }

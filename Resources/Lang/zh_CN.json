@@ -4191,5 +4191,7 @@
   "Sorcerer": "巫术师",
   "SorcererInfo": "唤醒灵魂的力量！",
   "SorcererInfoLong": "(内鬼阵营):\n巫术师可以使用报告按钮将死亡的玩家复活，并让他们成为叛徒或者逃亡者！",
-  "RevivedChangeMode": "被复活的玩家成为"
+  "RevivedChangeMode": "被复活的玩家成为",
+  "Awakened": "身份觉醒",
+  "AwakenedInfoLong": "(游戏机制):\n身份觉醒是游戏中一个独特的机制，通过完成任务，使用技能，击杀玩家，存活来积累觉醒值，觉醒后会解锁觉醒技能。以下是支持身份觉醒的身份。\n<color=#ff1919>邪恶赌怪</color>\n<color=#8cffff>正义赌怪，警长，哪吒</color>\n<color=#7f8c8d>末日赌怪</color>\n<color=#ac42f2></color>"
 }

@@ -780,6 +780,7 @@ public enum CustomRoles
     Admirer,
     Alchemist,
     Altruist,
+    Awakened,
     Bastion,
     Benefactor,
     Bodyguard,
