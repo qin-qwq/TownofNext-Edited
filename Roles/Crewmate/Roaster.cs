@@ -62,7 +62,7 @@ internal class Roaster : RoleBase
             Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - CakeSpeed.GetFloat() + tmpSpeed;
             target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Roaster), GetString("CakeEaten")));
             target.MarkDirtySettings();
-            RPC.PlaySoundRPC(killer.PlayerId, Sounds.TaskComplete);
+            RPC.PlaySoundRPC(target.PlayerId, Sounds.TaskComplete);
         }, CakeDuration.GetFloat());
 
         return false;
