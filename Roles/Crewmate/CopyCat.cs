@@ -153,6 +153,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Jinx => CustomRoles.Crusader,
                 CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(),
                 CustomRoles.Instigator => CustomRoles.Requiter,
+                CustomRoles.Impostorr => CustomRoles.Crewmater,
                 _ => role
             };
         }
