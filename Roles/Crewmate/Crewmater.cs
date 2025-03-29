@@ -20,11 +20,16 @@ internal class Crewmater : RoleBase
         OverrideTasksData.Create(Id + 20, TabGroup.CrewmateRoles, CustomRoles.Crewmater);
     }
 
+    private static bool BlackList(CustomRoles role)
+    {
+        return role is CustomRoles.Crewmater;
+    }
+
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
     {
         if (player.GetPlayerTaskState().IsTaskFinished && player.IsAlive())
         {
-            CustomRoles role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !role.Is(CustomRoles.Crewmater)).ToList().RandomElement();
+            CustomRoles role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement();
             player.RpcChangeRoleBasis(role);
             player.GetRoleClass()?.OnRemove(_Player.PlayerId);
             player.RpcSetCustomRole(role);

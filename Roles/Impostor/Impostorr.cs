@@ -30,9 +30,14 @@ internal class Impostorr : RoleBase
         AURoleOptions.ShapeshifterCooldown = SkillCooldown.GetFloat();
     }
 
+    private static bool BlackList(CustomRoles role)
+    {
+        return role is CustomRoles.Impostorr;
+    }
+
     public override void UnShapeShiftButton(PlayerControl player)
     {
-        CustomRoles role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsImpostor() && !role.Is(CustomRoles.Impostorr)).ToList().RandomElement();
+        CustomRoles role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsImpostor() && !BlackList(role)).ToList().RandomElement();
         player.RpcChangeRoleBasis(role);
         player.GetRoleClass()?.OnRemove(player.PlayerId);
         player.RpcSetCustomRole(role);
