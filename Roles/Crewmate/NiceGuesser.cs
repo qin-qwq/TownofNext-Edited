@@ -19,7 +19,6 @@ internal class NiceGuesser : RoleBase
     private static OptionItem GGTryHideMsg;
     private static OptionItem EnableAwakening;
     private static OptionItem ProgressPerTask;
-    private static OptionItem ProgressPerSkill;
     private static OptionItem ProgressPerSecond;
 
     private static float AwakeningProgress;
@@ -37,9 +36,6 @@ internal class NiceGuesser : RoleBase
         EnableAwakening = BooleanOptionItem.Create(Id + 14, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.NiceGuesser]);
         ProgressPerTask = FloatOptionItem.Create(Id + 15, "ProgressPerTask", new(0f, 100f, 10f), 20f, TabGroup.CrewmateRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSkill = FloatOptionItem.Create(Id + 16, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.CrewmateRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
         ProgressPerSecond = FloatOptionItem.Create(Id + 17, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 0.5f, TabGroup.CrewmateRoles, false)
@@ -73,15 +69,6 @@ internal class NiceGuesser : RoleBase
         if (!IsAwakened)
         {
             AwakeningProgress += ProgressPerTask.GetFloat();
-        }
-        return true;
-    }
-
-    public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
-    {
-        if (!IsAwakened)
-        {
-            AwakeningProgress += ProgressPerSkill.GetFloat();
         }
         return true;
     }

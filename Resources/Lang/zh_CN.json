@@ -790,7 +790,7 @@
   "ButcherInfoLong": "(内鬼阵营):\n肢解者击杀（包括被动击杀）的目标会出现多具尸体，以至于报告尸体时无法准确分辨其他受害者\n注意：因实现原理，被击杀的目标不得不重复地显示自己被击杀的动画，此动画无法跳过且期间无法正常参与会议。此外，若肢解者肢解了复仇者，则复仇者会因愤怒带走全场所有人",
   "HangmanInfoLong": "(内鬼阵营):\n刽子手在变形期间的击杀方式为绞杀，绞杀无视目标的任何状态例如医生的护盾、保镖的守护、大明星的技能等，被绞杀的玩家不会留下尸体，也不会触发其任何技能例如老兵反杀等（包括附加职业），此外，灵媒也不会得到提示",
   "SwooperInfoLong": "(内鬼阵营):\n隐匿者无法正常使用管道。但可以通过跳管进入隐身状态，再次跳管则取消隐身状态\n注意：当隐身时间结束时你会被强制现形。根据房主设置，隐匿者可以在隐形期间正常使用通风管",
-  "CrewpostorInfoLong": "(内鬼阵营):\n船鬼不能正常击杀但拥有任务，每当船鬼完成任务时，距离船鬼最近的玩家就会死亡。",
+  "CrewpostorInfoLong": "(内鬼阵营):\n船鬼不能正常击杀但拥有任务，每当船鬼完成一定数量的任务时，距离船鬼最近的玩家就会死亡。\n每次会议后船鬼的任务都会被重置。\n如果船鬼是绝境者，船鬼只需要完成一个任务就能击杀。",
   "WildlingInfoLong": "(内鬼阵营):\n野人可以变形但不能跳管\n当野人击杀玩家时，会暂时免疫其它攻击（跟嗜血骑士一样）",
   "TricksterInfoLong": "(内鬼阵营):\n骗术师跟普通内鬼一样，不过骗术师被视为船员\n\n——警长不能执法骗术师\n——愚者不能看到骗术师是邪恶的\n——告密者不能找到骗术师\n\n根据房主设置，骗术师可以使用变形按钮关闭灯光，如果灯光已经被破坏则无事发生。",
   "VindicatorInfoLong": "(内鬼阵营):\n卫道士有额外票数，像<color=#204d42>市长</color>一样（票数根据房主设定）",
@@ -1460,6 +1460,7 @@
   "CrewpostorKnowsAllies": "知道<color=#ff1919>内鬼</color>",
   "AlliesKnowCrewpostor": "已知的<color=#ff1919>内鬼</color>",
   "CrewpostorLungeKill": "船鬼瞬移击杀",
+  "CrewpostorKillsPerRound": "击杀所需的任务数",
   "CrewpostorKillAfterTask": "完成1次击杀的任务数",
   "NonNeutralKillingRolesMinPlayer": "<color=#ffff00>无刀</color><color=#7f8c8d>中立</color>的<color=#00ffff>最低</color>数量",
   "NonNeutralKillingRolesMaxPlayer": "<color=#ffff00>无刀</color><color=#7f8c8d>中立</color>的<color=#00a5ff>最高</color>数量",
@@ -4193,5 +4194,7 @@
   "SorcererInfoLong": "(内鬼阵营):\n巫术师可以使用报告按钮将死亡的玩家复活，并让他们成为叛徒或者逃亡者！",
   "RevivedChangeMode": "被复活的玩家成为",
   "Awakened": "身份觉醒",
-  "AwakenedInfoLong": "(游戏机制):\n身份觉醒是游戏中一个独特的机制，通过完成任务，使用技能，击杀玩家，存活来积累觉醒值，觉醒后会解锁觉醒技能。\n以下是支持身份觉醒的身份：\n<color=#ff1919>邪恶赌怪</color>\n<color=#8cffff>正义赌怪，警长，哪吒，老兵</color>\n<color=#7f8c8d>末日赌怪</color>\n<color=#ac42f2></color>"
+  "AwakenedInfoLong": "(游戏机制):\n身份觉醒是游戏中一个独特的机制，通过完成任务，使用技能，击杀玩家，存活来积累觉醒值，觉醒后会解锁觉醒技能。\n以下是支持身份觉醒的身份：\n<color=#ff1919>邪恶赌怪</color>\n<color=#8cffff>正义赌怪，警长，哪吒，老兵</color>\n<color=#7f8c8d>末日赌怪</color>\n<color=#ac42f2></color>",
+  "BakerRegenBread": "面包师在有面包玩家死亡后再次给予面包",
+  "BakerBreadDied": "{0} 失去了面包！<br>你可以给其他玩家面包！"
 }

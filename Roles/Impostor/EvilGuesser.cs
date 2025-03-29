@@ -21,7 +21,6 @@ internal class EvilGuesser : RoleBase
     private static OptionItem EGTryHideMsg;
     private static OptionItem EnableAwakening;
     private static OptionItem ProgressPerKill;
-    private static OptionItem ProgressPerSkill;
     private static OptionItem ProgressPerSecond;
 
     private static float AwakeningProgress;
@@ -45,9 +44,6 @@ internal class EvilGuesser : RoleBase
         EnableAwakening = BooleanOptionItem.Create(Id + 7, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
         ProgressPerKill = FloatOptionItem.Create(Id + 8, "ProgressPerKill", new(0f, 100f, 10f), 35f, TabGroup.ImpostorRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSkill = FloatOptionItem.Create(Id + 9, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
         ProgressPerSecond = FloatOptionItem.Create(Id + 10, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 0.5f, TabGroup.ImpostorRoles, false)
@@ -81,15 +77,6 @@ internal class EvilGuesser : RoleBase
         if (!IsAwakened)
         {
             AwakeningProgress += ProgressPerKill.GetFloat();
-        }
-        return true;
-    }
-
-    public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
-    {
-        if (!IsAwakened)
-        {
-            AwakeningProgress += ProgressPerSkill.GetFloat();
         }
         return true;
     }

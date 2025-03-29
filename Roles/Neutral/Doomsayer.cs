@@ -32,7 +32,6 @@ internal class Doomsayer : RoleBase
     private static OptionItem DoomsayerTryHideMsg;
     private static OptionItem ImpostorVision;
     private static OptionItem EnableAwakening;
-    private static OptionItem ProgressPerSkill;
     private static OptionItem ProgressPerSecond;
 
     private readonly HashSet<CustomRoles> GuessedRoles = [];
@@ -79,9 +78,6 @@ internal class Doomsayer : RoleBase
 
         EnableAwakening = BooleanOptionItem.Create(Id + 30, "EnableAwakening", true, TabGroup.NeutralRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-        ProgressPerSkill = FloatOptionItem.Create(Id + 31, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.NeutralRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
         ProgressPerSecond = FloatOptionItem.Create(Id + 32, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 1.5f, TabGroup.NeutralRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
@@ -277,15 +273,6 @@ internal class Doomsayer : RoleBase
             AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
         }
         else CheckAwakening(player);
-    }
-
-    public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
-    {
-        if (!IsAwakened)
-        {
-            AwakeningProgress += ProgressPerSkill.GetFloat();
-        }
-        return true;
     }
 
     private static void CheckAwakening(PlayerControl player)

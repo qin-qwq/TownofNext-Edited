@@ -35,6 +35,7 @@ public class CustomRpcSender
     public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe)
     {
         stream = MessageWriter.Get(sendOption);
+
         this.name = name;
         this.sendOption = sendOption;
         this.isUnsafe = isUnsafe;
@@ -181,7 +182,7 @@ public class CustomRpcSender
             onSendDelegate();
         }
         currentState = State.Finished;
-        Logger.Info($"\"{name}\" is finished, dispose: {dispose}", "CustomRpcSender");
+        Logger.Info($"\"{name}\" is " + (dispose ? "disposed" : "finished"), "CustomRpcSender");
         stream.Recycle();
     }
 
@@ -239,6 +240,14 @@ public static class CustomRpcSenderExtensions
         sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetRole, targetClientId)
             .Write((ushort)role)
             .Write(true) // canOverride
+            .EndRpc();
+    }
+
+    public static void RpcSetCustomRole(this CustomRpcSender sender, byte playerId, CustomRoles role, int targetClientId = -1)
+    {
+        sender.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetCustomRole, targetClientId)
+            .Write(playerId)
+            .WritePacked((int)role)
             .EndRpc();
     }
 }
