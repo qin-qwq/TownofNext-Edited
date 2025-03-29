@@ -92,7 +92,7 @@ internal class Fury : RoleBase
         foreach (var target in Main.AllPlayerControls)
         {
             target.KillFlash();
-            RPC.PlaySoundRPC(player.PlayerId, Sounds.ImpTransform);
+            RPC.PlaySoundRPC(target.PlayerId, Sounds.ImpTransform);
             target.Notify(GetString("SeerFuryInRage"), 5f);
         }
         player.MarkDirtySettings();
