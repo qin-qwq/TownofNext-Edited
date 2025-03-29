@@ -112,6 +112,7 @@ internal class Veteran : RoleBase
         {
             target.RpcMurderPlayer(killer);
             killer.SetRealKiller(target);
+            target.RpcRemoveAbilityUse();
             AutoAlert = false;
             return false;
         }
