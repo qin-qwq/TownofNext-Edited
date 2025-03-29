@@ -1290,6 +1290,10 @@ static class ExtendedPlayerControl
                         Main.AllPlayerKillCooldown[player.PlayerId] -= Main.AllPlayerKillCooldown[player.PlayerId] * (Overclocked.OverclockedReduction.GetFloat() / 100);
                         break;
 
+                    case CustomRoles.Underdog:
+                        Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllAlivePlayerControls.Length <= Underdog.UnderdogMaximumPlayersNeededToKill.GetInt() ? Underdog.UnderdogKillMinCooldown.GetInt() : Underdog.UnderdogKillMaxCooldown.GetInt();
+                        break;
+
                     case CustomRoles.Diseased:
                         Diseased.IncreaseKCD(player);
                         break;

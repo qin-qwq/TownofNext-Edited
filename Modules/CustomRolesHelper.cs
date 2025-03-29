@@ -412,7 +412,8 @@ public static class CustomRolesHelper
             CustomRoles.Mimic or
             CustomRoles.Stealer or
             CustomRoles.Circumvent or
-            CustomRoles.Swift;
+            CustomRoles.Swift or
+            CustomRoles.Underdog;
     }
 
     public static bool IsPlayerImpostorTeam(this PlayerControl player, bool onlyMainRole = false) => Main.PlayerStates.TryGetValue(player.PlayerId, out var state) && state.IsPlayerImpostorTeam(onlyMainRole);
@@ -1205,6 +1206,11 @@ public static class CustomRolesHelper
                 break;
             case CustomRoles.Evader:
                 if (pc.IsNeutralApocalypse())
+                    return false;
+                break;
+
+            case CustomRoles.Underdog:
+                if (!pc.GetCustomRole().IsImpostor())
                     return false;
                 break;
         }

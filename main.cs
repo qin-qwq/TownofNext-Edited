@@ -762,7 +762,6 @@ public enum CustomRoles
     Trapster,
     Trickster,
     Twister,
-    Underdog,
     Undertaker,
     Vampire,
     Vindicator,
@@ -1046,6 +1045,7 @@ public enum CustomRoles
     Trapper,
     Tricky,
     Tired,
+    Underdog,
     Unlucky,
     Unreportable, //disregarded
     VoidBallot,

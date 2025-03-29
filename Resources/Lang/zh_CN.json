@@ -810,7 +810,7 @@
   "VisionaryInfoLong": "(内鬼阵营):\n幻想家可以在会议上看见每个玩家的阵营：\n- 红色名表示内鬼阵营\n- 青色名表示船员阵营\n -灰色名表示中立阵营",
   "PlagueDoctorInfoLong": "(中立阵营)「来自TOH的瘟疫医生」:\n瘟疫学家选择一名玩家进行感染。任何在被感染玩家范围内停留一定时间的玩家都会被感染。感染进度是累积性的，不会随着距离或会议后重置",
   "RefugeeInfoLong": "(叛徒阵营):\n逃亡者可能是：\n -通过回忆得知自己是一名内鬼\n -击杀了教父目标的带刀玩家\n -其恋人是内鬼的浪漫者\n -效仿了内鬼的效仿者\n\n现在你的职责是帮助内鬼阵营击杀船员阵营",
-  "UnderdogInfoLong": "(内鬼阵营):\n失败者只能在在场存活人数小于房主设置的人数时才能进行击杀",
+  "UnderdogInfoLong": "(附加职业):\n失败者在在场存活人数小于房主设置的人数时击杀冷却时间更短，反之则更长。",
   "ConsigliereInfoLong": "(内鬼阵营):\n军师可以对一位玩家使用击杀键来得知目标的职业。当显示职业次数用完时，击杀为正常击杀\n- 单击显示身份\n- 双击正常击杀",
   "LudopathInfoLong": "(内鬼阵营):\n速度者的击杀冷却时间是随机的。击杀冷却最小值为1秒，而最大值是房主设置的默认击杀冷却时间",
   "GodfatherInfoLong": "(内鬼阵营):\n教父投票给某人，让他们成为教父的目标。在下一轮中，如果有人击杀了目标，凶手将变成逃亡者或者叛徒。\n教父还可以使用/f指令直接结束会议！教父名字旁边会显示可使用次数！",
@@ -3001,7 +3001,7 @@
   "ShroudCooldown": "裹尸布冷却",
   "Message.Shrouded": "一个或多个玩家被<b><color=#6697FF>裹尸布覆盖</color></b>！\n\n除掉<b><color=#6697FF>裹尸布</b>，否则所有被裹尸的玩家都会<color=#ff1919>自杀</color>！",
   "LudopathRandomKillCD": "最大击杀冷却时间",
-  "UnderdogMaximumPlayersNeededToKill": "开始击杀所需的玩家数量上限",
+  "UnderdogMaximumPlayersNeededToKill": "减少击杀冷却时间所需的玩家数量",
   "GodfatherTargetCountMode": "带刀玩家变成",
   "GodfatherCount_Refugee": "<color=#ff1919>逃亡者</color>",
   "GodfatherCount_Madmate": "<color=#ff1919>叛徒</color>",
@@ -4196,5 +4196,7 @@
   "Awakened": "身份觉醒",
   "AwakenedInfoLong": "(游戏机制):\n身份觉醒是游戏中一个独特的机制，通过完成任务，使用技能，击杀玩家，存活来积累觉醒值，觉醒后会解锁觉醒技能。\n以下是支持身份觉醒的身份：\n<color=#ff1919>邪恶赌怪</color>\n<color=#8cffff>正义赌怪，警长，哪吒，老兵</color>\n<color=#7f8c8d>末日赌怪</color>\n<color=#ac42f2></color>",
   "BakerRegenBread": "面包师在有面包玩家死亡后再次给予面包",
-  "BakerBreadDied": "{0} 失去了面包！<br>你可以给其他玩家面包！"
+  "BakerBreadDied": "{0} 失去了面包！<br>你可以给其他玩家面包！",
+  "UnderdogKillMaxCooldown": "最大击杀冷却时间",
+  "UnderdogKillMinCooldown": "最小击杀冷却时间"
 }
