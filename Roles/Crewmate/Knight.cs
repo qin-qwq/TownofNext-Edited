@@ -19,6 +19,7 @@ internal class Knight : RoleBase
 
     public static OptionItem CanVent;
     public static OptionItem KillCooldown;
+    public static OptionItem KnightKillLimit;
     public static OptionItem RequiterChance;
     public static OptionItem RequiterIgnoresShields;
 
@@ -30,15 +31,18 @@ internal class Knight : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CanVent = BooleanOptionItem.Create(Id + 11, GeneralOption.CanVent, false, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Knight]);
-        RequiterChance = IntegerOptionItem.Create(Id + 12, "RequiterChance", new(0, 100, 5), 0, TabGroup.CrewmateRoles, false)
+        KnightKillLimit = IntegerOptionItem.Create(Id + 12, GeneralOption.SkillLimitTimes, new(1, 15, 1), 1, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Knight])
+            .SetValueFormat(OptionFormat.Times);
+        RequiterChance = IntegerOptionItem.Create(Id + 13, "RequiterChance", new(0, 100, 5), 0, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Knight])
             .SetValueFormat(OptionFormat.Percent);
-        RequiterIgnoresShields = BooleanOptionItem.Create(Id + 13, "RequiterIgnoresShields", false, TabGroup.CrewmateRoles, false)
+        RequiterIgnoresShields = BooleanOptionItem.Create(Id + 14, "RequiterIgnoresShields", false, TabGroup.CrewmateRoles, false)
             .SetParent(RequiterChance);
     }
     public override void Add(byte playerId)
     {
-        playerId.SetAbilityUseLimit(1);
+        playerId.SetAbilityUseLimit(KnightKillLimit.GetInt());
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(false);

@@ -14,16 +14,9 @@ internal class Crewmater : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\
 
-    public static OptionItem CrewmaterKillCooldown;
-    public static OptionItem CrewmaterKillLimit;
-
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Crewmater);
-        CrewmaterKillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(2.5f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Crewmater])
-            .SetValueFormat(OptionFormat.Seconds);
-        CrewmaterKillLimit = IntegerOptionItem.Create(Id + 11, "CrewmaterKillLimit", new(1, 15, 1), 2, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Crewmater])
-            .SetValueFormat(OptionFormat.Times);
         OverrideTasksData.Create(Id + 20, TabGroup.CrewmateRoles, CustomRoles.Crewmater);
     }
 
@@ -31,46 +24,18 @@ internal class Crewmater : RoleBase
     {
         if (player.GetPlayerTaskState().IsTaskFinished && player.IsAlive())
         {
-            player.RpcChangeRoleBasis(CustomRoles.Soldier);
-            player.RpcSetCustomRole(CustomRoles.Soldier);
+            CustomRoles role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !role.Is(CustomRoles.Crewmater)).ToList().RandomElement();
+            player.RpcChangeRoleBasis(role);
+            player.GetRoleClass()?.OnRemove(_Player.PlayerId);
+            player.RpcSetCustomRole(role);
             player.GetRoleClass()?.OnAdd(_Player.PlayerId);
-            player.Notify(GetString("BecomeSoldier"), 5f);
+            player.Notify(string.Format(GetString("RevenantTargeted"), Utils.GetRoleName(role)));
             player.RpcGuardAndKill(player);
+            player.ResetKillCooldown();
+            player.SetKillCooldown(forceAnime: true);
+            player.MarkDirtySettings();
             return true;
         }
         return false;
-    }
-}
-internal class Soldier : RoleBase
-{
-    //===========================SETUP================================\\
-    public override CustomRoles Role => CustomRoles.Soldier;
-    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Soldier);
-    public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
-    //==================================================================\\
-
-    public override void Add(byte playerId)
-    {
-        Main.PlayerStates[playerId].taskState.hasTasks = false;
-        playerId.SetAbilityUseLimit(Crewmater.CrewmaterKillLimit.GetInt());
-    }
-
-    public override bool CanUseImpostorVentButton(PlayerControl pc) => false;
-    public override bool CanUseSabotage(PlayerControl pc) => false;
-
-    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = IsKilled(id) ? 300f : Crewmater.CrewmaterKillCooldown.GetFloat();
-    public override bool CanUseKillButton(PlayerControl pc)
-        => !IsKilled(pc.PlayerId);
-
-    private static bool IsKilled(byte playerId) => playerId.GetAbilityUseLimit() <= 0;
-
-    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
-    {
-        killer.RpcRemoveAbilityUse();
-        killer.ResetKillCooldown();
-        killer.SetKillCooldown();
-        return true;
     }
 }

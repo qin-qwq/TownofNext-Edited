@@ -838,7 +838,7 @@
   "UndercoverInfoLong": "(船员阵营):\n内鬼会将卧底认作自己的队友，但卧底并不知道内鬼是谁",
   "NiceGuesserInfoLong": "(船员阵营):\n正义赌怪可以在会议时猜测某位玩家的职业，正确则击杀目标，错误则会自杀\n猜测指令为：/bt [玩家编号] [职业名]\n当正义赌怪成为叛徒时可以猜测船员\n<b>正义赌怪觉醒：获得一次猜测失败不会被淘汰的机会。</b>",
   "GuessMasterInfoLong": "(附加职业):\n竞猜大师将收到会议期间每次尝试竞猜的信息。将获知「正义/邪恶」赌怪试图猜测的职业，如果「正义/邪恶」赌怪猜错了，竞猜大师也会收到通知",
-  "KnightInfoLong": "(船员阵营):\n侠客可以正义击杀任何阵营的人，不过机会只有一次",
+  "KnightInfoLong": "(船员阵营):\n侠客可以正义击杀任何阵营的人，不过机会只有设定次",
   "TransporterInfoLong": "(船员阵营):\n每当传送师完成任务，就会有随机两位玩家交换位置，但若剩余玩家不足将什么都不会发生。\n注意：管道中的玩家不会被选中",
   "TimeManagerInfoLong": "(船员阵营):\n时间操控者做的任务越多，会议时间就会越长，当时间操控者死亡则会议时间恢复正常。当时间操控者成为叛徒时则技能变为减少会议时长而不是增加会议时长",
   "VeteranInfoLong": "(船员阵营):\n老兵可以通过使用通风管道进入戒备状态，如果戒备状态下有玩家尝试击杀老兵，则老兵反杀凶手。老兵进入以及退出戒备状态时会看到自己身上有护盾破碎作为提示。\n<b>老兵觉醒：可以自动反弹一次袭击。</b>",
@@ -4120,11 +4120,6 @@
   "Crewmater": "船员？",
   "CrewmaterInfo": "你似乎是一个幸运儿呢~",
   "CrewmaterInfoLong": "(船员阵营):\n船员？的目标是完成任务，找到并驱逐所有内鬼。",
-  "Soldier": "士兵",
-  "SoldierInfo": "保持警惕，是战场的第一生存守则",
-  "SoldierInfoLong": "(船员阵营):\n士兵由船员？完成所有任务转变而来，士兵可以使用设定次击杀。",
-  "CrewmaterKillLimit": "击杀次数上限",
-  "BecomeSoldier": "你成为了士兵！！！",
   "DreamweaverSettings.CanDreamweaveNeutrals": "中立可以被编织梦境",
   "DreamweaverSettings.CanDreamweaveImpostors": "内鬼可以被编织梦境",
   "Dreamweaver.InsomniaNotification": "你已经失眠了！",
@@ -4198,5 +4193,8 @@
   "BakerRegenBread": "面包师在有面包玩家死亡后再次给予面包",
   "BakerBreadDied": "{0} 失去了面包！<br>你可以给其他玩家面包！",
   "UnderdogKillMaxCooldown": "最大击杀冷却时间",
-  "UnderdogKillMinCooldown": "最小击杀冷却时间"
+  "UnderdogKillMinCooldown": "最小击杀冷却时间",
+  "Impostorr": "变形者？",
+  "ImpostorrInfo": "改头换面，真相...扑朔迷离",
+  "ImpostorrInfoLong": "(内鬼阵营):\n变形者？可以变形为其他玩家。当变形者？变形或取消变形时，变形效果会很明显。"
 }

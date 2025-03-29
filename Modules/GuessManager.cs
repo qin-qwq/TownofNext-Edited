@@ -1005,12 +1005,6 @@ public static class GuessManager
                         listOfRoles.Add(CustomRoles.Enchanted);
                 }
 
-                if (CustomRoles.Crewmater.IsEnable())
-                {
-                    if (!listOfRoles.Contains(CustomRoles.Soldier))
-                        listOfRoles.Add(CustomRoles.Soldier);
-                }
-
                 arrayOfRoles = [.. listOfRoles];
             }
             else
