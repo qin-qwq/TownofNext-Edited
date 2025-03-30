@@ -4189,7 +4189,7 @@
   "SorcererInfoLong": "(内鬼阵营):\n巫术师可以使用报告按钮将死亡的玩家复活，并让他们成为叛徒或者逃亡者！",
   "RevivedChangeMode": "被复活的玩家成为",
   "Awakened": "身份觉醒",
-  "AwakenedInfoLong": "(游戏机制):\n身份觉醒是游戏中一个独特的机制，通过完成任务，使用技能，击杀玩家，存活来积累觉醒值，觉醒后会解锁觉醒技能。\n以下是支持身份觉醒的身份：\n<color=#ff1919>邪恶赌怪</color>\n<color=#8cffff>正义赌怪，警长，哪吒，老兵</color>\n<color=#7f8c8d>末日赌怪</color>\n<color=#ac42f2></color>",
+  "AwakenedInfoLong": "(游戏机制):\n身份觉醒是游戏中一个独特的机制，通过完成任务，使用技能，击杀玩家，存活来积累觉醒值，觉醒后会解锁觉醒技能。\n以下是支持身份觉醒的身份：\n<color=#ff1919>邪恶赌怪，女帝</color>\n<color=#8cffff>正义赌怪，警长，哪吒，老兵</color>\n<color=#7f8c8d>末日赌怪</color>\n<color=#ac42f2></color>",
   "BakerRegenBread": "面包师在有面包玩家死亡后再次给予面包",
   "BakerBreadDied": "{0} 失去了面包！<br>你可以给其他玩家面包！",
   "UnderdogKillMaxCooldown": "最大击杀冷却时间",
@@ -4197,5 +4197,9 @@
   "Impostorr": "变形者？",
   "ImpostorrInfo": "改头换面，真相...扑朔迷离",
   "ImpostorrInfoLong": "(内鬼阵营):\n变形者？可以变形为其他玩家。当变形者？变形或取消变形时，变形效果会很明显。",
-  "AliveWithoutEndGame": "存活时不结束游戏"
+  "AliveWithoutEndGame": "存活时不结束游戏",
+  "Empress": "女帝",
+  "EmpressInfo": "率土之滨，莫非王臣！",
+  "EmpressInfoLong": "(内鬼阵营):\n女帝可以使用变形按钮召见一名玩家到自己身边。\n<b>女帝觉醒：被召见的玩家击杀禁用5秒钟。</b>",
+  "EmpressButtonText": "召见"
 }

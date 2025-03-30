@@ -47,6 +47,7 @@ internal class Sheriff : RoleBase
     private static OptionItem ProgressPerSecond;
 
     private float CurrentKillCooldown;
+    private float ErrorKillCooldown;
     private static float AwakeningProgress;
     private static bool IsAwakened;
 
@@ -108,6 +109,7 @@ internal class Sheriff : RoleBase
     public override void Add(byte playerId)
     {
         CurrentKillCooldown = KillCooldown.GetFloat();
+        ErrorKillCooldown = KillErrorCooldown.GetFloat();
         playerId.SetAbilityUseLimit(ShotLimitOpt.GetInt());
     }
     private static void SetUpNeutralOptions(int Id)
@@ -154,7 +156,7 @@ internal class Sheriff : RoleBase
         if (IsAwakened)
         {
             killer.ResetKillCooldown();
-            killer.SetKillCooldown(KillErrorCooldown.GetFloat());
+            killer.SetKillCooldown(ErrorKillCooldown);
             killer.RpcGuardAndKill(target);
             killer.Notify(GetString("TargetCantKill"));
             return false;

@@ -722,6 +722,7 @@ public enum CustomRoles
     Disperser,
     DollMaster,
     DoubleAgent,
+    Empress,
     Eraser,
     Escapist,
     EvilGuesser,
