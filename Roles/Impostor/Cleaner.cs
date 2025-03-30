@@ -1,4 +1,5 @@
 using UnityEngine;
+using static TOHE.Translator;
 
 namespace TOHE.Roles.Impostor;
 
@@ -33,7 +34,7 @@ internal class Cleaner : RoleBase
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Cleaner])
             .SetValueFormat(OptionFormat.Seconds);
         EnableAwakening = BooleanOptionItem.Create(Id + 12, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Cleaner]);
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Cleaner]);
         ProgressPerKill = FloatOptionItem.Create(Id + 13, "ProgressPerKill", new(0f, 100f, 10f), 40f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
@@ -53,7 +54,7 @@ internal class Cleaner : RoleBase
 
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {
-        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100 || GameStates.IsMeeting || isformeeting) return string.Empty;
+        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100 || GameStates.IsMeeting || isForMeeting) return string.Empty;
         return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
     }
 

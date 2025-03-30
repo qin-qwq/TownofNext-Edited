@@ -1,6 +1,7 @@
 using TOHE.Roles.Core;
 using TOHE.Roles.Coven;
 using TOHE.Roles.Neutral;
+using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 
@@ -21,9 +22,14 @@ internal class CopyCat : RoleBase
     private static OptionItem KillCooldown;
     private static OptionItem CopyCrewVar;
     private static OptionItem CopyTeamChangingAddon;
+    private static OptionItem EnableAwakening;
+    private static OptionItem ProgressPerSkill;
+    private static OptionItem ProgressPerSecond;
 
     private static float CurrentKillCooldown = new();
     private static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
+    private static float AwakeningProgress;
+    private static bool IsAwakened;
 
     public override void SetupCustomOption()
     {
@@ -32,6 +38,14 @@ internal class CopyCat : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CopyCrewVar = BooleanOptionItem.Create(Id + 13, "CopyCrewVar", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
         CopyTeamChangingAddon = BooleanOptionItem.Create(Id + 14, "CopyTeamChangingAddon", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
+        EnableAwakening = BooleanOptionItem.Create(Id + 15, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.CopyCat]);
+        ProgressPerSkill = FloatOptionItem.Create(Id + 16, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.CrewmateRoles, false)
+            .SetParent(EnableAwakening)
+            .SetValueFormat(OptionFormat.Percent);
+        ProgressPerSecond = FloatOptionItem.Create(Id + 17, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 1.5f, TabGroup.CrewmateRoles, false)
+            .SetParent(EnableAwakening)
+            .SetValueFormat(OptionFormat.Percent);
     }
 
     public override void Init()
@@ -39,6 +53,8 @@ internal class CopyCat : RoleBase
         playerIdList.Clear();
         CurrentKillCooldown = new();
         OldAddons.Clear();
+        AwakeningProgress = 0;
+        IsAwakened = false;
     }
 
     public override void Add(byte playerId)
@@ -160,6 +176,7 @@ internal class CopyCat : RoleBase
         {
             if (role != CustomRoles.CopyCat)
             {
+                AwakeningProgress += ProgressPerSkill.GetFloat();
                 killer.RpcChangeRoleBasis(role);
                 killer.RpcSetCustomRole(role, false, false);
                 killer.GetRoleClass()?.OnAdd(killer.PlayerId);
@@ -206,5 +223,27 @@ internal class CopyCat : RoleBase
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
         hud.KillButton.OverrideText(GetString("CopyButtonText"));
+    }
+
+    public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
+    {
+        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100 || GameStates.IsMeeting || isForMeeting) return string.Empty;
+        return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
+    }
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (AwakeningProgress < 100)
+        {
+            AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
+        }
+        else CheckAwakening(player);;
+    }
+    private static void CheckAwakening(PlayerControl player)
+    {
+        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
+        {
+            IsAwakened = true;
+            player.Notify(GetString("SuccessfulAwakening"), 5f);
+        }
     }
 }
