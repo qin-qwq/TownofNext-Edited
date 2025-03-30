@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Double;
+using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 
@@ -21,18 +22,37 @@ internal class Monarch : RoleBase
     private static OptionItem KnightCooldown;
     private static OptionItem KnightMax;
     public static OptionItem HideAdditionalVotesForKnighted;
+    private static OptionItem EnableAwakening;
+    private static OptionItem ProgressPerSkill;
+    private static OptionItem ProgressPerSecond;
+
+    private static float AwakeningProgress;
+    private static bool IsAwakened;
 
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Monarch, 1);
-        KnightCooldown = FloatOptionItem.Create(Id + 10, "MonarchKnightCooldown", new(0f, 180f, 2.5f), 10f, TabGroup.CrewmateRoles, false)
+        KnightCooldown = FloatOptionItem.Create(Id + 10, "MonarchKnightCooldown", new(0f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Monarch])
             .SetValueFormat(OptionFormat.Seconds);
-        KnightMax = IntegerOptionItem.Create(Id + 12, "MonarchKnightMax", new(1, 15, 1), 3, TabGroup.CrewmateRoles, false)
+        KnightMax = IntegerOptionItem.Create(Id + 12, "MonarchKnightMax", new(1, 15, 1), 2, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Monarch])
             .SetValueFormat(OptionFormat.Times);
         HideAdditionalVotesForKnighted = BooleanOptionItem.Create(Id + 13, "HideAdditionalVotesForKnighted", false, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Monarch]);
+        EnableAwakening = BooleanOptionItem.Create(Id + 14, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Monarch]);
+        ProgressPerSkill = FloatOptionItem.Create(Id + 15, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.CrewmateRoles, false)
+            .SetParent(EnableAwakening)
+            .SetValueFormat(OptionFormat.Percent);
+        ProgressPerSecond = FloatOptionItem.Create(Id + 16, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 1.5f, TabGroup.CrewmateRoles, false)
+            .SetParent(EnableAwakening)
+            .SetValueFormat(OptionFormat.Percent);
+    }
+    public override void Init()
+    {
+        AwakeningProgress = 0;
+        IsAwakened = false;
     }
     public override void Add(byte playerId)
     {
@@ -56,6 +76,7 @@ internal class Monarch : RoleBase
         }
         if (CanBeKnighted(target))
         {
+            AwakeningProgress += ProgressPerSkill.GetFloat();
             killer.RpcRemoveAbilityUse();
             target.RpcSetCustomRole(CustomRoles.Knighted);
 
@@ -105,5 +126,28 @@ internal class Monarch : RoleBase
     {
         if (playerId.GetAbilityUseLimit() > 0)
             hud.KillButton.OverrideText(GetString("MonarchKillButtonText"));
+    }
+
+    public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
+    {
+        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100) return string.Empty;
+        return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
+    }
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (AwakeningProgress < 100)
+        {
+            AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
+        }
+        else CheckAwakening(player);;
+    }
+    private static void CheckAwakening(PlayerControl player)
+    {
+        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
+        {
+            IsAwakened = true;
+            player.RpcIncreaseAbilityUseLimitBy(50);
+            player.Notify(GetString("SuccessfulAwakening"), 5f);
+        }
     }
 }

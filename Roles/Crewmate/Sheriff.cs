@@ -156,7 +156,7 @@ internal class Sheriff : RoleBase
         if (IsAwakened)
         {
             killer.ResetKillCooldown();
-            killer.SetKillCooldown(ErrorKillCooldown);
+            killer.SetKillCooldown(ErrorKillCooldown, forceAnime: true);
             killer.RpcGuardAndKill(target);
             killer.Notify(GetString("TargetCantKill"));
             return false;

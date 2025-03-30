@@ -1214,6 +1214,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.BountyHunter)
                     || pc.Is(CustomRoles.Zombie)
                     || pc.Is(CustomRoles.Bomber))
+                    return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
                 break;
