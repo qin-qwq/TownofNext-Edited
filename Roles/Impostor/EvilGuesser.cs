@@ -83,7 +83,7 @@ internal class EvilGuesser : RoleBase
 
     private static void CheckAwakening(PlayerControl player)
     {
-        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool())
+        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
         {
             IsAwakened = true;
             player.RpcSetCustomRole(CustomRoles.DoubleShot, false, false);

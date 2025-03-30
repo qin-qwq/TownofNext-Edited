@@ -226,7 +226,7 @@ internal class Sheriff : RoleBase
     }
     private static void CheckAwakening(PlayerControl player)
     {
-        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool())
+        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
         {
             IsAwakened = true;
             player.Notify(GetString("SuccessfulAwakening"), 5f);
