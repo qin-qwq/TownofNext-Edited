@@ -4196,5 +4196,6 @@
   "UnderdogKillMinCooldown": "最小击杀冷却时间",
   "Impostorr": "变形者？",
   "ImpostorrInfo": "改头换面，真相...扑朔迷离",
-  "ImpostorrInfoLong": "(内鬼阵营):\n变形者？可以变形为其他玩家。当变形者？变形或取消变形时，变形效果会很明显。"
+  "ImpostorrInfoLong": "(内鬼阵营):\n变形者？可以变形为其他玩家。当变形者？变形或取消变形时，变形效果会很明显。",
+  "AliveWithoutEndGame": "存活时不结束游戏"
 }

@@ -1384,6 +1384,7 @@ public static class CustomRolesHelper
            CustomRoles.Opportunist => CountTypes.None,
            CustomRoles.MoonWolf => CountTypes.MoonWolf,
            CustomRoles.Disruptor => CountTypes.Disruptor,
+           CustomRoles.Doomsayer => Doomsayer.AliveWithoutEndGame() ? CountTypes.Doomsayer : CountTypes.Crew,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1480,6 +1481,7 @@ public static class CustomRolesHelper
             CountTypes.Shocker => CustomRoles.Shocker,
             CountTypes.MoonWolf => CustomRoles.MoonWolf,
             CountTypes.Disruptor => CustomRoles.Disruptor,
+            CountTypes.Doomsayer => CustomRoles.Doomsayer,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1568,5 +1570,6 @@ public enum CountTypes
     Shocker,
     Coven,
     MoonWolf,
-    Disruptor
+    Disruptor,
+    Doomsayer
 }
