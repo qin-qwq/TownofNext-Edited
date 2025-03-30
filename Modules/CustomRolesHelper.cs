@@ -1210,6 +1210,10 @@ public static class CustomRolesHelper
                 break;
 
             case CustomRoles.Underdog:
+                if (pc.Is(CustomRoles.Arrogance)
+                    || pc.Is(CustomRoles.BountyHunter)
+                    || pc.Is(CustomRoles.Zombie)
+                    || pc.Is(CustomRoles.Bomber))
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
                 break;
