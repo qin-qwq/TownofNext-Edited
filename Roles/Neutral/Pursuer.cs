@@ -37,7 +37,6 @@ internal class Pursuer : RoleBase
     }
     public override void Add(byte playerId)
     {
-        Main.PlayerStates[playerId].taskState.hasTasks = false;
         playerId.SetAbilityUseLimit(PursuerSkillLimitTimes.GetInt());
     }
     public override bool CanUseKillButton(PlayerControl pc) => CanUseKillButton(pc.PlayerId);
