@@ -31,7 +31,7 @@ internal class Revenant : RoleBase
         CustomRoles role = killer.GetCustomRole();
         if (role.IsTNA()) return false;
 
-        if(CanKillKiller.GetBool())
+        if (CanKillKiller.GetBool())
         {
             killer.RpcMurderPlayer(killer);
             killer.SetRealKiller(target);

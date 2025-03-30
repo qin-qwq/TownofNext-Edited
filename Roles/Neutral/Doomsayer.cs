@@ -81,7 +81,7 @@ internal class Doomsayer : RoleBase
 
         EnableAwakening = BooleanOptionItem.Create(Id + 30, "EnableAwakening", true, TabGroup.NeutralRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-        ProgressPerSecond = FloatOptionItem.Create(Id + 32, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 1.5f, TabGroup.NeutralRoles, false)
+        ProgressPerSecond = FloatOptionItem.Create(Id + 32, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 2f, TabGroup.NeutralRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
     }
