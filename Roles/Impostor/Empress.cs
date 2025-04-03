@@ -17,7 +17,6 @@ internal class Empress : RoleBase
     //==================================================================\\
 
     private static OptionItem EmpressShapeshiftCooldown;
-    private static OptionItem ShowShapeshiftAnimationsOpt;
     private static OptionItem EnableAwakening;
     private static OptionItem ProgressPerKill;
     private static OptionItem ProgressPerSkill;
@@ -32,8 +31,6 @@ internal class Empress : RoleBase
         EmpressShapeshiftCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.ShapeshifterBase_ShapeshiftCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Empress])
             .SetValueFormat(OptionFormat.Seconds);
-        ShowShapeshiftAnimationsOpt = BooleanOptionItem.Create(Id + 11, GeneralOption.ShowShapeshiftAnimations, true, TabGroup.ImpostorRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Empress]);
         EnableAwakening = BooleanOptionItem.Create(Id + 12, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Empress]);
         ProgressPerKill = FloatOptionItem.Create(Id + 13, "ProgressPerKill", new(0f, 100f, 10f), 40f, TabGroup.ImpostorRoles, false)
@@ -97,22 +94,8 @@ internal class Empress : RoleBase
 
     public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
     {
-        if (ShowShapeshiftAnimationsOpt.GetBool() || shapeshifter.PlayerId == target.PlayerId) return true;
+        if (shapeshifter.PlayerId == target.PlayerId) return false;
 
-        DoTP(shapeshifter, target);
-
-        return false;
-    }
-
-    public override void OnShapeshift(PlayerControl shapeshifter, PlayerControl target, bool IsAnimate, bool shapeshifting)
-    {
-        if (!shapeshifting) return;
-
-        DoTP(shapeshifter, target);
-    }
-
-    private void DoTP(PlayerControl shapeshifter, PlayerControl target)
-    {
         if (target.CanBeTeleported())
         {
             if (!IsAwakened)
@@ -133,5 +116,7 @@ internal class Empress : RoleBase
         {
             shapeshifter.Notify(ColorString(GetRoleColor(CustomRoles.Empress), GetString("ErrorTeleport")));
         }
+
+        return false;
     }
 }
