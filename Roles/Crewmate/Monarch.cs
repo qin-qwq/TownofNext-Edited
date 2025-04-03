@@ -68,7 +68,7 @@ internal class Monarch : RoleBase
     }
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (killer.GetAbilityUseLimit() <= 0) return false;
+        if (killer.GetAbilityUseLimit() <= 0 && !IsAwakened) return false;
         if (Mini.Age < 18 && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)))
         {
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cultist), GetString("CantRecruit")));
@@ -77,7 +77,10 @@ internal class Monarch : RoleBase
         if (CanBeKnighted(target))
         {
             AwakeningProgress += ProgressPerSkill.GetFloat();
-            killer.RpcRemoveAbilityUse();
+            if (!IsAwakened)
+            {
+                killer.RpcRemoveAbilityUse();
+            }
             target.RpcSetCustomRole(CustomRoles.Knighted);
 
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Monarch), GetString("MonarchKnightedPlayer")));
@@ -146,7 +149,6 @@ internal class Monarch : RoleBase
         if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
         {
             IsAwakened = true;
-            player.RpcIncreaseAbilityUseLimitBy(50);
             player.Notify(GetString("SuccessfulAwakening"), 5f);
         }
     }
