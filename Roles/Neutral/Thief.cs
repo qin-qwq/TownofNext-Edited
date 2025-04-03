@@ -69,9 +69,6 @@ internal class Thief : RoleBase
 
             killer.Notify(string.Format(GetString("RevenantTargeted"), Utils.GetRoleName(role)));
             
-            Utils.NotifyRoles(SpecifySeer: killer, SpecifyTarget: target, ForceLoop: true);
-            Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
-            
             killer.ResetKillCooldown();
             killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
             return true;
@@ -88,9 +85,6 @@ internal class Thief : RoleBase
 
         killer.Notify(string.Format(GetString("RevenantTargeted"), Utils.GetRoleName(role)));
         target.Notify(string.Format(GetString("YouBecomeThief")));
-
-        Utils.NotifyRoles(SpecifySeer: killer, SpecifyTarget: target, ForceLoop: true);
-        Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
 
         killer.ResetKillCooldown();
         killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
