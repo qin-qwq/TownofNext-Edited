@@ -136,7 +136,7 @@ internal class Yandere : RoleBase
     private void TryKill(PlayerControl player)
     {
         var playerId = player.PlayerId;
-        if (!BetPlayer.ContainsValue(playerId) || player == null || !pc.IsAlive) return;
+        if (!BetPlayer.ContainsValue(playerId) || player == null) return;
 
         byte yandere = 0x73;
         BetPlayer.Do(x =>
@@ -154,18 +154,13 @@ internal class Yandere : RoleBase
             pc.RpcMurderPlayer(pc);
             return;
         }
-        if (GameStates.IsMeeting)
+        else
         {
             pc.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
             pc.RpcExileV2();
             pc.Data.IsDead = true;
             pc.Data.MarkDirty();
             Main.PlayerStates[pc.PlayerId].SetDead();
-        }
-        else
-        {
-            pc.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
-            pc.RpcMurderPlayer(pc);
         }
     }
 
@@ -188,6 +183,8 @@ internal class Yandere : RoleBase
     private static bool PotentialTarget(PlayerControl player, PlayerControl target)
     {
         if (target == null || player == null) return false;
+
+        if (target == player) return false;
 
         if (target.Is(CustomRoles.Lovers)) return false;
 
