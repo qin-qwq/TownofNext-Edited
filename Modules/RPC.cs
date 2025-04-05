@@ -16,7 +16,7 @@ using static TOHE.Translator;
 namespace TOHE;
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 176/255 USED
+public enum CustomRPC : byte // 177/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -107,6 +107,7 @@ public enum CustomRPC : byte // 176/255 USED
     SyncBraveStage,
     DictatorRPC,
     Necronomicon,
+    SetYandereTarget,
 
     //FFA
     SyncFFAPlayer,
@@ -384,6 +385,9 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.SetBountyTarget:
                 BountyHunter.ReceiveRPC(reader);
+                break;
+            case CustomRPC.SetYandereTarget:
+                Yandere.ReceiveRPC(reader);
                 break;
             case CustomRPC.SyncPuppet:
                 Puppeteer.ReceiveRPC(reader);

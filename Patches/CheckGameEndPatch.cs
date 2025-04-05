@@ -214,6 +214,12 @@ class GameEndCheckerForNormal
                             WinnerIds.Add(pc.PlayerId);
                         }
                         break;
+                    case CustomWinner.Yandere:
+                        if (pc.Is(CustomRoles.Yandere) && !WinnerIds.Contains(Yandere.BetPlayer[pc.PlayerId]))
+                        {
+                            WinnerIds.Add(Yandere.BetPlayer[pc.PlayerId]);
+                        }
+                        break;
                 }
             }
 

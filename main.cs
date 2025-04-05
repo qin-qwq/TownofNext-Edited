@@ -52,8 +52,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
-    public const string PluginVersion = "2025.0404.515.00010"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "5.1.5 Beta 1";
+    public const string PluginVersion = "2025.0404.515.00021"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "5.1.5 Beta 2 Hotfix 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU = 
         [
             (2024, 8, 11, 0) // 2025.3.25 & 16.0.0
@@ -61,7 +61,7 @@ public class Main : BasePlugin
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
-    public static readonly bool canaryRelease = true; // Latest: V5.1.5 Beta 1
+    public static readonly bool canaryRelease = true; // Latest: V5.1.5 Beta 2 Hotfix 1
     public static readonly bool fullRelease = false; // Latest: V5.1.4.1
 
     public static bool hasAccess = true;
@@ -941,6 +941,7 @@ public enum CustomRoles
     Werewolf,
     Workaholic,
     Wraith,
+    Yandere,
 
     //Coven
     Coven,
@@ -1130,6 +1131,7 @@ public enum CustomWinner
     Coven = CustomRoles.Coven,
     MoonWolf = CustomRoles.MoonWolf,
     Disruptor = CustomRoles.Disruptor,
+    Yandere = CustomRoles.Yandere,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners
@@ -1158,6 +1160,7 @@ public enum AdditionalWinners
     Quizmaster = CustomRoles.Quizmaster,
     SchrodingersCat = CustomRoles.SchrodingersCat,
     Troller = CustomRoles.Troller,
+    Yandere = CustomRoles.Yandere,
     //   NiceMini = CustomRoles.NiceMini,
     //   Baker = CustomRoles.Baker,
 }

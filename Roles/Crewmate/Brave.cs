@@ -1,4 +1,5 @@
 using Hazel;
+using TOHE.Roles.Core;
 
 namespace TOHE.Roles.Crewmate;
 
@@ -8,6 +9,7 @@ internal class Brave : RoleBase
     public override CustomRoles Role => CustomRoles.Brave;
     private const int Id = 31400;
     public override bool IsDesyncRole => true;
+    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Brave);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\

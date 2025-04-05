@@ -156,7 +156,8 @@ public static class CustomRolesHelper
             CustomRoles.VengefulRomantic or
             CustomRoles.Doppelganger or
             CustomRoles.SchrodingersCat or
-            CustomRoles.Follower;
+            CustomRoles.Follower or
+            CustomRoles.Yandere;
     }
     public static bool IsAmneCrew(this PlayerControl target)
     {
@@ -212,7 +213,8 @@ public static class CustomRolesHelper
             CustomRoles.BloodKnight or
             CustomRoles.Cultist or
             CustomRoles.MoonWolf or
-            CustomRoles.Disruptor;
+            CustomRoles.Disruptor or
+            CustomRoles.Yandere;
     }
     public static bool IsTasklessCrewmate(this CustomRoles role)
     {
@@ -1390,6 +1392,7 @@ public static class CustomRolesHelper
            CustomRoles.MoonWolf => CountTypes.MoonWolf,
            CustomRoles.Disruptor => CountTypes.Disruptor,
            CustomRoles.Doomsayer => Doomsayer.AliveWithoutEndGame() ? CountTypes.Doomsayer : CountTypes.Crew,
+           CustomRoles.Yandere => CountTypes.Yandere,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1450,6 +1453,7 @@ public static class CustomRolesHelper
             CustomRoles.Shocker => CustomWinner.Shocker,
             CustomRoles.MoonWolf => CustomWinner.MoonWolf,
             CustomRoles.Disruptor => CustomWinner.Disruptor,
+            CustomRoles.Yandere => CustomWinner.Yandere,
             _ => throw new NotImplementedException()
 
         };
@@ -1487,6 +1491,7 @@ public static class CustomRolesHelper
             CountTypes.MoonWolf => CustomRoles.MoonWolf,
             CountTypes.Disruptor => CustomRoles.Disruptor,
             CountTypes.Doomsayer => CustomRoles.Doomsayer,
+            CountTypes.Yandere => CustomRoles.Yandere,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1576,5 +1581,6 @@ public enum CountTypes
     Coven,
     MoonWolf,
     Disruptor,
-    Doomsayer
+    Doomsayer,
+    Yandere
 }
