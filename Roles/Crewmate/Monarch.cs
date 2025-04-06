@@ -53,7 +53,7 @@ internal class Monarch : RoleBase
             kg.RpcMurderPlayer(kg);
             kg.SetRealKiller(killer);
             killer.ResetKillCooldown();
-            killer.SetKillCooldown()
+            killer.SetKillCooldown();
             return false;
         }
         else return true;
