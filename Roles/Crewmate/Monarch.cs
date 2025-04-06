@@ -2,7 +2,6 @@ using AmongUs.GameOptions;
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Double;
-using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 
@@ -22,12 +21,6 @@ internal class Monarch : RoleBase
     private static OptionItem KnightCooldown;
     private static OptionItem KnightMax;
     public static OptionItem HideAdditionalVotesForKnighted;
-    private static OptionItem EnableAwakening;
-    private static OptionItem ProgressPerSkill;
-    private static OptionItem ProgressPerSecond;
-
-    private static float AwakeningProgress;
-    private static bool IsAwakened;
 
     public override void SetupCustomOption()
     {
@@ -40,19 +33,6 @@ internal class Monarch : RoleBase
             .SetValueFormat(OptionFormat.Times);
         HideAdditionalVotesForKnighted = BooleanOptionItem.Create(Id + 13, "HideAdditionalVotesForKnighted", false, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Monarch]);
-        EnableAwakening = BooleanOptionItem.Create(Id + 14, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Monarch]);
-        ProgressPerSkill = FloatOptionItem.Create(Id + 15, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.CrewmateRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSecond = FloatOptionItem.Create(Id + 16, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 1.5f, TabGroup.CrewmateRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
-    }
-    public override void Init()
-    {
-        AwakeningProgress = 0;
-        IsAwakened = false;
     }
     public override void Add(byte playerId)
     {
@@ -64,11 +44,21 @@ internal class Monarch : RoleBase
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
-        return !CustomRoles.Knighted.RoleExist();
+        var pcList = Main.AllAlivePlayerControls.Where(pc => pc.PlayerId != target.PlayerId && pc.Is(CustomRoles.Knighted)).ToList();
+
+        if (pcList.Any())
+        {
+            PlayerControl kg = pcList.RandomElement();
+            kg.SetDeathReason(PlayerState.DeathReason.Sacrifice);
+            kg.RpcMurderPlayer(kg);
+            kg.SetRealKiller(killer);
+            return false;
+        }
+        else return true;
     }
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (killer.GetAbilityUseLimit() <= 0 && !IsAwakened) return false;
+        if (killer.GetAbilityUseLimit() <= 0) return false;
         if (Mini.Age < 18 && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)))
         {
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cultist), GetString("CantRecruit")));
@@ -76,11 +66,7 @@ internal class Monarch : RoleBase
         }
         if (CanBeKnighted(target))
         {
-            AwakeningProgress += ProgressPerSkill.GetFloat();
-            if (!IsAwakened)
-            {
-                killer.RpcRemoveAbilityUse();
-            }
+            killer.RpcRemoveAbilityUse();
             target.RpcSetCustomRole(CustomRoles.Knighted);
 
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Monarch), GetString("MonarchKnightedPlayer")));
@@ -129,27 +115,5 @@ internal class Monarch : RoleBase
     {
         if (playerId.GetAbilityUseLimit() > 0)
             hud.KillButton.OverrideText(GetString("MonarchKillButtonText"));
-    }
-
-    public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
-    {
-        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100 || GameStates.IsMeeting || isForMeeting) return string.Empty;
-        return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
-    }
-    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
-    {
-        if (AwakeningProgress < 100)
-        {
-            AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
-        }
-        else CheckAwakening(player);;
-    }
-    private static void CheckAwakening(PlayerControl player)
-    {
-        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
-        {
-            IsAwakened = true;
-            player.Notify(GetString("SuccessfulAwakening"), 5f);
-        }
     }
 }

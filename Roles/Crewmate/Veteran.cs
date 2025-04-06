@@ -23,14 +23,7 @@ internal class Veteran : RoleBase
     private static OptionItem VeteranSkillCooldown;
     private static OptionItem VeteranSkillDuration;
     private static OptionItem VeteranSkillMaxOfUseage;
-    private static OptionItem EnableAwakening;
-    private static OptionItem ProgressPerTask;
-    private static OptionItem ProgressPerSkill;
-    private static OptionItem ProgressPerSecond;
 
-    private static float AwakeningProgress;
-    private static bool IsAwakened;
-    private static bool AutoAlert;
     private static readonly Dictionary<byte, long> VeteranInProtect = [];
 
     public override void SetupCustomOption()
@@ -44,24 +37,10 @@ internal class Veteran : RoleBase
             .SetValueFormat(OptionFormat.Times);
         VeteranAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Id + 13, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Veteran])
             .SetValueFormat(OptionFormat.Times);
-        EnableAwakening = BooleanOptionItem.Create(Id + 14, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Veteran]);
-        ProgressPerTask = FloatOptionItem.Create(Id + 15, "ProgressPerTask", new(0f, 100f, 10f), 20f, TabGroup.CrewmateRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSkill = FloatOptionItem.Create(Id + 16, "ProgressPerSkill", new(0f, 100f, 10f), 30f, TabGroup.CrewmateRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
-        ProgressPerSecond = FloatOptionItem.Create(Id + 17, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 0.5f, TabGroup.CrewmateRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
     }
     public override void Init()
     {
         VeteranInProtect.Clear();
-        AwakeningProgress = 0;
-        IsAwakened = false;
-        AutoAlert = false;
     }
     public override void Add(byte playerId)
     {
@@ -71,31 +50,6 @@ internal class Veteran : RoleBase
     {
         AURoleOptions.EngineerCooldown = VeteranSkillCooldown.GetFloat();
         AURoleOptions.EngineerInVentMaxTime = 1;
-    }
-
-    public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
-    {
-        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100 || GameStates.IsMeeting || isForMeeting) return string.Empty;
-        return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
-    }
-
-    public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
-    {
-        if (!IsAwakened)
-        {
-            AwakeningProgress += ProgressPerTask.GetFloat();
-        }
-        return true;
-    }
-
-    private static void CheckAwakening(PlayerControl player)
-    {
-        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
-        {
-            IsAwakened = true;
-            AutoAlert = true;
-            player.Notify(GetString("SuccessfulAwakening"), 5f);
-        }
     }
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
@@ -108,14 +62,6 @@ internal class Veteran : RoleBase
             or CustomRoles.Deputy)
             return true;
 
-        if (AutoAlert && IsAwakened)
-        {
-            target.RpcMurderPlayer(killer);
-            killer.SetRealKiller(target);
-            target.RpcRemoveAbilityUse();
-            AutoAlert = false;
-            return false;
-        }
         if (killer.PlayerId != target.PlayerId && VeteranInProtect.TryGetValue(target.PlayerId, out var time))
             if (time + VeteranSkillDuration.GetInt() >= GetTimeStamp())
             {
@@ -144,12 +90,6 @@ internal class Veteran : RoleBase
     }
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        if (AwakeningProgress < 100)
-        {
-            AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
-        }
-        else CheckAwakening(player);
-
         if (!lowLoad && VeteranInProtect.TryGetValue(player.PlayerId, out var vtime) && vtime + VeteranSkillDuration.GetInt() < nowTime)
         {
             VeteranInProtect.Remove(player.PlayerId);
@@ -178,10 +118,6 @@ internal class Veteran : RoleBase
         // Use ability
         if (!VeteranInProtect.ContainsKey(pc.PlayerId))
         {
-            if (!IsAwakened)
-            {
-                AwakeningProgress += ProgressPerSkill.GetFloat();
-            }
             VeteranInProtect.Remove(pc.PlayerId);
             VeteranInProtect.Add(pc.PlayerId, GetTimeStamp(DateTime.Now));
             pc.RpcRemoveAbilityUse();

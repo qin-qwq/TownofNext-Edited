@@ -1,6 +1,5 @@
 using UnityEngine;
 using static TOHE.Options;
-using static TOHE.Translator;
 
 namespace TOHE.Roles.Crewmate;
 
@@ -17,12 +16,12 @@ internal class NiceGuesser : RoleBase
     private static OptionItem GGCanGuessCrew;
     private static OptionItem GGCanGuessAdt;
     private static OptionItem GGTryHideMsg;
-    private static OptionItem EnableAwakening;
+    /*private static OptionItem EnableAwakening;
     private static OptionItem ProgressPerTask;
     private static OptionItem ProgressPerSecond;
 
     private static float AwakeningProgress;
-    private static bool IsAwakened;
+    private static bool IsAwakened;*/
 
     public override void SetupCustomOption()
     {
@@ -33,17 +32,17 @@ internal class NiceGuesser : RoleBase
         GGCanGuessAdt = BooleanOptionItem.Create(Id + 12, "GGCanGuessAdt", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.NiceGuesser]);
         GGTryHideMsg = BooleanOptionItem.Create(Id + 13, "GuesserTryHideMsg", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.NiceGuesser])
             .SetColor(Color.green);
-        EnableAwakening = BooleanOptionItem.Create(Id + 14, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
+        /*EnableAwakening = BooleanOptionItem.Create(Id + 14, "EnableAwakening", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.NiceGuesser]);
         ProgressPerTask = FloatOptionItem.Create(Id + 15, "ProgressPerTask", new(0f, 100f, 10f), 20f, TabGroup.CrewmateRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
         ProgressPerSecond = FloatOptionItem.Create(Id + 17, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 0.5f, TabGroup.CrewmateRoles, false)
             .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
+            .SetValueFormat(OptionFormat.Percent);*/
     }
 
-    public override void Init()
+    /*public override void Init()
     {
         AwakeningProgress = 0;
         IsAwakened = false;
@@ -81,7 +80,7 @@ internal class NiceGuesser : RoleBase
             player.RpcSetCustomRole(CustomRoles.DoubleShot, false, false);
             player.Notify(GetString("SuccessfulAwakening"), 5f);
         }
-    }
+    }*/
 
     public static bool NeedHideMsg(PlayerControl pc) => pc.Is(CustomRoles.NiceGuesser) && GGTryHideMsg.GetBool();
 

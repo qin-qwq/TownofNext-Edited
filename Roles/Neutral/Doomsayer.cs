@@ -32,13 +32,9 @@ internal class Doomsayer : RoleBase
     private static OptionItem DoomsayerTryHideMsg;
     private static OptionItem ImpostorVision;
     public static OptionItem AliveWithoutEndGameOpt;
-    private static OptionItem EnableAwakening;
-    private static OptionItem ProgressPerSecond;
 
     private readonly HashSet<CustomRoles> GuessedRoles = [];
 
-    private static float AwakeningProgress;
-    private static bool IsAwakened;
     private int GuessesCount = 0;
     private int GuessesCountPerMeeting = 0;
     private static bool CantGuess = false;
@@ -78,18 +74,10 @@ internal class Doomsayer : RoleBase
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         AliveWithoutEndGameOpt = BooleanOptionItem.Create(Id + 27, "AliveWithoutEndGame", true, TabGroup.NeutralRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-
-        EnableAwakening = BooleanOptionItem.Create(Id + 30, "EnableAwakening", true, TabGroup.NeutralRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-        ProgressPerSecond = FloatOptionItem.Create(Id + 32, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 2f, TabGroup.NeutralRoles, false)
-            .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
     }
     public override void Init()
     {
         CantGuess = false;
-        AwakeningProgress = 0;
-        IsAwakened = false;
     }
     public override void Add(byte playerId)
     {
@@ -260,31 +248,6 @@ internal class Doomsayer : RoleBase
             {
                 SendMessage(string.Format(GetString("DoomsayerGuessCountMsg"), guesser.GetAbilityUseLimit()), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("DoomsayerGuessCountTitle")));
             }, 0.7f, "Doomsayer Guess Msg 2");
-        }
-    }
-
-    public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
-    {
-        if (!EnableAwakening.GetBool() || AwakeningProgress >= 100 || GameStates.IsMeeting || isForMeeting) return string.Empty;
-        return string.Format(GetString("AwakeningProgress") + ": {0:F0}% / {1:F0}%", AwakeningProgress, 100);
-    }
-
-    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
-    {
-        if (AwakeningProgress < 100)
-        {
-            AwakeningProgress += ProgressPerSecond.GetFloat() * Time.fixedDeltaTime;
-        }
-        else CheckAwakening(player);
-    }
-
-    private static void CheckAwakening(PlayerControl player)
-    {
-        if (AwakeningProgress >= 100 && !IsAwakened && EnableAwakening.GetBool() && player.IsAlive())
-        {
-            IsAwakened = true;
-            player.RpcSetCustomRole(CustomRoles.DoubleShot, false, false);
-            player.Notify(GetString("SuccessfulAwakening"), 5f);
         }
     }
 

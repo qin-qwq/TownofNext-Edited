@@ -1,7 +1,5 @@
 using UnityEngine;
 using static TOHE.Options;
-using static TOHE.Translator;
-using TOHE.Roles.Core;
 
 namespace TOHE.Roles.Impostor;
 
@@ -19,12 +17,12 @@ internal class EvilGuesser : RoleBase
     private static OptionItem EGCanGuessAdt;
     //private static OptionItem EGCanGuessTaskDoneSnitch; Not used
     private static OptionItem EGTryHideMsg;
-    private static OptionItem EnableAwakening;
+    /*private static OptionItem EnableAwakening;
     private static OptionItem ProgressPerKill;
     private static OptionItem ProgressPerSecond;
 
     private static float AwakeningProgress;
-    private static bool IsAwakened;
+    private static bool IsAwakened;*/
 
     public override void SetupCustomOption()
     {
@@ -41,17 +39,17 @@ internal class EvilGuesser : RoleBase
         EGTryHideMsg = BooleanOptionItem.Create(Id + 6, "GuesserTryHideMsg", true, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EvilGuesser])
             .SetColor(Color.green);
-        EnableAwakening = BooleanOptionItem.Create(Id + 7, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
+        /*EnableAwakening = BooleanOptionItem.Create(Id + 7, "EnableAwakening", true, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
         ProgressPerKill = FloatOptionItem.Create(Id + 8, "ProgressPerKill", new(0f, 100f, 10f), 40f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
             .SetValueFormat(OptionFormat.Percent);
         ProgressPerSecond = FloatOptionItem.Create(Id + 10, "ProgressPerSecond", new(0.1f, 3f, 0.1f), 0.5f, TabGroup.ImpostorRoles, false)
             .SetParent(EnableAwakening)
-            .SetValueFormat(OptionFormat.Percent);
+            .SetValueFormat(OptionFormat.Percent);*/
     }
 
-    public override void Init()
+    /*public override void Init()
     {
         AwakeningProgress = 0;
         IsAwakened = false;
@@ -89,7 +87,7 @@ internal class EvilGuesser : RoleBase
             player.RpcSetCustomRole(CustomRoles.DoubleShot, false, false);
             player.Notify(GetString("SuccessfulAwakening"), 5f);
         }
-    }
+    }*/
     
     public static bool NeedHideMsg(PlayerControl pc) => pc.Is(CustomRoles.EvilGuesser) && EGTryHideMsg.GetBool();
 
