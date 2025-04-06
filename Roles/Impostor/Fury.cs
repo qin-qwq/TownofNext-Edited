@@ -25,7 +25,6 @@ internal class Fury : RoleBase
     private static OptionItem AngryKillCooldown;
     private static OptionItem AngrySpeed;
     private static OptionItem AngryVision;
-    private static OptionItem CanStartMeetingWhenAngry;
 
     private bool FuryAngry;
 
@@ -44,7 +43,6 @@ internal class Fury : RoleBase
             .SetValueFormat(OptionFormat.Multiplier);
         AngryVision = FloatOptionItem.Create(Id + 15, "AngryVision", new(0f, 5f, 0.05f), 0.25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Multiplier);
-        CanStartMeetingWhenAngry = BooleanOptionItem.Create(Id + 16, "CanStartMeetingWhenAngry", true, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury]);
     }
 
     public override void Init()
@@ -52,21 +50,6 @@ internal class Fury : RoleBase
         FuryAngry = false;
     }
 
-    public override bool OnCheckStartMeeting(PlayerControl reporter)
-    {
-        foreach (PlayerControl playerControl in Main.AllPlayerControls)
-        {
-            if (!CanStartMeetingWhenAngry.GetBool() && FuryAngry == true)
-            {
-                return false;
-            }
-            if (CanStartMeetingWhenAngry.GetBool() && FuryAngry == true)
-            {
-                return true;
-            }
-        }
-        return true;
-    }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.ShapeshifterCooldown = AngryCooldown.GetFloat();
@@ -106,6 +89,7 @@ internal class Fury : RoleBase
             FuryAngry = false;
             Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed;
             Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKillCooldown;
+            player.RpcResetAbilityCooldown();
             player.Notify(GetString("FuryInCalm"), 5f);
             player.MarkDirtySettings();
         }, AngryDuration.GetFloat());

@@ -72,6 +72,7 @@ internal class MoonWolf : RoleBase
             Moon = false;
             player.ResetKillCooldown();
             player.SetKillCooldown();
+            player.RpcResetAbilityCooldown();
             player.MarkDirtySettings();
         }, MoonDuration.GetFloat());
     }
