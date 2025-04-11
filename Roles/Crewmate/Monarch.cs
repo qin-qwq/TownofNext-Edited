@@ -49,11 +49,14 @@ internal class Monarch : RoleBase
         if (pcList.Any())
         {
             PlayerControl kg = pcList.RandomElement();
-            kg.SetDeathReason(PlayerState.DeathReason.Sacrifice);
-            kg.RpcMurderPlayer(kg);
-            kg.SetRealKiller(killer);
-            killer.ResetKillCooldown();
-            killer.SetKillCooldown();
+            if (killer.CheckForInvalidMurdering(kg) && killer.RpcCheckAndMurder(kg, check: true))
+            {
+                kg.SetDeathReason(PlayerState.DeathReason.Sacrifice);
+                kg.RpcMurderPlayer(kg);
+                kg.SetRealKiller(killer);
+                killer.ResetKillCooldown();
+                killer.SetKillCooldown();
+            }
             return false;
         }
         else return true;
