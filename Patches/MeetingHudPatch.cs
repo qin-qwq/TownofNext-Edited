@@ -117,6 +117,61 @@ class CheckForEndVotingPatch
                     return true;
                 }
 
+                if (Konan.KonanCheckVotingForTarget(pc, pva))
+                {
+                    var voteTarget = GetPlayerById(pva.VotedFor);
+
+                    statesList.Add(new()
+                    {
+                        VoterId = pva.TargetPlayerId,
+                        VotedForId = pva.VotedFor
+                    });
+                    states = [.. statesList];
+
+                    var exiled = voteTarget.Data;
+
+                    ExileControllerWrapUpPatch.AntiBlackout_LastExiled = exiled;
+                    Main.LastVotedPlayerInfo = exiled;
+                    AntiBlackout.ExilePlayerId = exiled.PlayerId;
+
+                    if (AntiBlackout.BlackOutIsActive)
+                    {
+                        // Need check BlackOutIsActive again
+                        var isBlackOut = AntiBlackout.BlackOutIsActive;
+
+                        if (exiled != null)
+                        {
+                            AntiBlackout.ShowExiledInfo = isBlackOut;
+                            ConfirmEjections(exiled, isBlackOut);
+                        }
+
+                        if (isBlackOut)
+                            __instance.AntiBlackRpcVotingComplete(states, exiled, false);
+                        else
+                            __instance.RpcVotingComplete(states, exiled, false);
+                    }
+                    else
+                    {
+
+                        if (exiled != null)
+                        {
+                            ConfirmEjections(exiled);
+                        }
+
+                        __instance.RpcVotingComplete(states, exiled, false);
+                    }
+
+                    Logger.Info($"{voteTarget.GetNameWithRole()} expelled by Konan", "Konan");
+
+                    CheckForDeathOnExile(PlayerState.DeathReason.Vote, pva.VotedFor);
+
+                    Logger.Info("Konan vote, forced closure of the meeting", "Special Phase");
+
+                    voteTarget.SetRealKiller(pc);
+
+                    return true;
+                }
+
                 if (pva.DidVote && pva.VotedFor < 253 && pc.IsAlive())
                 {
                     var voteTarget = GetPlayerById(pva.VotedFor);
@@ -704,7 +759,7 @@ class CastVotePatch
         // Return vote to player if uses checkvote and wants to vote normal without using his abilities.
         if (suspectPlayerId == 253 && voter.GetRoleClass()?.IsMethodOverridden("CheckVote") == true)
         {
-            if (!voter.GetRoleClass().HasVoted)
+            if (!voter.GetRoleClass().HasVoted && !voter.Is(CustomRoles.Konan))
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
@@ -758,7 +813,7 @@ class CastVotePatch
         }
         else if (suspectPlayerId == 253 && voter.IsPlayerCoven())
         {
-            if (!voter.GetRoleClass().HasVoted)
+            if (!voter.GetRoleClass().HasVoted && !voter.Is(CustomRoles.Konan))
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
@@ -768,7 +823,7 @@ class CastVotePatch
         }
         else if (voter.IsPlayerCoven() && target.IsPlayerCoven())
         {
-            if (!voter.GetRoleClass().HasVoted)
+            if (!voter.GetRoleClass().HasVoted && !voter.Is(CustomRoles.Konan))
             {
                 voter.GetRoleClass().HasVoted = true;
                 CovenManager.necroVotes.Add(voter.PlayerId, target.PlayerId);
