@@ -15,7 +15,7 @@ internal class Arrogance : RoleBase
     private static OptionItem DefaultKillCooldown;
     private static OptionItem ReduceKillCooldown;
     private static OptionItem MinKillCooldown;
-    public static OptionItem BardChance;
+    //public static OptionItem BardChance;
 
     private static readonly Dictionary<byte, float> NowCooldown = [];
 
@@ -28,9 +28,9 @@ internal class Arrogance : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         MinKillCooldown = FloatOptionItem.Create(Id + 12, GeneralOption.MinKillCooldown, new(0f, 180f, 2.5f), 2.5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Arrogance])
             .SetValueFormat(OptionFormat.Seconds);
-        BardChance = IntegerOptionItem.Create(Id + 13, "BardChance", new(0, 100, 5), 0, TabGroup.ImpostorRoles, false)
+        /*BardChance = IntegerOptionItem.Create(Id + 13, "BardChance", new(0, 100, 5), 0, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Arrogance])
-            .SetValueFormat(OptionFormat.Percent);
+            .SetValueFormat(OptionFormat.Percent);*/
     }
     public override void Init()
     {
