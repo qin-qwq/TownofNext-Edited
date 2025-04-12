@@ -648,9 +648,9 @@ internal class RPCHandlerPatch
             case CustomRPC.SetSwapperVotes:
                 Swapper.ReceiveSwapRPC(reader, __instance);
                 break;
-            /*case CustomRPC.DictatorRPC:
+            case CustomRPC.DictatorRPC:
                 Dictator.OnReceiveDictatorRPC(reader, __instance);
-                break;*/
+                break;
             case CustomRPC.SyncShieldPersonDiedFirst:
                 Main.FirstDied = reader.ReadString();
                 Main.FirstDiedPrevious = reader.ReadString();

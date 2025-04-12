@@ -1,7 +1,5 @@
-using AmongUs.GameOptions;
 using Hazel;
 using System;
-using TOHE.Modules;
 using TOHE.Modules.ChatManager;
 using TOHE.Roles.Core;
 using UnityEngine;
@@ -19,17 +17,14 @@ internal class Dictator : RoleBase
     public override CustomRoles ThisRoleBase => CustomRoles.Tracker;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\
-    //public static OptionItem ChangeCommandToExpel;
+    public static OptionItem ChangeCommandToExpel;
     private static OptionItem TrackCooldown;
     private static OptionItem TrackDuration;
     private static OptionItem TrackDelay;
-
-    private bool Didvote = false;
-
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Dictator);
-        //ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator]);
+        ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator]);
         TrackCooldown = IntegerOptionItem.Create(Id + 2, GeneralOption.TrackerBase_TrackingCooldown, new(1, 120, 1), 15, TabGroup.CrewmateRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator])
             .SetValueFormat(OptionFormat.Seconds);
@@ -41,35 +36,9 @@ internal class Dictator : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
     }
 
-    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
-    {
-        AURoleOptions.TrackerCooldown = TrackCooldown.GetInt();
-        AURoleOptions.TrackerDuration = TrackDuration.GetInt();
-        AURoleOptions.TrackerDelay = TrackDelay.GetInt();
-    }
-
-    public override void Add(byte playerId)
-    {
-        playerId.SetAbilityUseLimit(1);
-    }
     public static bool CheckVotingForTarget(PlayerControl pc, PlayerVoteArea pva)
-        => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedFor && pva.VotedFor < 253 && !pc.Data.IsDead && pc.GetAbilityUseLimit() > 0;
-
-    public override void AfterMeetingTasks() => Didvote = false;
-    public override bool CheckVote(PlayerControl votePlayer, PlayerControl voteTarget)
-    {
-        if (votePlayer == null || voteTarget == null) return true;
-        if (Didvote == true) return false;
-        if (voteTarget.GetCustomRole().IsCrewmate() && votePlayer.GetAbilityUseLimit() > 0)
-        {
-            Didvote = true;
-            votePlayer.RpcRemoveAbilityUse();
-            SendMessage(GetString("DictatorVoteHasReturned"), votePlayer.PlayerId, title: ColorString(GetRoleColor(CustomRoles.Dictator), string.Format(GetString("VoteAbilityUsed"), GetString("Dictator"))));
-            return false;
-        }
-        return true;
-    }
-    /*public bool ExilePlayer(PlayerControl pc, string msg, bool isUI = false)
+        => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedFor && pva.VotedFor < 253 && !pc.Data.IsDead;
+    public bool ExilePlayer(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!ChangeCommandToExpel.GetBool()) return false;
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -250,5 +219,5 @@ internal class Dictator : RoleBase
                 DictatorOnClick(pva.TargetPlayerId, __instance);
             }));
         }
-    }*/
+    }
 }

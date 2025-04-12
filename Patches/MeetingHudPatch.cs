@@ -61,10 +61,10 @@ class CheckForEndVotingPatch
                     }
                 }
 
-                if (Dictator.CheckVotingForTarget(pc, pva))
+                if (Dictator.CheckVotingForTarget(pc, pva) && !Dictator.ChangeCommandToExpel.GetBool())
                 {
                     var voteTarget = GetPlayerById(pva.VotedFor);
-                    //TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Suicide, pc.PlayerId);
+                    TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Suicide, pc.PlayerId);
 
                     statesList.Add(new()
                     {
@@ -704,7 +704,7 @@ class CastVotePatch
         // Return vote to player if uses checkvote and wants to vote normal without using his abilities.
         if (suspectPlayerId == 253 && voter.GetRoleClass()?.IsMethodOverridden("CheckVote") == true)
         {
-            if (!voter.GetRoleClass().HasVoted && !voter.Is(CustomRoles.Dictator))
+            if (!voter.GetRoleClass().HasVoted)
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
@@ -758,7 +758,7 @@ class CastVotePatch
         }
         else if (suspectPlayerId == 253 && voter.IsPlayerCoven())
         {
-            if (!voter.GetRoleClass().HasVoted && !voter.Is(CustomRoles.Dictator))
+            if (!voter.GetRoleClass().HasVoted)
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
