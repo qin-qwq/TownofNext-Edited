@@ -202,18 +202,6 @@ class GameEndCheckerForNormal
                             WinnerIds.Add(Romantic.BetPlayer[pc.PlayerId]);
                         }
                         break;
-                    case CustomWinner.MoonWolf:
-                        if (pc.Is(CustomRoles.MoonWolf) && !WinnerIds.Contains(pc.PlayerId))
-                        {
-                            WinnerIds.Add(pc.PlayerId);
-                        }
-                        break;
-                    case CustomWinner.Disruptor:
-                        if (pc.Is(CustomRoles.Disruptor) && !WinnerIds.Contains(pc.PlayerId))
-                        {
-                            WinnerIds.Add(pc.PlayerId);
-                        }
-                        break;
                     case CustomWinner.Yandere:
                         if (pc.Is(CustomRoles.Yandere) && !WinnerIds.Contains(Yandere.BetPlayer[pc.PlayerId]))
                         {
