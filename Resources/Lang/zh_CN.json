@@ -4202,5 +4202,7 @@
   "WinnerRoleText.Yandere": "病娇胜利！",
   "YandereWinWithTarget": "病娇死亡后跟随目标胜利",
   "Prerelease": "Pre-release",
-  "ShowModdedClientText": "显示模组客户端"
+  "ShowModdedClientText": "显示模组客户端",
+  "MayorAdditionalVoteTask": "完成一个任务增加的票数",
+  "MayorAdditionalVoteMeeting": "每轮会议后增加的票数"
 }
