@@ -4205,5 +4205,6 @@
   "Prerelease": "Pre-release",
   "ShowModdedClientText": "显示模组客户端",
   "MayorAdditionalVoteTask": "完成一个任务增加的票数",
-  "MayorAdditionalVoteMeeting": "每轮会议后增加的票数"
+  "MayorAdditionalVoteMeeting": "每轮会议后增加的票数",
+  "CanAppearFungle": "在蘑菇岛地图生成"
 }

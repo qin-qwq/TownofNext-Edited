@@ -24,6 +24,7 @@ internal class Camouflager : RoleBase
     private static OptionItem CanUseCommsSabotagOpt;
     private static OptionItem DisableReportWhenCamouflageIsActiveOpt;
     private static OptionItem ShowShapeshiftAnimationsOpt;
+    public static OptionItem CanAppearFungle;
 
     public static bool AbilityActivated = false;
     private static float CamouflageCooldown;
@@ -38,11 +39,13 @@ internal class Camouflager : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CamouflageDurationOpt = FloatOptionItem.Create(Id + 4, "CamouflageDuration", new(1f, 180f, 1f), 10f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager])
             .SetValueFormat(OptionFormat.Seconds);
-        CanUseCommsSabotagOpt = BooleanOptionItem.Create(Id + 6, "CanUseCommsSabotage", false, TabGroup.ImpostorRoles, false)
+        CanUseCommsSabotagOpt = BooleanOptionItem.Create(Id + 6, "CanUseCommsSabotage", true, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
         DisableReportWhenCamouflageIsActiveOpt = BooleanOptionItem.Create(Id + 8, "DisableReportWhenCamouflageIsActive", false, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
-        ShowShapeshiftAnimationsOpt = BooleanOptionItem.Create(Id + 9, GeneralOption.ShowShapeshiftAnimations, true, TabGroup.ImpostorRoles, false)
+        ShowShapeshiftAnimationsOpt = BooleanOptionItem.Create(Id + 9, GeneralOption.ShowShapeshiftAnimations, false, TabGroup.ImpostorRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
+        CanAppearFungle = BooleanOptionItem.Create(Id + 10, "CanAppearFungle", false, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
 
     }
