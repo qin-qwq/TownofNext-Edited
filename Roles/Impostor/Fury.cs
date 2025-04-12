@@ -67,6 +67,12 @@ internal class Fury : RoleBase
             opt.SetFloat(FloatOptionNames.ImpostorLightMod, Main.DefaultImpostorVision);
         }
     }
+
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        FuryAngry = false;
+    }
+    
     public override void UnShapeShiftButton(PlayerControl player)
     {
         FuryAngry = true;
