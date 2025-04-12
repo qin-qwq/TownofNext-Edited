@@ -21,6 +21,7 @@ internal class Yandere : RoleBase
     private static OptionItem KillCooldown;
     private static OptionItem KnowTargetRole;
     private static OptionItem TargetKnowYandere;
+    public static OptionItem YandereWinWithTarget;
     private static OptionItem CanVent;
     private static OptionItem HasImpostorVision;
     private static OptionItem CanUsesSabotage;
@@ -34,9 +35,10 @@ internal class Yandere : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         KnowTargetRole = BooleanOptionItem.Create(Id + 11, "YandereKnowTargetRole", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
         TargetKnowYandere = BooleanOptionItem.Create(Id + 12, "TargetKnowYandere", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
-        CanVent = BooleanOptionItem.Create(Id + 13, GeneralOption.CanVent, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
-        HasImpostorVision = BooleanOptionItem.Create(Id + 14, GeneralOption.ImpostorVision, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
-        CanUsesSabotage = BooleanOptionItem.Create(Id + 15, GeneralOption.CanUseSabotage, false, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
+        YandereWinWithTarget = BooleanOptionItem.Create(Id + 13, "YandereWinWithTarget", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
+        CanVent = BooleanOptionItem.Create(Id + 14, GeneralOption.CanVent, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
+        HasImpostorVision = BooleanOptionItem.Create(Id + 15, GeneralOption.ImpostorVision, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
+        CanUsesSabotage = BooleanOptionItem.Create(Id + 16, GeneralOption.CanUseSabotage, false, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Yandere]);
     }
 
     public override void Init()

@@ -491,6 +491,14 @@ class GameEndCheckerForNormal
                                 WinnerIds.Add(pc.PlayerId);
                                 AdditionalWinnerTeams.Add(AdditionalWinners.Follower);
                                 break;
+                            case CustomRoles.Yandere when !pc.IsAlive() && Yandere.YandereWinWithTarget.GetBool():
+                                if (Yandere.BetPlayer.TryGetValue(pc.PlayerId, out var BetTarget)
+                                    && (WinnerIds.Contains(BetTarget) || (Main.PlayerStates.TryGetValue(BetTarget, out var BetTargetPS) && WinnerRoles.Contains(BetTargetPS.MainRole))))
+                                {
+                                    WinnerIds.Add(pc.PlayerId);
+                                    AdditionalWinnerTeams.Add(AdditionalWinners.Yandere);
+                                }
+                                break;
                         }
                     }
 

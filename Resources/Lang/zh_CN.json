@@ -4200,6 +4200,7 @@
   "YandereKnowTargetRole": "病娇知道目标职业",
   "TargetKnowYandere": "目标知道自己有病娇",
   "WinnerRoleText.Yandere": "病娇胜利！",
+  "YandereWinWithTarget": "病娇死亡后跟随目标胜利",
   "Prerelease": "Pre-release",
   "ShowModdedClientText": "显示模组客户端"
 }
