@@ -166,6 +166,11 @@ class VersionShowerStartPatch
         if (Main.IsAprilFools)
             Main.credentialsText = $"<color=#00bfff>Town Of Host</color> v11.45.14";
 
+        if (Main.IsPrerelease)
+        {
+            Main.credentialsText += $"\r\n<#F39C12><size=80%>{GetString("Prerelease")}</size></color>";
+        }
+
         var credentials = Object.Instantiate(__instance.text);
         credentials.text = Main.credentialsText;
         credentials.alignment = TextAlignmentOptions.Right;

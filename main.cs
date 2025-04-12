@@ -52,8 +52,9 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
-    public const string PluginVersion = "2025.0404.515.00030"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "5.1.5 Beta 3";
+    public const string PluginVersion = "2025.0412.515.00090"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "5.1.5";
+    public static bool IsPrerelease { get; } = true;
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU = 
         [
             (2024, 8, 11, 0) // 2025.3.25 & 16.0.0
@@ -61,8 +62,8 @@ public class Main : BasePlugin
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
-    public static readonly bool canaryRelease = true; // Latest: V5.1.5 Beta 3
-    public static readonly bool fullRelease = false; // Latest: V5.1.4.1
+    public static readonly bool canaryRelease = false; // Latest: V5.1.5 Beta 3
+    public static readonly bool fullRelease = true; // Latest: V5.1.4.1
 
     public static bool hasAccess = true;
 
@@ -103,6 +104,7 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> DarkTheme { get; private set; }
     public static ConfigEntry<bool> DisableLobbyMusic { get; private set; }
     public static ConfigEntry<bool> ShowTextOverlay { get; private set; }
+    public static ConfigEntry<bool> ShowModdedClientText { get; private set; }
     public static ConfigEntry<bool> HorseMode { get; private set; }
     public static ConfigEntry<bool> LongMode { get; private set; }
     public static ConfigEntry<bool> ForceOwnLanguage { get; private set; }
@@ -546,6 +548,7 @@ public class Main : BasePlugin
         DarkTheme = Config.Bind("Client Options", "DarkTheme", false);
         DisableLobbyMusic = Config.Bind("Client Options", "DisableLobbyMusic", false);
         ShowTextOverlay = Config.Bind("Client Options", "ShowTextOverlay", false);
+        ShowModdedClientText = Config.Bind("Client Options", "ShowModdedClientText", true);
         HorseMode = Config.Bind("Client Options", "HorseMode", false);
         LongMode = Config.Bind("Client Options", "LongMode", false);
         ForceOwnLanguage = Config.Bind("Client Options", "ForceOwnLanguage", false);
@@ -573,7 +576,6 @@ public class Main : BasePlugin
         //TOHE.Logger.Disable("NotifyRoles");
         TOHE.Logger.Disable("SwitchSystem");
         TOHE.Logger.Disable("ModNews");
-        TOHE.Logger.Disable("CustomRpcSender");
         TOHE.Logger.Disable("RpcSetNamePrivate");
         TOHE.Logger.Disable("KnowRoleTarget");
         if (!DebugModeManager.AmDebugger)
@@ -595,6 +597,7 @@ public class Main : BasePlugin
             TOHE.Logger.Disable("PlayerControl.RpcSetRole");
             TOHE.Logger.Disable("SyncCustomSettings");
             //TOHE.Logger.Disable("DoNotifyRoles");
+            TOHE.Logger.Disable("CustomRpcSender");
         }
         //TOHE.Logger.isDetail = true;
 
