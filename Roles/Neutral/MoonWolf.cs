@@ -58,6 +58,11 @@ internal class MoonWolf : RoleBase
     public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
     public override bool CanUseSabotage(PlayerControl pc) => CanUsesSabotage.GetBool();
 
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        Moon = false;
+    }
+    
     public override void UnShapeShiftButton(PlayerControl player)
     {
         Moon = true;
