@@ -52,8 +52,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
-    public const string PluginVersion = "2025.0412.520.00010"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "5.2.0 Beta 1";
+    public const string PluginVersion = "2025.0419.520.00020"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "5.2.0 Beta 2";
     public static bool IsPrerelease { get; } = false;
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU = 
         [
@@ -62,7 +62,7 @@ public class Main : BasePlugin
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V2.2.0 Alpha 4 Hotfix 1
-    public static readonly bool canaryRelease = true; // Latest: V5.2.0 Beta 1
+    public static readonly bool canaryRelease = true; // Latest: V5.2.0 Beta 2
     public static readonly bool fullRelease = false; // Latest: V5.1.5 Pre
 
     public static bool hasAccess = true;
@@ -792,6 +792,7 @@ public enum CustomRoles
     Admirer,
     Alchemist,
     Altruist,
+    AnitaHailey,
     Bastion,
     Benefactor,
     Bodyguard,

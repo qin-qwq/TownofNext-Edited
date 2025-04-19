@@ -229,6 +229,11 @@ public static class GuessManager
                     pc.ShowInfoMessage(isUI, GetString("CantGuessJailed"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("JailerTitle")));
                     return true;
                 }
+                if (AnitaHailey.HaveAPTX4869(pc.PlayerId))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("AnitaHaileyCantGuess"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.AnitaHailey), GetString("AnitaHaileyTitle")));
+                    return true;
+                }
                 if (!Mundane.OnGuess(pc))
                 {
                     pc.ShowInfoMessage(isUI, GetString("GuessedAsMundane"));

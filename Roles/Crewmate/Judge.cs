@@ -165,6 +165,11 @@ internal class Judge : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), ColorString(GetRoleColor(CustomRoles.Jailer), GetString("JailerTitle")));
                     return true;
                 }
+                if (AnitaHailey.HaveAPTX4869(pc.PlayerId))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), ColorString(GetRoleColor(CustomRoles.AnitaHailey), GetString("AnitaHaileyTitle")));
+                    return true;
+                }
                 if (pc.PlayerId == target.PlayerId)
                 {
                     pc.ShowInfoMessage(isUI, GetString("Judge_LaughToWhoTrialSelf"), ColorString(Color.cyan, GetString("MessageFromKPD")));
