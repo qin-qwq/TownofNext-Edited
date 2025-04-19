@@ -123,7 +123,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Consigliere => CustomRoles.Overseer,
                 CustomRoles.Mercenary => CustomRoles.Addict,
                 CustomRoles.Miner => CustomRoles.Mole,
-                CustomRoles.Godfather => CustomRoles.ChiefOfPolice,
+                CustomRoles.Godfather => CustomRoles.President,
                 CustomRoles.Twister => CustomRoles.TimeMaster,
                 CustomRoles.Disperser => CustomRoles.Transporter,
                 CustomRoles.Eraser => CustomRoles.Cleanser,
