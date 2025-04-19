@@ -71,6 +71,29 @@ internal class AnitaHailey : RoleBase
         return false;
     }
 
+    public override bool CheckMurderOnOthersTarget(PlayerControl killer, PlayerControl target)
+    {
+        if (killer == null) return false;
+        if (APTX4869Players.Contains(killer.PlayerId))
+        {
+            if (killer.GetCustomRole() is
+                CustomRoles.SerialKiller or
+                CustomRoles.Pursuer or
+                CustomRoles.Deputy or
+                CustomRoles.Deceiver or
+                CustomRoles.AnitaHailey or
+                CustomRoles.Poisoner)
+                return false;
+
+                killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.AnitaHailey), GetString("YouGetAPTX4869")));
+                killer.SetKillCooldownV3(300f, forceAnime: !DisableShieldAnimations.GetBool());
+                killer.ResetKillCooldown();
+
+            return true;
+        }
+        return false;
+    }
+
     public override void AfterMeetingTasks()
     {
         APTX4869Players.Clear();
