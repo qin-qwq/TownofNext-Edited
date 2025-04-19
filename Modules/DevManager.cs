@@ -90,13 +90,14 @@ public static class DevManager
     {
         // Dev
         DevUserList.Add(new(code: "actorour#0029", color: "#ffc0cb", tag: "Original Developer", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "KARPED1EM"));
-        DevUserList.Add(new(code: "hodstuck#3628", color: "#ffc0cb", tag: "null", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "秦始皇"));
+        DevUserList.Add(new(code: "hodstuck#3628", color: "null", tag: "null", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "秦始皇"));
         DevUserList.Add(new(code: "pinklaze#1776", color: "#30548e", tag: "#Dev", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: false, upName: "NCSIMON"));
         DevUserList.Add(new(code: "sofaagile#3120", color: "null", tag: "null", userType: "s_cr", isUp: false, isDev: true, deBug: true, colorCmd: false, upName: null)); //天寸
         //DevUserList.Add(new(code: "keyscreech#2151", color: "null", tag: "<color=#D3A4FF>美術</color><color=#5A5AAD>NotKomi</color>", isUp: false, isDev: true, deBug: false, upName: null)); //Endrmen40409
         DevUserList.Add(new(code: "icingposh#6469", color: "#9e2424", userType: "s_cr", tag: "discord.gg/tohe", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "ryuk2"));
         DevUserList.Add(new(code: "bestanswer#3360", color: "#00ff1d", tag: "绿色游戏", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null)); //NikoCat233's alt
         DevUserList.Add(new(code: "happypride#3747", color: "#00ff1d", tag: "绿色游戏", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null)); //NikoCat233's alt 2
+        DevUserList.Add(new(code: "alphacook#6624", color: "null", tag: "<#f0bbd0>D<#e1b5d5>u<#d3b0db>c<#c4aae0>k<#b5a5e5>e<#a69fea>d<#979aef>E<#8994f5>z<#7a8ffa>l<#6b89ff>y<#6b89ff>", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null));
         //// pt-BR Translators
         //DevUserList.Add(new(code: "modelpad#5195", color: "null", tag: "Tradutor", isUp: true, isDev: false, deBug: false, colorCmd: false, upName: "Reginaldoo")); // and content creator
         //DevUserList.Add(new(code: "mimerecord#9638", color: "null", tag: "Tradutor", isUp: false, isDev: false, deBug: false, colorCmd: false, upName: "Arc"));
