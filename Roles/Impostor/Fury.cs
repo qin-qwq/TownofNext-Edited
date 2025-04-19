@@ -25,15 +25,17 @@ internal class Fury : RoleBase
     private static OptionItem AngryKillCooldown;
     private static OptionItem AngrySpeed;
     private static OptionItem AngryVision;
+    private static OptionItem EveryOneKnowFuryWhenAngry;
 
-    private bool FuryAngry;
+
+    public static bool FuryAngry;
 
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Fury);
-        KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 120f, 2.5f), 30f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
+        KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 120f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Seconds);
-        AngryCooldown = FloatOptionItem.Create(Id + 11, "AngryCooldown", new(2.5f, 120f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
+        AngryCooldown = FloatOptionItem.Create(Id + 11, "AngryCooldown", new(2.5f, 120f, 2.5f), 20f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Seconds);
         AngryDuration = FloatOptionItem.Create(Id + 12, "AngryDuration", new(2.5f, 60f, 2.5f), 15f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
                 .SetValueFormat(OptionFormat.Seconds);
@@ -41,8 +43,9 @@ internal class Fury : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         AngrySpeed = FloatOptionItem.Create(Id + 14, "AngrySpeed", new(0f, 3f, 0.25f), 2.5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Multiplier);
-        AngryVision = FloatOptionItem.Create(Id + 15, "AngryVision", new(0f, 5f, 0.05f), 0.25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
+        AngryVision = FloatOptionItem.Create(Id + 15, "AngryVision", new(0f, 5f, 0.25f), 1.25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Multiplier);
+        EveryOneKnowFuryWhenAngry = BooleanOptionItem.Create(Id + 16, "EveryOneKnowFuryWhenAngry", true, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury]);
     }
 
     public override void Init()
@@ -105,4 +108,8 @@ internal class Fury : RoleBase
         hud.AbilityButton.OverrideText(GetString("FuryShapeshiftText"));
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Rage");
+
+    public static bool VisibleToEveryone(PlayerControl target) => target.Is(CustomRoles.Fury) && EveryOneKnowFuryWhenAngry.GetBool() && FuryAngry;
+    public override bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target) => VisibleToEveryone(target);
+    public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => VisibleToEveryone(target);
 }
