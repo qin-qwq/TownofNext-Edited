@@ -35,7 +35,7 @@ internal class AbyssBringer : RoleBase
         const TabGroup tab = TabGroup.ImpostorRoles;
         const CustomRoles role = CustomRoles.Abyssbringer;
         SetupRoleOptions(Id, tab, role);
-        BlackHoleCountLimit = IntegerOptionItem.Create(Id + 16, "BlackHoleCountLimit", new(1, 15, 1), 1, tab, false)
+        BlackHoleCountLimit = IntegerOptionItem.Create(Id + 16, "BlackHoleCountLimit", new(1, 15, 1), 2, tab, false)
             .SetParent(CustomRoleSpawnChances[role]);
         BlackHolePlaceCooldown = IntegerOptionItem.Create(Id + 10, "BlackHolePlaceCooldown", new(1, 180, 1), 30, tab, false)
             .SetParent(CustomRoleSpawnChances[role])
