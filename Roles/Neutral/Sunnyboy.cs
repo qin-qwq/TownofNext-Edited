@@ -7,7 +7,7 @@ internal class Sunnyboy : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Sunnyboy;
-    private const int Id = 14400;
+    private const int Id = 33500;
     private static readonly HashSet<byte> PlayerIds = [];
     public static bool HasEnabled => PlayerIds.Any();
 
