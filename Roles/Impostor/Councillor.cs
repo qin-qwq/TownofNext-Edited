@@ -131,6 +131,11 @@ internal class Councillor : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("JailerTitle")));
                     return true;
                 }
+                if (AnitaHailey.HaveAPTX4869(pc.PlayerId))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("CanNotTrialHaveAPTX4869"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.AnitaHailey), GetString("AnitaHaileyTitle")));
+                    return true;
+                }
                 if (pc.PlayerId == target.PlayerId)
                 {
                     pc.ShowInfoMessage(isUI, GetString("Councillor_LaughToWhoMurderSelf"), Utils.ColorString(Color.cyan, GetString("MessageFromKPD")));

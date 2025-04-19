@@ -167,7 +167,7 @@ internal class Judge : RoleBase
                 }
                 if (AnitaHailey.HaveAPTX4869(pc.PlayerId))
                 {
-                    pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), ColorString(GetRoleColor(CustomRoles.AnitaHailey), GetString("AnitaHaileyTitle")));
+                    pc.ShowInfoMessage(isUI, GetString("CanNotTrialHaveAPTX4869"), ColorString(GetRoleColor(CustomRoles.AnitaHailey), GetString("AnitaHaileyTitle")));
                     return true;
                 }
                 if (pc.PlayerId == target.PlayerId)
