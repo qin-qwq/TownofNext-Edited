@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using System.Text;
+using TOHE.Modules;
 using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
@@ -60,6 +61,7 @@ internal partial class Mayor : RoleBase
     {
         MayorUsedButtonCount[playerId] = 0;
         AdditionalVotes = MayorAdditionalVote.GetInt();
+        playerId.SetAbilityUseLimit(AdditionalVotes);
     }
     public override void Remove(byte playerId)
     {
@@ -142,12 +144,4 @@ internal partial class Mayor : RoleBase
         hud.AbilityButton.buttonLabelText.text = GetString("MayorVentButtonText");
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("EmergencyButton");
-
-    public override string GetProgressText(byte playerId, bool coooms)
-    {
-        var voteNum = AdditionalVotes;
-        var ProgressText = new StringBuilder();
-        ProgressText.Append(ColorString(voteNum < 1 ? Color.gray : GetRoleColor(CustomRoles.Mayor), $"({voteNum})"));
-        return ProgressText.ToString();
-    }
 }
