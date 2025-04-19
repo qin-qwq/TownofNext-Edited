@@ -1,7 +1,5 @@
 using AmongUs.GameOptions;
 using Hazel;
-using InnerNet;
-using MS.Internal.Xml.XPath;
 using TOHE.Roles.Core;
 using static TOHE.Options;
 

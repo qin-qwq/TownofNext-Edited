@@ -1,10 +1,5 @@
 using AmongUs.GameOptions;
-using Hazel;
-using System;
 using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Roles.Core;
-using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 using static TOHE.Utils;
