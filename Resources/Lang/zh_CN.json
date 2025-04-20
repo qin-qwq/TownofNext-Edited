@@ -4221,5 +4221,6 @@
   "YouGetAPTX4869": "你中了毒药，下轮会议结束前无法袭击！",
   "AnitaHaileyAPTX4869text": "毒药",
   "APTX4869Cooldown": "毒药冷却时间",
-  "APTX4869Max": "毒药技能次数"
+  "APTX4869Max": "毒药技能次数",
+  "MedicPortableVitals": "医生可以在保护玩家后查看便携式心电图"
 }
