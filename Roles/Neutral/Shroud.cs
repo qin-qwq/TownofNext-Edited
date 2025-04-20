@@ -175,6 +175,6 @@ internal class Shroud : RoleBase
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        hud.KillButton?.OverrideText($"{GetString("ShroudButtonText")}");
+        hud.KillButton?.OverrideText($"{GetString("Shroud")}");
     }
 }

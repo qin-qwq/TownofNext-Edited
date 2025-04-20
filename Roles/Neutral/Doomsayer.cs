@@ -199,7 +199,7 @@ internal class Doomsayer : RoleBase
                 {
                     _ = new LateTask(() =>
                     {
-                        SendMessage(GetString("DoomsayerGuessSameRoleAgainMsg"), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("DoomsayerGuessCountTitle")));
+                        SendMessage(GetString("DoomsayerGuessSameRoleAgainMsg"), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
                     }, 0.7f, "Doomsayer Guess Same Role Again Msg");
                 }
                 else
@@ -209,7 +209,7 @@ internal class Doomsayer : RoleBase
 
                     _ = new LateTask(() =>
                     {
-                        SendMessage(string.Format(GetString("DoomsayerGuessCountMsg"), guesser.GetAbilityUseLimit()), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("DoomsayerGuessCountTitle")));
+                        SendMessage(string.Format(GetString("DoomsayerGuessCountMsg"), guesser.GetAbilityUseLimit()), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
                     }, 0.7f, "Doomsayer Guess Msg 1");
                 }
 
@@ -246,7 +246,7 @@ internal class Doomsayer : RoleBase
 
             _ = new LateTask(() =>
             {
-                SendMessage(string.Format(GetString("DoomsayerGuessCountMsg"), guesser.GetAbilityUseLimit()), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("DoomsayerGuessCountTitle")));
+                SendMessage(string.Format(GetString("DoomsayerGuessCountMsg"), guesser.GetAbilityUseLimit()), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
             }, 0.7f, "Doomsayer Guess Msg 2");
         }
     }
