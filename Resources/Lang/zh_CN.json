@@ -3496,6 +3496,7 @@
   "RoleType.ImpHindering": "<color=#6e003a>★</color> 内鬼<color=#636363>阻碍类</color>身份",
   "RoleType.ImpGhost": "<color=#bd8b88>★</color> 内鬼阵营<color=#bd8b88>幽灵</color>职业/ghostinfo",
   "RoleType.Madmate": "★ 叛徒类身份",
+  "RoleType.CrewSpecial": "<color=#ffc0cb>★</color> 船员<color=#ffc0cb>特殊类</color>身份",
   "RoleType.CrewSupport": "<color=#00ffff>★</color> 船员<color=#00ffff>帮助类</color>身份",
   "RoleType.CrewInvestigative": "<color=#000880>★</color> 船员<color=#0080>调查类</color>身份",
   "RoleType.CrewPower": "<color=#ffff00>★</color> 船员<color=#ffff00>统治类</color>身份",

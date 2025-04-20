@@ -11,9 +11,8 @@ internal class Konan : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Konan;
     private const int Id = 33300;
-    public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Tracker;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSpecial;
     //==================================================================\\
 
     private static OptionItem TrackCooldown;

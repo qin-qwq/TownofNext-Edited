@@ -12,7 +12,7 @@ internal class AnitaHailey : RoleBase
     public override CustomRoles Role => CustomRoles.AnitaHailey;
     private const int Id = 33400;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSpecial;
     //==================================================================\\
 
     private static OptionItem APTX4869Cooldown;
