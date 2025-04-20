@@ -45,7 +45,7 @@ internal class Requiter : RoleBase
     public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(false);
     public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
 
-    public override void SetKillCooldown(byte id) => KillCooldown.GetFloat();
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc)
         => pc.GetAbilityUseLimit() > 0;
 
