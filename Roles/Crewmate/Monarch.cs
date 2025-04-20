@@ -49,17 +49,17 @@ internal class Monarch : RoleBase
         if (pcList.Any())
         {
             PlayerControl kg = pcList.RandomElement();
-            if (killer.CheckForInvalidMurdering(kg) && killer.RpcCheckAndMurder(kg, check: true))
+            if (target.RpcCheckAndMurder(killer, true))
             {
                 kg.SetDeathReason(PlayerState.DeathReason.Sacrifice);
                 kg.RpcMurderPlayer(kg);
                 kg.SetRealKiller(killer);
                 killer.ResetKillCooldown();
                 killer.SetKillCooldown();
+                return false;
             }
-            return false;
         }
-        else return true;
+        return true;
     }
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
