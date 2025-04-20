@@ -51,7 +51,7 @@ internal class Roaster : RoleBase
     public override void OnMeetingHudStart(PlayerControl pc)
     {
         if (pc.IsAlive() && NotifyRoasterAlive.GetBool())
-            AddMsg(Translator.GetString("RoasterNoticeAlive"), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Roaster), Translator.GetString("RoasterAliveTitle")));
+            AddMsg(Translator.GetString("RoasterNoticeAlive"), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Roaster), Translator.GetString("Roaster").ToUpper()));
     }
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)

@@ -221,17 +221,17 @@ public static class GuessManager
                 }
                 if (Jailer.IsTarget(pc.PlayerId) && role != CustomRoles.Jailer)
                 {
-                    pc.ShowInfoMessage(isUI, GetString("JailedCanOnlyGuessJailer"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("JailerTitle")));
+                    pc.ShowInfoMessage(isUI, GetString("JailedCanOnlyGuessJailer"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
                     return true;
                 }
                 if (Jailer.IsTarget(target.PlayerId))
                 {
-                    pc.ShowInfoMessage(isUI, GetString("CantGuessJailed"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("JailerTitle")));
+                    pc.ShowInfoMessage(isUI, GetString("CantGuessJailed"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
                     return true;
                 }
                 if (AnitaHailey.HaveAPTX4869(pc.PlayerId))
                 {
-                    pc.ShowInfoMessage(isUI, GetString("AnitaHaileyCantGuess"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.AnitaHailey), GetString("AnitaHaileyTitle")));
+                    pc.ShowInfoMessage(isUI, GetString("AnitaHaileyCantGuess"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.AnitaHailey), GetString("AnitaHailey").ToUpper()));
                     return true;
                 }
                 if (!Mundane.OnGuess(pc))
