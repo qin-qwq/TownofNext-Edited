@@ -18,6 +18,7 @@ internal class Magician : RoleBase
 
     private static OptionItem MagicCooldown;
     private static OptionItem WaitCooldown;
+    private static OptionItem MagicianCantBeGuess;
 
     private static bool MagicTime;
 
@@ -30,6 +31,8 @@ internal class Magician : RoleBase
         WaitCooldown = FloatOptionItem.Create(Id + 11, "WaitCooldown", new(0f, 10f, 1f), 1f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Magician])
             .SetValueFormat(OptionFormat.Seconds);
+        MagicianCantBeGuess = BooleanOptionItem.Create(Id + 12, "MagicianCantBeGuess", true, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Magician]);
         OverrideTasksData.Create(Id + 20, TabGroup.CrewmateRoles, CustomRoles.Magician);
     }
 
@@ -79,6 +82,17 @@ internal class Magician : RoleBase
             MagicTime = false;
         }
         return true;
+    }
+
+    public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
+    {
+        if (role != CustomRoles.Magician) return false;
+        if (MagicianCantBeGuess.GetBool())
+        {
+            guesser.ShowInfoMessage(isUI, GetString("GuessMagician"));
+            return true;
+        }
+        return false;
     }
 
     public override void AfterMeetingTasks()
