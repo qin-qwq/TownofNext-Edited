@@ -2760,7 +2760,7 @@
   "CamouflageMode.TommyXL": "<color=#EC7578>TommyXL</color>",
   "CamouflageMode.Sarha": "<color=#bc88dc>Sarha</color>",
   "CamouflageMode.Marg": "<color=#ee9aac>Marg</color>",
-  "DeathCmd.NotDead": "嘿，<b>{0}</b>，看起来你是<b>{1}</b>。\n你还没有死，这只能在你死后使用\n在你被残忍杀害后再次查看<b><color=#ff1919>死因</color></b>",
+  "DeathCmd.NotDead": "嘿，<b>{0}</b>\n看起来你是<b>{1}</b>\n你还没有死，这只能在你死后使用\n在你被残忍杀害后再次查看<b><color=#ff1919>死因</color></b>",
   "DeathCmd.KillerName": "击杀你的玩家是",
   "DeathCmd.KillerRole": "击杀你的玩家身份是",
   "DeathCmd.DeathReason": "你的死因是",
@@ -4054,5 +4054,13 @@
   "AnitaHaileyAPTX4869text": "毒药",
   "APTX4869Cooldown": "毒药冷却时间",
   "APTX4869Max": "毒药技能次数",
-  "MedicPortableVitals": "医生可以在保护玩家后查看便携式心电图"
+  "MedicPortableVitals": "医生可以在保护玩家后查看便携式心电图",
+  "Magician": "魔术师",
+  "MagicianInfo": "想见识大变活人的魔术吗？",
+  "MagicianInfoLong": "(船员阵营):\n魔术师可以通过进入通风口来表演魔术，几秒后魔术师就会死亡，完成一个任务魔术师就会在一个随机的通风口复活。\n如果尸体消失或者死亡过程中召开了会议，魔术师将彻底死亡，无法复活！\n任务完成后，魔术师将不能再次表演魔术。",
+  "WaitCooldown": "魔术等待时间",
+  "MagicianText": "大变活人",
+  "CantMagic": "你的任务完成了，所以你不能再表演魔术了！",
+  "YouWillDie": "你将在几秒后死亡，尽快完成任务来复活！",
+  "CantMagicTwo": "你的尸体消失了，无法复活！"
 }

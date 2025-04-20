@@ -825,6 +825,7 @@ public enum CustomRoles
     LazyGuy,
     Lighter,
     Lookout,
+    Magician,
     Marshall,
     Mayor,
     Mechanic,
