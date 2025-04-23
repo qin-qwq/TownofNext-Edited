@@ -116,7 +116,7 @@ internal class Pelican : RoleBase
             }
         }
 
-        return target != null && target.CanBeTeleported() && !target.IsTransformedNeutralApocalypse() && !Medic.IsProtected(target.PlayerId) && !target.Is(CustomRoles.GM) && !IsEaten(pc, id);
+        return target != null && target.CanBeTeleported() && !target.IsTransformedNeutralApocalypse() && !Medic.IsProtected(target.PlayerId) && !target.Is(CustomRoles.GM) && !IsEaten(pc, id) && (!target.Is(CustomRoles.Brave) && Brave.HasShield);
     }
     public static Vector2 GetBlackRoomPSForPelican()
     {
