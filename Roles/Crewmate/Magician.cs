@@ -19,6 +19,7 @@ internal class Magician : RoleBase
     private static OptionItem MagicCooldown;
     private static OptionItem WaitCooldown;
     private static OptionItem MagicianCantBeGuess;
+    private static OptionItem HideBodies;
 
     private static bool MagicTime;
 
@@ -28,10 +29,12 @@ internal class Magician : RoleBase
         MagicCooldown = FloatOptionItem.Create(Id + 10, "AbilityCooldown", new(0f, 60f, 2.5f), 10f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Magician])
             .SetValueFormat(OptionFormat.Seconds);
-        WaitCooldown = FloatOptionItem.Create(Id + 11, "WaitCooldown", new(0f, 10f, 1f), 1f, TabGroup.CrewmateRoles, false)
+        WaitCooldown = FloatOptionItem.Create(Id + 11, "WaitCooldown", new(2f, 10f, 1f), 2f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Magician])
             .SetValueFormat(OptionFormat.Seconds);
         MagicianCantBeGuess = BooleanOptionItem.Create(Id + 12, "MagicianCantBeGuess", true, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Magician]);
+        HideBodies = BooleanOptionItem.Create(Id + 13, "HideBodies", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Magician]);
         OverrideTasksData.Create(Id + 20, TabGroup.CrewmateRoles, CustomRoles.Magician);
     }
@@ -63,7 +66,17 @@ internal class Magician : RoleBase
         pc.Notify(GetString("YouWillDie"), 5f);
         _ = new LateTask(() =>
         {
+            if (HideBodies.GetBool())
+            {
+                pc.RpcExileV2();
+                pc.SetRealKiller(_Player);
+                pc.SetDeathReason(PlayerState.DeathReason.Magic);
+                Main.PlayerStates[pc.PlayerId].SetDead();
+                MagicTime = true;
+                return;
+            }
             pc.RpcMurderPlayer(pc);
+            pc.SetDeathReason(PlayerState.DeathReason.Magic);
             MagicTime = true;
         }, WaitCooldown.GetFloat());
     }

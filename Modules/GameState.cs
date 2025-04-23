@@ -337,6 +337,7 @@ public class PlayerState(byte playerId)
         Hack,
         Pirate,
         Shrouded,
+        Magic,
         Mauled,
         Drained,
         Shattered,
