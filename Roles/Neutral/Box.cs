@@ -25,12 +25,12 @@ internal class Box : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Box);
-        BecomeBaitDelayNotify = BooleanOptionItem.Create(Id + 10, "BecomeBaitDelayNotify", false, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Box]);
+        BecomeBaitDelayNotify = BooleanOptionItem.Create(Id + 10, "BaitDelayNotify", false, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Box]);
         BecomeBaitDelayMin = FloatOptionItem.Create(Id + 11, "BaitDelayMin", new(0f, 5f, 1f), 1f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Box])
             .SetValueFormat(OptionFormat.Seconds);
         BecomeBaitDelayMax = FloatOptionItem.Create(Id + 12, "BaitDelayMax", new(0f, 10f, 1f), 1f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Box])
             .SetValueFormat(OptionFormat.Seconds);
-        BecomeTrapperBlockMoveTime = FloatOptionItem.Create(Id + 13, "BecomeTrapperBlockMoveTime", new(1f, 180f, 1f), 5f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Box])
+        BecomeTrapperBlockMoveTime = FloatOptionItem.Create(Id + 13, "FreezeTime", new(1f, 180f, 1f), 5f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Box])
             .SetValueFormat(OptionFormat.Seconds);
         SpeedMax = FloatOptionItem.Create(Id + 14, "SpeedMax", new(0f, 3f, 0.25f), 2.5f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Box])
             .SetValueFormat(OptionFormat.Multiplier);
