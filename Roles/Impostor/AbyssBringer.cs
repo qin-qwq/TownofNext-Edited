@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using Hazel;
 using System;
 using TOHE.Modules;
+using TOHE.Roles.Crewmate;
 using UnityEngine;
 using static TOHE.Modules.HazelExtensions;
 using static TOHE.Options;
@@ -158,7 +159,7 @@ internal class AbyssBringer : RoleBase
 
                 if (Vector2.Distance(pos, blackHole.Position) <= BlackHoleRadius.GetFloat())
                 {
-                    if (nearestPlayer.Is(Custom_Team.Impostor) && !CanKillImpostors.GetBool() || nearestPlayer.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool()) continue;
+                    if (nearestPlayer.Is(Custom_Team.Impostor) && !CanKillImpostors.GetBool() || nearestPlayer.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool() || nearestPlayer.Is(CustomRoles.Brave) && Brave.HasShield) continue;
                     blackHole.PlayersConsumed++;
                     Utils.SendRPC(CustomRPC.SyncRoleSkill, _Player, 2, id, (byte)blackHole.PlayersConsumed);
                     Notify();

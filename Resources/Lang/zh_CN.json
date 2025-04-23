@@ -2114,6 +2114,7 @@
   "DeathReason.Electrocuted": "触电",
   "DeathReason.Scavenged": "已抹除",
   "DeathReason.BlastedOff": "爆破",
+  "DeathReason.Magic": "魔术",
   "OnlyEnabledDeathReasons": "仅启用死亡原因",
   "Alive": "存活",
   "Disconnected": "断连",
@@ -3836,11 +3837,14 @@
   "Format.Count": "{0}次",
   "Brave": "勇者",
   "BraveInfo": "打败魔王！",
-  "BraveInfoLong": "(船员阵营):\n勇者在场上存活玩家数量越少时，能解锁的能力就越多（勇者之心，勇者之盾，勇者之剑）。\n请注意，只有勇者之心技能需要在会议上获取。",
+  "BraveInfoLong": "(船员阵营):\n勇者在场上存活玩家数量越少时，能解锁的能力就越多（勇者之心，勇者之盾，勇者之剑）。",
   "BraveHeartThreshold": "剩余几人解锁勇者之心",
   "BraveShieldThreshold": "剩余几人解锁勇者之盾",
   "BraveSwordThreshold": "剩余几人解锁勇者之剑",
   "BraveSwordCooldown": "勇者之剑冷却时间",
+  "BraveA": "解锁能力勇者之心，可以看到场上被淘汰的玩家数",
+  "BraveB": "解锁能力勇者之盾，可以免受袭击类技能的伤害！",
+  "BraveC": "解锁能力勇者之剑，可以袭击！",
   "Thief": "怪盗",
   "ThiefInfo": "我将偷走你灵魂的力量",
   "ThiefInfoLong": "(中立阵营);\n怪盗可以和其他玩家交换身份，获取他人的技能与获胜条件。但是交换到内鬼会直接被淘汰！\n注意，怪盗自身无法获胜！",
@@ -4065,5 +4069,6 @@
   "CantMagic": "你的任务完成了，所以你不能再表演魔术了！",
   "YouWillDie": "你将在几秒后死亡，尽快完成任务来复活！",
   "CantMagicTwo": "你的尸体消失了，无法复活！",
-  "GuessMagician": "很抱歉，该房设置不允许猜测魔术师"
+  "GuessMagician": "很抱歉，该房设置不允许猜测魔术师",
+  "HideBodies": "隐藏魔术师尸体(防止多次死亡)"
 }
