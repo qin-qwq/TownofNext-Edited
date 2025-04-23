@@ -71,12 +71,14 @@ internal partial class Mayor : RoleBase
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
     {
         AdditionalVotes += MayorVoteGainWithEachTaskCompleted.GetInt();
+        _Player.RpcIncreaseAbilityUseLimitBy(MayorVoteGainWithEachTaskCompleted.GetInt());
         return true;
     }
 
     public override void AfterMeetingTasks()
     {
         AdditionalVotes += MayorVoteGainWithAfterMeeting.GetInt();
+        _Player.RpcIncreaseAbilityUseLimitBy(MayorVoteGainWithAfterMeeting.GetInt());
     }
 
     public override int AddRealVotesNum(PlayerVoteArea PVA) => AdditionalVotes;
