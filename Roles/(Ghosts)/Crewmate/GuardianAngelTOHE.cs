@@ -11,7 +11,7 @@ internal class GuardianAngelTOHE : RoleBase
     private const int Id = 20900;
 
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanillaGhosts;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;
     //==================================================================\\
 
     private static OptionItem AbilityCooldown;

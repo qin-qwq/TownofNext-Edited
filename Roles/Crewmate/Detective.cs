@@ -3,6 +3,7 @@ using TOHE.Roles.Core;
 using static TOHE.MeetingHudStartPatch;
 using static TOHE.Options;
 using static TOHE.Translator;
+using static UnityEngine.GraphicsBuffer;
 
 namespace TOHE.Roles.Crewmate;
 
@@ -16,8 +17,11 @@ internal class Detective : RoleBase
     //==================================================================\\
 
     private static OptionItem DetectiveCanknowKiller;
+    private static OptionItem DetectiveCanknowRealKiller;
+    private static OptionItem FindKillerProbability;
 
     private string Notify;
+    private static readonly HashSet<byte> KillerList = [];
     private readonly Dictionary<byte, string> InfoAboutDeadPlayerAndKiller = [];
 
     public override void SetupCustomOption()
@@ -25,12 +29,18 @@ internal class Detective : RoleBase
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Detective);
         DetectiveCanknowKiller = BooleanOptionItem.Create(7902, "DetectiveCanknowKiller", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Detective]);
+        DetectiveCanknowRealKiller = BooleanOptionItem.Create(Id + 11, "DetectiveCanknowRealKiller", true, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Detective]);
+        FindKillerProbability = IntegerOptionItem.Create(Id + 12, "FindKillerProbability", new(0, 100, 5), 50, TabGroup.CrewmateRoles, false)
+            .SetParent(DetectiveCanknowRealKiller)
+            .SetValueFormat(OptionFormat.Percent);
     }
 
     public override void Init()
     {
         Notify = string.Empty;
         InfoAboutDeadPlayerAndKiller.Clear();
+        KillerList.Clear();
     }
 
     public override void Add(byte playerId)
@@ -58,6 +68,12 @@ internal class Detective : RoleBase
             {
                 var realKiller = deadBody.PlayerId.GetRealKillerById();
 
+                 var rd = IRandom.Instance;
+                if (DetectiveCanknowRealKiller.GetBool() && rd.Next(0, 101) < FindKillerProbability.GetInt() && !KillerList.Contains(realKiller.PlayerId))
+                {
+                    KillerList.Add(realKiller.PlayerId);
+                }
+
                 if (realKiller == null
                     || realKiller.Data == null
                     || deadBody.PlayerId == realKiller.Data.PlayerId)
@@ -80,6 +96,15 @@ internal class Detective : RoleBase
             Notify = msg.ToString();
         }
         InfoAboutDeadPlayerAndKiller.Clear();
+    }
+
+    public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
+    {
+        if ((!seer.IsAlive() || seer.Is(CustomRoles.Detective)) && KillerList.Contains(target.PlayerId))
+        {
+            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Detective), "○");
+        }
+        return string.Empty;
     }
 
     public override void OnMeetingHudStart(PlayerControl pc)

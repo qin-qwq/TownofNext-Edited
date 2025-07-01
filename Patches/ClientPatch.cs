@@ -96,6 +96,7 @@ internal class RunLoginPatch
         if (!EOSManager.Instance.loginFlowFinished) return;
 
         var friendcode = EOSManager.Instance.friendCode;
+        //Main.Instance.StartCoroutine(dbConnect.Init());
         if (friendcode == null || friendcode == "")
         {
             EOSManager.Instance.attemptAuthAgain = true;
@@ -162,6 +163,28 @@ internal class KickPlayerPatch
         return true;
     }
 }
+
+[HarmonyPatch(typeof(EOSManager), nameof(EOSManager.IsMinorByDate), [typeof(System.DateTime)])]
+[HarmonyPatch(typeof(EOSManager), nameof(EOSManager.IsMinorByDate), [typeof(int), typeof(int), typeof(int)])]
+internal class IsMinorByDatePatch
+{
+    public static bool Prefix(EOSManager __instance, ref bool __result)
+    {
+        /*
+        if (DebugModeManager.AmDebugger)
+        {
+            Logger.Info("Skipped Eos is minor check", "IsMinorByDatePatch");
+            __result = false;
+            return false;
+        }
+        */
+
+        return true;
+        
+    }
+}
+
+
 //[HarmonyPatch(typeof(ResolutionManager), nameof(ResolutionManager.SetResolution))]
 //class SetResolutionManager
 //{
@@ -175,22 +198,6 @@ internal class KickPlayerPatch
 //            MainMenuManagerPatch.updateButton.transform.localPosition = MainMenuManagerPatch.template.transform.localPosition + new Vector3(0.25f, 0.75f);
 //    }
 //}
-
-[HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.SendAllStreamedObjects))]
-internal class InnerNetObjectSerializePatch
-{
-    public static void Prefix()
-    {
-        // This code is sometimes called before the lobby has been created
-        try
-        {
-            if (AmongUsClient.Instance.AmHost)
-                GameOptionsSender.SendAllGameOptions();
-        }
-        catch
-        { }
-    }
-}
 
 //[HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.SendClientReady))]
 //internal class SendClientReadyPatch

@@ -21,7 +21,6 @@ class HudManagerUpdatePatch
 {
     public static bool ShowDebugText = false;
     public static int LastCallNotifyRolesPerSecond = 0;
-    public static int NowCallNotifyRolesCount = 0;
     public static int LastSetNameDesyncCount = 0;
     public static int LastFPS = 0;
     public static int NowFrameCount = 0;
@@ -318,18 +317,18 @@ class TaskPanelBehaviourPatch
                     {
                         var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
                         if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1)
-                            text = $"{Utils.ColorString(Utils.GetRoleColor(player.GetCustomRole()).ShadeColor(0.2f), GetString("FakeTask"))}\r\n{text}";
+                            text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
 
                     if (MeetingStates.FirstMeeting)
                     {
                         AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
-                        if (Main.PlayerStates.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var ps) && ps.SubRoles.Count >= 1)
+                        /*if (Main.PlayerStates.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var ps) && ps.SubRoles.Count >= 1)
                             AllText += $"\r\n{GetString("PressF2ShowAddRoleDes")}";
                         AllText += $"\r\n{GetString("PressF3ShowRoleSettings")}";
                         if (ps.SubRoles.Count >= 1)
-                            AllText += $"\r\n{GetString("PressF4ShowAddOnsSettings")}";
+                            AllText += $"\r\n{GetString("PressF4ShowAddOnsSettings")}";*/
                         AllText += "</size>";
                     }
                     break;
@@ -365,7 +364,7 @@ class TaskPanelBehaviourPatch
                     {
                         var text = sb2.ToString().TrimEnd('\n').TrimEnd('\r');
                         if (!Utils.HasTasks(player.Data, false) && sb2.ToString().Count(s => (s == '\n')) >= 1)
-                            text = $"{Utils.ColorString(Utils.GetRoleColor(player.GetCustomRole()).ShadeColor(0.2f), GetString("FakeTask"))}\r\n{text}";
+                            text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
 

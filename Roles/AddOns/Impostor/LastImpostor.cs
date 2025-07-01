@@ -1,5 +1,4 @@
 using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
 
 namespace TOHE.Roles.AddOns.Impostor;
 
@@ -11,7 +10,6 @@ public class LastImpostor : IAddon
     public static byte currentId = byte.MaxValue;
 
     private static OptionItem CooldownReduction;
-    private static OptionItem GetGuesser;
 
     public void SetupCustomOption()
     {
@@ -19,8 +17,6 @@ public class LastImpostor : IAddon
         CooldownReduction = FloatOptionItem.Create(Id + 15, "OverclockedReduction", new(5f, 95f, 5f), 50f, TabGroup.Addons, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.LastImpostor])
             .SetValueFormat(OptionFormat.Percent);
-        GetGuesser = BooleanOptionItem.Create(Id + 16, "GetGuesser", true, TabGroup.Addons, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.LastImpostor]);
     }
     public void Init() => currentId = byte.MaxValue;
     public void Add(byte playerId, bool gameIsLoading = true)
@@ -36,7 +32,7 @@ public class LastImpostor : IAddon
         Main.AllPlayerKillCooldown[currentId] -= removeCooldown;
     }
     private static bool CanBeLastImpostor(PlayerControl pc)
-        => pc.IsAlive() && !pc.Is(CustomRoles.LastImpostor) && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !Main.PlayerStates[pc.PlayerId].IsNecromancer;
+        => pc.IsAlive() && !pc.Is(CustomRoles.LastImpostor) && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !Main.PlayerStates[pc.PlayerId].IsNecromancer && !pc.Is(CustomRoles.Narc);
 
     public static void SetSubRole()
     {
@@ -48,10 +44,6 @@ public class LastImpostor : IAddon
             if (CanBeLastImpostor(pc))
             {
                 pc.RpcSetCustomRole(CustomRoles.LastImpostor);
-                if (GetGuesser.GetBool())
-                {
-                    pc.RpcSetCustomRole(CustomRoles.Guesser);
-                }
                 AddMidGame(pc.PlayerId);
                 SetKillCooldown();
                 pc.SyncSettings();

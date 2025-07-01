@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
 using Hazel;
-using InnerNet;
 using TOHE.Modules;
+using TOHE.Modules.Rpc;
 using TOHE.Roles.Core;
 using UnityEngine;
 using static TOHE.Translator;
@@ -16,7 +16,7 @@ internal class Medic : RoleBase
     private const int Id = 8600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Medic);
     public override bool IsDesyncRole => !GiveTasks;
-    public override CustomRoles ThisRoleBase => GiveTasks ? CustomRoles.Crewmate : CustomRoles.Impostor;
+    public override CustomRoles ThisRoleBase => GiveTasks ? (MedicPortableVitals.GetBool() ? CustomRoles.Scientist : CustomRoles.Crewmate) : CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
 
@@ -93,8 +93,7 @@ internal class Medic : RoleBase
     }
     private void SendRPC()
     {
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncRoleSkill, SendOption.Reliable, -1);
-        writer.WriteNetObject(_Player);
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(TempMarkProtected.Count);
         foreach (var markProtected in TempMarkProtected)
         {
@@ -105,7 +104,7 @@ internal class Medic : RoleBase
         {
             writer.Write(protect);
         }
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
@@ -208,45 +207,13 @@ internal class Medic : RoleBase
 
         if (!MedicPortableVitals.GetBool())
         {
-            medic.RpcSetRoleType(RoleTypes.Crewmate, removeFromDesyncList: true);
+            medic.RpcSetRoleDesync(RoleTypes.Crewmate, medicClientId);
         }
         else
         {
-            medic.RpcSetRoleType(RoleTypes.Scientist, removeFromDesyncList: true);
+            medic.RpcSetRoleDesync(RoleTypes.Scientist, medicClientId);
         }
         medic.RpcResetTasks();
-
-        // set others as normal RoleType
-        foreach (var target in Main.AllPlayerControls)
-        {
-            if (medic.PlayerId == target.PlayerId) continue;
-
-            RoleTypes remeberRoleType;
-            var (targetRoleType, targetCustomRole) = target.GetRoleMap();
-            var targetIsHost = target.IsHost();
-            var targetIsDesync = targetCustomRole.IsDesyncRole();
-
-            if (target.IsAlive())
-            {
-                if (targetIsDesync)
-                    remeberRoleType = targetIsHost ? RoleTypes.Crewmate : RoleTypes.Scientist;
-                else
-                    remeberRoleType = targetRoleType;
-            }
-            else
-            {
-                if (target.Is(Custom_Team.Impostor)) remeberRoleType = RoleTypes.ImpostorGhost;
-                else remeberRoleType = RoleTypes.CrewmateGhost;
-
-                RpcSetRoleReplacer.RoleMap[(medic.PlayerId, target.PlayerId)] = (targetIsDesync ? targetIsHost ? RoleTypes.Crewmate : RoleTypes.Scientist : targetRoleType, targetCustomRole);
-                target.RpcSetRoleDesync(remeberRoleType, medicClientId);
-                continue;
-            }
-
-            // Set role type for player
-            RpcSetRoleReplacer.RoleMap[(medic.PlayerId, target.PlayerId)] = (remeberRoleType, targetCustomRole);
-            target.RpcSetRoleDesync(remeberRoleType, medicClientId);
-        }
     }
     public override void AfterMeetingTasks()
     {

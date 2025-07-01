@@ -2,6 +2,7 @@ using Hazel;
 using System;
 using System.Text;
 using TOHE.Modules;
+using TOHE.Modules.Rpc;
 using TOHE.Roles.Core;
 using UnityEngine;
 using static TOHE.Options;
@@ -63,14 +64,8 @@ internal class Keeper : RoleBase
 
     private static void SendRPC(int type, byte keeperId = 0xff, byte targetId = 0xff)
     {
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.KeeperRPC, SendOption.Reliable, -1);
-        writer.Write(type);
-        if (type == 0)
-        {
-            writer.Write(keeperId);
-            writer.Write(targetId);
-        }
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        var msg = new RpcKeeper(PlayerControl.LocalPlayer.NetId, type, keeperId, targetId);
+        RpcUtils.LateBroadcastReliableMessage(msg);
     }
 
     public static void ReceiveRPC(MessageReader reader)
@@ -109,7 +104,7 @@ internal class Keeper : RoleBase
         keeperTarget.Add(target.PlayerId);
         Logger.Info($"{voter.GetNameWithRole()} chosen as keeper target by {target.GetNameWithRole()}", "Keeper");
         SendRPC(type: 0, keeperId: voter.PlayerId, targetId: target.PlayerId); // add keeperUses, KeeperTarget and DidVote
-        Utils.SendMessage(string.Format(GetString("KeeperProtect"), target.GetRealName()), voter.PlayerId, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Keeper), GetString("KeeperTitle")));
+        Utils.SendMessage(string.Format(GetString("KeeperProtect"), target.GetRealName()), voter.PlayerId, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Keeper), GetString("Keeper").ToUpper()));
         return false;
     }
 

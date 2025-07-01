@@ -1,5 +1,4 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
 
 namespace TOHE.Roles.Neutral;
 
@@ -7,7 +6,7 @@ internal class Sunnyboy : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Sunnyboy;
-    private const int Id = 33500;
+    private const int Id = 14400;
     private static readonly HashSet<byte> PlayerIds = [];
     public static bool HasEnabled => PlayerIds.Any();
 
@@ -15,10 +14,6 @@ internal class Sunnyboy : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
     //==================================================================\\
 
-    public override void SetupCustomOption()
-    {
-        SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Sunnyboy);
-    }
     public override void Init()
     {
         PlayerIds.Clear();
@@ -34,11 +29,11 @@ internal class Sunnyboy : RoleBase
         AURoleOptions.ScientistCooldown = 0f;
         AURoleOptions.ScientistBatteryCharge = 60f;
     }
-    /*public static bool CheckSpawn()
+    public static bool CheckSpawn()
     {
         var Rand = IRandom.Instance;
         return Rand.Next(0, 100) < Jester.SunnyboyChance.GetInt();
-    }*/
+    }
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => false;
 
     public static bool CheckGameEnd()

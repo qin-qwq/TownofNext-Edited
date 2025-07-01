@@ -1,7 +1,8 @@
 using AmongUs.GameOptions;
 using Hazel;
-using UnityEngine;
+using TOHE.Modules.Rpc;
 using TOHE.Roles.AddOns.Impostor;
+using UnityEngine;
 using static TOHE.Options;
 
 namespace TOHE.Roles.Impostor;
@@ -16,8 +17,8 @@ internal class Crewpostor : RoleBase
     //==================================================================\\
 
     private static OptionItem CanKillAllies;
-    private static OptionItem KnowsAllies;
-    private static OptionItem AlliesKnowCrewpostor;
+    public static OptionItem KnowsAllies;
+    public static OptionItem AlliesKnowCrewpostor;
     private static OptionItem LungeKill;
     public static OptionItem KillAfterTask;
     public static OptionItem KillsPerRound;
@@ -52,7 +53,7 @@ internal class Crewpostor : RoleBase
 
     }
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => !ForRecompute && !player.IsDead;
-    
+
     private static void SendRPC(byte cpID, int tasksDone)
     {
         if (PlayerControl.LocalPlayer.PlayerId == cpID)
@@ -63,10 +64,8 @@ internal class Crewpostor : RoleBase
         }
         else
         {
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetCrewpostorTasksDone, SendOption.Reliable, -1);
-            writer.Write(cpID);
-            writer.WritePacked(tasksDone);
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            var msg = new RpcSetCrewpostorTasksDone(PlayerControl.LocalPlayer.NetId, cpID, tasksDone);
+            RpcUtils.LateBroadcastReliableMessage(msg);
         }
     }
     public static void ReceiveRPC(MessageReader reader)
@@ -88,17 +87,11 @@ internal class Crewpostor : RoleBase
 
     public override bool CanUseKillButton(PlayerControl pc) => false;
 
-    public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => KnowRoleTarget(seer, target) ? Utils.GetRoleColorCode(CustomRoles.Crewpostor) : string.Empty;
-    public override bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target) => KnowRoleTarget(seer, target);
-    public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target)
-        => (AlliesKnowCrewpostor.GetBool() && seer.Is(Custom_Team.Impostor) && target.Is(CustomRoles.Crewpostor) && !Main.PlayerStates[seer.PlayerId].IsNecromancer && !Main.PlayerStates[target.PlayerId].IsNecromancer)
-            || (KnowsAllies.GetBool() && seer.Is(CustomRoles.Crewpostor) && target.Is(Custom_Team.Impostor) && !Main.PlayerStates[seer.PlayerId].IsNecromancer && !Main.PlayerStates[target.PlayerId].IsNecromancer);
-
     public override string GetProgressText(byte playerId, bool comms)
     {
         var color = comms ? Color.gray : Color.red;
         string TaskCompleted = comms ? "?" : $"{TasksDone[playerId]}";
-        string DisplayTaskProgress = LastImpostor.currentId == playerId ? 
+        string DisplayTaskProgress = LastImpostor.currentId == playerId ?
                                 string.Empty : Utils.ColorString(color, $" ({TaskCompleted}/{KillAfterTask.GetInt()})");
 
         int NumKillsLeft = KillsPerRound.GetInt() - Main.MurderedThisRound.Count(ded => ded.GetRealKillerById() == playerId.GetPlayer());
@@ -118,7 +111,9 @@ internal class Crewpostor : RoleBase
             TasksDone[player.PlayerId] = 0;
 
         SendRPC(player.PlayerId, TasksDone[player.PlayerId]);
-        List<PlayerControl> list = Main.AllAlivePlayerControls.Where(x => x.PlayerId != player.PlayerId && !(x.GetCustomRole() is CustomRoles.NiceMini or CustomRoles.EvilMini or CustomRoles.Solsticer) && (CanKillAllies.GetBool() || !x.GetCustomRole().IsImpostorTeam())).ToList();
+        List<PlayerControl> list = Main.AllAlivePlayerControls.Where(x => x.PlayerId != player.PlayerId && !(x.GetCustomRole() is CustomRoles.NiceMini or CustomRoles.EvilMini or CustomRoles.Solsticer)
+        && (!player.Is(CustomRoles.Narc) && (CanKillAllies.GetBool() || NarcManager.ImpsCanKillEachOther.GetBool() || !x.CheckImpCanSeeAllies(CheckAsTarget: true)))
+        && !(player.Is(CustomRoles.Narc) && x.GetCustomRole() is CustomRoles.ChiefOfPolice or CustomRoles.Sheriff && x.IsPlayerCrewmateTeam())).ToList();
 
         if (!list.Any())
         {

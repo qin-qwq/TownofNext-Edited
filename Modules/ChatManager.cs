@@ -1,8 +1,8 @@
-using AmongUs.QuickChat;
 using Hazel;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using TOHE.Modules.Rpc;
 using TOHE.Roles.Impostor;
 using static TOHE.Options;
 using static TOHE.Translator;
@@ -103,7 +103,7 @@ namespace TOHE.Modules.ChatManager
 
             if (GameStates.IsInGame) operate = 3;
             if (CheckCommond(ref msg, "id|guesslist|gl编号|玩家编号|玩家id|id列表|玩家列表|列表|所有id|全部id|編號|玩家編號")) operate = 1;
-            else if (CheckCommond(ref msg, "shoot|guess|bet|st|gs|bt|猜|赌|賭|sp|jj|tl|trial|审判|判|审|審判|審|compare|cmp|比较|比較|duel|sw|swap|st|换票|换|換票|換|finish|结束|结束会议|結束|結束會議|f|reveal|展示|rt|rit|ritual|bloodritual", false)) operate = 2;
+            else if (CheckCommond(ref msg, "shoot|guess|bet|st|gs|bt|猜|赌|賭|sp|jj|tl|trial|审判|判|审|審判|審|compare|cmp|比较|比較|duel|sw|swap|st|换票|换|換票|換|finish|fin|结束|结束会议|結束|結束會議|reveal|展示|rt|rit|ritual|bloodritual", false)) operate = 2;
             else if (ChatSentBySystem.Contains(GetTextHash(msg))) operate = 5;
 
             if ((operate == 1 || Blackmailer.CheckBlackmaile(player)) && player.IsAlive())
@@ -160,91 +160,8 @@ namespace TOHE.Modules.ChatManager
 
         public static void SendQuickChatSpam()
         {
-            var firstAlivePlayer = Main.AllAlivePlayerControls.OrderBy(x => x.PlayerId).FirstOrDefault() ?? PlayerControl.LocalPlayer;
-            var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
-            var name = firstAlivePlayer?.Data?.PlayerName ?? "Error";
-
-            var writer = CustomRpcSender.Create("EzHacked_QuickChatSpamExploit", ExtendedPlayerControl.RpcSendOption);
-            writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SetName);
-            writer.Write(firstAlivePlayer.Data.NetId);
-            writer.Write(title);
-            writer.EndRpc();
-
-            firstAlivePlayer.Data.PlayerName = title;
-
-            switch (quickChatSpamMode)
-            {
-                case QuickChatSpamMode.QuickChatSpam_Disabled:
-                    Logger.Info("QuickChatSpam disabled but trying to spam?", "SendQuickChatSpam");
-                    goto case QuickChatSpamMode.QuickChatSpam_Random20;
-                // Send as random 20 here
-                case QuickChatSpamMode.QuickChatSpam_Random20:
-                    var random = IRandom.Instance;
-                    var stringNamesValues = Enum.GetValues(typeof(StringNames)).Cast<StringNames>().ToArray();
-                    for (int i = 0; i < 25; i++)
-                    {
-                        var randomString = stringNamesValues[random.Next(stringNamesValues.Length)];
-                        writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendQuickChat);
-                        writer.Write((byte)QuickChatPhraseType.ComplexPhrase);
-                        writer.Write((uint)randomString);
-                        writer.Write((byte)0);
-                        writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(randomString), false);
-                    }
-                    break;
-                case QuickChatSpamMode.QuickChatSpam_How2PlayNormal:
-                    foreach (var names in Main.how2playN)
-                    {
-                        writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendQuickChat);
-                        writer.Write((byte)QuickChatPhraseType.SimplePhrase);
-                        writer.Write((uint)names);
-                        writer.EndRpc();
-                        writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendQuickChat);
-                        writer.Write((byte)QuickChatPhraseType.SimplePhrase);
-                        writer.Write((uint)names);
-                        writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                    }
-                    break;
-                case QuickChatSpamMode.QuickChatSpam_How2PlayHidenSeek:
-                    foreach (var names in Main.how2playHnS)
-                    {
-                        writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendQuickChat);
-                        writer.Write((byte)QuickChatPhraseType.SimplePhrase);
-                        writer.Write((uint)names);
-                        writer.EndRpc();
-                        writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendQuickChat);
-                        writer.Write((byte)QuickChatPhraseType.SimplePhrase);
-                        writer.Write((uint)names);
-                        writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                    }
-                    break;
-                case QuickChatSpamMode.QuickChatSpam_EzHacked:
-                    foreach (var names in Main.how2playEzHacked)
-                    {
-                        writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendQuickChat);
-                        writer.Write((byte)QuickChatPhraseType.SimplePhrase);
-                        writer.Write((uint)names);
-                        writer.EndRpc();
-                        writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendQuickChat);
-                        writer.Write((byte)QuickChatPhraseType.SimplePhrase);
-                        writer.Write((uint)names);
-                        writer.EndRpc();
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                    }
-                    break;
-            }
-            writer.AutoStartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SetName);
-            writer.Write(firstAlivePlayer.Data.NetId);
-            writer.Write(name);
-            writer.EndRpc();
-
-            firstAlivePlayer.Data.PlayerName = name;
-            writer.SendMessage();
+            var message = new RpcQuickChatSpam();
+            RpcUtils.LateBroadcastReliableMessage(message);
         }
         public static void SendPreviousMessagesToAll()
         {

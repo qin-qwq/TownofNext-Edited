@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using Hazel;
 using TOHE.Modules;
+using TOHE.Modules.Rpc;
 using TOHE.Roles.Double;
 using UnityEngine;
 using static TOHE.MeetingHudStartPatch;
@@ -175,16 +176,15 @@ internal class Nemesis : RoleBase
             }
             target.SetRealKiller(pc);
 
-            _ = new LateTask(() => { Utils.SendMessage(string.Format(GetString("NemesisKillSucceed"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Nemesis), GetString("NemesisRevengeTitle")), true); }, 0.6f, "Nemesis Kill");
+            _ = new LateTask(() => { Utils.SendMessage(string.Format(GetString("NemesisKillSucceed"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Nemesis), GetString("Nemesis").ToUpper()), true); }, 0.6f, "Nemesis Kill");
         }, 0.2f, "Nemesis Start Kill");
         return true;
     }
 
     private static void SendRPC(byte playerId)
     {
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.NemesisRevenge, SendOption.Reliable, -1);
-        writer.Write(playerId);
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        var msg = new RpcNemesisRevenge(PlayerControl.LocalPlayer.NetId, playerId);
+        RpcUtils.LateBroadcastReliableMessage(msg);
     }
     public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
     {
@@ -192,9 +192,9 @@ internal class Nemesis : RoleBase
         NemesisMsgCheck(pc, $"/rv {PlayerId}", true);
     }
 
-    public override bool CanUseKillButton(PlayerControl pc) => CheckCanUseKillButton();
+    public override bool CanUseKillButton(PlayerControl pc) => true;
 
-    public static bool CheckCanUseKillButton()
+    public static bool CheckCanUseKillButton(PlayerControl pc)
     {
         if (Main.PlayerStates == null) return false;
 
@@ -203,10 +203,12 @@ internal class Nemesis : RoleBase
         foreach (var player in Main.AllAlivePlayerControls)
         {
             var role = player.GetCustomRole();
-            if (role != CustomRoles.Nemesis && role.IsImpostor()) LivingImpostorsNum++;
+            if (role != CustomRoles.Nemesis && role.IsImpostor() && !player.Is(CustomRoles.Narc)) LivingImpostorsNum++;
         }
 
-        return LivingImpostorsNum <= 0;
+        // if Nemesis is Narc, they can use kill buttom when all Sheriffs are dead
+        // if not, they can use kill button when LivingImpostorNum is 0
+        return pc.Is(CustomRoles.Narc) ? !CustomRoles.Sheriff.RoleExist() : LivingImpostorsNum <= 0;
     }
 
     private static void NemesisOnClick(byte playerId /*, MeetingHud __instance*/)

@@ -16,10 +16,9 @@ public class DevUser(string code = "", string color = "null", string userType = 
     public string UpName { get; set; } = upName;
 
     public bool HasTag() => Tag != "null";
-    //public string GetTag() => Color == "null" ? $"<size=1.2>{Tag}</size>\r\n" : $"<color={Color}><size=1.2>{(Tag == "#Dev" ? Translator.GetString("Developer") : Tag)}</size></color>\r\n";
     public string GetTag()
     {
-        string tagColorFilePath = @$"./TOHE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
+        string tagColorFilePath = @$"./TONE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
 
         if (Color == "null" || Color == string.Empty) return $"<size=1.2>{Tag}</size>\r\n";
         var startColor = Color.TrimStart('#');
@@ -33,53 +32,6 @@ public class DevUser(string code = "", string color = "null", string userType = 
         t1 = Tag == "#Dev" ? Translator.GetString("Developer") : Tag;
         return $"<size=1.2><color=#{startColor}>{t1}</color></size>\r\r\n";
     }
-    //public string GetTag() 
-    //{
-    //    string tagColorFilePath = @$"./TOHE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
-
-    //    if (Color == "null" || Color == string.Empty) return $"<size=1.2>{Tag}</size>\r\n";
-    //    var startColor = "FFFF00";
-    //    var endColor = "FFFF00";
-    //    var startColor1 = startColor;
-    //    var endColor1 = endColor;
-    //    if (Color.Split(",").Length == 1)
-    //    {
-    //        startColor1 = Color.Split(",")[0].TrimStart('#');
-    //        endColor1 = startColor1;
-    //    }
-    //    else if (Color.Split(",").Length == 2)
-    //    {
-    //         startColor1 = Color.Split(",")[0].TrimStart('#');
-    //         endColor1 = Color.Split(",")[1].TrimStart('#');
-    //    }
-    //    if (File.Exists(tagColorFilePath))
-    //    {
-    //        var ColorCode = File.ReadAllText(tagColorFilePath);
-    //        if (ColorCode.Split(" ").Length == 2)
-    //        {
-    //            startColor = ColorCode.Split(" ")[0];
-    //            endColor = ColorCode.Split(" ")[1];
-    //        }
-    //        else
-    //        {
-    //            startColor = startColor1;
-    //            endColor = endColor1;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        startColor = startColor1;
-    //        endColor = endColor1;
-    //    }
-    //    if (!Utils.CheckGradientCode($"{startColor} {endColor}"))
-    //    {
-    //        startColor = "FFFF00";
-    //        endColor = "FFFF00";
-    //    }
-    //    var t1 = "";
-    //    t1 = Tag == "#Dev" ? Translator.GetString("Developer") : Tag;
-    //    return $"<size=1.2>{Utils.GradientColorText(startColor,endColor, t1)}</size>\r\n";
-    //}
 }
 
 public static class DevManager
@@ -97,7 +49,6 @@ public static class DevManager
         DevUserList.Add(new(code: "icingposh#6469", color: "#9e2424", userType: "s_cr", tag: "discord.gg/tohe", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "ryuk2"));
         DevUserList.Add(new(code: "bestanswer#3360", color: "#00ff1d", tag: "绿色游戏", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null)); //NikoCat233's alt
         DevUserList.Add(new(code: "happypride#3747", color: "#00ff1d", tag: "绿色游戏", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null)); //NikoCat233's alt 2
-        DevUserList.Add(new(code: "alphacook#6624", color: "null", tag: "<#f0bbd0>D<#e1b5d5>u<#d3b0db>c<#c4aae0>k<#b5a5e5>e<#a69fea>d<#979aef>E<#8994f5>z<#7a8ffa>l<#6b89ff>y<#6b89ff>", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null));
         //// pt-BR Translators
         //DevUserList.Add(new(code: "modelpad#5195", color: "null", tag: "Tradutor", isUp: true, isDev: false, deBug: false, colorCmd: false, upName: "Reginaldoo")); // and content creator
         //DevUserList.Add(new(code: "mimerecord#9638", color: "null", tag: "Tradutor", isUp: false, isDev: false, deBug: false, colorCmd: false, upName: "Arc"));

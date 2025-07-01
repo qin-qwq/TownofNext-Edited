@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using UnityEngine;
@@ -12,8 +13,8 @@ internal class ChiefOfPolice : RoleBase
     public override CustomRoles Role => CustomRoles.ChiefOfPolice;
     private const int Id = 12600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.ChiefOfPolice);
-    public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
+    public override bool IsDesyncRole => !GiveTasks;
+    public override CustomRoles ThisRoleBase => GiveTasks ? CustomRoles.Crewmate : CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\
 
@@ -25,6 +26,8 @@ internal class ChiefOfPolice : RoleBase
     private static OptionItem PreventRecruitNonKiller;
     private static OptionItem SuidiceWhenTargetNotKiller;
     private static OptionItem PassConverted;
+
+    private bool GiveTasks = false;
 
     public override void SetupCustomOption()
     {
@@ -40,6 +43,10 @@ internal class ChiefOfPolice : RoleBase
         PassConverted = BooleanOptionItem.Create(Id + 17, "PolicPassConverted", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.ChiefOfPolice]);
     }
 
+    public override void Init()
+    {
+        GiveTasks = false;
+    }
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(1);
@@ -94,6 +101,11 @@ internal class ChiefOfPolice : RoleBase
                 Utils.NotifyRoles(killer);
                 Utils.NotifyRoles(target);
                 isSuccess = true;
+
+                GiveTasks = true;
+                var copClientId = killer.GetClientId();
+                killer.RpcSetRoleDesync(RoleTypes.Crewmate, copClientId);
+                killer.RpcResetTasks();
             }
         }
         else
@@ -134,6 +146,11 @@ internal class ChiefOfPolice : RoleBase
                     Utils.NotifyRoles(killer);
                     Utils.NotifyRoles(target);
                     isSuccess = true;
+
+                    GiveTasks = true;
+                    var copClientId = killer.GetClientId();
+                    killer.RpcSetRoleDesync(RoleTypes.Crewmate, copClientId);
+                    killer.RpcResetTasks();
                 }
             }
         }

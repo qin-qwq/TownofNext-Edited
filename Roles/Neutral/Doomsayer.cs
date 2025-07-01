@@ -15,7 +15,7 @@ internal class Doomsayer : RoleBase
     private const int Id = 14100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Doomsayer);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => AliveWithoutEndGame() ? Custom_RoleType.NeutralKilling : Custom_RoleType.NeutralEvil;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
     //==================================================================\\
 
     private static OptionItem DoomsayerAmountOfGuessesToWin;
@@ -31,7 +31,6 @@ internal class Doomsayer : RoleBase
     private static OptionItem MisguessRolePrevGuessRoleUntilNextMeeting;
     private static OptionItem DoomsayerTryHideMsg;
     private static OptionItem ImpostorVision;
-    public static OptionItem AliveWithoutEndGameOpt;
 
     private readonly HashSet<CustomRoles> GuessedRoles = [];
 
@@ -71,8 +70,6 @@ internal class Doomsayer : RoleBase
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DoomsayerTryHideMsg = BooleanOptionItem.Create(Id + 21, "DoomsayerTryHideMsg", true, TabGroup.NeutralRoles, true)
             .SetColor(Color.green)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-        AliveWithoutEndGameOpt = BooleanOptionItem.Create(Id + 27, "AliveWithoutEndGame", true, TabGroup.NeutralRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
     }
     public override void Init()
@@ -250,6 +247,4 @@ internal class Doomsayer : RoleBase
             }, 0.7f, "Doomsayer Guess Msg 2");
         }
     }
-
-    public static bool AliveWithoutEndGame() => AliveWithoutEndGameOpt == null ? false : AliveWithoutEndGameOpt.GetBool();
 }

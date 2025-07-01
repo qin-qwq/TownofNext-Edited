@@ -56,26 +56,21 @@ internal class ControllerManagerUpdatePatch
             //}
 
             // Show Role info
-            if (Input.GetKeyDown(KeyCode.F1) && GameStates.IsInGame && Options.CurrentGameMode == CustomGameMode.Standard)
+            if (GameStates.IsInGame && (GameStates.IsCanMove || GameStates.IsMeeting) && Options.CurrentGameMode == CustomGameMode.Standard)
             {
-                try
+                if (Input.GetKey(KeyCode.F1))
                 {
-                    var role = PlayerControl.LocalPlayer.GetCustomRole();
-                    var lp = PlayerControl.LocalPlayer;
-                    var sb = new StringBuilder();
-                    sb.Append(GetString(role.ToString()) + Utils.GetRoleMode(role) + lp.GetRoleInfo(true));
-                    //if (Options.CustomRoleSpawnChances.TryGetValue(role, out var opt))
-                    //Utils.ShowChildrenSettings(Options.CustomRoleSpawnChances[role], ref sb, command: true);
-                    HudManager.Instance.ShowPopUp(sb.ToString() + "<size=0%>tohe</size>");
+                    if (!InGameRoleInfoMenu.Showing)
+                    {
+                        InGameRoleInfoMenu.SetRoleInfoRef(PlayerControl.LocalPlayer);
+                        InGameRoleInfoMenu.Show();
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Utils.ThrowException(ex);
-                    throw;
-                }
+                else if (InGameRoleInfoMenu.Showing) InGameRoleInfoMenu.Hide();
             }
+            else if (InGameRoleInfoMenu.Showing) InGameRoleInfoMenu.Show();
             // Show Add-on info
-            if (Input.GetKeyDown(KeyCode.F2) && GameStates.IsInGame && Options.CurrentGameMode == CustomGameMode.Standard)
+            /*if (Input.GetKeyDown(KeyCode.F2) && GameStates.IsInGame && Options.CurrentGameMode == CustomGameMode.Standard)
             {
                 try
                 {
@@ -140,7 +135,7 @@ internal class ControllerManagerUpdatePatch
                 {
                     Utils.ThrowException(ex);
                 }
-            }
+            }*/
             // Changing the resolution
             if (GetKeysDown(KeyCode.F11, KeyCode.LeftAlt))
             {

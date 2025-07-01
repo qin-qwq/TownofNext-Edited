@@ -34,14 +34,6 @@
 > 
 > - Town of Host: Enhanced was forked from Town of Host: Re-Edited.
 >
-### :star: [NOS](https://github.com/Dolly1016/Nebula)
-> 
-> - 一些图标
->
-### :star: [TOHO](https://github.com/TOHOptimized/TownofHost-Optimized) 
-> 
-> - 一些角色想法
-> 
 ### :star: [TOHE](https://github.com/KARPED1EM/TownOfHostEdited) :
 > 
 > - Town of Host: Re-Edited was forked from Town of Host: Edited. (TONX)
@@ -112,8 +104,13 @@
 > - Host icon during the meeting
 ### :star: [MoreGamemodes](https://github.com/Rabek009/MoreGamemodes)
 >
+> - CustomNetObjects (CustomNetObjects.cs)
 > - Changer Role Basis (RoleBasisChanger.cs)
 > - Disable use vent for vanilla players (VentSystemPatch.cs)
 ### :star: [Reactor](https://github.com/NuclearPowered/Reactor)
 >
 > - Reference: Disable the 5s timeout on custom servers
+### :star: [CrowdedMod](https://github.com/CrowdedMods/CrowdedMod)
+>
+> - We included CrowdedMod in our Mod
+---

@@ -1,5 +1,4 @@
 using UnityEngine;
-using static TOHE.Translator;
 
 namespace TOHE.Roles.Impostor;
 
@@ -28,7 +27,6 @@ internal class Cleaner : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
     }
 
-
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
     public override bool OnCheckReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo deadBody, PlayerControl killer)
@@ -41,7 +39,8 @@ internal class Cleaner : RoleBase
 
             reporter.Notify(Translator.GetString("CleanerCleanBody"));
             reporter.SetKillCooldownV3(KillCooldownAfterCleaning.GetFloat(), forceAnime: true);
-            Logger.Info($"Cleaner: {reporter.GetRealName()} clear body: {deadBody.PlayerName}", "Cleaner");
+
+            Logger.Info($"Cleaner: {reporter.GetRealName()} clear body: {deadBody.PlayerName}，qshyylx", "Cleaner");
             return false;
         }
 

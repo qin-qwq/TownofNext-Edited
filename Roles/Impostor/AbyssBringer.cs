@@ -2,7 +2,6 @@ using AmongUs.GameOptions;
 using Hazel;
 using System;
 using TOHE.Modules;
-using TOHE.Roles.Crewmate;
 using UnityEngine;
 using static TOHE.Modules.HazelExtensions;
 using static TOHE.Options;
@@ -36,7 +35,7 @@ internal class AbyssBringer : RoleBase
         const TabGroup tab = TabGroup.ImpostorRoles;
         const CustomRoles role = CustomRoles.Abyssbringer;
         SetupRoleOptions(Id, tab, role);
-        BlackHoleCountLimit = IntegerOptionItem.Create(Id + 16, "BlackHoleCountLimit", new(1, 15, 1), 2, tab, false)
+        BlackHoleCountLimit = IntegerOptionItem.Create(Id + 16, "BlackHoleCountLimit", new(1, 15, 1), 1, tab, false)
             .SetParent(CustomRoleSpawnChances[role]);
         BlackHolePlaceCooldown = IntegerOptionItem.Create(Id + 10, "BlackHolePlaceCooldown", new(1, 180, 1), 30, tab, false)
             .SetParent(CustomRoleSpawnChances[role])
@@ -104,7 +103,8 @@ internal class AbyssBringer : RoleBase
             return;
         }
         // When no player exists, Instantly spawm and despawn networked object will cause error spam
-        if (BlackHoles.Count() >= BlackHoleCountLimit.GetInt())
+
+        if (BlackHoles.Count >= BlackHoleCountLimit.GetInt())
         {
             return;
         }
@@ -116,11 +116,7 @@ internal class AbyssBringer : RoleBase
         BlackHoles.Add(blackHoleId, new(new(pos, _state.PlayerId), Utils.TimeStamp, pos, roomName, 0));
         Utils.SendRPC(CustomRPC.SyncRoleSkill, _Player, 1, blackHoleId, pos, roomName);
     }
-    public override void SetAbilityButtonText(HudManager hud, byte id)
-    {
-        hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
-        hud.AbilityButton.SetUsesRemaining(BlackHoleCountLimit.GetInt() - BlackHoles.Count());
-    }
+    public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
     {
         var abyssbringer = _Player;
@@ -159,7 +155,10 @@ internal class AbyssBringer : RoleBase
 
                 if (Vector2.Distance(pos, blackHole.Position) <= BlackHoleRadius.GetFloat())
                 {
-                    if (nearestPlayer.Is(Custom_Team.Impostor) && !CanKillImpostors.GetBool() || nearestPlayer.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool() || nearestPlayer.Is(CustomRoles.Brave) && Brave.HasShield) continue;
+                    if ((nearestPlayer.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc) && !CanKillImpostors.GetBool()) || (nearestPlayer.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool())) continue;
+                    if (nearestPlayer.IsPolice() && pc.Is(CustomRoles.Narc) && !CanKillImpostors.GetBool()) continue;
+
+                    RPC.PlaySoundRPC(Sounds.KillSound, pc.PlayerId);
                     blackHole.PlayersConsumed++;
                     Utils.SendRPC(CustomRPC.SyncRoleSkill, _Player, 2, id, (byte)blackHole.PlayersConsumed);
                     Notify();
@@ -261,7 +260,6 @@ internal class AbyssBringer : RoleBase
             return string.Format(Translator.GetString("Abyssbringer.Suffix.BlackHole"), rn, playersConsumed);
         }
     }
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("BlackHole");
 
     [Obfuscation(Exclude = true)]
     enum DespawnMode

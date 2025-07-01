@@ -10,15 +10,13 @@ internal class Celebrity : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Celebrity;
     private const int Id = 6500;
-    public override CustomRoles ThisRoleBase => CustomRoles.Noisemaker;
+    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\
 
     private static OptionItem ImpKnowCelebrityDead;
     private static OptionItem NeutralKnowCelebrityDead;
     private static OptionItem CovenKnowCelebrityDead;
-    private static OptionItem ImpostorAlert;
-    private static OptionItem AlertDuration;
 
     private static readonly HashSet<byte> CelebrityDead = [];
 
@@ -31,11 +29,6 @@ internal class Celebrity : RoleBase
             .SetParent(CustomRoleSpawnChances[CustomRoles.Celebrity]);
         CovenKnowCelebrityDead = BooleanOptionItem.Create(Id + 12, "CovenKnowCelebrityDead", false, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Celebrity]);
-        ImpostorAlert = BooleanOptionItem.Create(Id + 2, GeneralOption.NoisemakerBase_ImpostorAlert, false, TabGroup.CrewmateRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Celebrity]);
-        AlertDuration = IntegerOptionItem.Create(Id + 3, GeneralOption.NoisemakerBase_AlertDuration, new(1, 20, 1), 10, TabGroup.CrewmateRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Celebrity])
-            .SetValueFormat(OptionFormat.Seconds);
     }
     public override void Init()
     {
@@ -63,11 +56,11 @@ internal class Celebrity : RoleBase
             //Death Message
             foreach (var pc in Main.AllPlayerControls)
             {
-                if (!ImpKnowCelebrityDead.GetBool() && pc.GetCustomRole().IsImpostor()) continue;
-                if (!NeutralKnowCelebrityDead.GetBool() && pc.GetCustomRole().IsNeutral()) continue;
-                if (!CovenKnowCelebrityDead.GetBool() && pc.GetCustomRole().IsCoven()) continue;
+                if (!ImpKnowCelebrityDead.GetBool() && pc.IsPlayerImpostorTeam()) continue;
+                if (!NeutralKnowCelebrityDead.GetBool() && pc.IsPlayerNeutralTeam()) continue;
+                if (!CovenKnowCelebrityDead.GetBool() && pc.IsPlayerCovenTeam()) continue;
 
-                SendMessage(string.Format(GetString("CelebrityDead"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Celebrity), GetString("CelebrityNewsTitle")));
+                SendMessage(string.Format(GetString("CelebrityDead"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Celebrity), GetString("Celebrity").ToUpper()));
             }
         }
         else
@@ -80,10 +73,10 @@ internal class Celebrity : RoleBase
     {
         foreach (var csId in CelebrityDead)
         {
-            if (!ImpKnowCelebrityDead.GetBool() && targets.GetCustomRole().IsImpostor()) continue;
-            if (!NeutralKnowCelebrityDead.GetBool() && targets.GetCustomRole().IsNeutral()) continue;
-            if (!CovenKnowCelebrityDead.GetBool() && targets.GetCustomRole().IsCoven()) continue;
-            AddMsg(string.Format(GetString("CelebrityDead"), Main.AllPlayerNames[csId]), targets.PlayerId, ColorString(GetRoleColor(CustomRoles.Celebrity), GetString("CelebrityNewsTitle")));
+            if (!ImpKnowCelebrityDead.GetBool() && targets.IsPlayerImpostorTeam()) continue;
+            if (!NeutralKnowCelebrityDead.GetBool() && targets.IsPlayerNeutralTeam()) continue;
+            if (!CovenKnowCelebrityDead.GetBool() && targets.IsPlayerCovenTeam()) continue;
+            AddMsg(string.Format(GetString("CelebrityDead"), Main.AllPlayerNames[csId]), targets.PlayerId, ColorString(GetRoleColor(CustomRoles.Celebrity), GetString("Celebrity").ToUpper()));
         }
     }
     public override void MeetingHudClear()

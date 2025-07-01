@@ -48,6 +48,9 @@ public class ModUpdater
 
     public static IEnumerator PrefixCoroutine()
     {
+        Logger.Info("User Facing Version: " + DestroyableSingleton<ReferenceDataManager>.Instance.Refdata.userFacingVersion + " " + Constants.extraBuildVersionInfo, "CheckRelease");
+        Logger.Info("Constants Version: " + string.Format("{0}.{1}.{2}.{3}", Constants.Year, Constants.Month, Constants.Day, Constants.Revision) + " " + Constants.GetBroadcastVersion(), "CheckRelease");
+
         CheckCustomRegions();
         NewVersionCheck();
         DeleteOldFiles();
@@ -143,7 +146,7 @@ public class ModUpdater
     }
     public static void ResetUpdateButton()
     {
-        if (updateButton == null)
+        /*if (updateButton == null)
         {
             updateButton = MainMenuManagerPatch.CreateButton(
                 "updateButton",
@@ -154,7 +157,7 @@ public class ModUpdater
                 GetString("update"));
             updateButton.transform.localScale = Vector3.one;
         }
-        updateButton.gameObject.SetActive(hasUpdate);
+        updateButton.gameObject.SetActive(hasUpdate);*/
     }
     public static void ShowAvailableUpdate()
     {
@@ -273,7 +276,7 @@ public class ModUpdater
         try
         {
             var fileName = Assembly.GetExecutingAssembly().Location;
-            if (Directory.Exists("TOH_DATA") && File.Exists(@"./TOHE-DATA/BanWords.txt"))
+            if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
             {
                 DirectoryInfo di = new("TOH_DATA");
                 di.Delete(true);

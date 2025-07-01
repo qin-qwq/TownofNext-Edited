@@ -52,6 +52,10 @@ internal class Bodyguard : RoleBase
         {
             Logger.Info($"{bodyguard.GetRealName()} He was a Coven, so he chose to ignore the murder scene", "Bodyguard");
         }
+        else if (bodyguard.Is(CustomRoles.Recruit) && killer.Is(CustomRoles.Jackal))
+        {
+            Logger.Info($"{bodyguard.GetRealName()} He was a Jackal, so he chose to ignore the murder scene", "Bodyguard");
+        }
         else if (bodyguard.CheckForInvalidMurdering(killer))
         {
             bodyguard.SetDeathReason(PlayerState.DeathReason.Sacrifice);

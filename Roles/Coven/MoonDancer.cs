@@ -1,7 +1,8 @@
 using Hazel;
-using InnerNet;
 using TOHE.Modules;
+using TOHE.Modules.Rpc;
 using TOHE.Roles.AddOns;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Double;
 using TOHE.Roles.Impostor;
@@ -67,8 +68,7 @@ internal class MoonDancer : CovenManager
     }
     private void SendRPC(byte playerId)
     {
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncRoleSkill, SendOption.Reliable, -1);
-        writer.WriteNetObject(_Player);
+        var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(playerId);
         if (playerId != byte.MaxValue)
         {
@@ -76,7 +76,7 @@ internal class MoonDancer : CovenManager
             foreach (var bl in BlastedOffList[playerId])
                 writer.Write(bl);
         }
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
@@ -183,7 +183,10 @@ internal class MoonDancer : CovenManager
             }
             else
             {
-                killer.Notify(GetString("MoonDancerNormalKill"));
+                _ = new LateTask(() =>
+                {
+                    killer.Notify(GetString("MoonDancerNormalKill"));
+                }, target.Is(CustomRoles.Burst) ? Burst.BurstKillDelay.GetFloat() : 0f, "BurstKillCheck");
                 return true;
             }
         }

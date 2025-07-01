@@ -103,7 +103,7 @@ public static class Options
         Chance100,
     }
     [Obfuscation(Exclude = true)]
-    private enum RatesZeroOne
+    public enum RatesZeroOne
     {
         RoleOff,
         RoleRate,
@@ -125,7 +125,6 @@ public static class Options
         "CamouflageMode.Random",
         "CamouflageMode.OnlyRandomColor",
         "CamouflageMode.Karpe",
-        "CamouflageMode.Qin",
         "CamouflageMode.Lauryn",
         "CamouflageMode.Moe",
         "CamouflageMode.Pyro",
@@ -143,6 +142,7 @@ public static class Options
         QuickChatSpam_How2PlayHidenSeek,
         QuickChatSpam_Random20,
         QuickChatSpam_EzHacked,
+        QuickChatSpam_Empty
     };
     [Obfuscation(Exclude = true)]
     public enum ShortAddOnNamesMode
@@ -177,13 +177,14 @@ public static class Options
 
     // ------------ System Settings Tab ------------
     public static OptionItem BypassRateLimitAC;
+    public static OptionItem MaxSpiltReliablePacketsPerTick;
+    public static OptionItem MaxSpiltNonePacketsPerTick;
+
     public static OptionItem GradientTagsOpt;
     public static OptionItem EnableKillerLeftCommand;
     public static OptionItem ShowMadmatesInLeftCommand;
     public static OptionItem ShowApocalypseInLeftCommand;
     public static OptionItem ShowCovenInLeftCommand;
-    public static OptionItem SeeEjectedRolesInMeeting;
-    public static OptionItem ShowBetrayalAddonsOnEject;
 
     public static OptionItem KickLowLevelPlayer;
     public static OptionItem TempBanLowLevelPlayer;
@@ -192,6 +193,7 @@ public static class Options
     public static OptionItem AllowOnlyWhiteList;
 
     public static OptionItem KickOtherPlatformPlayer;
+    public static OptionItem WhiteListNoKick;
     public static OptionItem OptKickAndroidPlayer;
     public static OptionItem OptKickIphonePlayer;
     public static OptionItem OptKickXboxPlayer;
@@ -293,6 +295,8 @@ public static class Options
     public static OptionItem ShowTeamNextToRoleNameOnEject;
     public static OptionItem ConfirmEgoistOnEject;
     public static OptionItem ConfirmLoversOnEject;
+    public static OptionItem SeeEjectedRolesInMeeting;
+    public static OptionItem ShowBetrayalAddonsOnEject;
     //public static OptionItem ConfirmSidekickOnEject;
     //public static OptionItem ExtendedEjections;
 
@@ -368,6 +372,7 @@ public static class Options
     public static OptionItem DisableMeeting;
     public static OptionItem DisableSabotage;
     public static OptionItem DisableCloseDoor;
+    public static OptionItem DisableVenting1v1;
 
     public static OptionItem DisableDevices;
     public static OptionItem DisableSkeldDevices;
@@ -530,6 +535,10 @@ public static class Options
     public static OptionItem DisableLiftWeights;
     public static OptionItem DisableCollectShells;
 
+    public static OptionItem OverrideMedbayScan_OnVisualOff;
+    public static OptionItem OverrideMedbayScan_MinPlayer;
+    public static OptionItem OverrideMedbayScan_MaxPlayer;
+
     // Guesser Mode
     public static OptionItem GuesserMode;
     public static OptionItem CrewmatesCanGuess;
@@ -552,6 +561,9 @@ public static class Options
     // ------------ General Role Settings ------------
 
     // Imp
+    public static OptionItem UseVariableImp;
+    public static OptionItem ImpRolesMinPlayer;
+    public static OptionItem ImpRolesMaxPlayer;
     public static OptionItem ImpsCanSeeEachOthersRoles;
     public static OptionItem ImpsCanSeeEachOthersAddOns;
 
@@ -705,7 +717,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33600 last id for roles/add-ons (Next use 33700)
+        // 32000 last id for roles/add-ons (Next use 32100)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -738,6 +750,17 @@ public static class Options
         //    .SetColor(Utils.GetRoleColor(CustomRoles.GM))
         //    .SetHidden(true)
         //    .SetHeader(true);
+        UseVariableImp = BooleanOptionItem.Create(60037, "UseVariableImp", false, TabGroup.ImpostorRoles, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true);
+        ImpRolesMinPlayer = IntegerOptionItem.Create(60038, "ImpRolesMinPlayer", new(0, 15, 1), 0, TabGroup.ImpostorRoles, false)
+           .SetGameMode(CustomGameMode.Standard)
+           .SetParent(UseVariableImp)
+           .SetValueFormat(OptionFormat.Players);
+        ImpRolesMaxPlayer = IntegerOptionItem.Create(60039, "ImpRolesMaxPlayer", new(0, 15, 1), 0, TabGroup.ImpostorRoles, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetParent(UseVariableImp)
+            .SetValueFormat(OptionFormat.Players);
 
         ImpsCanSeeEachOthersRoles = BooleanOptionItem.Create(60001, "ImpsCanSeeEachOthersRoles", true, TabGroup.ImpostorRoles, false)
             .SetGameMode(CustomGameMode.Standard)
@@ -756,14 +779,6 @@ public static class Options
             .SetValueFormat(OptionFormat.Seconds);
         DeadImpCantSabotage = BooleanOptionItem.Create(60012, "DeadImpCantSabotage", false, TabGroup.ImpostorRoles, false)
             .SetGameMode(CustomGameMode.Standard);
-
-        SpawnOneRandomKillingFraction = BooleanOptionItem.Create(60036, "SpawnOneRandomKillingFraction", true, TabGroup.NeutralRoles, false)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetHeader(true);
-
-        TextOptionItem.Create(10000016, "CovenInfo", TabGroup.CovenRoles)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
         NonNeutralKillingRolesMinPlayer = IntegerOptionItem.Create(60013, "NonNeutralKillingRolesMinPlayer", new(0, 15, 1), 0, TabGroup.NeutralRoles, false)
             .SetGameMode(CustomGameMode.Standard)
@@ -796,6 +811,14 @@ public static class Options
         NeutralWinTogether = BooleanOptionItem.Create(60018, "NeutralWinTogether", false, TabGroup.NeutralRoles, false)
             .SetParent(NeutralRoleWinTogether)
             .SetGameMode(CustomGameMode.Standard);
+
+        SpawnOneRandomKillingFraction = BooleanOptionItem.Create(60036, "SpawnOneRandomKillingFraction", true, TabGroup.NeutralRoles, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true);
+
+        TextOptionItem.Create(10000015, "CovenInfo", TabGroup.CovenRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
         CovenRolesMinPlayer = IntegerOptionItem.Create(60026, "CovenRolesMinPlayer", new(0, 15, 1), 0, TabGroup.CovenRoles, false)
             .SetGameMode(CustomGameMode.Standard)
@@ -846,7 +869,7 @@ public static class Options
 
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsImpostor()).Any(r => r.Value.IsExperimental))
         {
-            TextOptionItem.Create(10000021, "Experimental.Roles", TabGroup.ImpostorRoles)
+            TextOptionItem.Create(10000020, "Experimental.Roles", TabGroup.ImpostorRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
@@ -924,7 +947,7 @@ public static class Options
 
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCrewmate()).Any(r => r.Value.IsExperimental))
         {
-            TextOptionItem.Create(10000022, "Experimental.Roles", TabGroup.CrewmateRoles)
+            TextOptionItem.Create(10000021, "Experimental.Roles", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
@@ -934,18 +957,9 @@ public static class Options
         }
 
         /*
-         * SPECIAL ROLES
-         */
-        TextOptionItem.Create(10000007, "RoleType.CrewSpecial", TabGroup.CrewmateRoles)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetColor(new Color32(140, 255, 255, byte.MaxValue));
-
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateSpecial).ForEach(r => r.SetupCustomOption());
-
-        /*
          * BASIC ROLES
          */
-        TextOptionItem.Create(10000008, "RoleType.CrewBasic", TabGroup.CrewmateRoles)
+        TextOptionItem.Create(10000007, "RoleType.CrewBasic", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
@@ -959,7 +973,7 @@ public static class Options
         /*
          * SUPPORT ROLES
          */
-        TextOptionItem.Create(10000009, "RoleType.CrewSupport", TabGroup.CrewmateRoles)
+        TextOptionItem.Create(10000008, "RoleType.CrewSupport", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
@@ -968,7 +982,7 @@ public static class Options
         /*
          * KILLING ROLES
          */
-        TextOptionItem.Create(10000010, "RoleType.CrewKilling", TabGroup.CrewmateRoles)
+        TextOptionItem.Create(10000009, "RoleType.CrewKilling", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
@@ -977,7 +991,7 @@ public static class Options
         /*
          * POWER ROLES
          */
-        TextOptionItem.Create(10000011, "RoleType.CrewPower", TabGroup.CrewmateRoles)
+        TextOptionItem.Create(10000010, "RoleType.CrewPower", TabGroup.CrewmateRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
@@ -1002,7 +1016,7 @@ public static class Options
 
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsNeutral()).Any(r => r.Value.IsExperimental))
         {
-            TextOptionItem.Create(10000023, "Experimental.Roles", TabGroup.NeutralRoles)
+            TextOptionItem.Create(10000022, "Experimental.Roles", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
@@ -1011,25 +1025,25 @@ public static class Options
 
         }
         // Neutral
-        TextOptionItem.Create(10000012, "RoleType.NeutralBenign", TabGroup.NeutralRoles)
+        TextOptionItem.Create(10000011, "RoleType.NeutralBenign", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralBenign).ForEach(r => r.SetupCustomOption());
 
-        TextOptionItem.Create(10000013, "RoleType.NeutralEvil", TabGroup.NeutralRoles)
+        TextOptionItem.Create(10000012, "RoleType.NeutralEvil", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralEvil).ForEach(r => r.SetupCustomOption());
 
-        TextOptionItem.Create(10000014, "RoleType.NeutralChaos", TabGroup.NeutralRoles)
+        TextOptionItem.Create(10000013, "RoleType.NeutralChaos", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralChaos).ForEach(r => r.SetupCustomOption());
 
-        TextOptionItem.Create(10000015, "RoleType.NeutralKilling", TabGroup.NeutralRoles)
+        TextOptionItem.Create(10000014, "RoleType.NeutralKilling", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
@@ -1052,7 +1066,7 @@ public static class Options
         yield return null;
 
         #region Coven Settings
-        /*if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCoven()).Any(r => r.Value.IsExperimental))
+        if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCoven()).Any(r => r.Value.IsExperimental))
         {
             TextOptionItem.Create(10000023, "Experimental.Roles", TabGroup.NeutralRoles)
             .SetGameMode(CustomGameMode.Standard)
@@ -1061,27 +1075,27 @@ public static class Options
             CustomRoleManager.GetExperimentalOptions(Custom_Team.Coven).ForEach(r => r.SetupCustomOption());
 
 
-        }*/
+        }
 
-        TextOptionItem.Create(10000017, "RoleType.CovenPower", TabGroup.CovenRoles)
+        TextOptionItem.Create(10000016, "RoleType.CovenPower", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenPower).ForEach(r => r.SetupCustomOption());
 
-        TextOptionItem.Create(10000018, "RoleType.CovenKilling", TabGroup.CovenRoles)
+        TextOptionItem.Create(10000017, "RoleType.CovenKilling", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenKilling).ForEach(r => r.SetupCustomOption());
 
-        TextOptionItem.Create(10000019, "RoleType.CovenTrickery", TabGroup.CovenRoles)
+        TextOptionItem.Create(10000018, "RoleType.CovenTrickery", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenTrickery).ForEach(r => r.SetupCustomOption());
 
-        TextOptionItem.Create(10000020, "RoleType.CovenUtility", TabGroup.CovenRoles)
+        TextOptionItem.Create(10000019, "RoleType.CovenUtility", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
@@ -1117,7 +1131,10 @@ public static class Options
                 Madmate.SetupCustomMenuOptions();
 
             if (addonType.Key == AddonTypes.Misc)
-                SetupLoversRoleOptionsToggle(23600); // KYS 
+                SetupLoversRoleOptionsToggle(23600);
+
+            if (addonType.Key == AddonTypes.Experimental)
+                NarcManager.SetUpOptionsForNarc();
 
             foreach (var addon in addonType.Value)
             {
@@ -1155,6 +1172,13 @@ public static class Options
         #region System Settings
         BypassRateLimitAC = BooleanOptionItem.Create(60049, "BypassRateLimitAC", true, TabGroup.SystemSettings, false)
             .SetHeader(true);
+        MaxSpiltReliablePacketsPerTick = IntegerOptionItem.Create(60048, "MaxSpiltReliablePacketsPerTick", new(1, 100, 1), 3, TabGroup.SystemSettings, false)
+            .SetValueFormat(OptionFormat.Pieces)
+            .SetParent(BypassRateLimitAC);
+        MaxSpiltNonePacketsPerTick = IntegerOptionItem.Create(60047, "MaxSpiltNonePacketsPerTick", new(1, 100, 1), 5, TabGroup.SystemSettings, false)
+            .SetValueFormat(OptionFormat.Pieces)
+            .SetParent(BypassRateLimitAC);
+
         GradientTagsOpt = BooleanOptionItem.Create(60031, "EnableGadientTags", false, TabGroup.SystemSettings, false)
             .SetHeader(true);
         EnableKillerLeftCommand = BooleanOptionItem.Create(60040, "EnableKillerLeftCommand", true, TabGroup.SystemSettings, false)
@@ -1179,6 +1203,8 @@ public static class Options
         AllowOnlyWhiteList = BooleanOptionItem.Create(60061, "AllowOnlyWhiteList", false, TabGroup.SystemSettings, false);
 
         KickOtherPlatformPlayer = BooleanOptionItem.Create(60070, "KickOtherPlatformPlayer", false, TabGroup.SystemSettings, false);
+        WhiteListNoKick = BooleanOptionItem.Create(60076, "WhiteListNoKick", false, TabGroup.SystemSettings, false)
+            .SetParent(KickOtherPlatformPlayer);
         OptKickAndroidPlayer = BooleanOptionItem.Create(60071, "OptKickAndroidPlayer", false, TabGroup.SystemSettings, false)
             .SetParent(KickOtherPlatformPlayer);
         OptKickIphonePlayer = BooleanOptionItem.Create(60072, "OptKickIphonePlayer", false, TabGroup.SystemSettings, false)
@@ -1246,8 +1272,6 @@ public static class Options
         LowLoadMode = BooleanOptionItem.Create(60230, "LowLoadMode", true, TabGroup.SystemSettings, false)
             .SetHeader(true)
             .SetColor(Color.green);
-        LowLoadDelayUpdateNames = BooleanOptionItem.Create(60231, "LowLoad_DelayUpdateNames", true, TabGroup.SystemSettings, false)
-            .SetParent(LowLoadMode);
         EndWhenPlayerBug = BooleanOptionItem.Create(60240, "EndWhenPlayerBug", true, TabGroup.SystemSettings, false)
             .SetColor(Color.blue);
         HideExileChat = BooleanOptionItem.Create(60292, "HideExileChat", true, TabGroup.SystemSettings, false)
@@ -1418,7 +1442,6 @@ public static class Options
             .SetColor(Color.cyan);
 
         CanOnlyGuessEnabled = BooleanOptionItem.Create(60696, "CanOnlyGuessEnabled", true, TabGroup.ModSettings, false)
-            .SetColor(Color.cyan)
             .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard);
 
@@ -1662,6 +1685,9 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 153, 153, byte.MaxValue));
         DisableCloseDoor = BooleanOptionItem.Create(60566, "DisableCloseDoor", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 153, 153, byte.MaxValue));
+        DisableVenting1v1 = BooleanOptionItem.Create(60567, "DisableVenting1v1", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 153, 153, byte.MaxValue));
         // Disable Devices
@@ -1912,6 +1938,15 @@ public static class Options
         DisableActivateWeatherNodes = BooleanOptionItem.Create(60670, "DisableActivateWeatherNodes", false, TabGroup.ModSettings, false)
             .SetParent(DisableOtherTasks);
 
+        OverrideMedbayScan_OnVisualOff = BooleanOptionItem.Create(60671, "OverrideMedbayScan_OnVisualOff", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(239, 89, 175, byte.MaxValue));
+        OverrideMedbayScan_MinPlayer = IntegerOptionItem.Create(60672, "OverrideMedbayScan_MinPlayer", new(1, 15, 1), 1, TabGroup.ModSettings, false)
+            .SetParent(OverrideMedbayScan_OnVisualOff)
+            .SetValueFormat(OptionFormat.Players);
+        OverrideMedbayScan_MaxPlayer = IntegerOptionItem.Create(60673, "OverrideMedbayScan_MaxPlayer", new(1, 100, 1), 3, TabGroup.ModSettings, false)
+            .SetParent(OverrideMedbayScan_OnVisualOff)
+            .SetValueFormat(OptionFormat.Players);
 
         // Meeting Settings
         TextOptionItem.Create(10000034, "MenuTitle.Meeting", TabGroup.ModSettings)
@@ -2011,7 +2046,7 @@ public static class Options
         PreventFirstDeadShapeShift = BooleanOptionItem.Create(60873, "PreventFirstDeadShapeShift", true, TabGroup.ModSettings, false).SetParent(ShieldPersonDiedFirst)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
-            
+
         ShieldedCanUseKillButton = BooleanOptionItem.Create(60782, "ShieldedCanUseKillButton", true, TabGroup.ModSettings, false).SetParent(ShieldPersonDiedFirst)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));

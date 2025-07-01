@@ -51,7 +51,6 @@ internal class Veteran : RoleBase
         AURoleOptions.EngineerCooldown = VeteranSkillCooldown.GetFloat();
         AURoleOptions.EngineerInVentMaxTime = 1;
     }
-
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
         var killerRole = killer.GetCustomRole();
@@ -103,6 +102,7 @@ internal class Veteran : RoleBase
                 player.RpcResetAbilityCooldown();
             }
 
+            RPC.PlaySoundRPC(Sounds.TaskComplete, player.PlayerId);
             player.Notify(string.Format(GetString("AbilityExpired"), player.GetAbilityUseLimit()));
         }
     }

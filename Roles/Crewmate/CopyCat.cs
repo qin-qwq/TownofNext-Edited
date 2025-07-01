@@ -106,7 +106,7 @@ internal class CopyCat : RoleBase
 
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        CustomRoles role = target.GetCustomRole();
+        CustomRoles role = target.Is(CustomRoles.Narc) ? CustomRoles.Sheriff : target.GetCustomRole();
         if (BlackList(role))
         {
             killer.Notify(GetString("CopyCatCanNotCopy"));
@@ -123,7 +123,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Consigliere => CustomRoles.Overseer,
                 CustomRoles.Mercenary => CustomRoles.Addict,
                 CustomRoles.Miner => CustomRoles.Mole,
-                CustomRoles.Godfather => CustomRoles.President,
+                CustomRoles.Godfather => CustomRoles.ChiefOfPolice,
                 CustomRoles.Twister => CustomRoles.TimeMaster,
                 CustomRoles.Disperser => CustomRoles.Transporter,
                 CustomRoles.Eraser => CustomRoles.Cleanser,
@@ -187,7 +187,7 @@ internal class CopyCat : RoleBase
                 if (target.Is(CustomRoles.Recruit)) killer.RpcSetCustomRole(CustomRoles.Recruit);
                 if (target.Is(CustomRoles.Contagious)) killer.RpcSetCustomRole(CustomRoles.Contagious);
                 if (target.Is(CustomRoles.Soulless)) killer.RpcSetCustomRole(CustomRoles.Soulless);
-                if (target.Is(CustomRoles.Admired)) killer.RpcSetCustomRole(CustomRoles.Admired);
+                if (target.Is(CustomRoles.Admired) || target.Is(CustomRoles.Narc)) killer.RpcSetCustomRole(CustomRoles.Admired);
                 if (target.Is(CustomRoles.Enchanted)) killer.RpcSetCustomRole(CustomRoles.Enchanted);
             }
             killer.RpcGuardAndKill(killer);

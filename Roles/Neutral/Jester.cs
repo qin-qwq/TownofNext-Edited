@@ -24,7 +24,7 @@ internal class Jester : RoleBase
     public static OptionItem CantMoveInVents;
     private static OptionItem MeetingsNeededForWin;
     private static OptionItem HideJesterVote;
-    //public static OptionItem SunnyboyChance;
+    public static OptionItem SunnyboyChance;
     private static OptionItem RevealJesterUponEjection;
 
     public override void SetupCustomOption()
@@ -45,9 +45,9 @@ internal class Jester : RoleBase
             .SetValueFormat(OptionFormat.Times);
         RevealJesterUponEjection = BooleanOptionItem.Create(Id + 8, "Jester_RevealUponEject", true, TabGroup.NeutralRoles, true)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Jester]);
-        /*SunnyboyChance = IntegerOptionItem.Create(Id + 7, "SunnyboyChance", new(0, 100, 5), 0, TabGroup.NeutralRoles, false)
+        SunnyboyChance = IntegerOptionItem.Create(Id + 7, "SunnyboyChance", new(0, 100, 5), 0, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Jester])
-            .SetValueFormat(OptionFormat.Percent);*/
+            .SetValueFormat(OptionFormat.Percent);
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {

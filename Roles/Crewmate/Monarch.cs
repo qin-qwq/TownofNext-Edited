@@ -25,10 +25,10 @@ internal class Monarch : RoleBase
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Monarch, 1);
-        KnightCooldown = FloatOptionItem.Create(Id + 10, "MonarchKnightCooldown", new(0f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false)
+        KnightCooldown = FloatOptionItem.Create(Id + 10, "MonarchKnightCooldown", new(0f, 180f, 2.5f), 10f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Monarch])
             .SetValueFormat(OptionFormat.Seconds);
-        KnightMax = IntegerOptionItem.Create(Id + 12, "MonarchKnightMax", new(1, 15, 1), 2, TabGroup.CrewmateRoles, false)
+        KnightMax = IntegerOptionItem.Create(Id + 12, "MonarchKnightMax", new(1, 15, 1), 3, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Monarch])
             .SetValueFormat(OptionFormat.Times);
         HideAdditionalVotesForKnighted = BooleanOptionItem.Create(Id + 13, "HideAdditionalVotesForKnighted", false, TabGroup.CrewmateRoles, false)
@@ -44,22 +44,7 @@ internal class Monarch : RoleBase
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
-        var pcList = Main.AllAlivePlayerControls.Where(pc => pc.PlayerId != target.PlayerId && pc.Is(CustomRoles.Knighted)).ToList();
-
-        if (pcList.Any())
-        {
-            PlayerControl kg = pcList.RandomElement();
-            if (target.RpcCheckAndMurder(killer, true))
-            {
-                kg.SetDeathReason(PlayerState.DeathReason.Sacrifice);
-                kg.RpcMurderPlayer(kg);
-                kg.SetRealKiller(killer);
-                killer.ResetKillCooldown();
-                killer.SetKillCooldown();
-                return false;
-            }
-        }
-        return true;
+        return !CustomRoles.Knighted.RoleExist();
     }
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {

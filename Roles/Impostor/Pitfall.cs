@@ -43,7 +43,7 @@ internal class Pitfall : RoleBase
             .SetValueFormat(OptionFormat.Times);
         TrapDurationOpt = FloatOptionItem.Create(Id + 13, "PitfallTrapDuration", new(5f, 180f, 1f), 30f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pitfall])
             .SetValueFormat(OptionFormat.Seconds);
-        TrapRadius = FloatOptionItem.Create(Id + 14, "PitfallTrapRadius", new(0.5f, 10f, 0.5f), 2f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pitfall])
+        TrapRadius = FloatOptionItem.Create(Id + 14, "PitfallTrapRadius", new(0.5f, 5f, 0.5f), 2f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pitfall])
             .SetValueFormat(OptionFormat.Multiplier);
         TrapFreezeTime = FloatOptionItem.Create(Id + 15, "PitfallTrapFreezeTime", new(0f, 30f, 1f), 5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pitfall])
             .SetValueFormat(OptionFormat.Seconds);
@@ -169,12 +169,14 @@ internal class Pitfall : RoleBase
     {
         Main.AllPlayerSpeed[player.PlayerId] = Main.MinSpeed;
         ReportDeadBodyPatch.CanReport[player.PlayerId] = false;
+        RPC.PlaySoundRPC(Sounds.SabotageSound, player.PlayerId);
         player.MarkDirtySettings();
+
         _ = new LateTask(() =>
         {
             Main.AllPlayerSpeed[player.PlayerId] = DefaultSpeed;
             ReportDeadBodyPatch.CanReport[player.PlayerId] = true;
-            RPC.PlaySoundRPC(player.PlayerId, Sounds.TaskComplete);
+            RPC.PlaySoundRPC(Sounds.TaskComplete, player.PlayerId);
             player.MarkDirtySettings();
         }, TrapFreezeTime.GetFloat(), "Pitfall Trap Player Freeze");
     }
