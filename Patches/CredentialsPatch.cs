@@ -142,23 +142,23 @@ class VersionShowerStartPatch
     static TextMeshPro SpecialEventText;
     private static void Postfix(VersionShower __instance)
     {
-        Main.credentialsText = $"<size=70%><size=85%><color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}</size>";
+        Main.credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
         var buildtype = "";
 
 #if RELEASE
-            Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
+            //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
             buildtype = "Release";
 #endif
 
 #if CANARY
         Main.credentialsText += $"\r\n<color=#ffc0cb>Canary:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
-        Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
+        //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
         buildtype = "Canary";
 #endif
 
 #if DEBUG
         Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
-        Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
+        //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
         buildtype = "Debug";
 #endif
         Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TOHE version");

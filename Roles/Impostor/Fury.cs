@@ -24,6 +24,8 @@ internal class Fury : RoleBase
     private static OptionItem AngryKillCooldown;
     private static OptionItem AngrySpeed;
 
+    private static bool Angry;
+
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Fury);
@@ -39,6 +41,10 @@ internal class Fury : RoleBase
             .SetValueFormat(OptionFormat.Multiplier);
     }
 
+    public override void Init()
+    {
+        Angry = false;
+    }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.ShapeshifterCooldown = AngryCooldown.GetFloat();
@@ -46,7 +52,9 @@ internal class Fury : RoleBase
 
     public override void UnShapeShiftButton(PlayerControl player)
     {
-        AURoleOptions.ShapeshifterCooldown = 300;
+        if (Angry) return;
+        Angry = true;
+        AURoleOptions.ShapeshifterCooldown = AngryDuration.GetFloat();
         player.SetKillCooldown(AngryKillCooldown.GetFloat());
         foreach (var target in Main.AllPlayerControls)
         {
@@ -62,12 +70,17 @@ internal class Fury : RoleBase
 
         _ = new LateTask(() =>
         {
+            Angry = false;
             Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed;
             Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKillCooldown;
             player.RpcResetAbilityCooldown();
             player.Notify(GetString("FuryInCalm"), 5f);
             player.MarkDirtySettings();
         }, AngryDuration.GetFloat());
+    }
+    public override void OnReportDeadBody(PlayerControl player, NetworkedPlayerInfo deadBody)
+    {
+        Angry = false;
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

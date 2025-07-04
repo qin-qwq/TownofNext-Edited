@@ -220,6 +220,7 @@ public class Main : BasePlugin
     public static int MeetingsPassed = 0;
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static MapNames CurrentMap => (MapNames)NormalOptions.MapId;
+    public static readonly HashSet<byte> Invisible = [];
 
 
     public static PlayerControl[] AllPlayerControls

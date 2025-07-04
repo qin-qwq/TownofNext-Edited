@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
 using TOHE.Modules.Rpc;
@@ -14,17 +15,17 @@ internal class Swooper : RoleBase
     public override CustomRoles Role => CustomRoles.Swooper;
     private const int Id = 4700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swooper);
-    public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
     private static OptionItem SwooperCooldown;
     private static OptionItem SwooperDuration;
-    private static OptionItem SwooperVentNormallyOnCooldown;
 
-    private static readonly Dictionary<byte, int> ventedId = [];
-    private static readonly Dictionary<byte, long> InvisCooldown = [];
-    private static readonly Dictionary<byte, long> InvisDuration = [];
+    //private static readonly Dictionary<byte, int> ventedId = [];
+    //private static readonly Dictionary<byte, long> InvisCooldown = [];
+    //private static readonly Dictionary<byte, long> InvisDuration = [];
+    private static bool IsInvis;
 
     public override void SetupCustomOption()
     {
@@ -33,15 +34,12 @@ internal class Swooper : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         SwooperDuration = FloatOptionItem.Create(Id + 4, "SwooperDuration", new(1f, 60f, 1f), 15f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Swooper])
             .SetValueFormat(OptionFormat.Seconds);
-        SwooperVentNormallyOnCooldown = BooleanOptionItem.Create(Id + 5, "SwooperVentNormallyOnCooldown", true, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Swooper]);
     }
     public override void Init()
     {
-        InvisCooldown.Clear();
-        InvisDuration.Clear();
-        ventedId.Clear();
+        IsInvis = false;
     }
-    public override void Add(byte playerId)
+    /*public override void Add(byte playerId)
     {
         InvisCooldown[playerId] = Utils.GetTimeStamp();
     }
@@ -61,9 +59,34 @@ internal class Swooper : RoleBase
         long invis = long.Parse(reader.ReadString());
         if (cooldown > 0) InvisCooldown.Add(PlayerControl.LocalPlayer.PlayerId, cooldown);
         if (invis > 0) InvisDuration.Add(PlayerControl.LocalPlayer.PlayerId, invis);
+    }*/
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.ShapeshifterCooldown = SwooperCooldown.GetFloat();
     }
-
-    private static bool CanGoInvis(byte id)
+    public override void UnShapeShiftButton(PlayerControl player)
+    {
+        if (IsInvis) return;
+        IsInvis = true;
+        player.RpcMakeInvisible();
+        AURoleOptions.ShapeshifterCooldown = SwooperDuration.GetFloat();
+        _ = new LateTask(() =>
+        {
+            player.Notify(GetString("SwooperInvisStateCountdown"), 5f);
+        }, SwooperDuration.GetFloat() - 10f);
+        _ = new LateTask(() =>
+        {
+            player.Notify(GetString("SwooperInvisStateCountdownn"), 5f);
+        }, SwooperDuration.GetFloat() - 5f);
+        _ = new LateTask(() =>
+        {
+            player.RpcResetAbilityCooldown();
+            player.Notify(GetString("SwooperInvisStateOut"), 5f);
+            player.RpcMakeVisible();
+            IsInvis = false;
+        }, SwooperDuration.GetFloat());
+    }
+    /*private static bool CanGoInvis(byte id)
         => GameStates.IsInTask && !InvisCooldown.ContainsKey(id);
 
     private static bool IsInvis(byte id)
@@ -232,11 +255,15 @@ internal class Swooper : RoleBase
             str.Append(GetString("SwooperCanVent"));
         }
         return str.ToString();
-    }
+    }*/
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        hud.ImpostorVentButton?.OverrideText(GetString(IsInvis(playerId) ? "SwooperRevertVentButtonText" : "SwooperVentButtonText"));
+        hud.AbilityButton.OverrideText(GetString("SwooperVentButtonText"));
     }
-    public override Sprite ImpostorVentButtonSprite(PlayerControl player) => CustomButton.Get("invisible");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("invisible");
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        IsInvis = false;
+    }
 }

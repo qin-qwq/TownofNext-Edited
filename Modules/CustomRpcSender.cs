@@ -3,6 +3,7 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
 using System;
+using UnityEngine;
 
 namespace TOHE;
 
@@ -216,6 +217,8 @@ public class CustomRpcSender
     public CustomRpcSender WriteNetObject(InnerNetObject obj) => Write(w => w.WriteNetObject(obj));
     public CustomRpcSender WriteMessageType(byte val) => Write(w => w.StartMessage(val));
     public CustomRpcSender WriteEndMessage() => Write(w => w.EndMessage());
+    public CustomRpcSender WriteVector2(Vector2 vector2) => Write(w => NetHelpers.WriteVector2(vector2, w));
+
     #endregion
 
     private CustomRpcSender Write(Action<MessageWriter> action)

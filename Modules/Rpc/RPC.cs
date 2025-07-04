@@ -110,6 +110,7 @@ public enum CustomRPC : byte // 175/255 USED
     DictatorRPC,
     Necronomicon,
     ExorcistExorcise,
+    Invisibility,
 
     //FFA
     SyncFFAPlayer,
@@ -622,9 +623,9 @@ internal class RPCHandlerPatch
             case CustomRPC.RetributionistRevenge:
                 Retributionist.ReceiveRPC_Custom(reader, __instance);
                 break;
-            case CustomRPC.SetChameleonTimer:
+            /*case CustomRPC.SetChameleonTimer:
                 Chameleon.ReceiveRPC_Custom(reader);
-                break;
+                break;*/
             case CustomRPC.SetAlchemistTimer:
                 Alchemist.ReceiveRPC(reader);
                 break;
@@ -684,6 +685,12 @@ internal class RPCHandlerPatch
                 var gtarget = reader.ReadNetObject<PlayerControl>();
                 gtarget.ShowFailedMurder();
                 break;
+            case CustomRPC.Invisibility:
+                {
+                    if (reader.ReadBoolean()) __instance.MakeInvisible();
+                    else __instance.MakeVisible();
+                    break;
+                }
         }
     }
 

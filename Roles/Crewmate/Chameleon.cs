@@ -19,15 +19,17 @@ internal class Chameleon : RoleBase
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Chameleon);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
     private static OptionItem ChameleonCooldown;
     private static OptionItem ChameleonDuration;
     private static OptionItem UseLimitOpt;
 
-    private static readonly Dictionary<byte, int> ventedId = [];
-    private static readonly Dictionary<byte, long> InvisCooldown = [];
-    private static readonly Dictionary<byte, long> InvisDuration = [];
+    //private static readonly Dictionary<byte, int> ventedId = [];
+    //private static readonly Dictionary<byte, long> InvisCooldown = [];
+    //private static readonly Dictionary<byte, long> InvisDuration = [];
+    private static bool IsInvis;
 
     public override void SetupCustomOption()
     {
@@ -44,15 +46,13 @@ internal class Chameleon : RoleBase
     }
     public override void Init()
     {
-        InvisCooldown.Clear();
-        InvisDuration.Clear();
-        ventedId.Clear();
+        IsInvis = false;
     }
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(UseLimitOpt.GetInt());
     }
-    public static void SendRPC(PlayerControl pc)
+    /*public static void SendRPC(PlayerControl pc)
     {
         if (!pc.IsNonHostModdedClient()) return;
         var cooldown = (InvisCooldown.TryGetValue(pc.PlayerId, out var y) ? y : -1).ToString();
@@ -70,14 +70,38 @@ internal class Chameleon : RoleBase
         long invis = long.Parse(reader.ReadString());
         if (cooldown > 0) InvisCooldown.Add(playerId, cooldown);
         if (invis > 0) InvisDuration.Add(playerId, invis);
-    }
+    }*/
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.EngineerCooldown = ChameleonCooldown.GetFloat() + 1f;
         AURoleOptions.EngineerInVentMaxTime = 1f;
     }
-
-    private static bool CanGoInvis(byte id)
+    public override void OnReportDeadBody(PlayerControl y, NetworkedPlayerInfo x)
+    {
+        IsInvis = false;       
+    }
+    public override void OnEnterVent(PlayerControl player, Vent vent)
+    {
+        if (IsInvis) return;
+        IsInvis = true;
+        player.RpcMakeInvisible();
+        _ = new LateTask(() =>
+        {
+            player.Notify(GetString("SwooperInvisStateCountdown"), 5f);
+        }, ChameleonDuration.GetFloat() - 10f);
+        _ = new LateTask(() =>
+        {
+            player.Notify(GetString("SwooperInvisStateCountdownn"), 5f);
+        }, ChameleonDuration.GetFloat() - 5f);
+        _ = new LateTask(() =>
+        {
+            player.RpcResetAbilityCooldown();
+            player.Notify(GetString("SwooperInvisStateOut"), 5f);
+            player.RpcMakeVisible();
+            IsInvis = false;
+        }, ChameleonDuration.GetFloat());
+    }
+    /*private static bool CanGoInvis(byte id)
         => GameStates.IsInTask && !InvisDuration.ContainsKey(id) && !InvisCooldown.ContainsKey(id);
 
     private static bool IsInvis(byte id) => InvisDuration.ContainsKey(id);
@@ -238,10 +262,10 @@ internal class Chameleon : RoleBase
         if (!IsInvis(killer.PlayerId)) return true;
         target?.MyPhysics?.RpcBootFromVent(ventedId.TryGetValue(target.PlayerId, out var id) ? id : Main.LastEnteredVent[target.PlayerId].Id);
         return true;
-    }
+    }*/
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
-        hud.AbilityButton.OverrideText(GetString(IsInvis(PlayerControl.LocalPlayer.PlayerId) ? "ChameleonRevertDisguise" : "ChameleonDisguise"));
+        hud.AbilityButton.OverrideText(GetString("ChameleonDisguise"));
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("invisible");
