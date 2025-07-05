@@ -546,6 +546,7 @@ static class ExtendedPlayerControl
         }
         else if (forceAnime || !player.IsModded())
         {
+            player.SyncSettings();
             if (player.AmOwner)
             {
                 time = (Main.AllPlayerKillCooldown[player.PlayerId] /= 2);

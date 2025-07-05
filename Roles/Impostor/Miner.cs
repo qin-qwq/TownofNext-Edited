@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using TOHE.Modules;
+using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
 
@@ -31,15 +32,9 @@ internal class Miner : RoleBase
     {
         hud.AbilityButton.OverrideText(GetString("MinerTeleButtonText"));
     }
-
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
-        if (Main.LastEnteredVent.ContainsKey(shapeshifter.PlayerId))
-        {
-            var lastVentPosition = Main.LastEnteredVentLocation[shapeshifter.PlayerId];
-            Logger.Info($"Miner - {shapeshifter.GetNameWithRole()}:{lastVentPosition}", "MinerTeleport");
-            shapeshifter.RpcTeleport(lastVentPosition);
-            shapeshifter.RPCPlayCustomSound("Teleport");
-        }
+        Vector2 closestVentPosition = player.GetClosestVent().transform.position;
+        player.RpcTeleport(closestVentPosition);
     }
 }

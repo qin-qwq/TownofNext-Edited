@@ -1,5 +1,6 @@
 using Hazel;
 using InnerNet;
+using System.Xml;
 
 namespace TOHE.Modules.Rpc
 {
@@ -453,6 +454,27 @@ namespace TOHE.Modules.Rpc
         private readonly bool fixSabo;
         private readonly byte potionId;
         private readonly string invisTime;
+    }
+    class RpcSetArchaeologist : BaseModdedRpc
+    {
+        public override byte RpcType => (byte)CustomRPC.SetArchaeologist;
+        public RpcSetArchaeologist(uint netId, bool fixSabo, byte AntiqueID, byte RevivedPlayerId) : base(netId)
+        {
+            this.fixSabo = fixSabo;
+            this.AntiqueID = AntiqueID;
+            this.RevivedPlayerId = RevivedPlayerId;
+        }
+
+        public override void SerializeRpcValues(MessageWriter msg)
+        {
+            msg.Write(fixSabo);
+            msg.Write(AntiqueID);
+            msg.Write(RevivedPlayerId);
+        }
+
+        private readonly bool fixSabo;
+        private readonly byte AntiqueID;
+        private readonly byte RevivedPlayerId;
     }
     class RpcUndertakerLocationSync : BaseModdedRpc
     {

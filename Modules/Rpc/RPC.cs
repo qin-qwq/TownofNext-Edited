@@ -92,6 +92,7 @@ public enum CustomRPC : byte // 175/255 USED
     SetInspectorLimit,
     KeeperRPC,
     SetAlchemistTimer,
+    SetArchaeologist,
     UndertakerLocationSync,
     LightningSetGhostPlayer,
     SetConsigliere,
@@ -628,6 +629,9 @@ internal class RPCHandlerPatch
                 break;*/
             case CustomRPC.SetAlchemistTimer:
                 Alchemist.ReceiveRPC(reader);
+                break;
+            case CustomRPC.SetArchaeologist:
+                Archaeologist.ReceiveRPC(reader);
                 break;
             case CustomRPC.SetConsigliere:
                 Consigliere.ReceiveRPC(reader);

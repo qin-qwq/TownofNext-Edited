@@ -30,7 +30,7 @@ internal partial class Pyrophoric : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Pyrophoric);
+        SetupSingleRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Pyrophoric, 1);
         PyrophoricSkillCooldown = FloatOptionItem.Create(Id + 10, "PyrophoricSkillCooldown", new(5f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pyrophoric])
             .SetValueFormat(OptionFormat.Seconds);
         PyrophoricVision = FloatOptionItem.Create(Id + 11, "PyrophoricVision", new(0f, 5f, 0.25f), 2.0f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pyrophoric])
