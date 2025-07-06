@@ -366,6 +366,10 @@ public static class CustomRoleManager
                         Bait.BaitAfterDeathTasks(trueDMKiller, target); // Use trueDMKiller to any roles that needs the Dollmaster to be the killer!
                         break;
 
+                    case CustomRoles.BloodSpatter when !inMeeting && !fromRole:
+                        BloodSpatter.BloodSpatterAfterDeathTasks(trueDMKiller, target); // Use trueDMKiller to any roles that needs the Dollmaster to be the killer!
+                        break;
+                        
                     case CustomRoles.Trapper when !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
                         killer.TrapperKilled(target);
                         break;

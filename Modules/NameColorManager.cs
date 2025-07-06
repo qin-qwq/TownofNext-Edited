@@ -94,6 +94,10 @@ public static class NameColorManager
 
         if (target.Is(CustomRoles.Mare) && Utils.IsActive(SystemTypes.Electrical) && !isMeeting) color = Main.roleColors[CustomRoles.Mare];
 
+        if (target.Is(CustomRoles.Fury) && Fury.PlayerToAngry.Contains(target.PlayerId) && !isMeeting) color = Main.roleColors[CustomRoles.Fury];
+
+        if (BloodSpatter.PlayerBloodSpatter.Contains(target.PlayerId) && !isMeeting) color = "b40000";
+
         //Virus
         if (Virus.KnowRoleColor(seer, target) != "") color = Virus.KnowRoleColor(seer, target);
 

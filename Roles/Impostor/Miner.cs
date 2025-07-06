@@ -32,6 +32,7 @@ internal class Miner : RoleBase
     {
         hud.AbilityButton.OverrideText(GetString("MinerTeleButtonText"));
     }
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Retreat");
     public override void UnShapeShiftButton(PlayerControl player)
     {
         Vector2 closestVentPosition = player.GetClosestVent().transform.position;

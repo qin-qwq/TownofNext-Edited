@@ -74,9 +74,6 @@ internal class SchrodingersCat : RoleBase
         target.ResetKillCooldown();
         target.SetKillCooldown(forceAnime: true);
 
-        Utils.NotifyRoles(SpecifySeer: killer, SpecifyTarget: target, ForceLoop: true);
-        Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
-
         killer.SetKillCooldown();
 
         return false;

@@ -23,8 +23,10 @@ internal class Fury : RoleBase
     private static OptionItem AngryDuration;
     private static OptionItem AngryKillCooldown;
     private static OptionItem AngrySpeed;
+    private static OptionItem ShowRedNameWhenAngry;
 
     private static bool Angry;
+    public static readonly HashSet<byte> PlayerToAngry = [];
 
     public override void SetupCustomOption()
     {
@@ -39,11 +41,13 @@ internal class Fury : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         AngrySpeed = FloatOptionItem.Create(Id + 14, "AngrySpeed", new(0f, 3f, 0.25f), 2.5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Multiplier);
+        ShowRedNameWhenAngry = BooleanOptionItem.Create(Id + 15, "ShowRedNameWhenAngry", true, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury]);
     }
 
     public override void Init()
     {
         Angry = false;
+        PlayerToAngry.Clear();
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
@@ -54,6 +58,11 @@ internal class Fury : RoleBase
     {
         if (Angry) return;
         Angry = true;
+        if (ShowRedNameWhenAngry.GetBool())
+        {
+            PlayerToAngry.Add(player.PlayerId);
+            Utils.NotifyRoles(SpecifyTarget: player);
+        }
         AURoleOptions.ShapeshifterCooldown = AngryDuration.GetFloat();
         player.SetKillCooldown(AngryKillCooldown.GetFloat());
         foreach (var target in Main.AllPlayerControls)
@@ -71,6 +80,11 @@ internal class Fury : RoleBase
         _ = new LateTask(() =>
         {
             Angry = false;
+            if (ShowRedNameWhenAngry.GetBool())
+            {
+                PlayerToAngry.Remove(player.PlayerId);
+                if (!GameStates.IsMeeting) Utils.NotifyRoles(SpecifyTarget: player);
+            }
             Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed;
             Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKillCooldown;
             player.RpcResetAbilityCooldown();
