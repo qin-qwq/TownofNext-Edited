@@ -1076,7 +1076,7 @@ public static class Utils
 
         if (AmongUsClient.Instance.NetworkMode != NetworkModes.OnlineGame)
         {
-            name = "Local Games";
+            name = "本地";
             return name;
         }
 
