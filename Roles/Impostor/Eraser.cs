@@ -97,6 +97,7 @@ internal class Eraser : RoleBase
             player.ResetKillCooldown();
             player.SetKillCooldown();
             Logger.Info($"{player.GetNameWithRole()} Erase by Eraser", "Eraser");
+            PlayerToErase.Clear();
         }
         Utils.MarkEveryoneDirtySettings();
     }
