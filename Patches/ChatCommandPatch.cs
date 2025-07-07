@@ -23,10 +23,10 @@ namespace TOHE;
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
 internal class ChatCommands
 {
-    private static readonly string modLogFiles = @"./TOHE-DATA/ModLogs.txt";
-    private static readonly string modTagsFiles = @"./TOHE-DATA/Tags/MOD_TAGS";
-    private static readonly string sponsorTagsFiles = @"./TOHE-DATA/Tags/SPONSOR_TAGS";
-    private static readonly string vipTagsFiles = @"./TOHE-DATA/Tags/VIP_TAGS";
+    private static readonly string modLogFiles = @"./TONE-DATA/ModLogs.txt";
+    private static readonly string modTagsFiles = @"./TONE-DATA/Tags/MOD_TAGS";
+    private static readonly string sponsorTagsFiles = @"./TONE-DATA/Tags/SPONSOR_TAGS";
+    private static readonly string vipTagsFiles = @"./TONE-DATA/Tags/VIP_TAGS";
 
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];

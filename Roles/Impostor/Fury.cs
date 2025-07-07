@@ -26,7 +26,7 @@ internal class Fury : RoleBase
     private static OptionItem ShowRedNameWhenAngry;
 
     private static bool Angry;
-    public static readonly HashSet<byte> PlayerToAngry = [];
+    public static readonly List<byte> PlayerToAngry = [];
 
     public override void SetupCustomOption()
     {

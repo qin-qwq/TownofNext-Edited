@@ -10,7 +10,7 @@ public class BloodSpatter : IAddon
 
     public static OptionItem BloodSpatterDuration;
 
-    public static readonly HashSet<byte> PlayerBloodSpatter = [];
+    public static readonly List<byte> PlayerBloodSpatter = [];
 
     public void SetupCustomOption()
     {

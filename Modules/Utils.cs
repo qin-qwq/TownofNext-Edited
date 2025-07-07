@@ -1674,6 +1674,7 @@ public static class Utils
     public static System.Collections.IEnumerator NotifyEveryoneAsync(int speed = 2)
     {
         var count = 0;
+        if (GameStates.IsMeeting) yield break;
 
         PlayerControl[] aapc = Main.AllAlivePlayerControls;
 
@@ -1681,6 +1682,7 @@ public static class Utils
         {
             foreach (PlayerControl target in aapc)
             {
+                if (GameStates.IsMeeting) yield break;
                 NotifyRoles(SpecifySeer: seer, SpecifyTarget: target);
                 if (count++ % speed == 0) yield return null;
             }

@@ -1399,7 +1399,8 @@ static class ExtendedPlayerControl
 
     public static bool KnowDeadTeam(this PlayerControl seer, PlayerControl target)
         => (seer.Is(CustomRoles.Necroview))
-        && target.Data.IsDead;
+        && target.Data.IsDead
+        && !target.IsAlive();
 
     public static bool KnowLivingTeam(this PlayerControl seer, PlayerControl target)
         => (seer.Is(CustomRoles.Visionary))

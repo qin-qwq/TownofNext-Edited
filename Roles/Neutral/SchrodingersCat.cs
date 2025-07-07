@@ -12,62 +12,35 @@ internal class SchrodingersCat : RoleBase
     public override CustomRoles Role => CustomRoles.SchrodingersCat;
     private const int Id = 6900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.SchrodingersCat);
-    public override bool IsDesyncRole => true;
+    //public override bool IsDesyncRole => true;
     public override bool IsExperimental => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
+    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
     //==================================================================\\
-
-    public static readonly Dictionary<byte, byte> teammate = [];
 
     public override void SetupCustomOption()
     {
         Options.SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.SchrodingersCat);
     }
 
-    /*public override void Init()
-    {
-        teammate.Clear();
-    }
-
-    public override void Add(byte playerId)
-    {
-        teammate[playerId] = byte.MaxValue;
-    }
-
-    private void SendRPC(byte catID)
-    {
-        var writer = MessageWriter.Get(SendOption.Reliable);
-        writer.Write(catID);
-        writer.Write(teammate[catID]);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
-    }
-    public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
-    {
-        byte catID = reader.ReadByte();
-        byte teammateID = reader.ReadByte();
-        teammate[catID] = teammateID;
-    }
-    public override string GetProgressText(byte catID, bool computervirus) => Utils.ColorString(Utils.GetRoleColor(CustomRoles.SchrodingersCat).ShadeColor(0.25f), $"({(teammate.TryGetValue(catID, out var value) ? (value != byte.MaxValue ? "0" : "1") : "0")})");*/
-
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
         if (killer.Is(CustomRoles.Taskinator)) return true;
-        //if (teammate[target.PlayerId] != byte.MaxValue) return true;
-
-        //teammate[target.PlayerId] = killer.PlayerId;
-        //SendRPC(target.PlayerId);
 
         killer.RpcGuardAndKill(target);
         target.RpcGuardAndKill();
 
         CustomRoles role = killer.GetCustomRole();
 
+        var sender = CustomRpcSender.Create("SchrodingersCat.OnCheckMurderAsTarget", SendOption.Reliable);
+
         target.GetRoleClass()?.OnRemove(target.PlayerId);
         target.RpcChangeRoleBasis(role);
         target.RpcSetCustomRole(role);
         target.GetRoleClass()?.OnAdd(target.PlayerId);
         if (killer.Is(CustomRoles.Narc)) target.RpcSetCustomRole(CustomRoles.Narc);
+
+        sender.SendMessage();
 
         target.Notify(string.Format(GetString("RevenantTargeted"), Utils.GetRoleName(role)));
 
@@ -79,54 +52,10 @@ internal class SchrodingersCat : RoleBase
         return false;
     }
 
-    public override void ApplyGameOptions(IGameOptions opt, byte babuyaga) => opt.SetVision(false);
-    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = 300f;
+    //public override void ApplyGameOptions(IGameOptions opt, byte babuyaga) => opt.SetVision(false);
+    //public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = 300f;
 
-    public override bool CanUseKillButton(PlayerControl pc) => false;
-    public override bool CanUseSabotage(PlayerControl pc) => false;
-    public override bool CanUseImpostorVentButton(PlayerControl pc) => false;
-
-    /*public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
-    {
-        if (seer != target && seer.IsAlive() && teammate.ContainsKey(seer.PlayerId) && teammate.ContainsValue(target.PlayerId))
-        {
-            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.SchrodingersCat), " ☜");
-        }
-        else if (seer != target && !seer.IsAlive() && teammate.ContainsValue(target.PlayerId))
-        {
-            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.SchrodingersCat), " ☜");
-        }
-        return string.Empty;
-    }
-
-    public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target)
-    {
-        if (teammate.TryGetValue(seer.PlayerId, out var temmate) && target.PlayerId == temmate)
-        {
-            if (target.IsPlayerCrewmateTeam()) return Main.roleColors[CustomRoles.CrewmateTOHE];
-            else return Main.roleColors[target.GetCustomRole()];
-        }
-        return string.Empty;
-    }
-    public override bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target)
-    {
-        if (teammate.TryGetValue(target.PlayerId, out var killer) && killer == seer.PlayerId)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public static void SchrodingerWinCondition(PlayerControl pc)
-    {
-        if (!HasEnabled) return;
-        if (pc == null) return;
-        if (!pc.Is(CustomRoles.SchrodingersCat)) return;
-        if (!teammate.ContainsKey(pc.PlayerId) || teammate[pc.PlayerId] == byte.MaxValue) return;
-        if (CustomWinnerHolder.WinnerIds.Contains(teammate[pc.PlayerId]) || Main.PlayerStates.TryGetValue(teammate[pc.PlayerId], out var ps) && CustomWinnerHolder.WinnerRoles.Contains(ps.MainRole))
-        {
-            CustomWinnerHolder.WinnerIds.Add(pc.PlayerId);
-            CustomWinnerHolder.AdditionalWinnerTeams.Add(AdditionalWinners.SchrodingersCat);
-        }
-    }*/
+    //public override bool CanUseKillButton(PlayerControl pc) => false;
+    //public override bool CanUseSabotage(PlayerControl pc) => false;
+    //public override bool CanUseImpostorVentButton(PlayerControl pc) => false;
 }

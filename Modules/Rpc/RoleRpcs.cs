@@ -831,7 +831,7 @@ namespace TOHE.Modules.Rpc
     class RpcGuess : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.Guess;
-        public RpcGuess(uint netId, byte playerId, CustomRoles role) : base(netId)
+        public RpcGuess(uint netId, int playerId, CustomRoles role) : base(netId)
         {
             this.playerId = playerId;
             this.role = role;
@@ -843,7 +843,7 @@ namespace TOHE.Modules.Rpc
             msg.WritePacked((int)role);
         }
 
-        private readonly byte playerId;
+        private readonly int playerId;
         private readonly CustomRoles role;
     }
 }

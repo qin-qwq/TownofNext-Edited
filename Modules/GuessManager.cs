@@ -108,49 +108,6 @@ public static class GuessManager
         Logger.Msg(msg, "Msg Guesser");
         Logger.Msg($"{operate}", "Operate");
 
-        if (!pc.IsAlive())
-        {
-            pc.ShowInfoMessage(isUI, GetString("GuessDead"));
-            return true;
-        }
-        if (!pc.Is(CustomRoles.NiceGuesser))
-        {
-            if (pc.GetCustomRole().IsCrewmate() && !Options.CrewmatesCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Judge))
-            {
-                pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
-                return true;
-            }
-        }
-        if (!pc.Is(CustomRoles.EvilGuesser))
-        {
-            if ((pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !Options.ImpostorsCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Councillor))
-            {
-                pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
-                return true;
-            }
-        }
-
-        if (pc.GetCustomRole().IsNK() && !Options.NeutralKillersCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser))
-        {
-            pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
-            return true;
-        }
-        if (pc.GetCustomRole().IsNonNK() && !Options.PassiveNeutralsCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Doomsayer))
-        {
-            pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
-            return true;
-        }
-        if (pc.GetCustomRole().IsNA() && !Options.NeutralApocalypseCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser))
-        {
-            pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
-            return true;
-        }
-        if (pc.GetCustomRole().IsCoven() && !Options.CovenCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser))
-        {
-            pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
-            return true;
-        }
-
         if (operate == 1)
         {
             Utils.SendMessage(GetFormatString(), pc.PlayerId);
@@ -184,6 +141,49 @@ public static class GuessManager
             Logger.Msg($" {pc.PlayerId}", "Guesser - pc.PlayerId");
             Logger.Msg($" {target.PlayerId}", "Guesser - target.PlayerId");
             Logger.Msg($" {role}", "Guesser - role");
+
+            if (!pc.IsAlive())
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessDead"));
+                return true;
+            }
+            if (!pc.Is(CustomRoles.NiceGuesser))
+            {
+                if (pc.GetCustomRole().IsCrewmate() && !Options.CrewmatesCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Judge))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
+                    return true;
+                }
+            }
+            if (!pc.Is(CustomRoles.EvilGuesser))
+            {
+                if ((pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !Options.ImpostorsCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Councillor))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
+                    return true;
+                }
+            }
+
+            if (pc.GetCustomRole().IsNK() && !Options.NeutralKillersCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser))
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
+                return true;
+            }
+            if (pc.GetCustomRole().IsNonNK() && !Options.PassiveNeutralsCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Doomsayer))
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
+                return true;
+            }
+            if (pc.GetCustomRole().IsNA() && !Options.NeutralApocalypseCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser))
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
+                return true;
+            }
+            if (pc.GetCustomRole().IsCoven() && !Options.CovenCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser))
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessNotAllowed"));
+                return true;
+            }
 
             if (target != null)
             {
@@ -652,6 +652,8 @@ public static class GuessManager
                 if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetCustomRole().IsNonNK() && Options.PassiveNeutralsCanGuess.GetBool())
                     CreateGuesserButton(__instance);
                 if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetCustomRole().IsCoven() && Options.CovenCanGuess.GetBool())
+                    CreateGuesserButton(__instance);
+                if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.Is(CustomRoles.Guesser))
                     CreateGuesserButton(__instance);
                 else if (PlayerControl.LocalPlayer.GetCustomRole() is CustomRoles.Doomsayer && !Options.PassiveNeutralsCanGuess.GetBool() && !Doomsayer.CheckCantGuess)
                     CreateGuesserButton(__instance);
@@ -1127,7 +1129,7 @@ public static class GuessManager
     }
 
     // Modded non-host client guess role/add-on
-    private static void SendRPC(byte playerId, CustomRoles role)
+    private static void SendRPC(int playerId, CustomRoles role)
     {
         var msg = new RpcGuess(PlayerControl.LocalPlayer.NetId, playerId, role);
         RpcUtils.LateBroadcastReliableMessage(msg);
