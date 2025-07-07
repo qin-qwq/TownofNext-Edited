@@ -221,6 +221,7 @@ public class Main : BasePlugin
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static MapNames CurrentMap => (MapNames)NormalOptions.MapId;
     public static readonly HashSet<byte> Invisible = [];
+    public static Dictionary<byte, string> OriginalPets = new Dictionary<byte, string>();
 
 
     public static PlayerControl[] AllPlayerControls

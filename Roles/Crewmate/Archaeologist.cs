@@ -183,11 +183,11 @@ internal class Archaeologist : RoleBase
                 player.RpcMakeInvisible();
                 _ = new LateTask(() =>
                 {
-                    player.Notify(GetString("SwooperInvisStateCountdown"), 5f);
+                    player.Notify(GetString("SwooperInvisStateCountdown"), 3f);
                 }, InvisDuration.GetFloat() - 10f);
                 _ = new LateTask(() =>
                 {
-                    player.Notify(GetString("SwooperInvisStateCountdownn"), 5f);
+                    player.Notify(GetString("SwooperInvisStateCountdownn"), 3f);
                 }, InvisDuration.GetFloat() - 5f);
                 _ = new LateTask(() =>
                 {

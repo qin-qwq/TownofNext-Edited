@@ -50,7 +50,7 @@ internal class Ninja : RoleBase
         var targetId = MarkedPlayer.ContainsKey(playerId) ? MarkedPlayer[playerId] : byte.MaxValue;
         var msg = new RpcSetMarkedPlayer(PlayerControl.LocalPlayer.NetId, playerId, targetId);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void ReceiveRPC(MessageReader reader)
     {
@@ -94,6 +94,9 @@ internal class Ninja : RoleBase
     }
     public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
+        // Ninja not marked player
+        if (!MarkedPlayer.ContainsKey(shapeshifter.PlayerId)) return;
+
         // Check and kill marked player
         if (MarkedPlayer.TryGetValue(shapeshifter.PlayerId, out var targetId))
         {
@@ -114,21 +117,13 @@ internal class Ninja : RoleBase
                     shapeshifter.ResetKillCooldown();
                     shapeshifter.RpcMurderPlayer(marketTarget);
 
-                    Logger.Info("Was kill market target", "Ninja");
                     _ = new LateTask(() =>
                     {
-                        shapeshifter.Notify(GetString("SwooperInvisStateCountdown"), 5f);
-                    }, ShapeshiftDurationOpt.GetFloat() - 10f);
-                    _ = new LateTask(() =>
-                    {
-                        shapeshifter.Notify(GetString("SwooperInvisStateCountdownn"), 5f);
-                    }, ShapeshiftDurationOpt.GetFloat() - 5f);
-                    _ = new LateTask(() =>
-                    {
-                        shapeshifter.RpcResetAbilityCooldown();
-                        shapeshifter.Notify(GetString("SwooperInvisStateOut"), 5f);
+                        shapeshifter.Notify(GetString("SwooperInvisStateOut"));
                         shapeshifter.RpcMakeVisible();
                     }, ShapeshiftDurationOpt.GetFloat());
+
+                    Logger.Info("Was kill market target", "Ninja");
                 }
             }
             else
@@ -146,7 +141,7 @@ internal class Ninja : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerid)
     {
         if (!Shapeshifting(playerid))
-            hud.KillButton.OverrideText(GetString("NinjaMarkButtonText"));
+            hud.KillButton.OverrideText(GetString("MarkButtonText"));
         else
             hud.KillButton.OverrideText(GetString("KillButtonText"));
 

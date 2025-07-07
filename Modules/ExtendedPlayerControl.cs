@@ -1716,6 +1716,10 @@ static class ExtendedPlayerControl
     {
         if (!Main.Invisible.Add(player.PlayerId)) return;
         if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (!Main.OriginalPets.ContainsKey(player.PlayerId))
+        {
+            Main.OriginalPets[player.PlayerId] = player.CurrentOutfit.PetId;
+        }
         player.RpcSetPet("");
 
         if (!phantom)
@@ -1751,6 +1755,11 @@ static class ExtendedPlayerControl
     {
         if (!Main.Invisible.Remove(player.PlayerId)) return;
         if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (Main.OriginalPets.TryGetValue(player.PlayerId, out string originalPetId))
+        {
+            player.RpcSetPet(originalPetId);
+            Main.OriginalPets.Remove(player.PlayerId);
+        }
 
         if (!phantom)
         {

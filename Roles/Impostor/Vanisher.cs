@@ -51,11 +51,11 @@ internal class Vanisher : RoleBase
                 target.Notify(GetString("VanisherMakeYouInvisible"));
                 _ = new LateTask(() =>
                 {
-                    target.Notify(GetString("SwooperInvisStateCountdown"), 5f);
+                    target.Notify(GetString("SwooperInvisStateCountdown"), 3f);
                 }, VanisherSSDuration.GetFloat() - 10f);
                 _ = new LateTask(() =>
                 {
-                    target.Notify(GetString("SwooperInvisStateCountdownn"), 5f);
+                    target.Notify(GetString("SwooperInvisStateCountdownn"), 3f);
                 }, VanisherSSDuration.GetFloat() - 5f);
                 _ = new LateTask(() =>
                 {
@@ -65,7 +65,6 @@ internal class Vanisher : RoleBase
             _ = new LateTask(() =>
             {
                 target.RpcMakeVisible();
-                shapeshifter.RpcResetAbilityCooldown();
             }, VanisherSSDuration.GetFloat());
         }
         if (ShowShapeshiftAnimationsOpt.GetBool()) return true;
