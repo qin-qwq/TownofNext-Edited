@@ -486,7 +486,7 @@ public static class GuessManager
                 meetingHud.CheckForEndVoting();
             }
             _ = new LateTask(() => hudManager.SetHudActive(false), 0.3f, "SetHudActive in GuesserMurderPlayer", shoudLog: false);
-            var msg = new RpcGuessKill(pc.NetId, pc.PlayerId);
+            var msg = new RpcGuessKill(PlayerControl.LocalPlayer.NetId, pc.PlayerId);
             RpcUtils.LateBroadcastReliableMessage(msg);
 
             GameEndCheckerForNormal.ShouldNotCheck = false;
@@ -1131,8 +1131,10 @@ public static class GuessManager
     // Modded non-host client guess role/add-on
     private static void SendRPC(int playerId, CustomRoles role)
     {
-        var msg = new RpcGuess(PlayerControl.LocalPlayer.NetId, playerId, role);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (int)CustomRPC.Guess, SendOption.Reliable, -1);
+        writer.Write(playerId);
+        writer.Write((int)role);
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
     public static void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
