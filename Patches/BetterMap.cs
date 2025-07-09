@@ -16,19 +16,25 @@ public class MapBehaviourPatch
     public static void ShowNormalMapPostfix(MapBehaviour __instance)
     {
         InitializeCustomHerePoints(__instance);
-        var player = PlayerControl.LocalPlayer;
-        var role = player.GetCustomRole();
-        var color = Utils.GetRoleColor(role);
-        __instance.ColorControl.SetColor(color);
+        if (Options.CurrentGameMode == CustomGameMode.Standard)
+        {
+            var player = PlayerControl.LocalPlayer;
+            var role = player.GetCustomRole();
+            var color = Utils.GetRoleColor(role);
+            __instance.ColorControl.SetColor(color);
+        }
     }
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap)), HarmonyPostfix]
     public static void ShowSabotageMapPostfix(MapBehaviour __instance)
     {
         InitializeCustomHerePoints(__instance);
-        var player = PlayerControl.LocalPlayer;
-        var role = player.GetCustomRole();
-        var color = Utils.GetRoleColor(role);
-        __instance.ColorControl.SetColor(color);
+        if (Options.CurrentGameMode == CustomGameMode.Standard)
+        {
+            var player = PlayerControl.LocalPlayer;
+            var role = player.GetCustomRole();
+            var color = Utils.GetRoleColor(role);
+            __instance.ColorControl.SetColor(color);
+        }
     }
 
     public static void InitializeCustomHerePoints(MapBehaviour __instance)

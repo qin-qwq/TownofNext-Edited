@@ -370,6 +370,10 @@ public static class CustomRoleManager
                         BloodSpatter.BloodSpatterAfterDeathTasks(trueDMKiller, target); // Use trueDMKiller to any roles that needs the Dollmaster to be the killer!
                         break;
                         
+                    case CustomRoles.Randomizer when !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
+                        Randomizer.RandomizerKilled(killer, target);
+                        break;
+
                     case CustomRoles.Trapper when !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
                         killer.TrapperKilled(target);
                         break;

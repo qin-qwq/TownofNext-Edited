@@ -7,7 +7,6 @@ namespace TOHE;
 public static class OptionsMenuBehaviourStartPatch
 {
     private static ClientOptionItem UnlockFPS;
-    private static ClientOptionItem ShowFPS;
     private static ClientOptionItem EnableGM;
     private static ClientOptionItem AutoStart;
     private static ClientOptionItem DarkTheme;
@@ -50,10 +49,6 @@ public static class OptionsMenuBehaviourStartPatch
                 Application.targetFrameRate = Main.UnlockFPS.Value ? 165 : 60;
                 Logger.SendInGame(string.Format(Translator.GetString("FPSSetTo"), Application.targetFrameRate));
             }
-        }
-        if (ShowFPS == null || ShowFPS.ToggleButton == null)
-        {
-            ShowFPS = ClientOptionItem.Create("ShowFPS", Main.ShowFPS, __instance);
         }
         if (EnableGM == null || EnableGM.ToggleButton == null)
         {

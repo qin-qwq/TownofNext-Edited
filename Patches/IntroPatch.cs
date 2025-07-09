@@ -207,7 +207,6 @@ class SetUpRoleTextPatch
         sb.Append("------------Client Options------------\n");
         sb.Append($"Game Master: {Main.EnableGM.Value}\n");
         sb.Append($"UnlockFPS: {Main.UnlockFPS.Value}\n");
-        sb.Append($"Show FPS: {Main.ShowFPS.Value}\n");
         sb.Append($"Auto Start: {Main.AutoStart.Value}\n");
         sb.Append($"Dark Theme: {Main.DarkTheme.Value}\n");
         sb.Append($"Disable Lobby Music: {Main.DisableLobbyMusic.Value}\n");

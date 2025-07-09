@@ -4047,5 +4047,12 @@
   "Talented": "天才",
   "TalentedInfo": "何罪之有",
   "TalentedInfoLong": "(船员阵营):\n天才每完成一个任务，都会获得一个有益的附加职业",
-  "OnlyCanGetEnabledAddons": "只能获得启用的附加职业"
+  "OnlyCanGetEnabledAddons": "只能获得启用的附加职业",
+  "CommandInvalidID": "你指定了一个无效的ID",
+  "CommandAddHost": "你不能将自己添加为协管",
+  "CommandDeleteHost": "你想要移除自己的协管？",
+  "PlayerAlreadyMod": "你选择的玩家已经是协管了",
+  "PlayerNotMod": "你选择的玩家还不是协管",
+  "PlayerJoinModList": "玩家成功加入协管名单",
+  "PlayerDeleteFromModList": "玩家成功移除协管名单"
 }

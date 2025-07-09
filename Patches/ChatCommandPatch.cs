@@ -27,6 +27,7 @@ internal class ChatCommands
     private static readonly string modTagsFiles = @"./TONE-DATA/Tags/MOD_TAGS";
     private static readonly string sponsorTagsFiles = @"./TONE-DATA/Tags/SPONSOR_TAGS";
     private static readonly string vipTagsFiles = @"./TONE-DATA/Tags/VIP_TAGS";
+    private static readonly string modFiles = @"./TONE-DATA/Moderators.txt";
 
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
@@ -1032,6 +1033,75 @@ internal class ChatCommands
                             Utils.NotifyRoles(ForceLoop: false, NoCache: true);
 
                         }, 0.2f, "Update NotifyRoles players after /kill");
+                    }
+                    break;
+
+                case "/addmod":
+                    canceled = true;
+                    subArgs = args.Length < 2 ? "" : args[1];
+                    if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte AddModPlayerId))
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    if (AddModPlayerId == 0)
+                    {
+                        Utils.SendMessage(GetString("CommandAddHost"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    var addModPlayerId = Utils.GetPlayerById(AddModPlayerId);
+                    if (addModPlayerId == null)
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (Utils.IsPlayerModerator(addModPlayerId.FriendCode))
+                    {
+                        Utils.SendMessage(GetString("PlayerAlreadyMod"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (addModPlayerId != null)
+                    {
+                        string moderatorFriendCode10 = addModPlayerId.FriendCode.ToString();
+                        string Message10 = $"{moderatorFriendCode10}";
+                        File.AppendAllText(modFiles, Message10);
+                        Utils.SendMessage(GetString("PlayerJoinModList"), PlayerControl.LocalPlayer.PlayerId);
+                    }
+                    break;
+
+                case "/deletemod":
+                    canceled = true;
+                    subArgs = args.Length < 2 ? "" : args[1];
+                    if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte DeleteModPlayerId))
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    if (DeleteModPlayerId == 0)
+                    {
+                        Utils.SendMessage(GetString("CommandDeleteHost"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    var deleteModPlayerId = Utils.GetPlayerById(DeleteModPlayerId);
+                    if (deleteModPlayerId == null)
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (!Utils.IsPlayerModerator(deleteModPlayerId.FriendCode))
+                    {
+                        Utils.SendMessage(GetString("PlayerNotMod"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (deleteModPlayerId != null)
+                    {
+                        string moderatorFriendCode11 = deleteModPlayerId.FriendCode.ToString();
+                        File.WriteAllLines(modFiles, File.ReadAllLines(modFiles).Where(x => !x.Contains(moderatorFriendCode11)));
+                        Utils.SendMessage(GetString("PlayerDeleteFromModList"), PlayerControl.LocalPlayer.PlayerId);
                     }
                     break;
 

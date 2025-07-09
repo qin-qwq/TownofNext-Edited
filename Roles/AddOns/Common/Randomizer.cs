@@ -36,16 +36,14 @@ public class Randomizer : IAddon
     { }
     public void Remove(byte playerId)
     { }
-    public static void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    public static void RandomizerKilled(PlayerControl killer, PlayerControl target)
     {
-        if (inMeeting || isSuicide) return;
-
         var Fg = IRandom.Instance;
         int Randomizer = Fg.Next(1, 5);
 
         if (Randomizer == 1)
         {
-            if (isSuicide)
+            if (killer.PlayerId == target.PlayerId)
             {
                 if (target.GetRealKiller() != null)
                 {
@@ -60,7 +58,7 @@ public class Randomizer : IAddon
                 || (killer.Is(CustomRoles.Oblivious) && Oblivious.ObliviousBaitImmune.GetBool()))
                 return;
 
-            if (!isSuicide || (target.GetRealKiller()?.GetCustomRole() is CustomRoles.Swooper or CustomRoles.Wraith) || !killer.Is(CustomRoles.KillingMachine) || !killer.Is(CustomRoles.Oblivious) || (killer.Is(CustomRoles.Oblivious) && !Oblivious.ObliviousBaitImmune.GetBool()))
+            if (killer.PlayerId != target.PlayerId || (target.GetRealKiller()?.GetCustomRole() is CustomRoles.Swooper or CustomRoles.Wraith) || !killer.Is(CustomRoles.KillingMachine) || !killer.Is(CustomRoles.Oblivious) || (killer.Is(CustomRoles.Oblivious) && !Oblivious.ObliviousBaitImmune.GetBool()))
             {
                 killer.RPCPlayCustomSound("Congrats");
                 target.RPCPlayCustomSound("Congrats");

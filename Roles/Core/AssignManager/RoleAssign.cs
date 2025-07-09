@@ -1036,6 +1036,52 @@ public class RoleAssign
             Logger.Warn("Role assignment warirng: There are players who have not been assigned a role", "RoleAssign");
         if (FinalRolesList.Any())
             Logger.Warn("Team assignment warirng: There is an unassigned team", "RoleAssign");
+        /*if (RoleResult.Values.Contains(CustomRoles.Sheriff))
+        {
+            // 随机选择添加职业
+            var rolesToAdd = new List<CustomRoles> { CustomRoles.Deputy };
+            var roleToAssign = rolesToAdd[IRandom.Instance.Next(0, rolesToAdd.Count)];
+        
+            // 获取所有白板
+            var vanillaCrewPlayers = Main.AllPlayerControls
+            .Where(p => RoleResult.TryGetValue(p.PlayerId, out var role) && 
+                        role == CustomRoles.CrewmateTOHE)
+            .ToList();
+        
+            if (vanillaCrewPlayers.Count > 0)
+            {
+                // 随机选择一个白板
+                var playerToReplace = vanillaCrewPlayers.RandomElement();
+                RoleResult[playerToReplace.PlayerId] = roleToAssign;
+            
+                Logger.Info($"将玩家 {playerToReplace.GetRealName()} 的职业替换为 {roleToAssign}", "RoleAssign");
+            }
+            else
+            {
+                // 如果没有白板，尝试替换船员阵营职业
+                var replaceablePlayers = Main.AllPlayerControls
+                    .Where(p => RoleResult.TryGetValue(p.PlayerId, out var role) && 
+                                !role.IsImpostor() && 
+                                !role.IsNK() && 
+                                !role.IsNA() && 
+                                !role.IsCoven() &&
+                                role != CustomRoles.Sheriff)
+                    .ToList();
+            
+                if (replaceablePlayers.Count > 0)
+                {
+                    var playerToReplace = replaceablePlayers.RandomElement();
+                    var originalRole = RoleResult[playerToReplace.PlayerId];
+                    RoleResult[playerToReplace.PlayerId] = roleToAssign;
+                
+                    Logger.Info($"无白板，将玩家 {playerToReplace.GetRealName()} 的职业从 {originalRole} 替换为 {roleToAssign}", "RoleAssign");
+                }
+                else
+                {
+                    Logger.Warn("没有找到合适的替换玩家", "RoleAssign");
+                }
+            }
+        }*/
         return;
 
         RoleAssignInfo GetAssignInfo(CustomRoles role) => Roles.Values.FirstOrDefault(x => x.Any(y => y.Role == role))?.FirstOrDefault(x => x.Role == role);

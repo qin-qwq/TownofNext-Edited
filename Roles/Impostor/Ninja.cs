@@ -3,6 +3,7 @@ using Hazel;
 using System.Text;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Double;
 using UnityEngine;
 using static TOHE.Options;
@@ -115,7 +116,15 @@ internal class Ninja : RoleBase
                     shapeshifter.RpcMakeInvisible();
                     shapeshifter.RpcTeleport(marketTarget.GetCustomPosition());
                     shapeshifter.ResetKillCooldown();
-                    shapeshifter.RpcMurderPlayer(marketTarget);
+                    marketTarget.RpcMurderPlayer(marketTarget);
+                    marketTarget.SetRealKiller(shapeshifter);
+                    if (marketTarget.Is(CustomRoles.Bait) && GameStates.IsInTask)
+                    {
+                        _ = new LateTask(() =>
+                        {
+                            shapeshifter.CmdReportDeadBody(marketTarget.Data);
+                        }, Bait.BaitDelayMax.GetFloat(), "Bait Self Report");
+                    }
 
                     _ = new LateTask(() =>
                     {

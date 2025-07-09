@@ -53,8 +53,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.1.3"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.2.0 Beta 3";
+    public const string PluginVersion = "1.2.0"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.2.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 4, 15, 0) // 2025.3.25 & 16.0.0
@@ -62,8 +62,8 @@ public class Main : BasePlugin
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V2.3.0 Alpha 9
-    public static readonly bool canaryRelease = true; // Latest: V1.2.0 Beta 3
-    public static readonly bool fullRelease = false; // Latest: V1.2.0
+    public static readonly bool canaryRelease = false; // Latest: V1.2.0 Beta 3
+    public static readonly bool fullRelease = true; // Latest: V1.2.0
 
     public static bool hasAccess = true;
 
@@ -99,7 +99,6 @@ public class Main : BasePlugin
     public static ConfigEntry<int> MessageWait { get; private set; }
 
     public static ConfigEntry<bool> UnlockFPS { get; private set; }
-    public static ConfigEntry<bool> ShowFPS { get; private set; }
     public static ConfigEntry<bool> EnableGM { get; private set; }
     public static ConfigEntry<bool> AutoStart { get; private set; }
     public static ConfigEntry<bool> DarkTheme { get; private set; }
@@ -540,12 +539,11 @@ public class Main : BasePlugin
         Instance = this;
 
         //Client Options
-        HideName = Config.Bind("Client Options", "Hide Game Code Name", "TOHE");
+        HideName = Config.Bind("Client Options", "Hide Game Code Name", "TONE");
         HideColor = Config.Bind("Client Options", "Hide Game Code Color", $"{ModColor}");
         DebugKeyInput = Config.Bind("Authentication", "Debug Key", "");
 
         UnlockFPS = Config.Bind("Client Options", "UnlockFPS", false);
-        ShowFPS = Config.Bind("Client Options", "ShowFPS", false);
         EnableGM = Config.Bind("Client Options", "EnableGM", false);
         AutoStart = Config.Bind("Client Options", "AutoStart", false);
         DarkTheme = Config.Bind("Client Options", "DarkTheme", false);
