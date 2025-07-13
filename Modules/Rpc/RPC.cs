@@ -610,7 +610,7 @@ internal class RPCHandlerPatch
                 President.ReceiveRPC(reader, __instance, isEnd: false);
                 break;
             case CustomRPC.GodfatherEnd:
-                President.ReceiveRPC(reader, __instance);
+                Godfather.ReceiveRPC(reader, __instance);
                 break;
             case CustomRPC.CouncillorJudge:
                 Councillor.ReceiveRPC_Custom(reader, __instance);
@@ -834,13 +834,14 @@ internal static class RPC
         var message = new RpcSyncAllPlayerNames(PlayerControl.LocalPlayer.NetId);
         RpcUtils.LateBroadcastReliableMessage(message);
     }
+    /*
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        var msg = new RpcShowPopUp(pc.NetId, message, title);
+        var msg = new RpcShowPopUp(PlayerControl.LocalPlayer.NetId, message, title);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }
-    /*
+    */
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -849,7 +850,6 @@ internal static class RPC
         writer.Write(title);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
-    */
     public static void RpcSetFriendCode(string fc)
     {
         var msg = new RpcSetFriendCode(PlayerControl.LocalPlayer.NetId, fc);

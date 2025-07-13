@@ -155,6 +155,7 @@ internal class Judge : RoleBase
                 if (pc.GetAbilityUseLimit() < 1)
                 {
                     pc.ShowInfoMessage(isUI, GetString("JudgeTrialMaxGameMsg"));
+                    return true;
                 }
                 if (target.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target.PlayerId].Count > 0)
                 {

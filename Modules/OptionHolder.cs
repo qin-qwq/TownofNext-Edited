@@ -555,6 +555,7 @@ public static class Options
     public static OptionItem HideGuesserCommands;
     public static OptionItem ShowOnlyEnabledRolesInGuesserUI;
     public static OptionItem CanOnlyGuessEnabled;
+    public static OptionItem CantGuessDuringDiscussionTime;
     public static OptionItem UseQuickChatSpamCheat;
 
 
@@ -1443,7 +1444,13 @@ public static class Options
 
         CanOnlyGuessEnabled = BooleanOptionItem.Create(60696, "CanOnlyGuessEnabled", true, TabGroup.ModSettings, false)
             .SetHeader(true)
-            .SetGameMode(CustomGameMode.Standard);
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(Color.cyan);
+
+        CantGuessDuringDiscussionTime = BooleanOptionItem.Create(60697, "CantGuessDuringDiscussionTime", true, TabGroup.ModSettings, false)
+            .SetHeader(true)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(Color.cyan);
 
         //Maps Settings
         TextOptionItem.Create(10000025, "MenuTitle.MapsSettings", TabGroup.ModSettings)

@@ -20,6 +20,8 @@ internal class Deputy : RoleBase
     private static OptionItem HandcuffMax;
     private static OptionItem DeputyHandcuffCDForTarget;
     private static OptionItem HandcuffBrokenAfterMeeting;
+    private static OptionItem DeputyKnowSheriff;
+    public static OptionItem DeputyCanBecomeSheriff;
 
     private static readonly Dictionary<byte, List<byte>> RoleblockedPlayers = [];
 
@@ -33,6 +35,8 @@ internal class Deputy : RoleBase
         HandcuffMax = IntegerOptionItem.Create(Id + 12, "DeputyHandcuffMax", new(1, 30, 1), 15, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Deputy])
             .SetValueFormat(OptionFormat.Times);
         HandcuffBrokenAfterMeeting = BooleanOptionItem.Create(Id + 16, "HandcuffBrokenAfterMeeting", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Deputy]);
+        DeputyKnowSheriff = BooleanOptionItem.Create(Id + 17, "DeputyKnowSheriff", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Deputy]);
+        DeputyCanBecomeSheriff = BooleanOptionItem.Create(Id + 18, "DeputyCanBecomeSheriff", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Deputy]);
     }
     public override void Init()
     {
@@ -127,4 +131,15 @@ internal class Deputy : RoleBase
         hud.KillButton.OverrideText(GetString("DeputyHandcuffText"));
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Handcuff");
+
+    public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target)
+    {
+        if (seer.IsAnySubRole(x => x.IsConverted()) || target.IsAnySubRole(x => x.IsConverted()))
+            return false;
+        if (seer.Is(CustomRoles.Deputy) && target.Is(CustomRoles.Sheriff) && DeputyKnowSheriff.GetBool())
+            return true;
+        if (seer.Is(CustomRoles.Sheriff) && target.Is(CustomRoles.Deputy) && DeputyKnowSheriff.GetBool())
+            return true;
+        return false;
+    }
 }

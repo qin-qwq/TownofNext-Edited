@@ -1,4 +1,5 @@
 using static TOHE.Options;
+using static TOHE.Translator;
 
 namespace TOHE.Roles.AddOns.Common;
 
@@ -41,6 +42,7 @@ public class BloodSpatter : IAddon
 
         if (killer.PlayerId == target.PlayerId) return;
 
+        killer.Notify(GetString("YouKillBloodSpatter"), BloodSpatterDuration.GetFloat());
         PlayerBloodSpatter.Add(killer.PlayerId);
         Utils.NotifyRoles(SpecifyTarget: killer);
 

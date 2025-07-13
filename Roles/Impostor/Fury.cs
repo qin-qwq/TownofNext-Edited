@@ -25,7 +25,6 @@ internal class Fury : RoleBase
     private static OptionItem AngrySpeed;
     private static OptionItem ShowRedNameWhenAngry;
 
-    private static bool Angry;
     public static readonly List<byte> PlayerToAngry = [];
 
     public override void SetupCustomOption()
@@ -46,7 +45,6 @@ internal class Fury : RoleBase
 
     public override void Init()
     {
-        Angry = false;
         PlayerToAngry.Clear();
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -56,8 +54,7 @@ internal class Fury : RoleBase
 
     public override void UnShapeShiftButton(PlayerControl player)
     {
-        if (Angry) return;
-        Angry = true;
+        if (PlayerToAngry.Contains(player.PlayerId)) return;
         if (ShowRedNameWhenAngry.GetBool())
         {
             PlayerToAngry.Add(player.PlayerId);
@@ -79,7 +76,6 @@ internal class Fury : RoleBase
 
         _ = new LateTask(() =>
         {
-            Angry = false;
             if (ShowRedNameWhenAngry.GetBool())
             {
                 PlayerToAngry.Remove(player.PlayerId);
@@ -91,10 +87,6 @@ internal class Fury : RoleBase
             player.Notify(GetString("FuryInCalm"), 5f);
             player.MarkDirtySettings();
         }, AngryDuration.GetFloat());
-    }
-    public override void OnReportDeadBody(PlayerControl player, NetworkedPlayerInfo deadBody)
-    {
-        Angry = false;
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

@@ -147,6 +147,11 @@ public static class GuessManager
                 pc.ShowInfoMessage(isUI, GetString("GuessDead"));
                 return true;
             }
+            if (Options.CantGuessDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessDuringDiscussion"));
+                return true;
+            }
             if (!pc.Is(CustomRoles.NiceGuesser))
             {
                 if (pc.GetCustomRole().IsCrewmate() && !Options.CrewmatesCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Judge))

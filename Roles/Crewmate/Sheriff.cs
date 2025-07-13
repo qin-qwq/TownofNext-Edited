@@ -170,16 +170,28 @@ internal class Sheriff : RoleBase
             }
         };
     }
-    /*public override void AfterMeetingTasks()
-    {
-        _ = new LateTask(() =>
-        {
-            _Player.SetKillCooldown(forceAnime: true);
-        }, 5f, "Sheriff ResetKillCooldown");
-    }*/
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.KillButton.OverrideText(GetString("SheriffKillButtonText"));
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("CoPKill");
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (lowLoad) return;
+        if (player.IsAlive()) return;
+        if (!Deputy.DeputyCanBecomeSheriff.GetBool()) return;
+
+        DeputyBecomeSheriff();
+    }
+    public void DeputyBecomeSheriff()
+    {
+        foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Deputy)))
+        {
+            target.GetRoleClass()?.OnRemove(target.PlayerId);
+            target.RpcSetCustomRole(CustomRoles.Sheriff);
+            target.GetRoleClass()?.OnAdd(target.PlayerId);
+            target.ResetKillCooldown();
+            target.SetKillCooldown(forceAnime: true);
+        }
+    }
 }

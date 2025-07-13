@@ -253,8 +253,9 @@ public static class Utils
         }
         else if (player.IsNonHostModdedClient())
         {
-            var msg = new RpcKillFlash(PlayerControl.LocalPlayer.NetId, playKillSound);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.KillFlash, SendOption.Reliable, player.GetClientId());
+            writer.Write(playKillSound);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
         else if (!ReactorCheck) player.ReactorFlash(0f); //Reactor flash for vanilla
         player.MarkDirtySettings();
