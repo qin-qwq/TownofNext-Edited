@@ -53,16 +53,16 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.2.1"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.3.0 Beta 1";
+    public const string PluginVersion = "1.2.2"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.3.0 Alpha 2";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 4, 15, 0) // 2025.3.25 & 16.0.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V2.3.0 Alpha 9
-    public static readonly bool canaryRelease = true; // Latest: V1.3.0 Beta 1
+    public static readonly bool devRelease = true; // Latest: V1.3.0 Alpha 2
+    public static readonly bool canaryRelease = false; // Latest: V1.3.0 Beta 2
     public static readonly bool fullRelease = false; // Latest: V1.2.0
 
     public static bool hasAccess = true;
@@ -220,7 +220,6 @@ public class Main : BasePlugin
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static MapNames CurrentMap => (MapNames)NormalOptions.MapId;
     public static readonly HashSet<byte> Invisible = [];
-    public static Dictionary<byte, string> OriginalPets = new Dictionary<byte, string>();
 
 
     public static PlayerControl[] AllPlayerControls
@@ -986,7 +985,6 @@ public enum CustomRoles
     Aware,
     Bait,
     Bewilder,
-    BloodSpatter,
     Bloodthirst,
     Burst,
     Charmed,
