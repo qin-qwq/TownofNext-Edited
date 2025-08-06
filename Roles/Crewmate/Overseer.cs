@@ -30,7 +30,6 @@ internal class Overseer : RoleBase
 
     private static OptionItem OverseerCooldown;
     private static OptionItem OverseerRevealTime;
-    private static OptionItem Vision;
 
     //private static byte CurrentRevealTarget = byte.MaxValue;
 
@@ -83,8 +82,6 @@ internal class Overseer : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         OverseerRevealTime = FloatOptionItem.Create(Id + 11, "OverseerRevealTime", new(0f, 60f, 1f), 10f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Overseer])
             .SetValueFormat(OptionFormat.Seconds);
-        Vision = FloatOptionItem.Create(Id + 12, "OverseerVision", new(0f, 5f, 0.05f), 0.25f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Overseer])
-            .SetValueFormat(OptionFormat.Multiplier);
     }
     public override void Init()
     {
@@ -155,12 +152,7 @@ internal class Overseer : RoleBase
     }
 
     public static string GetRandomRole(byte playerId) => RandomRole[playerId];
-    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
-    {
-        opt.SetVision(false);
-        opt.SetFloat(FloatOptionNames.CrewLightMod, Vision.GetFloat());
-        opt.SetFloat(FloatOptionNames.ImpostorLightMod, Vision.GetFloat());
-    }
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(false);
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = OverseerCooldown.GetFloat();
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {

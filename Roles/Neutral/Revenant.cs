@@ -27,8 +27,8 @@ internal class Revenant : RoleBase
         killer.SetRealKiller(target);
 
         target.GetRoleClass()?.OnRemove(target.PlayerId);
-        target.RpcChangeRoleBasis(role);
         target.RpcSetCustomRole(role);
+        target.RpcSetRoleDesync(role.GetRoleTypes(), target.GetClientId());
         target.GetRoleClass()?.OnAdd(target.PlayerId);
         if (killer.Is(CustomRoles.Narc)) target.RpcSetCustomRole(CustomRoles.Narc);
 

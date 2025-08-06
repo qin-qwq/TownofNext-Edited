@@ -10,11 +10,11 @@ namespace TOHE;
 
 public static class BanManager
 {
-    private const string DenyNameListPath = "./TONE-DATA/DenyName.txt";
-    private const string BanListPath = "./TONE-DATA/BanList.txt";
-    private const string ModeratorListPath = "./TONE-DATA/Moderators.txt";
-    private const string VIPListPath = "./TONE-DATA/VIP-List.txt";
-    private const string WhiteListListPath = "./TONE-DATA/WhiteList.txt";
+    private static readonly string DenyNameListPath = @$"{Main.TONE_Initial_Path}/DenyName.txt";
+    private static readonly string BanListPath = @$"{Main.TONE_Initial_Path}/BanList.txt";
+    private static readonly string ModeratorListPath = @$"{Main.TONE_Initial_Path}/Moderators.txt";
+    private static readonly string VIPListPath = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
+    private static readonly string WhiteListListPath = @$"{Main.TONE_Initial_Path}/WhiteList.txt";
     //private static List<string> EACList = []; // Don't make it read-only
     public static List<string> TempBanWhiteList = []; //To prevent writing to ban list
     public static List<Dictionary<string, System.Text.Json.JsonElement>> EACDict = [];
@@ -22,7 +22,7 @@ public static class BanManager
     {
         try
         {
-            Directory.CreateDirectory("TONE-DATA");
+            Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
 
             if (!File.Exists(BanListPath))
             {
@@ -115,7 +115,7 @@ public static class BanManager
 
         try
         {
-            Directory.CreateDirectory("TONE-DATA");
+            Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
             if (!File.Exists(DenyNameListPath)) File.Create(DenyNameListPath).Close();
             using StreamReader sr = new(DenyNameListPath);
             string line;
@@ -198,7 +198,7 @@ public static class BanManager
 
         try
         {
-            Directory.CreateDirectory("TONE-DATA");
+            Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
             if (!File.Exists(BanListPath)) File.Create(BanListPath).Close();
             using StreamReader sr = new(BanListPath);
             string line;

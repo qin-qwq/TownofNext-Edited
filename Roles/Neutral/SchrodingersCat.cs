@@ -12,7 +12,6 @@ internal class SchrodingersCat : RoleBase
     public override CustomRoles Role => CustomRoles.SchrodingersCat;
     private const int Id = 6900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.SchrodingersCat);
-    public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
     //==================================================================\\
@@ -32,8 +31,8 @@ internal class SchrodingersCat : RoleBase
         CustomRoles role = killer.GetCustomRole();
 
         target.GetRoleClass()?.OnRemove(target.PlayerId);
-        target.RpcChangeRoleBasis(role);
         target.RpcSetCustomRole(role);
+        target.RpcSetRoleDesync(role.GetRoleTypes(), target.GetClientId());
         target.GetRoleClass()?.OnAdd(target.PlayerId);
         if (killer.Is(CustomRoles.Narc)) target.RpcSetCustomRole(CustomRoles.Narc);
 

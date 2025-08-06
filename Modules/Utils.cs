@@ -412,7 +412,7 @@ public static class Utils
         var playerId = player.PlayerId;
         var msg = new RpcSyncGeneralOptions(PlayerControl.LocalPlayer.NetId, playerId, player.GetCustomRole(), Main.PlayerStates[playerId].IsDead, Main.PlayerStates[playerId].Disconnected, Main.PlayerStates[playerId].deathReason, Main.AllPlayerKillCooldown[playerId], Main.AllPlayerSpeed[playerId]);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void SyncSpeed(this PlayerControl player)
     {
@@ -1030,6 +1030,17 @@ public static class Utils
             SendSpesificMessage(EndGamePatch.MainRoleLog, PlayerId);
         }
     }
+    public static string GetTeamMark(CustomRoles role, int sizePer)
+    {
+        string text = "　";
+        if (role.IsAdditionRole()) text = "<color=#ff9ace>Ⓐ</color>";
+        else if (role.IsImpostor()) text = "<color=#ff1919>Ⓘ</color>";
+        else if (role.IsCrewmate()) text = "<color=#8cffff>Ⓒ</color>";
+        else if (role.IsNeutral()) text = "<color=#7f8c8d>Ⓝ</color>";
+        else if (role.IsCoven()) text = "<color=#ac42f2>Ⓒ</color>";
+
+        return $"<size={sizePer}%>{text}</size>";
+    }
     public static void ShowLastResult(byte PlayerId = byte.MaxValue)
     {
         if (GameStates.IsInGame)
@@ -1361,14 +1372,14 @@ public static class Utils
     public static bool IsPlayerModerator(string friendCode)
     {
         if (friendCode == "") return false;
-        var friendCodesFilePath = @"./TONE-DATA/Moderators.txt";
+        var friendCodesFilePath = @$"{Main.TONE_Initial_Path}/Moderators.txt";
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
     public static bool IsPlayerVIP(string friendCode)
     {
         if (friendCode == "") return false;
-        var friendCodesFilePath = @"./TONE-DATA/VIP-List.txt";
+        var friendCodesFilePath = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
@@ -1491,7 +1502,7 @@ public static class Utils
         {
             if (IsPlayerVIP(player.FriendCode))
             {
-                string colorFilePath = @$"./TONE-DATA/Tags/VIP_TAGS/{player.FriendCode}.txt";
+                string colorFilePath = @$"{Main.TONE_Initial_Path}/Tags/VIP_TAGS/{player.FriendCode}.txt";
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -1535,7 +1546,7 @@ public static class Utils
         {
             if (IsPlayerModerator(player.FriendCode))
             {
-                string colorFilePath = @$"./TONE-DATA/Tags/MOD_TAGS/{player.FriendCode}.txt";
+                string colorFilePath = @$"{Main.TONE_Initial_Path}/Tags/MOD_TAGS/{player.FriendCode}.txt";
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -1643,7 +1654,7 @@ public static class Utils
 
         return false;
     }
-    public static IEnumerable<t> GetRoleBasesByType<t>() where t : RoleBase
+    public static IEnumerable<TRole> GetRoleBasesByType<TRole>() where TRole : RoleBase
     {
         try
         {
@@ -1652,7 +1663,7 @@ public static class Utils
             if (cache.Any())
             {
                 var Get = cache.Select(x => x.RoleClass);
-                return Get.OfType<t>().Any() ? Get.OfType<t>() : null;
+                return Get.OfType<TRole>().Any() ? Get.OfType<TRole>() : null;
             }
         }
         catch (Exception exx)
@@ -1675,7 +1686,6 @@ public static class Utils
     public static System.Collections.IEnumerator NotifyEveryoneAsync(int speed = 2)
     {
         var count = 0;
-        if (GameStates.IsMeeting) yield break;
 
         PlayerControl[] aapc = Main.AllAlivePlayerControls;
 
@@ -1683,7 +1693,6 @@ public static class Utils
         {
             foreach (PlayerControl target in aapc)
             {
-                if (GameStates.IsMeeting) yield break;
                 NotifyRoles(SpecifySeer: seer, SpecifyTarget: target);
                 if (count++ % speed == 0) yield return null;
             }
@@ -2076,7 +2085,7 @@ public static class Utils
                                     var GetTragetId = ColorString(GetRoleColor(seer.GetCustomRole()), target.PlayerId.ToString()) + " " + TargetPlayerName;
 
                                     //Crewmates
-                                    if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Swapper))
+                                    if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Lookout))
                                         TargetPlayerName = GetTragetId;
 
                                     else if (seer.Is(CustomRoles.NiceGuesser) && !Options.CrewmatesCanGuess.GetBool())
@@ -2300,6 +2309,7 @@ public static class Utils
         if (Antidote.IsEnable) Antidote.AfterMeetingTasks();
 
         AntiBlackout.AfterMeetingTasks();
+        RPC.SyncDeadPassedMeetingList();
 
         try
         {
@@ -2315,6 +2325,11 @@ public static class Utils
             foreach (var playerState in Main.PlayerStates.Values.ToArray())
             {
                 if (playerState.RoleClass == null) continue;
+                if (Balancer.Choose2)
+                {
+                    Balancer.BalancerAfterMeetingTasks();
+                    break;
+                }
 
                 playerState.RoleClass.AfterMeetingTasks();
                 playerState.RoleClass.HasVoted = false;
@@ -2351,7 +2366,6 @@ public static class Utils
         if (Options.AirshipVariableElectrical.GetBool())
             AirshipElectricalDoors.Initialize();
 
-        RPC.SyncDeadPassedMeetingList();
         DoorsReset.ResetDoors();
         CustomNetObject.AfterMeetingTasks();
 

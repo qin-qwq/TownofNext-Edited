@@ -1,5 +1,4 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
 using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
@@ -13,7 +12,6 @@ internal class Fury : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Fury;
     private const int Id = 32000;
-    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Fury);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
@@ -23,7 +21,6 @@ internal class Fury : RoleBase
     private static OptionItem AngryDuration;
     private static OptionItem AngryKillCooldown;
     private static OptionItem AngrySpeed;
-    private static OptionItem ShowRedNameWhenAngry;
 
     public static readonly List<byte> PlayerToAngry = [];
 
@@ -36,11 +33,10 @@ internal class Fury : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         AngryDuration = FloatOptionItem.Create(Id + 12, "AngryDuration", new(2.5f, 60f, 2.5f), 15f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
                 .SetValueFormat(OptionFormat.Seconds);
-        AngryKillCooldown = FloatOptionItem.Create(Id + 13, "AngryKillCooldown", new(0f, 120f, 2.5f), 2.5f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Fury])
+        AngryKillCooldown = FloatOptionItem.Create(Id + 13, "AngryKillCooldown", new(0f, 120f, 2.5f), 2.5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Seconds);
         AngrySpeed = FloatOptionItem.Create(Id + 14, "AngrySpeed", new(0f, 3f, 0.25f), 2.5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Multiplier);
-        ShowRedNameWhenAngry = BooleanOptionItem.Create(Id + 15, "ShowRedNameWhenAngry", true, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury]);
     }
 
     public override void Init()
@@ -55,18 +51,13 @@ internal class Fury : RoleBase
     public override void UnShapeShiftButton(PlayerControl player)
     {
         if (PlayerToAngry.Contains(player.PlayerId)) return;
-        if (ShowRedNameWhenAngry.GetBool())
-        {
-            PlayerToAngry.Add(player.PlayerId);
-            Utils.NotifyRoles(SpecifyTarget: player);
-        }
-        AURoleOptions.ShapeshifterCooldown = AngryDuration.GetFloat();
+        PlayerToAngry.Add(player.PlayerId);
         player.SetKillCooldown(AngryKillCooldown.GetFloat());
         foreach (var target in Main.AllPlayerControls)
         {
             target.KillFlash();
-            RPC.PlaySound(target.PlayerId, Sounds.ImpTransform);
-            target.Notify(GetString("SeerFuryInRage"), 5f);
+            RPC.PlaySoundRPC(Sounds.ImpTransform, target.PlayerId);
+            target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Fury), GetString("SeerFuryInRage")));
         }
         player.MarkDirtySettings();
         var tmpSpeed = Main.AllPlayerSpeed[player.PlayerId];
@@ -76,11 +67,7 @@ internal class Fury : RoleBase
 
         _ = new LateTask(() =>
         {
-            if (ShowRedNameWhenAngry.GetBool())
-            {
-                PlayerToAngry.Remove(player.PlayerId);
-                if (!GameStates.IsMeeting) Utils.NotifyRoles(SpecifyTarget: player);
-            }
+            PlayerToAngry.Remove(player.PlayerId);
             Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed;
             Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKillCooldown;
             player.RpcResetAbilityCooldown();

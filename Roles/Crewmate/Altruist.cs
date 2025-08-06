@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using Hazel;
+using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Roles.Core;
 
@@ -98,9 +99,9 @@ internal class Altruist : RoleBase
             deadPlayer.RpcTeleport(deadBodyObject.transform.position);
             deadPlayer.RpcRevive();
 
-            _Player.SetDeathReason(PlayerState.DeathReason.Sacrificed);
-            _Player.Data.IsDead = true;
             _Player.RpcExileV2();
+            _Player.SetRealKiller(_Player);
+            _Player.SetDeathReason(PlayerState.DeathReason.Sacrificed);
             Main.PlayerStates[_Player.PlayerId].SetDead();
 
             if (ImpostorsCanGetsAlert.GetBool() || NeutralKillersCanGetsAlert.GetBool())

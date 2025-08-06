@@ -488,5 +488,14 @@ namespace TOHE.Modules
             this.OwnerId = OwnerId;
         }
     }
+    internal sealed class Hole : CustomNetObject
+    {
+        internal Hole(Vector2 position, List<byte> visibleList, byte OwnerId)
+        {
+            if (!AmongUsClient.Instance.AmHost) return; // Spawning gets ignored for rift maker RPC, because it already does an rpc as Host
+            CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=72%><alpha=#00>█<alpha=#00>█<alpha=#00>█<#ab6421>█<#ab6421>█<#ab6421>█<#ab6421>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ab6421>█<#875222>█<#875222>█<#875222>█<#875222>█<#ab6421>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<alpha=#00>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><alpha=#00>█<#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ab6421>█<#875222>█<#875222>█<#875222>█<#875222>█<#ab6421>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<alpha=#00>█<#ab6421>█<#ab6421>█<#ab6421>█<#ab6421>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<br></color></line-height></font></size>", position);
+            this.OwnerId = OwnerId;
+        }
+    }
 
 }

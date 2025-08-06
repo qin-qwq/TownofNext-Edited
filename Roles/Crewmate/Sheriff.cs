@@ -124,6 +124,7 @@ internal class Sheriff : RoleBase
             if (killer.GetAbilityUseLimit() < 1)
             {
                 killer.SetKillCooldown();
+                return false;
             }
             return true;
         }
@@ -185,7 +186,7 @@ internal class Sheriff : RoleBase
     }
     public void DeputyBecomeSheriff()
     {
-        foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Deputy)))
+        foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Deputy) && !x.IsAnySubRole(x => x.IsConverted())))
         {
             target.GetRoleClass()?.OnRemove(target.PlayerId);
             target.RpcSetCustomRole(CustomRoles.Sheriff);

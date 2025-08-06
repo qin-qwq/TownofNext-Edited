@@ -148,10 +148,9 @@ internal class Jackal : RoleBase
 
         return false;
     }
-    private bool CanRecruit() => _Player?.GetAbilityUseLimit() > 0;
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        if (CanRecruit())
+        if (_Player.GetAbilityUseLimit() > 0)
             hud.KillButton?.OverrideText($"{GetString("GangsterButtonText")}");
         else
             hud.KillButton?.OverrideText($"{GetString("KillButtonText")}");
@@ -182,7 +181,7 @@ internal class Jackal : RoleBase
         if (target.Is(CustomRoles.Jackal)) return false;
         if (target.Is(addon) || target.Is(role)) return JackalCanKillSidekick.GetBool();
 
-        if (!CanRecruitSidekick.GetBool() || !CanRecruit())
+        if (!CanRecruitSidekick.GetBool() || killer.GetAbilityUseLimit() < 1)
         {
             Logger.Info("Jackal run out of recruits or Recruit disabled?", "Jackal");
             return true;

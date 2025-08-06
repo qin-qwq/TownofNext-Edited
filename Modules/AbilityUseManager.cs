@@ -1,5 +1,5 @@
+using Hazel;
 using System;
-using TOHE.Modules.Rpc;
 
 namespace TOHE.Modules;
 
@@ -42,8 +42,10 @@ public static class AbilityUseManager
         var player = playerId.GetPlayer();
         if (AmongUsClient.Instance.AmHost && player.IsNonHostModdedClient() && rpc)
         {
-            var message = new RpcSyncAbilityUseLimit(PlayerControl.LocalPlayer.NetId, playerId, limit);
-            RpcUtils.LateBroadcastReliableMessage(message);
+            var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncAbilityUseLimit, SendOption.Reliable);
+            writer.Write(playerId);
+            writer.Write(limit);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
 
         Utils.NotifyRoles(SpecifySeer: player, ForceLoop: false);

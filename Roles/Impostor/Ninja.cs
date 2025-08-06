@@ -3,7 +3,6 @@ using Hazel;
 using System.Text;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Double;
 using UnityEngine;
 using static TOHE.Options;
@@ -33,7 +32,7 @@ internal class Ninja : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         AssassinateCooldownOpt = FloatOptionItem.Create(Id + 11, "NinjaAssassinateCooldown", new(0f, 180f, 2.5f), 10f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Ninja])
             .SetValueFormat(OptionFormat.Seconds);
-        ShapeshiftDurationOpt = FloatOptionItem.Create(Id + 13, "SwooperDuration", new(0f, 180f, 2.5f), 5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Ninja])
+        ShapeshiftDurationOpt = FloatOptionItem.Create(Id + 13, GeneralOption.ShapeshifterBase_ShapeshiftDuration, new(0f, 180f, 2.5f), 5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Ninja])
             .SetValueFormat(OptionFormat.Seconds);
     }
     public override void Init()
@@ -71,6 +70,8 @@ internal class Ninja : RoleBase
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.ShapeshifterCooldown = AssassinateCooldownOpt.GetFloat();
+        AURoleOptions.ShapeshifterDuration = ShapeshiftDurationOpt.GetFloat();
+        AURoleOptions.ShapeshifterLeaveSkin = false;
     }
 
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
@@ -93,10 +94,27 @@ internal class Ninja : RoleBase
                 killer.RPCPlayCustomSound("Clothe");
             });
     }
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
     {
+        var selfShapeshift = shapeshifter.PlayerId == target.PlayerId;
+
+        // Not call code if is self revert shapeshift after meeting or when mushroom mixup was activated
+        if (selfShapeshift)
+        {
+            // When shapeshift duration is over
+            if (shouldAnimate && Shapeshifting(shapeshifter.PlayerId))
+            {
+                shouldAnimate = false;
+            }
+            return true;
+        }
+
         // Ninja not marked player
-        if (!MarkedPlayer.ContainsKey(shapeshifter.PlayerId)) return;
+        if (!MarkedPlayer.ContainsKey(shapeshifter.PlayerId))
+        {
+            resetCooldown = false;
+            return false;
+        }
 
         // Check and kill marked player
         if (MarkedPlayer.TryGetValue(shapeshifter.PlayerId, out var targetId))
@@ -113,31 +131,21 @@ internal class Ninja : RoleBase
                     if (marketTarget.inVent)
                         marketTarget.MyPhysics.RpcBootFromVent(Main.LastEnteredVent[marketTarget.PlayerId].Id);
 
-                    shapeshifter.RpcMakeInvisible();
                     shapeshifter.RpcTeleport(marketTarget.GetCustomPosition());
                     shapeshifter.ResetKillCooldown();
-                    marketTarget.RpcMurderPlayer(marketTarget);
-                    marketTarget.SetRealKiller(shapeshifter);
-                    if (marketTarget.Is(CustomRoles.Bait) && GameStates.IsInTask)
-                    {
-                        _ = new LateTask(() =>
-                        {
-                            shapeshifter.CmdReportDeadBody(marketTarget.Data);
-                        }, Bait.BaitDelayMax.GetFloat(), "Bait Self Report");
-                    }
-
-                    _ = new LateTask(() =>
-                    {
-                        shapeshifter.Notify(GetString("SwooperInvisStateOut"));
-                        shapeshifter.RpcMakeVisible();
-                    }, ShapeshiftDurationOpt.GetFloat());
+                    shapeshifter.RpcMurderPlayer(marketTarget);
+                    shouldAnimate = false;
 
                     Logger.Info("Was kill market target", "Ninja");
+
+                    return true;
                 }
             }
             else
                 shapeshifter.Notify(Utils.ColorString(Utils.GetRoleColor(shapeshifter.GetCustomRole()), GetString("TargetIsAlreadyDead")));
         }
+
+        return false;
     }
     public override string GetLowerText(PlayerControl witch, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {

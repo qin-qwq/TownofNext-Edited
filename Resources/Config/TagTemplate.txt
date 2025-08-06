@@ -1,10 +1,13 @@
 TagName: 
 TagColor: 
 // do not include #
+// 不需要包含#
 PermissionLevel: 
 // 0 = Purely Cosmetic, 1 = Like VIP, access to /color and /rn, 2 = Access to /warn, 3 = Access to /start, 4 = Access to /kick, 5 = Access to /ban
+// 0 = 装饰作用， 1 = 和VIP一样，可以使用/color和/rn， 2 = 可以使用/warn， 3 = 可以使用/start， 4 = 可以使用/kick， 5 = 可以使用/ban
 SayCommandAccess: 
 // Only give the permissions below to someone you are certain you trust
+// 仅将以下权限授予您信任的人
 EndCommandAccess: 
 ExecuteCommandAccess: 
 AssignGameMaster: 

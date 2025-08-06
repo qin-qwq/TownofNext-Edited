@@ -116,6 +116,12 @@ class CheckForEndVotingPatch
                     return true;
                 }
 
+                if (Balancer.Choose && !(pva.VotedFor == Balancer.Target1 || pva.VotedFor == Balancer.Target2) && pva.VotedFor < 254)
+                {
+                    __instance.UpdateButtons();
+                    __instance.RpcClearVoteDelay(pc.GetClientId());
+                    continue;
+                }
                 if (pva.DidVote && pva.VotedFor < 253 && pc.IsAlive())
                 {
                     var voteTarget = GetPlayerById(pva.VotedFor);
@@ -126,6 +132,7 @@ class CheckForEndVotingPatch
                         __instance.UpdateButtons();
                         __instance.RpcClearVoteDelay(pc.GetClientId());
                         Swapper.CheckSwapperTarget(pva.VotedFor);
+                        Balancer.CheckBalancerTarget(pva.VotedFor);
                         continue;
                     }
 
@@ -338,6 +345,14 @@ class CheckForEndVotingPatch
             List<Collector> CollectorCL = GetRoleBasesByType<Collector>()?.ToList();
             if (Collector.HasEnabled) CollectorCL?.Do(x => { x.CollectAmount(VotingData, __instance); });
 
+            if (Balancer.Choose && tie)
+            {
+                var exileIds = VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).Select(kvp => kvp.Key).ToArray();
+                foreach (var playerId in exileIds)
+                GetPlayerById(playerId).SetRealKiller(null);
+                TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);
+                exiledPlayer = null;
+            }
             if (Options.VoteMode.GetBool() && Options.WhenTie.GetBool() && tie)
             {
                 switch ((TieMode)Options.WhenTie.GetValue())
@@ -710,7 +725,11 @@ class CastVotePatch
                 return false;
             }
         }
-
+        if (Balancer.Choose && !(suspectPlayerId == Balancer.Target1 || suspectPlayerId == Balancer.Target2) && suspectPlayerId < 254)
+        {
+            __instance.RpcClearVoteDelay(voter.GetClientId());
+            return false;
+        }
 
         // Coven Leader Retraining
         if (CustomRoles.CovenLeader.RoleExist() && target == voter && CovenLeader.retrainPlayer.ContainsKey(voter.PlayerId))
@@ -784,6 +803,7 @@ class CastVotePatch
                 SendMessage(GetString("VoteDead"), srcPlayerId);
                 __instance.RpcClearVoteDelay(voter.GetClientId());
                 Swapper.CheckSwapperTarget(suspectPlayerId);
+                Balancer.CheckBalancerTarget(suspectPlayerId);
                 return false;
             }
 
@@ -791,7 +811,6 @@ class CastVotePatch
             if (!voter.GetRoleClass().HasVoted && voter.GetRoleClass().CheckVote(voter, target) == false)
             {
                 Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "CastVotePatch.RoleBase.CheckVote");
-                voter.GetRoleClass().HasVoted = true;
                 __instance.RpcClearVoteDelay(voter.GetClientId());
 
                 // Attempts to set thumbsdown color to the same as playerrole to signify player ability used on (only for modded client)

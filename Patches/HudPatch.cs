@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using System.Text;
 using TMPro;
 using TOHE.Roles.AddOns.Common;
@@ -432,5 +433,27 @@ class RepairSender
     public static string GetText()
     {
         return SystemType.ToString() + "(" + ((SystemTypes)SystemType).ToString() + ")\r\n" + amount;
+    }
+}
+[HarmonyPatch(typeof(ActionButton), nameof(ActionButton.SetFillUp))]
+internal static class ActionButtonSetFillUpPatch
+{
+    public static void Postfix(ActionButton __instance, [HarmonyArgument(0)] float timer)
+    {
+        if (__instance.isCoolingDown && timer is <= 90f and > 0f && !PlayerControl.LocalPlayer.shapeshifting)
+        {
+            RoleTypes roleType = PlayerControl.LocalPlayer.GetCustomRole().GetRoleTypes();
+
+            bool usingAbility = roleType switch
+            {
+                RoleTypes.Engineer => PlayerControl.LocalPlayer.inVent,
+                RoleTypes.Shapeshifter => PlayerControl.LocalPlayer.IsShifted(),
+                _ => false
+            };
+
+            Color color = usingAbility ? new Color32(255, 129, 166, 255) : Color.white;
+            __instance.cooldownTimerText.text = Utils.ColorString(color, Mathf.CeilToInt(timer).ToString());
+            __instance.cooldownTimerText.gameObject.SetActive(true);
+        }
     }
 }

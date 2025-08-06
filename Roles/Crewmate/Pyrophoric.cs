@@ -1,7 +1,6 @@
 using AmongUs.GameOptions;
 using UnityEngine;
 using TOHE.Modules;
-using TOHE.Roles.Core;
 using static TOHE.Options;
 using static TOHE.Translator;
 using TOHE.Roles.Double;
@@ -13,7 +12,6 @@ internal partial class Pyrophoric : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Pyrophoric;
     private const int Id = 31900;
-    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pyrophoric);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
@@ -30,7 +28,7 @@ internal partial class Pyrophoric : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Pyrophoric, 1);
+        SetupSingleRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Pyrophoric, 1, zeroOne: false);
         PyrophoricSkillCooldown = FloatOptionItem.Create(Id + 10, "PyrophoricSkillCooldown", new(5f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pyrophoric])
             .SetValueFormat(OptionFormat.Seconds);
         PyrophoricVision = FloatOptionItem.Create(Id + 11, "PyrophoricVision", new(0f, 5f, 0.25f), 2.0f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pyrophoric])

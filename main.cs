@@ -53,16 +53,16 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.2.2"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.3.0 Alpha 2";
+    public const string PluginVersion = "1.2.3"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.3.0 Beta 2";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 4, 15, 0) // 2025.3.25 & 16.0.0
+            (2025, 4, 15, 0) // 2025.4.15 & 16.0.5 & 16.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = true; // Latest: V1.3.0 Alpha 2
-    public static readonly bool canaryRelease = false; // Latest: V1.3.0 Beta 2
+    public static readonly bool devRelease = false; // Latest: V1.3.0 Alpha 3
+    public static readonly bool canaryRelease = true; // Latest: V1.3.0 Beta 2
     public static readonly bool fullRelease = false; // Latest: V1.2.0
 
     public static bool hasAccess = true;
@@ -147,7 +147,16 @@ public class Main : BasePlugin
     public static readonly Dictionary<byte, Color32> PlayerColors = [];
     public static readonly Dictionary<byte, PlayerState.DeathReason> AfterMeetingDeathPlayers = [];
     public static readonly Dictionary<CustomRoles, string> roleColors = [];
-    public const string LANGUAGE_FOLDER_NAME = "TONE-DATA/Language";
+
+    public const string TONE_DATA_FOLDER_NAME = "TONE-DATA";
+
+#if DEBUGANDROID || BETAANDROID || RELEASEANDROID
+    public static readonly string TONE_Initial_Path = @$"{Application.persistentDataPath}/{TONE_DATA_FOLDER_NAME}";
+        public static readonly string LANGUAGE_FOLDER_NAME = $"{TONE_Initial_Path}/Language";
+#else
+    public static readonly string TONE_Initial_Path = $"./{TONE_DATA_FOLDER_NAME}";
+    public static readonly string LANGUAGE_FOLDER_NAME = $"{TONE_DATA_FOLDER_NAME}/Language";
+#endif
 
     public static bool IsFixedCooldown => CustomRoles.Vampire.IsEnable() || CustomRoles.Poisoner.IsEnable();
     public static float RefixCooldownDelay = 0f;
@@ -206,8 +215,8 @@ public class Main : BasePlugin
         get
         {
             DateTime utcNow = DateTime.UtcNow;
-            DateTime t = new DateTime(utcNow.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
-            DateTime t2 = new DateTime(utcNow.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
+            DateTime t = new(utcNow.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
+            DateTime t2 = new(utcNow.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
             return utcNow >= t && utcNow <= t2;
         }
     }
@@ -418,10 +427,24 @@ public class Main : BasePlugin
         try
         {
             var RoleTypes = Assembly.GetAssembly(typeof(RoleBase))!
-                .GetTypes()
-                .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(RoleBase)));
+            .GetTypes()
+            .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(RoleBase)));
 
-            var roleInstances = RoleTypes.Select(x => (RoleBase)Activator.CreateInstance(x)).ToList();
+            var roleInstances = new List<RoleBase>();
+            foreach (var type in RoleTypes)
+            {
+                try
+                {
+                    if (Activator.CreateInstance(type) is RoleBase instance)
+                        roleInstances.Add(instance);
+                    else
+                        TOHE.Logger.Warn($"Failed to create instance of {type.Name}: Activator returned null", "LoadRoleClasses");
+                }
+                catch (Exception ex)
+                {
+                    TOHE.Logger.Error($"Failed to create instance of {type.Name}: {ex.Message}", "LoadRoleClasses");
+                }
+            }
 
             CustomRolesHelper.DuplicatedRoles = new Dictionary<CustomRoles, Type>
             {
@@ -520,7 +543,7 @@ public class Main : BasePlugin
         File.WriteAllText(@$"./{LANGUAGE_FOLDER_NAME}/export_RoleColor.dat", sb.ToString());
     }
 
-    private void InitializeFileHash()
+    private static void InitializeFileHash()
     {
         var file = Assembly.GetExecutingAssembly();
         using var stream = file.Location != null ? File.OpenRead(file.Location) : null;
@@ -800,9 +823,11 @@ public enum CustomRoles
     Alchemist,
     Altruist,
     Archaeologist,
+    Balancer,
     Bastion,
     Benefactor,
     Bodyguard,
+    Brave,
     Captain,
     Celebrity,
     Chameleon,

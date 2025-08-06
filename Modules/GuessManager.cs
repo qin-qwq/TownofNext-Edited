@@ -218,6 +218,7 @@ public static class GuessManager
                     pc.ShowInfoMessage(isUI, GetString("GuessDisabled"));
                     return true;
                 }
+                if (Balancer.Choose && !(target.PlayerId == Balancer.Target1 || target.PlayerId == Balancer.Target2)) return true;
                 if (Jailer.IsTarget(pc.PlayerId) && role != CustomRoles.Jailer)
                 {
                     pc.ShowInfoMessage(isUI, GetString("JailedCanOnlyGuessJailer"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
@@ -484,6 +485,7 @@ public static class GuessManager
                 meetingHud.ClearVote();
             }
             Swapper.CheckSwapperTarget(pc.PlayerId);
+            Balancer.CheckBalancerTarget(pc.PlayerId);
 
             // Prevent double check end voting
             if (meetingHud.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
@@ -572,7 +574,7 @@ public static class GuessManager
         PlayerControl target = Utils.GetPlayerById(id);
         if (target == null || target.Data.IsDead)
         {
-            error = GetString("GuessNull");
+            error = GetFormatString();
             role = new();
             return false;
         }

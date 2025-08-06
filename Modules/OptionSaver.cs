@@ -7,7 +7,7 @@ namespace TOHE.Modules;
 public static class OptionSaver
 {
     [Obfuscation(Exclude = true)]
-    private static readonly DirectoryInfo SaveDataDirectoryInfo = new("./TONE-DATA/SaveData/");
+    private static readonly DirectoryInfo SaveDataDirectoryInfo = new(@$"{Main.TONE_Initial_Path}/SaveData/");
     [Obfuscation(Exclude = true)]
     private static readonly FileInfo OptionSaverFileInfo = new($"{SaveDataDirectoryInfo.FullName}/Options.json");
 

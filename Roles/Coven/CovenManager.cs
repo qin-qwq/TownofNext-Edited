@@ -21,9 +21,16 @@ public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
         On,
         CovenPerRole
     }
+    [Obfuscation(Exclude = true)]
+    public enum SabotageOptionList
+    {
+        On,
+        CovenPerRole
+    }
 
     private static readonly Dictionary<CustomRoles, OptionItem> CovenImpVisOptions = [];
     private static readonly Dictionary<CustomRoles, OptionItem> CovenVentOptions = [];
+    private static readonly Dictionary<CustomRoles, OptionItem> CovenSabotageOptions = [];
 
     public static readonly Dictionary<byte, byte> necroVotes = [];
     public static void RunSetUpImpVisOptions(int Id)
@@ -42,6 +49,14 @@ public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
             Id++;
         }
     }
+    public static void RunSetUpSabotageOptions(int Id)
+    {
+        foreach (var cov in CustomRolesHelper.AllRoles.Where(x => x.IsCoven()).ToArray())
+        {
+            SetUpSabotageOption(cov, Id, true, CovenSabotageMode);
+            Id++;
+        }
+    }
     private static void SetUpImpVisOption(CustomRoles role, int Id, bool defaultValue = true, OptionItem parent = null)
     {
         var roleName = GetRoleName(role);
@@ -54,6 +69,13 @@ public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
         var roleName = GetRoleName(role);
         Dictionary<string, string> replacementDic = new() { { "%role%", ColorString(GetRoleColor(role), roleName) } };
         CovenVentOptions[role] = BooleanOptionItem.Create(Id, "%role%CanVent", defaultValue, TabGroup.CovenRoles, false).SetParent(parent);
+        CovenVentOptions[role].ReplacementDictionary = replacementDic;
+    }
+    private static void SetUpSabotageOption(CustomRoles role, int Id, bool defaultValue = true, OptionItem parent = null)
+    {
+        var roleName = GetRoleName(role);
+        Dictionary<string, string> replacementDic = new() { { "%role%", ColorString(GetRoleColor(role), roleName) } };
+        CovenVentOptions[role] = BooleanOptionItem.Create(Id, "%role%CanSabotage", defaultValue, TabGroup.CovenRoles, false).SetParent(parent);
         CovenVentOptions[role].ReplacementDictionary = replacementDic;
     }
     private static void SendRPC(byte playerId)
@@ -87,6 +109,18 @@ public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
         else
         {
             CovenVentOptions.TryGetValue(pc.GetCustomRole(), out var option);
+            return option.GetBool();
+        }
+    }
+    public override bool CanUseSabotage(PlayerControl pc)
+    {
+        if (!CovenCanSabotage.GetBool())
+            return false;
+        else if (CovenSabotageMode.GetValue() == 0)
+            return true;
+        else
+        {
+            CovenSabotageOptions.TryGetValue(pc.GetCustomRole(), out var option);
             return option.GetBool();
         }
     }

@@ -49,7 +49,7 @@ class PingTrackerUpdatePatch
             if (FPSGame < 20f) fpscolor = Color.red;
             else if (FPSGame < 40f) fpscolor = Color.yellow;
 
-            sb.Append($"\r\n").Append($"<color={pingcolor}>{ping} ms</size> <size=60%>Ping</size></color>  <color=#00a4ff>{((int)FPSGame).ToString()} <size=60%>FPS</size></color>  <color=#3aa675>{Utils.GetRegionName() + " <size=60%>Server</size></color>"}");
+            sb.Append($"\r\n").Append($"<color={pingcolor}>{ping} ms</size> <size=60%>Ping</size></color>  <color=#00a4ff>{((int)FPSGame).ToString()} <size=60%>FPS</size></color>  <color=#3aa675>{Utils.GetRegionName() + "</color>"}");
 
             if (!GameStates.IsModHost)
             {
@@ -134,18 +134,18 @@ class VersionShowerStartPatch
         Main.credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
         var buildtype = "";
 
-#if RELEASE
+#if RELEASEWINDOWS || RELEASEANDROID
             //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
             buildtype = "Release";
 #endif
 
-#if CANARY
-        Main.credentialsText += $"\r\n<color=#ffc0cb>Canary:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
+#if BETAWINDOWS || BETAANDROID
+        Main.credentialsText += $"\r\n<color=#ffc0cb>Beta:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
         //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
-        buildtype = "Canary";
+        buildtype = "Beta";
 #endif
 
-#if DEBUG
+#if DEBUGWINDOWS || DEBUGANDROID
         Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
         //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
         buildtype = "Debug";

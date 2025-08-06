@@ -23,11 +23,12 @@ namespace TOHE;
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
 internal class ChatCommands
 {
-    private static readonly string modLogFiles = @"./TONE-DATA/ModLogs.txt";
-    private static readonly string modTagsFiles = @"./TONE-DATA/Tags/MOD_TAGS";
-    private static readonly string sponsorTagsFiles = @"./TONE-DATA/Tags/SPONSOR_TAGS";
-    private static readonly string vipTagsFiles = @"./TONE-DATA/Tags/VIP_TAGS";
-    private static readonly string modFiles = @"./TONE-DATA/Moderators.txt";
+    private static readonly string modLogFiles = @$"{Main.TONE_Initial_Path}/ModLogs.txt";
+    private static readonly string modTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/MOD_TAGS";
+    private static readonly string sponsorTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/SPONSOR_TAGS";
+    private static readonly string vipTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/VIP_TAGS";
+    private static readonly string modFiles = @$"{Main.TONE_Initial_Path}/Moderators.txt";
+    private static readonly string vipFiles = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
 
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
@@ -270,8 +271,8 @@ internal class ChatCommands
                     Main.HideName.Value = args.Length > 1 ? args.Skip(1).Join(delimiter: " ") : Main.HideName.DefaultValue.ToString();
                     GameStartManagerPatch.GameStartManagerStartPatch.HideName.text =
                         ColorUtility.TryParseHtmlString(Main.HideColor.Value, out _)
-                            ? $"<color={Main.HideColor.Value}>{Main.HideName.Value}</color>"
-                            : $"<color={Main.ModColor}>{Main.HideName.Value}</color>";
+                            ? $"<color={Main.HideColor.Value}>TONE</color>"
+                            : $"<color={Main.ModColor}>TONE</color>";
                     break;
 
                 case "/level":
@@ -1102,6 +1103,75 @@ internal class ChatCommands
                         string moderatorFriendCode11 = deleteModPlayerId.FriendCode.ToString();
                         File.WriteAllLines(modFiles, File.ReadAllLines(modFiles).Where(x => !x.Contains(moderatorFriendCode11)));
                         Utils.SendMessage(GetString("PlayerDeleteFromModList"), PlayerControl.LocalPlayer.PlayerId);
+                    }
+                    break;
+
+                case "/addvip":
+                    canceled = true;
+                    subArgs = args.Length < 2 ? "" : args[1];
+                    if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte AddVipPlayerId))
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    if (AddVipPlayerId == 0)
+                    {
+                        Utils.SendMessage(GetString("CommandAddHost"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    var addVipPlayerId = Utils.GetPlayerById(AddVipPlayerId);
+                    if (addVipPlayerId == null)
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (Utils.IsPlayerVIP(addVipPlayerId.FriendCode))
+                    {
+                        Utils.SendMessage(GetString("PlayerAlreadyVip"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (addVipPlayerId != null)
+                    {
+                        string vipFriendCode10 = addVipPlayerId.FriendCode.ToString();
+                        string Message11 = $"{vipFriendCode10}";
+                        File.AppendAllText(vipFiles, Message11);
+                        Utils.SendMessage(GetString("PlayerJoinVipList"), PlayerControl.LocalPlayer.PlayerId);
+                    }
+                    break;
+
+                case "/deletevip":
+                    canceled = true;
+                    subArgs = args.Length < 2 ? "" : args[1];
+                    if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte DeleteVipPlayerId))
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    if (DeleteVipPlayerId == 0)
+                    {
+                        Utils.SendMessage(GetString("CommandDeleteHost"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    var deleteVipPlayerId = Utils.GetPlayerById(DeleteVipPlayerId);
+                    if (deleteVipPlayerId == null)
+                    {
+                        Utils.SendMessage(GetString("CommandInvalidID"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (!Utils.IsPlayerVIP(deleteVipPlayerId.FriendCode))
+                    {
+                        Utils.SendMessage(GetString("PlayerNotVip"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (deleteVipPlayerId != null)
+                    {
+                        string vipFriendCode11 = deleteVipPlayerId.FriendCode.ToString();
+                        File.WriteAllLines(vipFiles, File.ReadAllLines(vipFiles).Where(x => !x.Contains(vipFriendCode11)));
+                        Utils.SendMessage(GetString("PlayerDeleteFromVipList"), PlayerControl.LocalPlayer.PlayerId);
                     }
                     break;
 

@@ -10,7 +10,7 @@ namespace TOHE.Patches;
 public static class PhantomRolePatch
 {
     private static readonly Il2CppSystem.Collections.Generic.List<PlayerControl> InvisibilityList = new();
-    private static readonly Dictionary<byte, string> PetsList = [];
+    public static readonly Dictionary<byte, string> PetsList = [];
 
     /*
      *  InnerSloth is doing careless stuffs. They didnt put amModdedHost check in cmd check vanish appear
@@ -46,12 +46,41 @@ public static class PhantomRolePatch
     }
     // Called when Phantom press vanish button when visible
     [HarmonyPatch(nameof(PlayerControl.CheckVanish)), HarmonyPrefix]
-    private static void CheckVanish_Prefix(PlayerControl __instance)
+    private static bool CheckVanish_Prefix(PlayerControl __instance)
     {
-        if (!AmongUsClient.Instance.AmHost) return;
+        if (!AmongUsClient.Instance.AmHost) return true;
 
         var phantom = __instance;
         Logger.Info($"Player: {phantom.GetRealName()}", "CheckVanish");
+        var role = phantom.GetRoleClass();
+
+        if (role?.CheckVanish(phantom) == false)
+        {
+            if (phantom.AmOwner)
+            {
+                DestroyableSingleton<HudManager>.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
+                phantom.Data.Role.SetCooldown();
+                return false;
+            }
+
+            var sender = CustomRpcSender.Create($"Cancel vanish for {phantom.GetRealName()}", SendOption.Reliable);
+            sender.StartMessage(phantom.OwnerId);
+
+            sender.StartRpc(phantom.NetId, RpcCalls.SetRole)
+                .Write((ushort)RoleTypes.Phantom)
+                .Write(true)
+                .EndRpc();
+
+            sender.StartRpc(phantom.NetId, RpcCalls.ProtectPlayer)
+                .WriteNetObject(phantom)
+                .Write(0)
+                .EndRpc();
+
+            sender.EndMessage();
+            sender.SendMessage();
+
+            return false;
+        }
 
         foreach (var target in Main.AllPlayerControls)
         {
@@ -76,6 +105,7 @@ public static class PhantomRolePatch
             }, 1.2f, $"Set Phantom invisible {target.PlayerId}", shoudLog: false);
         }
         InvisibilityList.Add(phantom);
+        return true;
     }
     // Called when Phantom press appear button when is invisible
     [HarmonyPatch(nameof(PlayerControl.CheckAppear)), HarmonyPrefix]

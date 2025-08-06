@@ -642,21 +642,6 @@ namespace TOHE.Modules.Rpc
 
         private readonly byte playerId;
     }
-    class RpcGodfatherEnd : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.GodfatherEnd;
-        public RpcGodfatherEnd(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
     class RpcPresidentReveal : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.PresidentReveal;

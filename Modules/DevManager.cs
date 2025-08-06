@@ -18,7 +18,7 @@ public class DevUser(string code = "", string color = "null", string userType = 
     public bool HasTag() => Tag != "null";
     public string GetTag()
     {
-        string tagColorFilePath = @$"./TONE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
+        string tagColorFilePath = @$"{Main.TONE_Initial_Path}/Tags/SPONSOR_TAGS/{Code}.txt";
 
         if (Color == "null" || Color == string.Empty) return $"<size=1.2>{Tag}</size>\r\n";
         var startColor = Color.TrimStart('#');

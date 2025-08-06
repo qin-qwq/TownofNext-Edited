@@ -1,5 +1,4 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
 using static TOHE.Options;
 using static TOHE.Translator;
 using static TOHE.Utils;
@@ -11,7 +10,6 @@ internal class TimeAssassin : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.TimeAssassin;
     private const int Id = 32200;
-    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.TimeAssassin);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
@@ -35,7 +33,7 @@ internal class TimeAssassin : RoleBase
 
     public override void UnShapeShiftButton(PlayerControl player)
     {
-        foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin)))
+        foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin) && !x.Is(CustomRoles.GM)))
         {
             player.Notify(GetString("TimeStopStart"));
             Main.PlayerStates[target.PlayerId].IsBlackOut = true;

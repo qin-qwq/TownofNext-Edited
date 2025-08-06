@@ -109,9 +109,10 @@ public static class MainMenuManagerPatch
         splashArt.transform.position = new Vector3(0, 0f, 600f); //= new Vector3(0, 0.40f, 600f);
         var spriteRenderer = splashArt.AddComponent<SpriteRenderer>();
         string folder = "TOHE.Resources.Background.";
+        folder += "CurrentArtWinner";
         IRandom rand = IRandom.Instance;
-        if (rand.Next(0, 100) < 30) folder += "PrevArtWinner";
-        else folder += "CurrentArtWinner";
+        //if (rand.Next(0, 100) < 30) folder += "PrevArtWinner";
+        //else folder += "CurrentArtWinner";
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
         string[] fileNames = assembly.GetManifestResourceNames().Where(resourceName => resourceName.StartsWith(folder) && resourceName.EndsWith(".png")).ToArray();
         int choice = rand.Next(0, fileNames.Length);

@@ -70,6 +70,11 @@ public class MeetingTimeManager
 
         if (BonusMeetingTime >= 0)
             VotingTime += BonusMeetingTime; // Extended voting hours
+        if (Balancer.Choose)
+        {
+            DiscussionTime = 0;
+            VotingTime = Balancer.MeetingTime.GetInt();
+        }
         else
         {
             DiscussionTime += BonusMeetingTime; // Prioritize meeting time reduction

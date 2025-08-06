@@ -116,6 +116,7 @@ public class OptionShower : MonoBehaviour
                             mode = Utils.GetChance(Options.CustomAdtRoleSpawnRate[kvp.Key].GetFloat());
 
                         }
+                        sb.Append(Utils.GetTeamMark(kvp.Key, 85));
                         sb.Append($"{Utils.ColorString(Utils.GetRoleColor(kvp.Key), Utils.GetRoleName(kvp.Key))}: {mode}×{kvp.Key.GetCount()}\n");
                         count++;
 

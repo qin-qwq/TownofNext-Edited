@@ -6,7 +6,7 @@ namespace TOHE;
 
 public static class TagManager
 {
-    private static readonly string TAGS_FILE_PATH = "./TONE-DATA/Tags";
+    private static readonly string TAGS_FILE_PATH = @$"{Main.TONE_Initial_Path}/Tags";
 
     public static void Init()
     {
@@ -17,13 +17,13 @@ public static class TagManager
     {
         try
         {
-            if (!Directory.Exists(@"TONE-DATA/Tags")) Directory.CreateDirectory(@"TONE-DATA/Tags");
+            if (!Directory.Exists(TAGS_FILE_PATH)) Directory.CreateDirectory(TAGS_FILE_PATH);
             var defaultTagMsg = GetResourcesTxt($"TOHE.Resources.Config.TagTemplate.txt");
-            if (!File.Exists(@"./TONE-DATA/Tags/Tag_Template.txt")) // Default tag
+            if (!File.Exists(@$"{TAGS_FILE_PATH}/Tag_Template.txt")) // Default tag
             {
-                using FileStream fs = File.Create(@"./TONE-DATA/Tags/Tag_Template.txt");
+                using FileStream fs = File.Create(@$"{TAGS_FILE_PATH}/Tag_Template.txt");
             }
-            File.WriteAllText(@"./TONE-DATA/Tags/Tag_Template.txt", defaultTagMsg); // Overwriting default template
+            File.WriteAllText(@$"{TAGS_FILE_PATH}/Tag_Template.txt", defaultTagMsg); // Overwriting default template
         }
         catch (Exception ex)
         {

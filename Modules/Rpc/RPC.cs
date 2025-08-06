@@ -102,7 +102,6 @@ public enum CustomRPC : byte // 175/255 USED
     SetMarkedPlayer,
     PresidentEnd,
     PresidentReveal,
-    GodfatherEnd,
     SetInvestgatorLimit,
     SetOverseerRevealedPlayer,
     SetOverseerTimer,
@@ -160,7 +159,6 @@ internal class RPCHandlerPatch
         or CustomRPC.RetributionistRevenge
         or CustomRPC.Guess
         or CustomRPC.PresidentEnd
-        or CustomRPC.GodfatherEnd
         or CustomRPC.SetSwapperVotes
         or CustomRPC.DumpLog
         or CustomRPC.SetFriendCode
@@ -608,9 +606,6 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.PresidentReveal:
                 President.ReceiveRPC(reader, __instance, isEnd: false);
-                break;
-            case CustomRPC.GodfatherEnd:
-                Godfather.ReceiveRPC(reader, __instance);
                 break;
             case CustomRPC.CouncillorJudge:
                 Councillor.ReceiveRPC_Custom(reader, __instance);

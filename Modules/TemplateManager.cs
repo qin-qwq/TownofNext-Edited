@@ -10,7 +10,7 @@ namespace TOHE;
 
 public static class TemplateManager
 {
-    private static readonly string TEMPLATE_FILE_PATH = "./TONE-DATA/template.txt";
+    private static readonly string TEMPLATE_FILE_PATH = @$"{Main.TONE_Initial_Path}/template.txt";
     private static readonly Dictionary<string, Func<string>> _replaceDictionaryNormalOptions = new()
     {
         ["RoomCode"] = () => InnerNet.GameCode.IntToGameName(AmongUsClient.Instance.GameId),
@@ -105,14 +105,14 @@ public static class TemplateManager
                     _ => "English"
                 };
             else fileName = "English";
-            if (!Directory.Exists(@"TONE-DATA")) Directory.CreateDirectory(@"TONE-DATA");
+            if (!Directory.Exists(Main.TONE_DATA_FOLDER_NAME)) Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
             var defaultTemplateMsg = GetResourcesTxt($"TOHE.Resources.Config.template.{fileName}.txt");
-            if (!File.Exists(@"./TONE-DATA/Default_Teamplate.txt")) //default template
+            if (!File.Exists(@$"{Main.TONE_Initial_Path}/Default_Teamplate.txt")) //default template
             {
                 Logger.Warn("Creating Default_Template.txt", "TemplateManager");
-                using FileStream fs = File.Create(@"./TONE-DATA/Default_Teamplate.txt");
+                using FileStream fs = File.Create(@$"{Main.TONE_Initial_Path}/Default_Teamplate.txt");
             }
-            File.WriteAllText(@"./TONE-DATA/Default_Teamplate.txt", defaultTemplateMsg); //overwriting default template
+            File.WriteAllText(@$"{Main.TONE_Initial_Path}/Default_Teamplate.txt", defaultTemplateMsg); //overwriting default template
             if (!File.Exists(TEMPLATE_FILE_PATH))
             {
                 if (File.Exists(@"./template.txt")) File.Move(@"./template.txt", TEMPLATE_FILE_PATH);
@@ -175,7 +175,7 @@ public static class TemplateManager
             else Utils.SendMessage(string.Format(GetString("Message.TemplateNotFoundClient"), str), playerId, noReplay: true);
         }
         else for (int i = 0; i < sendList.Count; i++)
-        {
+            {
                 if (str == "welcome" && playerId != 0xff)
                 {
                     var player = Utils.GetPlayerById(playerId);
@@ -183,7 +183,7 @@ public static class TemplateManager
                     Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.GetRealName())));
                 }
                 else Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId);
-        }
+            }
     }
 
     private static string ApplyReplaceDictionary(string text)

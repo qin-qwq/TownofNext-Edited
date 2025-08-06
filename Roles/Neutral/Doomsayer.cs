@@ -1,8 +1,12 @@
 using AmongUs.GameOptions;
+using System;
 using System.Text;
 using TOHE.Modules;
 using TOHE.Roles.Core;
+using TOHE.Roles.Coven;
 using UnityEngine;
+using static TOHE.MeetingHudStartPatch;
+using static TOHE.Options;
 using static TOHE.Translator;
 using static TOHE.Utils;
 
@@ -14,7 +18,8 @@ internal class Doomsayer : RoleBase
     public override CustomRoles Role => CustomRoles.Doomsayer;
     private const int Id = 14100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Doomsayer);
-    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
+    public override bool IsDesyncRole => EasyMode.GetBool();
+    public override CustomRoles ThisRoleBase => EasyMode.GetBool() ? CustomRoles.Impostor : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
     //==================================================================\\
 
@@ -31,8 +36,12 @@ internal class Doomsayer : RoleBase
     private static OptionItem MisguessRolePrevGuessRoleUntilNextMeeting;
     private static OptionItem DoomsayerTryHideMsg;
     private static OptionItem ImpostorVision;
+    private static OptionItem EasyMode;
+    private static OptionItem ObserveCooldown;
+    private static OptionItem RoleNumber;
 
     private readonly HashSet<CustomRoles> GuessedRoles = [];
+    private static readonly Dictionary<byte, int> DoomsayerTarget = [];
 
     private int GuessesCount = 0;
     private int GuessesCountPerMeeting = 0;
@@ -40,23 +49,23 @@ internal class Doomsayer : RoleBase
 
     public override void SetupCustomOption()
     {
-        Options.SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Doomsayer);
+        SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Doomsayer);
         DoomsayerAmountOfGuessesToWin = IntegerOptionItem.Create(Id + 10, "DoomsayerAmountOfGuessesToWin", new(1, 10, 1), 3, TabGroup.NeutralRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer])
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer])
             .SetValueFormat(OptionFormat.Times);
         DCanGuessImpostors = BooleanOptionItem.Create(Id + 12, "DCanGuessImpostors", true, TabGroup.NeutralRoles, true)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DCanGuessCrewmates = BooleanOptionItem.Create(Id + 13, "DCanGuessCrewmates", true, TabGroup.NeutralRoles, true)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DCanGuessNeutrals = BooleanOptionItem.Create(Id + 14, "DCanGuessNeutrals", true, TabGroup.NeutralRoles, true)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DCanGuessCoven = BooleanOptionItem.Create(Id + 26, "DCanGuessCoven", true, TabGroup.NeutralRoles, true)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DCanGuessAdt = BooleanOptionItem.Create(Id + 15, "DCanGuessAdt", false, TabGroup.NeutralRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
 
         AdvancedSettings = BooleanOptionItem.Create(Id + 16, "DoomsayerAdvancedSettings", true, TabGroup.NeutralRoles, true)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         MaxNumberOfGuessesPerMeeting = IntegerOptionItem.Create(Id + 23, "DoomsayerMaxNumberOfGuessesPerMeeting", new(1, 10, 1), 3, TabGroup.NeutralRoles, false)
             .SetParent(AdvancedSettings);
         KillCorrectlyGuessedPlayers = BooleanOptionItem.Create(Id + 18, "DoomsayerKillCorrectlyGuessedPlayers", true, TabGroup.NeutralRoles, true)
@@ -67,18 +76,26 @@ internal class Doomsayer : RoleBase
             .SetParent(DoesNotSuicideWhenMisguessing);
 
         ImpostorVision = BooleanOptionItem.Create(Id + 25, GeneralOption.ImpostorVision, true, TabGroup.NeutralRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         DoomsayerTryHideMsg = BooleanOptionItem.Create(Id + 21, "DoomsayerTryHideMsg", true, TabGroup.NeutralRoles, true)
             .SetColor(Color.green)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+        EasyMode = BooleanOptionItem.Create(Id + 27, "DoomsayerEasyMode", false, TabGroup.NeutralRoles, true)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
+        ObserveCooldown = FloatOptionItem.Create(Id + 29, "DoomsayerObserveCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(EasyMode)
+            .SetValueFormat(OptionFormat.Seconds);
+        RoleNumber = IntegerOptionItem.Create(Id + 30, "DoomsayerObserveRoleNumber", new(1, 30, 1), 6, TabGroup.NeutralRoles, false).SetParent(EasyMode)
+            .SetValueFormat(OptionFormat.Pieces);
     }
     public override void Init()
     {
         CantGuess = false;
+        DoomsayerTarget.Clear();
     }
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(GuessesCount);
+        DoomsayerTarget[playerId] = byte.MaxValue;
     }
     public override void ApplyGameOptions(IGameOptions opt, byte id) => opt.SetVision(ImpostorVision.GetBool());
     public override string GetProgressText(byte playerId, bool comms)
@@ -246,5 +263,74 @@ internal class Doomsayer : RoleBase
                 SendMessage(string.Format(GetString("DoomsayerGuessCountMsg"), guesser.GetAbilityUseLimit()), guesser.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
             }, 0.7f, "Doomsayer Guess Msg 2");
         }
+    }
+    public override bool CanUseKillButton(PlayerControl pc) => EasyMode.GetBool();
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = ObserveCooldown.GetFloat();
+
+    public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (killer == null || target == null) return false;
+        if (!EasyMode.GetBool()) return false;
+        killer.Notify(string.Format(GetString("DoomsayerObserveNotif"), target.GetRealName()));
+        DoomsayerTarget[killer.PlayerId] = target.PlayerId;
+        killer.ResetKillCooldown();
+        killer.SetKillCooldown();
+        return false;
+    }
+    public override void SetAbilityButtonText(HudManager hud, byte playerId)
+    {
+        hud.KillButton?.OverrideText(GetString("DoomsayerKillButtonText"));
+    }
+    private static string GetTargetRoleList(CustomRoles[] roles)
+    {
+        return roles != null ? string.Join("，", roles.Select(x => x.ToColoredString())) : "";
+    }
+    public override void OnMeetingHudStart(PlayerControl pc)
+    {
+        if (DoomsayerTarget[pc.PlayerId] != byte.MaxValue)
+        {
+            foreach (var targetId in DoomsayerTarget.Values)
+            {
+                var targetIdByte = (byte)targetId;
+                var target = targetIdByte.GetPlayer();
+                if (!target.IsAlive()) return;
+                string msg;
+                bool targetIsVM = false;
+                if (target.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target.PlayerId].Count > 0)
+                {
+                    target = GetPlayerById(VoodooMaster.Dolls[target.PlayerId].Where(x => GetPlayerById(x).IsAlive()).ToList().RandomElement());
+                    SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
+                    targetIsVM = true;
+                }
+                var targetRole = target.GetCustomRole();
+                if (Illusionist.IsCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate()).ToList().RandomElement();
+                else if (Illusionist.IsNonCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement();
+                else if (target.Is(CustomRoles.Narc)) targetRole = CustomRoles.Sheriff;
+                var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && !role.IsAdditionRole()).ToList();
+                var count = Math.Min(RoleNumber.GetInt() - 1, activeRoleList.Count);
+                List<CustomRoles> roleList = [targetRole];
+                var rand = IRandom.Instance;
+                for (int i = 0; i < count; i++)
+                {
+                    int randomIndex = rand.Next(activeRoleList.Count);
+                    roleList.Add(activeRoleList[randomIndex]);
+                    activeRoleList.RemoveAt(randomIndex);
+                }
+                for (int i = roleList.Count - 1; i > 0; i--)
+                {
+                    int j = rand.Next(0, i + 1);
+                    (roleList[j], roleList[i]) = (roleList[i], roleList[j]);
+                }
+                var text = GetTargetRoleList([.. roleList]);
+                var targetName = target.GetRealName();
+                if (targetIsVM) targetName = Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().GetRealName();
+                msg = string.Format(GetString("FortuneTellerCheck.Result"), target.GetRealName(), text);
+                SendMessage(GetString("FortuneTellerCheck") + "\n" + msg, pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
+            }
+        }
+    }
+    public override void AfterMeetingTasks()
+    {
+        DoomsayerTarget[_Player.PlayerId] = byte.MaxValue;
     }
 }

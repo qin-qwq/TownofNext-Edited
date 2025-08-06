@@ -16,7 +16,7 @@ namespace TOHE;
 public static class CustomRolesHelper
 {
     public static readonly CustomRoles[] AllRoles = EnumHelper.GetAllValues<CustomRoles>();
-    public static Dictionary<CustomRoles, Type> DuplicatedRoles;
+    public static Dictionary<CustomRoles, Type> DuplicatedRoles = [];
     public static readonly Custom_Team[] AllRoleTypes = EnumHelper.GetAllValues<Custom_Team>();
     public static CustomRoles GetVNRole(this CustomRoles role) // RoleBase: Impostor, Shapeshifter, Crewmate, Engineer, Scientist
     {
@@ -367,7 +367,8 @@ public static class CustomRolesHelper
             CustomRoles.Statue or
             CustomRoles.Alchemist or
             CustomRoles.Tired or
-            CustomRoles.Sloth;
+            CustomRoles.Sloth or
+            CustomRoles.Fury;
     }
     public static bool IsRevealingRole(this CustomRoles role, PlayerControl target)
     {
@@ -841,7 +842,8 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.Mortician)
                     || pc.Is(CustomRoles.EvilTracker)
                     || pc.Is(CustomRoles.GuardianAngelTOHE)
-                    || pc.Is(CustomRoles.Archaeologist))
+                    || pc.Is(CustomRoles.Archaeologist)
+                    || pc.Is(CustomRoles.Brave))
                     return false;
                 break;
 
