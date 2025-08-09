@@ -130,9 +130,12 @@ public class PlayerState(byte playerId)
             // Since role basis may change, we need to re assign tasks?
 
             //Some role may be bugged for this, need further testing.
-            Logger.Info($"{pc.GetNameWithRole()} previously was {GetRoleName(preMainRole)}, reassign tasks!", "PlayerState.SetMainRole");
+            if (!(preMainRole == CustomRoles.Summoned || pc.GetCustomRole() == CustomRoles.Summoned))
+            {
+                Logger.Info($"{pc.GetNameWithRole()} previously was {GetRoleName(preMainRole)}, reassign tasks!", "PlayerState.SetMainRole");
 
-            pc.RpcResetTasks();
+                pc.RpcResetTasks();
+            }
 
             if (!Main.UnShapeShifter.Contains(pc.PlayerId) && pc.GetRoleClass()?.ThisRoleBase == CustomRoles.Shapeshifter && Utils.IsMethodOverridden(pc.GetRoleClass(), "UnShapeShiftButton"))
             {
@@ -350,6 +353,7 @@ public class PlayerState(byte playerId)
         Electrocuted,
         Scavenged,
         BlastedOff,
+        Expired,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

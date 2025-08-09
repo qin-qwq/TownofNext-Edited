@@ -47,7 +47,7 @@ internal class Archaeologist : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Archaeologist, 1);
+        SetupSingleRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Archaeologist, 1, zeroOne: false);
         VentCooldown = FloatOptionItem.Create(Id + 11, GeneralOption.EngineerBase_VentCooldown, new(0f, 70f, 1f), 15f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Archaeologist])
             .SetValueFormat(OptionFormat.Seconds);
         InvisDuration = FloatOptionItem.Create(Id + 12, "SwooperDuration", new(5f, 70f, 1f), 20f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Archaeologist])
@@ -80,7 +80,77 @@ internal class Archaeologist : RoleBase
         addons.AddRange(GroupedAddons[AddonTypes.Helpful]);
         RevivedPlayerId = byte.MaxValue;
     }
+    public override void Add(byte playerId)
+    {
+        if (AmongUsClient.Instance.AmHost)
+        {
+            _ = new LateTask(() =>
+            {
+                if (GameStates.IsInTask)
+                {
+                    var player = playerId.GetPlayer();
+                    if (player == null) return;
 
+                    var rand = IRandom.Instance;
+                    AntiqueID = (byte)rand.Next(1, 16);
+
+                    switch (AntiqueID)
+                    {
+                        case 1: // 灵魂回响镜 - 知道何时有玩家死亡
+                            player.Notify(GetString("GotMirror"), 15f);
+                            break;
+                        case 2: // 复活圣杯 - 复活一名死亡的玩家
+                            player.Notify(GetString("GotGrail"), 15f);
+                            break;
+                        case 3: // 相位斗篷 - 使你短暂隐形
+                            player.Notify(GetString("GotCloak"), 15f);
+                            break;
+                        case 4: // 引力石板 - 将所有玩家拉向自己位置
+                            player.Notify(GetString("GotFlagstone"), 15f);
+                            break;
+                        case 5: // 寒冰宝珠 - 冻结附近玩家
+                            player.Notify(GetString("GotOrbs"), 15f);
+                            break;
+                        case 6: // 战争号角 - 所有玩家移动速度提升
+                            player.Notify(GetString("GotBugle"), 15f);
+                            break;
+                        case 7: // 智慧卷轴 - 帮一名船员完成一个任务
+                            player.Notify(GetString("GotReel"), 15f);
+                            break;
+                        case 8: // 能量水晶 - 恢复所有船员的技能使用次数
+                            player.Notify(GetString("GotCrystal"), 15f);
+                            break;
+                        case 9: // 激励圣物 - 会议投票时获得额外投票权
+                            player.Notify(GetString("GotRelic"), 15f);
+                            break;
+                        case 10: // 契约卷轴 - 与一名玩家建立生命链接
+                            player.Notify(GetString("GotIndenture"), 15f);
+                            break;
+                        case 11: // 牺牲匕首 - 牺牲自己，为内鬼增加负面效果，为船员增加正面效果
+                            player.Notify(GetString("GotDagger"), 15f);
+                            break;
+                        case 12: // 太阳护符 - 使自己获得伤害免疫
+                            player.Notify(GetString("GotTalisman"), 15f);
+                            break;
+                        case 13: // 真理石板 - 揭示一名玩家的真实身份
+                            player.Notify(GetString("GotTruth"), 15f);
+                            break;
+                        case 14: // 时光沙漏 - 重置所有玩家的技能冷却时间
+                            player.Notify(GetString("GotHourglass"), 15f);
+                            break;
+                        case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
+                            player.Notify(GetString("GotProphecy"), 15f);
+                            break;
+                        default: // just in case
+                            break;
+                    }
+
+                    SendRPC(player);
+                }
+                return;
+            }, 8f, "Archaeologist In Start");
+        }
+    }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.EngineerCooldown = VentCooldown.GetFloat();
@@ -378,7 +448,7 @@ internal class Archaeologist : RoleBase
 
     public override void AddVisualVotes(PlayerVoteArea votedPlayer, ref List<MeetingHud.VoterState> statesList)
     {
-        for (var i = 0; i < CrystalExtraVotes.GetFloat(); i++)
+        for (var i = 0; i < Votes; i++)
         {
             statesList.Add(new MeetingHud.VoterState()
             {

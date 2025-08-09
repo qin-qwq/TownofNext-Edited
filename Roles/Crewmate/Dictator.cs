@@ -80,6 +80,13 @@ internal class Dictator : RoleBase
                 ChatManager.SendPreviousMessagesToAll();
                 return true;
             }
+            if (Balancer.Choose && !(targetid == Balancer.Target1 || targetid == Balancer.Target2))
+            {
+                pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
+                GuessManager.TryHideMsg();
+                ChatManager.SendPreviousMessagesToAll();
+                return true;
+            }
 
             statesList.Add(new()
             {

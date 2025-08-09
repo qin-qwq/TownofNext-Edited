@@ -218,7 +218,11 @@ public static class GuessManager
                     pc.ShowInfoMessage(isUI, GetString("GuessDisabled"));
                     return true;
                 }
-                if (Balancer.Choose && !(target.PlayerId == Balancer.Target1 || target.PlayerId == Balancer.Target2)) return true;
+                if (Balancer.Choose && !(target.PlayerId == Balancer.Target1 || target.PlayerId == Balancer.Target2))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
+                    return true;
+                }
                 if (Jailer.IsTarget(pc.PlayerId) && role != CustomRoles.Jailer)
                 {
                     pc.ShowInfoMessage(isUI, GetString("JailedCanOnlyGuessJailer"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
@@ -574,7 +578,7 @@ public static class GuessManager
         PlayerControl target = Utils.GetPlayerById(id);
         if (target == null || target.Data.IsDead)
         {
-            error = GetFormatString();
+            error = GetString("GuessNull");
             role = new();
             return false;
         }

@@ -1,5 +1,7 @@
 using System;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Impostor;
+using TOHE.Roles.Neutral;
 
 namespace TOHE.Roles.Core.AssignManager;
 
@@ -19,6 +21,7 @@ public static class AddonAssign
             case CustomRoles.Autopsy when Options.EveryoneCanSeeDeathReason.GetBool():
             case CustomRoles.Madmate when Madmate.MadmateSpawnMode.GetInt() != 0:
             case CustomRoles.Glow or CustomRoles.Mare or CustomRoles.Torch when GameStates.FungleIsActive:
+            case CustomRoles.Guesser when Guesser.AdvancedSettings.GetBool():
                 return true;
         }
 
@@ -212,5 +215,61 @@ public static class AddonAssign
         // logs the assigning
         var pc = ps.PlayerId.GetPlayer();
         Logger.Info($"Assigned Narc to {pc?.Data?.PlayerName}({pc.PlayerId}). {pc?.Data?.PlayerName}'s Role: {pc.GetCustomRole()} + Narc", "Assign Narc");
+    }
+
+    public static void StartAssigningGuesser()
+    {
+        if (!Guesser.AdvancedSettings.GetBool() || !CustomRoles.Guesser.IsEnable()) return;
+        var random = IRandom.Instance;
+        List<PlayerControl> AllPlayers = Main.AllPlayerControls.Shuffle(random).ToList();
+        int ImpNum = Guesser.GImpMax.GetInt();
+        int CrewNum = Guesser.GCrewMax.GetInt();
+        int NeuNum = Guesser.GNeuMax.GetInt();
+        int CovenNum = Guesser.GCovenMax.GetInt();
+        var role = CustomRoles.Guesser;
+        foreach (PlayerControl pc in AllPlayers)
+        {
+            if (pc == null) continue;
+            if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && !Guesser.CrewCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsNeutral() && !Guesser.NeutralCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsImpostor() && !Guesser.ImpCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsCoven() && !Guesser.CovenCanBeGuesser.GetBool())))
+                continue;
+            if (pc.Is(CustomRoles.EvilGuesser)
+                    || pc.Is(CustomRoles.NiceGuesser)
+                    || pc.Is(CustomRoles.Judge)
+                    || pc.Is(CustomRoles.CopyCat)
+                    || pc.Is(CustomRoles.Doomsayer)
+                    || pc.Is(CustomRoles.Nemesis)
+                    || pc.Is(CustomRoles.Councillor)
+                    || pc.Is(CustomRoles.GuardianAngelTOHE)
+                    || pc.Is(CustomRoles.PunchingBag))
+                continue;
+            if ((pc.Is(CustomRoles.Specter) && !Specter.CanGuess.GetBool())
+                    || (pc.Is(CustomRoles.Terrorist) && (!Terrorist.TerroristCanGuess.GetBool() || Terrorist.CanTerroristSuicideWin.GetBool()))
+                    || (pc.Is(CustomRoles.Workaholic) && !Workaholic.WorkaholicCanGuess.GetBool())
+                    || (pc.Is(CustomRoles.Solsticer) && !Solsticer.SolsticerCanGuess.GetBool())
+                    || (pc.Is(CustomRoles.God) && !God.CanGuess.GetBool()))
+                continue;
+            if ((pc.GetCustomRole().IsCrewmate() && !Guesser.CrewCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsNeutral() && !Guesser.NeutralCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsImpostor() && !Guesser.ImpCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsCoven() && !Guesser.CovenCanBeGuesser.GetBool()))
+                continue;
+            if (ImpNum > 0 && pc.IsPlayerImpostorTeam() && Guesser.ImpCanBeGuesser.GetBool())
+            {
+                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
+                ImpNum--;
+            }
+            else if (CrewNum > 0 && pc.IsPlayerCrewmateTeam() && Guesser.CrewCanBeGuesser.GetBool())
+            {
+                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
+                CrewNum--;
+            }
+            else if (NeuNum > 0 && pc.IsPlayerNeutralTeam() && Guesser.NeutralCanBeGuesser.GetBool())
+            {
+                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
+                NeuNum--;
+            }
+            else if (CovenNum > 0 && pc.IsPlayerCovenTeam() && Guesser.CovenCanBeGuesser.GetBool())
+            {
+                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
+                CovenNum--;
+            }
+        }
     }
 }

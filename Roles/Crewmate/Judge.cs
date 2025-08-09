@@ -167,6 +167,11 @@ internal class Judge : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), ColorString(GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
                     return true;
                 }
+                if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
+                    return true;
+                }
                 if (pc.PlayerId == target.PlayerId)
                 {
                     pc.ShowInfoMessage(isUI, GetString("Judge_LaughToWhoTrialSelf"), ColorString(Color.cyan, GetString("MessageFromKPD")));

@@ -7,6 +7,7 @@ using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Crewmate;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
+using TOHE.Roles.Coven;
 using TOHE.Roles.Neutral;
 using UnityEngine;
 using static TOHE.CustomWinnerHolder;
@@ -132,8 +133,7 @@ class GameEndCheckerForNormal
                         break;
                     case CustomWinner.Coven:
                         if (((pc.Is(Custom_Team.Coven) || pc.Is(CustomRoles.Enchanted) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && (countType == CountTypes.Coven || pc.Is(CustomRoles.Soulless)))
-                            || pc.Is(CustomRoles.Enchanted)
-                           )
+                            || (pc.Is(CustomRoles.Enchanted) || (Summoner.CheckWinCondition(pc.PlayerId) && CustomRoles.Summoner.RoleExist(true))))
                         {
                             WinnerIds.Add(pc.PlayerId);
                         }
@@ -329,7 +329,7 @@ class GameEndCheckerForNormal
                 }
                 if (Main.AllAlivePlayerControls.All(p => p.IsPlayerCoven() || p.Is(CustomRoles.Enchanted)))
                 {
-                    foreach (var pc in Main.AllPlayerControls.Where(x => x.IsPlayerCoven() || x.Is(CustomRoles.Enchanted) || Main.PlayerStates[x.PlayerId].IsNecromancer))
+                    foreach (var pc in Main.AllPlayerControls.Where(x => x.IsPlayerCoven() || x.Is(CustomRoles.Enchanted) || Main.PlayerStates[x.PlayerId].IsNecromancer || Summoner.CheckWinCondition(x.PlayerId)))
                     {
                         if (!WinnerIds.Contains(pc.PlayerId))
                             WinnerIds.Add(pc.PlayerId);

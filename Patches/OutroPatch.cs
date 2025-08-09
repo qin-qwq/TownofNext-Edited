@@ -42,6 +42,12 @@ class EndGamePatch
 
                         Main.PlayerStates[pvc].MainRole = prevrole;
 
+                        if (state.MainRole == CustomRoles.Summoned)
+                        {
+                            Logger.Info($"Player {Utils.GetPlayerById(pvc).GetRealName()} is Summoned. Skipping role reversion.", "OutroPatch");
+                            continue;
+                        }
+
                         var message = new RpcSyncPlayerSetting(PlayerControl.LocalPlayer.NetId, pvc, prevrole);
                         RpcUtils.LateBroadcastReliableMessage(message);
                     }

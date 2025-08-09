@@ -132,6 +132,11 @@ internal class Councillor : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
                     return true;
                 }
+                if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
+                    return true;
+                }
                 if (pc.PlayerId == target.PlayerId)
                 {
                     pc.ShowInfoMessage(isUI, GetString("Councillor_LaughToWhoMurderSelf"), Utils.ColorString(Color.cyan, GetString("MessageFromKPD")));

@@ -466,6 +466,7 @@ internal class StartGameHostPatch
                 if (Options.CurrentGameMode == CustomGameMode.Standard)
                 {
                     AddonAssign.StartAssigningNarc();
+                    AddonAssign.StartAssigningGuesser();
                     AddonAssign.InitAndStartAssignLovers();
                     AddonAssign.StartSortAndAssign();
                 }

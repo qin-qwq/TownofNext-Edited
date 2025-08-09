@@ -158,6 +158,9 @@ class SetUpRoleTextPatch
                             introCutscene.YouAreText.color = Utils.GetRoleColor(role);
                             introCutscene.RoleText.text = Utils.GetRoleName(role);
                             introCutscene.RoleText.color = Utils.GetRoleColor(role);
+                            introCutscene.RoleText.fontWeight = TMPro.FontWeight.Thin;
+                            introCutscene.RoleText.SetOutlineColor(Utils.ShadeColor(Utils.GetRoleColor(role), 0.1f).SetAlpha(0.38f));
+                            introCutscene.RoleText.SetOutlineThickness(0.17f);
                             introCutscene.RoleBlurbText.color = Utils.GetRoleColor(role);
                             introCutscene.RoleBlurbText.text = localPlayer.GetRoleInfo();
                         }

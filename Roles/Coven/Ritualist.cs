@@ -68,8 +68,6 @@ internal class Ritualist : CovenManager
     }
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
         => IsForMeeting && seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Ritualist), target.PlayerId.ToString()) + " " + TargetPlayerName : "";
-    public override string PVANameText(PlayerVoteArea pva, PlayerControl seer, PlayerControl target)
-        => seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Ritualist), target.PlayerId.ToString()) + " " + pva.NameText.text : "";
     public static bool RitualistMsgCheck(PlayerControl pc, string msg, bool isUI = false)
     {
         var originMsg = msg;
@@ -113,6 +111,11 @@ internal class Ritualist : CovenManager
             if (!MsgToPlayerAndRole(msg, out byte targetId, out CustomRoles role, out string error))
             {
                 pc.ShowInfoMessage(isUI, error);
+                return true;
+            }
+            if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
+            {
+                pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
                 return true;
             }
             var target = GetPlayerById(targetId);

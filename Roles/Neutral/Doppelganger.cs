@@ -55,15 +55,31 @@ internal class Doppelganger : RoleBase
             return true;
         }
 
-        killer.SetNewOutfit(Main.PlayerStates[target.PlayerId].NormalOutfit, true, true, target.Data.PlayerLevel);
-        Main.OvverideOutfit[killer.PlayerId] = (Main.PlayerStates[target.PlayerId].NormalOutfit, Main.PlayerStates[target.PlayerId].NormalOutfit.PlayerName);
+        killer.RpcRemoveAbilityUse();
 
-        target.SetNewOutfit(Main.PlayerStates[killer.PlayerId].NormalOutfit, true, true, killer.Data.PlayerLevel);
-        Main.OvverideOutfit[target.PlayerId] = (Main.PlayerStates[killer.PlayerId].NormalOutfit, Main.PlayerStates[killer.PlayerId].NormalOutfit.PlayerName);
+        string kname = killer.GetRealName(isMeeting: true);
+        string tname = target.GetRealName(isMeeting: true);
 
+        var killerSkin = new NetworkedPlayerInfo.PlayerOutfit()
+            .Set(kname, killer.CurrentOutfit.ColorId, killer.CurrentOutfit.HatId, killer.CurrentOutfit.SkinId, killer.CurrentOutfit.VisorId, killer.CurrentOutfit.PetId, killer.CurrentOutfit.NamePlateId);
+        var killerLvl = killer.Data.PlayerLevel;
+
+        var targetSkin = new NetworkedPlayerInfo.PlayerOutfit()
+            .Set(tname, target.CurrentOutfit.ColorId, target.CurrentOutfit.HatId, target.CurrentOutfit.SkinId, target.CurrentOutfit.VisorId, target.CurrentOutfit.PetId, target.CurrentOutfit.NamePlateId);
+        var targetLvl = target.Data.PlayerLevel;
+
+
+        target.SetNewOutfit(killerSkin, newLevel: killerLvl);
+        Main.OvverideOutfit[target.PlayerId] = (killerSkin, Main.PlayerStates[killer.PlayerId].NormalOutfit.PlayerName);
+        Logger.Info("Changed target skin", "Doppelganger");
+
+        killer.SetNewOutfit(targetSkin, newLevel: targetLvl);
+        Main.OvverideOutfit[killer.PlayerId] = (targetSkin, Main.PlayerStates[target.PlayerId].NormalOutfit.PlayerName);
+        Logger.Info("Changed killer skin", "Doppelganger");
+
+        RPC.SyncAllPlayerNames();
         Utils.NotifyRoles(SpecifyTarget: killer, NoCache: true);
 
-        killer.RpcRemoveAbilityUse();
         killer.ResetKillCooldown();
         killer.SetKillCooldown();
         return true;
