@@ -419,6 +419,7 @@ public static class Options
     public static OptionItem WhenSkipVoteIgnoreEmergency;
     public static OptionItem WhenNonVote;
     public static OptionItem WhenTie;
+    public static OptionItem ShowMeetingReason;
 
     // Other
     public static OptionItem LadderDeath;
@@ -2022,6 +2023,9 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard);
         ShouldVoteCmdsSpamChat = BooleanOptionItem.Create(60747, "ShouldVoteSpam", false, TabGroup.ModSettings, false)
             .SetParent(EnableVoteCommand)
+            .SetGameMode(CustomGameMode.Standard);
+        ShowMeetingReason = BooleanOptionItem.Create(60750, "ShowMeetingReason", false, TabGroup.ModSettings, false)
+            .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
         // 其它设定
         TextOptionItem.Create(10000031, "MenuTitle.Other", TabGroup.ModSettings)

@@ -125,6 +125,9 @@ public enum Sounds
     TaskComplete,
     TaskUpdateSound,
     ImpTransform,
+    HnSShort,
+    HnSLong,
+    HnSRanch,
     SabotageSound,
 
     Test,
@@ -686,8 +689,16 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.Invisibility:
                 {
-                    if (reader.ReadBoolean()) __instance.MakeInvisible();
-                    else __instance.MakeVisible();
+                    if (reader.ReadBoolean())
+                    {
+                        __instance.MakeInvisible();
+                        Main.Invisible.Add(__instance.PlayerId);
+                    }
+                    else
+                    {
+                        __instance.MakeVisible();
+                        Main.Invisible.Remove(__instance.PlayerId);
+                    }
                     break;
                 }
         }
@@ -941,6 +952,15 @@ internal static class RPC
                     break;
                 case Sounds.ImpTransform:
                     SoundManager.Instance.PlaySound(DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherImpostorTransformSfx, false, 0.8f);
+                    break;
+                case Sounds.HnSShort:
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorShortMusic, true);
+                    break;
+                case Sounds.HnSLong:
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorLongMusic, true);
+                    break;
+                case Sounds.HnSRanch:
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorRanchMusic, true);
                     break;
                 case Sounds.SabotageSound:
                     SoundManager.Instance.PlaySound(ShipStatus.Instance.SabotageSound, false, 0.8f);

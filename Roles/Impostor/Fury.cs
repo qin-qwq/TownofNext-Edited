@@ -55,7 +55,7 @@ internal class Fury : RoleBase
         player.SetKillCooldown(AngryKillCooldown.GetFloat());
         foreach (var target in Main.AllPlayerControls)
         {
-            target.KillFlash();
+            if (!target.IsModded()) target.KillFlash();
             RPC.PlaySoundRPC(Sounds.ImpTransform, target.PlayerId);
             target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Fury), GetString("SeerFuryInRage")));
         }

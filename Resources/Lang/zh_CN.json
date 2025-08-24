@@ -4057,7 +4057,6 @@
   "PlayerDeleteFromModList": "玩家成功移除协管名单",
   "DeputyKnowSheriff": "捕快和警长互相通晓",
   "DeputyCanBecomeSheriff": "捕快可以在警长死后成为警长",
-  "YouKillBloodSpatter": "你击杀了血语者！",
   "CantGuessDuringDiscussionTime": "不能在讨论时间猜测",
   "GuessDuringDiscussion": "很抱歉，你不能在讨论时间猜测",
   "Balancer": "大神官",
@@ -4117,5 +4116,8 @@
   "Summoner.SummonAnnouncementAgain": "<size=3><b>死灵法师重新召唤了{0}！\n祝你好运！/b></size>",
   "Summoner.NoMeetingWhileSummoned": "你以为你可以召开会议杀死被召唤者吗？\n被召唤者死亡后才能召开会议！",
   "Summoned.Notification": "死灵法师召唤了你！加入巫师阵营，杀死反对巫师阵营的人！",
-  "DeathReason.Expired": "过时"
+  "DeathReason.Expired": "过时",
+  "ShowMeetingReason": "显示会议开始原因",
+  "Message.isButton": "会议以使用紧急按钮开始",
+  "Message.isReport": "会议以发现一具尸体开始\n报告的尸体：{0}"
 }

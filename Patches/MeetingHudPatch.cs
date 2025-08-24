@@ -441,6 +441,7 @@ class CheckForEndVotingPatch
 
         var realName = Main.AllPlayerNames[exiledPlayer.PlayerId];
         Main.LastVotedPlayer = realName;
+        string coloredRealName = ColorString(Main.PlayerColors[exiledPlayer.PlayerId], realName);
 
         var player = GetPlayerById(exiledPlayer.PlayerId);
         var role = GetString(exiledPlayer.GetCustomRole().ToString());
@@ -488,37 +489,37 @@ class CheckForEndVotingPatch
         switch (Options.CEMode.GetInt())
         {
             case 0:
-                name = string.Format(GetString("PlayerExiled"), realName);
+                name = string.Format(GetString("PlayerExiled"), coloredRealName);
                 break;
             case 1:
                 if (Options.ShowBetrayalAddonsOnEject.GetBool() && player.IsAnySubRole(x => x.IsBetrayalAddonV2() && x != CustomRoles.Narc && (x != CustomRoles.Egoist || Egoist.EgoistCountAsConverted.GetBool())))
                 {
                     if (player.Is(CustomRoles.Madmate))
-                        name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
+                        name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
                     else if (player.Is(CustomRoles.Admired))
-                        name = string.Format(GetString("IsGood"), realName);
+                        name = string.Format(GetString("IsGood"), coloredRealName);
                     else if (player.IsAnySubRole(x => x.IsConverted() && x is not CustomRoles.Madmate and not CustomRoles.Enchanted))
-                        name = string.Format(GetString("BelongTo"), realName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
+                        name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
                     else if (player.Is(CustomRoles.Enchanted))
-                        name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
+                        name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
                 }
 
                 else if (player.GetCustomRole().IsImpostorTeamV3() && !player.Is(CustomRoles.Narc))
-                    name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
+                    name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
 
                 else if (player.GetCustomRole().IsCrewmate() || player.Is(CustomRoles.Narc))
-                    name = string.Format(GetString("IsGood"), realName);
+                    name = string.Format(GetString("IsGood"), coloredRealName);
 
                 else if (player.GetCustomRole().IsNeutral() && !player.GetCustomRole().IsMadmate())
-                    name = string.Format(GetString("BelongTo"), realName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
+                    name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
 
                 else if (player.GetCustomRole().IsCoven())
-                    name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
+                    name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
 
                 break;
             case 2:
                 var ejectedRoleText = Options.ShowBetrayalAddonsOnEject.GetBool() || player.Is(CustomRoles.Narc) ? coloredRole : player.GetCustomRole().ToColoredString();
-                name = string.Format(GetString("PlayerIsRole"), realName, ejectedRoleText);
+                name = string.Format(GetString("PlayerIsRole"), coloredRealName, ejectedRoleText);
                 if (Options.ShowTeamNextToRoleNameOnEject.GetBool())
                 {
                     name += " (";
@@ -1222,6 +1223,13 @@ class MeetingHudStartPatch
             SendMessage(string.Format(GetString("Message.SyncButtonLeft"), Options.SyncedButtonCount.GetFloat() - Options.UsedButtonCount));
             Logger.Info("Number of remaining buttons: " + (Options.SyncedButtonCount.GetFloat() - Options.UsedButtonCount), "SyncButtonMode");
         }
+        if (Options.ShowMeetingReason.GetBool())
+        {
+            if (ReportDeadBodyPatch.ReportTarget == null && !Balancer.Choose)
+                SendMessage(GetString("Message.isButton"));
+            else if (ReportDeadBodyPatch.ReportTarget != null)
+                SendMessage(string.Format(GetString("Message.isReport"), ColorString(Main.PlayerColors[ReportDeadBodyPatch.ReportTarget.PlayerId], ReportDeadBodyPatch.ReportTarget.PlayerName)));
+        }
 
         // AntiBlackout Message
         if (AntiBlackout.BlackOutIsActive)
@@ -1427,7 +1435,7 @@ class MeetingHudUpdatePatch
             //__instance.playerStates.Where(x => !x.TargetPlayerId.GetPlayer().IsAlive() && !x.AmDead)
             //    .Do(x => x.SetDead(x.DidReport, true, x.GAIcon));
 
-            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper && !PlayerControl.LocalPlayer.IsAlive())
+            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper or CustomRoles.Balancer && !PlayerControl.LocalPlayer.IsAlive())
                 ClearShootButton(__instance, true);
 
             if (myRole is CustomRoles.Nemesis && !PlayerControl.LocalPlayer.IsAlive() && GameObject.Find("ShootButton") == null)

@@ -49,6 +49,8 @@ public static class DevManager
         DevUserList.Add(new(code: "icingposh#6469", color: "#9e2424", userType: "s_cr", tag: "discord.gg/tohe", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "ryuk2"));
         DevUserList.Add(new(code: "bestanswer#3360", color: "#00ff1d", tag: "绿色游戏", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null)); //NikoCat233's alt
         DevUserList.Add(new(code: "happypride#3747", color: "#00ff1d", tag: "绿色游戏", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null)); //NikoCat233's alt 2
+        DevUserList.Add(new(code: "nikocat#9999", color: "#00ff1d", tag: "绿色游戏", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: null)); //NikoCat233's alt 3
+        DevUserList.Add(new(code: "cloakhazy#9133", color: "#87CEFA", tag: "我是崽子吖awa", userType: "s_cr", isUp: true, isDev: true, deBug: true, colorCmd: true, upName: "lezaiya")); //lezaiya
         //// pt-BR Translators
         //DevUserList.Add(new(code: "modelpad#5195", color: "null", tag: "Tradutor", isUp: true, isDev: false, deBug: false, colorCmd: false, upName: "Reginaldoo")); // and content creator
         //DevUserList.Add(new(code: "mimerecord#9638", color: "null", tag: "Tradutor", isUp: false, isDev: false, deBug: false, colorCmd: false, upName: "Arc"));
@@ -94,6 +96,8 @@ public static class DevManager
         DevUserList.Add(new(code: "beamelfin#9478", color: "#6495ED", tag: "Amaster-1111", isUp: false, isDev: false, colorCmd: false, deBug: false, upName: null));
         DevUserList.Add(new(code: "lordcosy#8966", color: "#FFD6EC", tag: "HostTOHE", isUp: false, isDev: false, colorCmd: false, deBug: false, upName: null)); //K
         DevUserList.Add(new(code: "honestsofa#2870", color: "#D381D9", tag: "Discord: SolarFlare#0700", isUp: true, isDev: false, colorCmd: false, deBug: false, upName: "SolarFlare")); //SolarFlare
+        DevUserList.Add(new(code: "alphacook#6624", color: "#6B89FF", tag: "简体中文译者", userType: "t_cs", isUp: false, isDev: false, colorCmd: false, deBug: false, upName: "reborn5537")); //雪鸢
+        DevUserList.Add(new(code: "alertcow#6200", color: "#e91515", tag: "Translator", userType: "t_eu", isUp: false, isDev: false, colorCmd: false, deBug: false, upName: "语安静言")); //安鸩
     }
     public static bool IsDevUser(this string code) => DevUserList.Any(x => x.Code == code);
     public static DevUser GetDevUser(this string code) => code.IsDevUser() ? DevUserList.Find(x => x.Code == code) : DefaultDevUser;

@@ -2886,7 +2886,7 @@ internal class ChatCommands
                 }
 
                 // Check if the player has the necessary privileges to use the command
-                if (!tagCanBan && !Utils.IsPlayerModerator(player.FriendCode))
+                if (!tagCanBan && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
                 {
                     Utils.SendMessage(GetString("BanCommandNoAccess"), player.PlayerId);
                     break;
@@ -2964,7 +2964,7 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("WarnCommandDisabled"), player.PlayerId);
                     break;
                 }
-                if (!tagCanWarn && !Utils.IsPlayerModerator(player.FriendCode))
+                if (!tagCanWarn && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
                 {
                     Utils.SendMessage(GetString("WarnCommandNoAccess"), player.PlayerId);
                     break;
@@ -3035,7 +3035,7 @@ internal class ChatCommands
                 }
 
                 // Check if the player has the necessary privileges to use the command
-                if (!tagCanKick && !Utils.IsPlayerModerator(player.FriendCode))
+                if (!tagCanKick && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
                 {
                     Utils.SendMessage(GetString("KickCommandNoAccess"), player.PlayerId);
                     break;

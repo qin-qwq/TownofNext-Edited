@@ -551,6 +551,29 @@ class RpcMurderPlayerPatch
             __instance.MurderPlayer(target, murderResultFlags);
         }
 
+        var sender = CustomRpcSender.Create("RpcMurderPlayer", SendOption.Reliable);
+        sender.StartMessage();
+
+        if (Main.Invisible.Contains(target.PlayerId) && murderResultFlags == MurderResultFlags.Succeeded)
+        {
+            sender.StartRpc(target.NetTransform.NetId, RpcCalls.SnapTo)
+                .WriteVector2(new Vector2(50f, 50f))
+                .Write((ushort)(target.NetTransform.lastSequenceId + 16383))
+                .EndRpc();
+            sender.StartRpc(target.NetTransform.NetId, RpcCalls.SnapTo)
+                .WriteVector2(new Vector2(50f, 50f))
+                .Write((ushort)(target.NetTransform.lastSequenceId + 32767))
+                .EndRpc();
+            sender.StartRpc(target.NetTransform.NetId, RpcCalls.SnapTo)
+                .WriteVector2(new Vector2(50f, 50f))
+                .Write((ushort)(target.NetTransform.lastSequenceId + 32767 + 16383))
+                .EndRpc();
+            sender.StartRpc(target.NetTransform.NetId, RpcCalls.SnapTo)
+                .WriteVector2(target.transform.position)
+                .Write(target.NetTransform.lastSequenceId)
+                .EndRpc();
+        }
+
         var message = new RpcMurderPlayer(__instance.NetId, target.NetId, murderResultFlags);
         RpcUtils.LateBroadcastReliableMessage(message);
 
@@ -714,10 +737,12 @@ class ShapeshiftPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
 class ReportDeadBodyPatch
 {
+    public static NetworkedPlayerInfo ReportTarget;
     public static Dictionary<byte, bool> CanReport = [];
     public static Dictionary<byte, List<NetworkedPlayerInfo>> WaitReport = [];
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo target)
     {
+        ReportTarget = target;
         if (GameStates.IsMeeting || GameStates.IsHideNSeek) return false;
 
         if (EAC.RpcReportDeadBodyCheck(__instance, target))

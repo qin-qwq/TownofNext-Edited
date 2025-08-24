@@ -1,4 +1,4 @@
-using AmongUs.GameOptions;
+/*using AmongUs.GameOptions;
 using UnityEngine;
 using static TOHE.Options;
 using static TOHE.Translator;
@@ -70,4 +70,16 @@ internal class Vanisher : RoleBase
         if (ShowShapeshiftAnimationsOpt.GetBool()) return true;
         return false;
     }
-}
+    public override bool CheckMurderOnOthersTarget(PlayerControl killer, PlayerControl target)
+    {
+        if (target.Is(CustomRoles.Bait)) return false;
+        if (Main.Invisible.Contains(killer.PlayerId))
+        {
+            target.RpcMurderPlayer(target);
+            target.SetRealKiller(killer);
+            killer.SetKillCooldown();
+            return true;
+        }
+        return false;
+    }
+}*/

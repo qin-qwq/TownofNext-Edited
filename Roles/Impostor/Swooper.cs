@@ -52,6 +52,18 @@ internal class Swooper : RoleBase
             player.RpcMakeVisible();
         }, SwooperDuration.GetFloat());
     }
+    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (target.Is(CustomRoles.Bait)) return true;
+        if (Main.Invisible.Contains(killer.PlayerId))
+        {
+            target.RpcMurderPlayer(target);
+            target.SetRealKiller(killer);
+            killer.SetKillCooldown();
+            return false;
+        }
+        return true;
+    }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.AbilityButton.OverrideText(GetString("SwooperVentButtonText"));

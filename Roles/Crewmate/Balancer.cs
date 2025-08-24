@@ -1,4 +1,7 @@
+using Hazel;
 using TOHE.Modules;
+using TOHE.Modules.Rpc;
+using UnityEngine;
 using static TOHE.CheckForEndVotingPatch;
 using static TOHE.Translator;
 using static TOHE.Utils;
@@ -43,6 +46,7 @@ internal class Balancer : RoleBase
     {
         if (voter.GetAbilityUseLimit() < 1) return true;
         if (voter == null || target == null) return true;
+        if (voter.IsHost()) return true;
         if (Target1 != 253)
         {
             Target2 = target.PlayerId;
@@ -67,6 +71,7 @@ internal class Balancer : RoleBase
             MeetingHud.Instance.RpcClose();
             Choose = true;
             Choose2 = true;
+            SendRPC();
             return false;
         }
         Target1 = target.PlayerId;
@@ -105,7 +110,6 @@ internal class Balancer : RoleBase
             MeetingHud.Instance.RpcClose();
         }
     }
-
     public static void BalancerAfterMeetingTasks()
     {
         Choose2 = false;
@@ -120,5 +124,81 @@ internal class Balancer : RoleBase
         Target1 = 253;
         Target2 = 253;
         Choose = false;
+        SendRPC();
+    }
+    public void SendRPC()
+    {
+        var writer = MessageWriter.Get(SendOption.Reliable);
+        writer.Write(Choose);
+        writer.Write(Choose2);
+        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+    }
+    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
+    {
+        Choose = reader.ReadBoolean();
+        Choose2 = reader.ReadBoolean();
+    }
+    private static void BalancerOnClick(byte targetId /*, MeetingHud __instance*/)
+    {
+        Logger.Msg($"Click: ID {targetId}", "Balancer UI");
+        var target = targetId.GetPlayer();
+        if (target == null || !target.IsAlive() || !GameStates.IsVoting || PlayerControl.LocalPlayer.GetAbilityUseLimit() < 1) return;
+        if (Target1 != 253)
+        {
+            Target2 = targetId;
+            if (Target1 == Target2)
+            {
+                SendMessage(GetString("Choose1=2"), PlayerControl.LocalPlayer.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+                Target1 = 253;
+                Target2 = 253;
+                return;
+            }
+            var Tar1 = GetPlayerById(Target1);
+            if (!Tar1.IsAlive())
+            {
+                Target1 = 253;
+                Target2 = 253;
+                SendMessage(string.Format(GetString("Choose1IsDead"), target.GetRealName()), PlayerControl.LocalPlayer.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+                return;
+            }
+            PlayerControl.LocalPlayer.RpcRemoveAbilityUse();
+            List<MeetingHud.VoterState> statesList = [];
+            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+            MeetingHud.Instance.RpcClose();
+            Choose = true;
+            Choose2 = true;
+            return;
+        }
+        Target1 = targetId;
+        SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), PlayerControl.LocalPlayer.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+        return;
+    }
+
+    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
+    class StartMeetingPatch
+    {
+        public static void Postfix(MeetingHud __instance)
+        {
+            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.IsHost())
+                CreateBalancerButton(__instance);
+        }
+    }
+    public static void CreateBalancerButton(MeetingHud __instance)
+    {
+        foreach (var pva in __instance.playerStates)
+        {
+            var pc = GetPlayerById(pva.TargetPlayerId);
+            if (pc == null || !pc.IsAlive()) continue;
+
+            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
+            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
+            targetBox.name = "ShootButton";
+            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
+            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
+            renderer.sprite = CustomButton.Get("BalancerIcon");
+            PassiveButton button = targetBox.GetComponent<PassiveButton>();
+            button.OnClick.RemoveAllListeners();
+            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => BalancerOnClick(pva.TargetPlayerId/*, __instance*/)));
+        }
     }
 }

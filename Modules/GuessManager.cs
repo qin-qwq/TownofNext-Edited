@@ -1034,7 +1034,6 @@ public static class GuessManager
                     or CustomRoles.Flash
                     or CustomRoles.NotAssigned
                     or CustomRoles.SuperStar
-                    or CustomRoles.Oblivious
                     or CustomRoles.Solsticer
                     or CustomRoles.Killer
                     or CustomRoles.Mini

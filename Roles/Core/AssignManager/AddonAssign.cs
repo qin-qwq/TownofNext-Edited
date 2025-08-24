@@ -214,7 +214,10 @@ public static class AddonAssign
 
         // logs the assigning
         var pc = ps.PlayerId.GetPlayer();
-        Logger.Info($"Assigned Narc to {pc?.Data?.PlayerName}({pc.PlayerId}). {pc?.Data?.PlayerName}'s Role: {pc.GetCustomRole()} + Narc", "Assign Narc");
+        if (pc != null)
+        {
+            Logger.Info($"将警局特工分配给 {pc?.Data?.PlayerName}({pc.PlayerId})。 {pc?.Data?.PlayerName}的职业是： {pc.GetCustomRole()} + 警局特工", "Assign Narc");
+        }
     }
 
     public static void StartAssigningGuesser()
@@ -240,6 +243,8 @@ public static class AddonAssign
                     || pc.Is(CustomRoles.Nemesis)
                     || pc.Is(CustomRoles.Councillor)
                     || pc.Is(CustomRoles.GuardianAngelTOHE)
+                    || pc.Is(CustomRoles.GM)
+                    || (pc.HasSubRole() && pc.GetCustomSubRoles().Count >= Options.NoLimitAddonsNumMax.GetInt())
                     || pc.Is(CustomRoles.PunchingBag))
                 continue;
             if ((pc.Is(CustomRoles.Specter) && !Specter.CanGuess.GetBool())

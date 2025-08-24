@@ -117,6 +117,11 @@ internal class Swapper : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("SwapperTrialMax"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     return true;
                 }
+                if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
+                    return true;
+                }
                 //Swapper skill limit is changed in after meeting task
 
                 if (!Vote.ContainsKey(pc.PlayerId) || !VoteTwo.ContainsKey(pc.PlayerId))

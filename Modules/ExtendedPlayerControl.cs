@@ -458,27 +458,6 @@ static class ExtendedPlayerControl
 
         killer.RpcMurderPlayer(target, true);
     }
-    public static bool IsInsideMap(this PlayerControl player)
-    {
-        if (player == null) return false;
-
-        var results = new Collider2D[10];
-        int overlapPointNonAlloc = Physics2D.OverlapPointNonAlloc(player.transform.position, results, Constants.ShipOnlyMask);
-        PlainShipRoom room = player.GetPlainShipRoom();
-        Vector2 pos = player.GetCustomPosition();
-
-        return Main.CurrentMap switch
-        {
-            MapNames.Fungle when overlapPointNonAlloc >= 2 => true,
-            MapNames.MiraHQ when overlapPointNonAlloc >= 1 => true,
-            MapNames.MiraHQ when room != null && room.RoomId is SystemTypes.MedBay or SystemTypes.Comms => true,
-            MapNames.Airship when overlapPointNonAlloc >= 1 => true,
-            MapNames.Skeld or MapNames.Dleks when room != null => true,
-            MapNames.Polus when overlapPointNonAlloc >= 1 => true,
-            MapNames.Polus when pos.y is >= -26.11f and <= -6.41f && pos.x is >= 3.56f and <= 32.68f => true,
-            _ => false
-        };
-    }
     public static void RpcGuardAndKill(this PlayerControl killer, PlayerControl target = null, bool forObserver = false, bool fromSetKCD = false)
     {
         if (!AmongUsClient.Instance.AmHost)

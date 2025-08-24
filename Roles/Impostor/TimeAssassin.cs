@@ -33,6 +33,7 @@ internal class TimeAssassin : RoleBase
 
     public override void UnShapeShiftButton(PlayerControl player)
     {
+        if (AnySabotageIsActive()) return;
         foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin) && !x.Is(CustomRoles.GM)))
         {
             player.Notify(GetString("TimeStopStart"));

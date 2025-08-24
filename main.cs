@@ -53,17 +53,17 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.3.0"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.3.0";
+    public const string PluginVersion = "1.3.1"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.4.0 Alpha 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 4, 15, 0) // 2025.4.15 & 16.0.5 & 16.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.3.0 Alpha 5
+    public static readonly bool devRelease = true; // Latest: V1.4.0 Alpha 1
     public static readonly bool canaryRelease = false; // Latest: V1.3.0 Beta 2
-    public static readonly bool fullRelease = true; // Latest: V1.3.0
+    public static readonly bool fullRelease = false; // Latest: V1.3.0
 
     public static bool hasAccess = true;
 
@@ -227,7 +227,6 @@ public class Main : BasePlugin
     public static int BardCreations = 0;
     public static int MeetingsPassed = 0;
     public static long LastMeetingEnded = Utils.GetTimeStamp();
-    public static MapNames CurrentMap => (MapNames)NormalOptions.MapId;
     public static readonly HashSet<byte> Invisible = [];
 
 
@@ -804,7 +803,7 @@ public enum CustomRoles
     Underdog,
     Undertaker,
     Vampire,
-    Vanisher,
+    //Vanisher,
     Vindicator,
     Visionary,
     Warlock,
