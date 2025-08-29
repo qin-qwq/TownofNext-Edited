@@ -1,5 +1,3 @@
 files:
   - source: /Resources/Lang/zh_CN.json
     translation: /Resources/Lang/%locale_with_underscore%.json
-  - source: /Resources/Announcements/modNews-zh_CN.json
-    translation: /Resources/Announcements/modNews-%locale_with_underscore%.json
