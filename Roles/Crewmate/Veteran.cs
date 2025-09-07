@@ -134,6 +134,7 @@ internal class Veteran : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.AbilityButton.buttonLabelText.text = GetString("VeteranVentButtonText");
+        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Veteran");
 }

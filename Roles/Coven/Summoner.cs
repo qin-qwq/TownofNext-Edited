@@ -264,7 +264,7 @@ internal class Summoner : CovenManager
         return true; // Suppress the command message
     }
 
-    private static void HideSummonCommand()
+    public static void HideSummonCommand()
     {
         ChatUpdatePatch.DoBlockChat = true;
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)

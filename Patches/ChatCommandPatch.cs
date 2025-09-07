@@ -517,6 +517,10 @@ internal class ChatCommands
                         case CustomGameMode.SpeedRun:
                             SpeedRun.AppendSpeedRunKcount(sub);
                             break;
+
+                        case CustomGameMode.TagMode:
+                            TagMode.AppendTagModeKcount(sub);
+                            break;
                     }
 
                     Utils.SendMessage(sub.ToString(), PlayerControl.LocalPlayer.PlayerId);
@@ -2207,6 +2211,11 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("ModeDescribe.SpeedRun"), playerId);
                     return;
                 }
+            case CustomGameMode.TagMode:
+                {
+                    Utils.SendMessage(GetString("ModeDescribe.TagMode"), playerId);
+                    return;
+                }
         }
         role = role.Trim().ToLower();
         if (role.StartsWith("/r")) _ = role.Replace("/r", string.Empty);
@@ -2713,6 +2722,10 @@ internal class ChatCommands
                     case CustomGameMode.SpeedRun:
                         SpeedRun.AppendSpeedRunKcount(sub);
                         break;
+
+                    case CustomGameMode.TagMode:
+                        TagMode.AppendTagModeKcount(sub);
+                        break;
                 }
 
                 Utils.SendMessage(sub.ToString(), player.PlayerId);
@@ -2831,9 +2844,9 @@ internal class ChatCommands
             case "/айди":
             case "/编号":
             case "/玩家编号":
-                if (TagManager.ReadPermission(player.FriendCode) < 2) break;
+                /*if (TagManager.ReadPermission(player.FriendCode) < 2) break;
                 else if (TagManager.ReadPermission(player.FriendCode) < 2 && (Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode))
-                    && !Options.EnableVoteCommand.GetBool()) break;
+                    && !Options.EnableVoteCommand.GetBool()) break;*/
 
                 string msgText = GetString("PlayerIdList");
                 foreach (var pc in Main.AllPlayerControls)
@@ -3614,7 +3627,7 @@ internal class ChatCommands
                 else
                 {
                     var tagCanMe = TagManager.ReadPermission(player.FriendCode) >= 2;
-                    if ((Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode)) && !tagCanMe)
+                    if ((Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode)) && !tagCanMe && !player.FriendCode.GetDevUser().DeBug)
                     {
                         Utils.SendMessage(GetString("Message.MeCommandNoPermission"), player.PlayerId);
                         break;

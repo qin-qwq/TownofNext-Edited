@@ -1616,6 +1616,11 @@ static class ExtendedPlayerControl
     {
         Main.PlayerStates[targetId].deathReason = reason;
     }
+    public static PlayerState.DeathReason GetDeathReason(this PlayerControl target) => target.PlayerId.GetDeathReason();
+    public static PlayerState.DeathReason GetDeathReason(this byte targetId)
+    {
+        return Main.PlayerStates[targetId].deathReason;
+    }
 
     public static bool Is(this PlayerControl target, CustomRoles role) =>
         role > CustomRoles.NotAssigned ? target.GetCustomSubRoles().Contains(role) : target.GetCustomRole() == role;
@@ -1825,5 +1830,51 @@ static class ExtendedPlayerControl
     public static string ColoredPlayerName(this byte id)
     {
         return Utils.ColorString(Main.PlayerColors.GetValueOrDefault(id, Color.white), Main.AllPlayerNames.GetValueOrDefault(id, Utils.GetPlayerById(id)?.GetRealName() ?? $"Someone (ID {id})"));
+    }
+    public static void SetChatVisible(this PlayerControl player, bool visible)
+    {
+        if (player.AmOwner)
+        {
+            HudManager.Instance.Chat.SetVisible(visible);
+		    HudManager.Instance.Chat.HideBanButton();
+            return;
+        }
+        bool isDead = player.Data.IsDead;
+        MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+        writer.StartMessage(6);
+        writer.Write(AmongUsClient.Instance.GameId);
+        writer.WritePacked(player.GetClientId());
+        writer.StartMessage(4);
+		writer.WritePacked(HudManager.Instance.MeetingPrefab.SpawnId);
+		writer.WritePacked(-2);
+		writer.Write((byte)SpawnFlags.None);
+		writer.WritePacked(1);
+        uint netIdCnt = AmongUsClient.Instance.NetIdCnt;
+		AmongUsClient.Instance.NetIdCnt = netIdCnt + 1U;
+		writer.WritePacked(netIdCnt);
+		writer.StartMessage(1);
+        writer.WritePacked(0);
+		writer.EndMessage();
+		writer.EndMessage();
+        player.Data.IsDead = visible;
+        writer.StartMessage(1);
+        writer.WritePacked(player.Data.NetId);
+        player.Data.Serialize(writer, true);
+        writer.EndMessage();
+        writer.StartMessage(2);
+        writer.WritePacked(netIdCnt);
+		writer.Write((byte)RpcCalls.CloseMeeting);
+        writer.EndMessage();
+        player.Data.IsDead = isDead;
+        writer.StartMessage(1);
+        writer.WritePacked(player.Data.NetId);
+        player.Data.Serialize(writer, true);
+        writer.EndMessage();
+        writer.StartMessage(5);
+        writer.WritePacked(netIdCnt);
+        writer.EndMessage();
+        writer.EndMessage();
+        AmongUsClient.Instance.SendOrDisconnect(writer);
+        writer.Recycle();
     }
 }

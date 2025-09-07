@@ -264,7 +264,7 @@ public abstract class RoleBase
     /// </summary>
     public virtual void OnShapeshift(PlayerControl shapeshifter, PlayerControl target, bool IsAnimate, bool shapeshifting)
     { }
-    public virtual bool CheckVanish(PlayerControl phantom) => true;
+    public virtual bool OnCheckVanish(PlayerControl phantom) => true;
 
     // NOTE: when using UnShapeshift button, it will not be possible to revert to normal state because of complications
     // So OnCheckShapeShift and OnShapeshift are pointless when using it

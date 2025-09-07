@@ -105,6 +105,7 @@ internal class Lighter : RoleBase
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
         hud.AbilityButton.buttonLabelText.text = GetString("LighterVentButtonText");
+        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Lighter");
 }

@@ -76,6 +76,14 @@ class GameEndCheckerForNormal
                     predicate = null;
                 }
                 return false;
+            case CustomGameMode.TagMode:
+                if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
+                {
+                    ShipStatus.Instance.enabled = false;
+                    StartEndGame(reason);
+                    predicate = null;
+                }
+                return false;
         }
 
         // Start end game
@@ -215,6 +223,14 @@ class GameEndCheckerForNormal
                             {
                                 reason = GameOverReason.ImpostorsByKill;
                                 ResetAndSetWinner(CustomWinner.Stalker);
+                                WinnerIds.Add(pc.PlayerId);
+                            }
+                            break;
+                        case CustomRoles.Tunny when pc.IsAlive() && Tunny.SnatchesWin.GetBool():
+                            reason = GameOverReason.ImpostorsByKill;
+                            if (!CheckForConvertedWinner(pc.PlayerId))
+                            {
+                                ResetAndSetWinner(CustomWinner.Tunny);
                                 WinnerIds.Add(pc.PlayerId);
                             }
                             break;
@@ -399,6 +415,10 @@ class GameEndCheckerForNormal
                             case CustomRoles.Opportunist when pc.IsAlive():
                                 WinnerIds.Add(pc.PlayerId);
                                 AdditionalWinnerTeams.Add(AdditionalWinners.Opportunist);
+                                break;
+                            case CustomRoles.Tunny when pc.IsAlive():
+                                WinnerIds.Add(pc.PlayerId);
+                                AdditionalWinnerTeams.Add(AdditionalWinners.Tunny);
                                 break;
                             case CustomRoles.Pixie when !CheckForConvertedWinner(pc.PlayerId):
                                 Pixie.PixieWinCondition(pc);
@@ -611,6 +631,7 @@ class GameEndCheckerForNormal
     public static void SetPredicateToNormal() => predicate = new NormalGameEndPredicate();
     public static void SetPredicateToFFA() => predicate = new FFAGameEndPredicate();
     public static void SetPredicateToSpeedRun() => predicate = new SpeedRunGameEndPredicate();
+    public static void SetPredicateToTagMode() => predicate = new TagModeGameEndPredicate();
 
 
     // ===== Check Game End =====

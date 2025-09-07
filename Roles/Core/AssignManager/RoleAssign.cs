@@ -115,6 +115,34 @@ public class RoleAssign
                     RoleResult[pc.PlayerId] = CustomRoles.Runner;
                 }
                 return;
+
+            case CustomGameMode.TagMode:
+                var random = IRandom.Instance;
+                List<PlayerControl> AllPlayers2 = Main.AllPlayerControls.Shuffle(random).ToList();
+                int ZombieNum = TagMode.ZombieMaximun.GetInt();
+                foreach (PlayerControl pc in AllPlayers2)
+                {
+                    if (Main.EnableGM.Value && pc.IsHost())
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        continue;
+                    }
+                    else if (TagManager.AssignGameMaster(pc.FriendCode))
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
+                        continue;
+                    }
+                    else if (ZombieNum > 0)
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.TZombie;
+                        ZombieNum--;
+                        Logger.Info($"将感染者分配给 [{pc.PlayerId}]{pc.GetRealName()}", "TagModeAssign");
+                        continue;
+                    }
+                    RoleResult[pc.PlayerId] = CustomRoles.TCrewmate;
+                }
+                return;
         }
 
         var rd = IRandom.Instance;

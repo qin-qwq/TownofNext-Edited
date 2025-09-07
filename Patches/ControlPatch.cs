@@ -172,7 +172,7 @@ internal class ControllerManagerUpdatePatch
             }
 
             // Show chat
-            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift))
+            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift) && !Options.PreventModdedClientSee.GetBool())
             {
                 HudManager.Instance.Chat.SetVisible(true);
             }

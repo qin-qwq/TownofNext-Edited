@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Roles.Core;
+using TOHE.Roles.Neutral;
 
 namespace TOHE.Roles.Crewmate;
 
@@ -99,9 +99,9 @@ internal class Altruist : RoleBase
             deadPlayer.RpcTeleport(deadBodyObject.transform.position);
             deadPlayer.RpcRevive();
 
-            _Player.RpcExileV2();
-            _Player.SetRealKiller(_Player);
             _Player.SetDeathReason(PlayerState.DeathReason.Sacrificed);
+            _Player.Data.IsDead = true;
+            _Player.RpcExileV2();
             Main.PlayerStates[_Player.PlayerId].SetDead();
 
             if (ImpostorsCanGetsAlert.GetBool() || NeutralKillersCanGetsAlert.GetBool())
@@ -142,6 +142,17 @@ internal class Altruist : RoleBase
                     }
                     if (getArrow)
                         TargetArrow.Add(pc.PlayerId, deadPlayerId);
+                }
+            }
+            if (Inquisitor.GetInquisitorsIfHeretic(deadPlayer, out HashSet<byte> inquisitors))
+            {
+                foreach (var inquisitor in inquisitors)
+                {
+                    PlayerControl pc = inquisitor.GetPlayer();
+                    Inquisitor.HereticRevived(pc);
+                    pc.KillFlash(playKillSound: false);
+                    pc.Notify(Translator.GetString("Altruist_DeadPlayerHasBeenRevived"));
+                    TargetArrow.Add(pc.PlayerId, deadPlayerId);
                 }
             }
             SendRPC();

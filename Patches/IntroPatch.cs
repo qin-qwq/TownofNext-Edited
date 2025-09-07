@@ -671,6 +671,13 @@ class BeginCrewmatePatch
                 __instance.ImpostorText.gameObject.SetActive(true);
                 __instance.ImpostorText.text = GetString("RunnerInfo");
                 break;
+            case CustomGameMode.TagMode:
+                __instance.TeamTitle.text = GetString("TagMode");
+                __instance.TeamTitle.color = __instance.BackgroundBar.material.color = new Color32(44, 204, 0, byte.MaxValue);
+                PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Phantom);
+                __instance.ImpostorText.gameObject.SetActive(true);
+                __instance.ImpostorText.text = GetString("TagModeInfo");
+                break;
         }
 
         // I hope no one notices this in code

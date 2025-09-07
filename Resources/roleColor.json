@@ -256,5 +256,11 @@
   "Talented": "#b5e6de",
   "Balancer": "#f0681c",
   "Brave": "#007fff",
-  "Summoned": "#CCCCFF"
+  "Summoned": "#CCCCFF",
+  "Tunny": "#f6f657",
+  "TZombie": "#7B8968",
+  "TCrewmate": "#8cffff",
+  "Lich": "#677052",
+  "Rat": "#696969",
+  "Inquisitor": "#ab1822"
 }

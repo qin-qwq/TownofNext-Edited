@@ -54,7 +54,7 @@ public static class PhantomRolePatch
         Logger.Info($"Player: {phantom.GetRealName()}", "CheckVanish");
         var role = phantom.GetRoleClass();
 
-        if (role?.CheckVanish(phantom) == false)
+        if (role?.OnCheckVanish(phantom) == false)
         {
             if (phantom.AmOwner)
             {

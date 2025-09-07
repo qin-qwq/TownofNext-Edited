@@ -61,7 +61,7 @@ internal class PotionMaster : CovenManager
         BarrierLimit[playerId] = BarrierMaxCount.GetInt();
         PotionMode = 0;
 
-        var pc = Utils.GetPlayerById(playerId);
+        var pc = GetPlayerById(playerId);
         pc?.AddDoubleTrigger();
     }
 
@@ -206,7 +206,7 @@ internal class PotionMaster : CovenManager
         var IsWatch = false;
         RevealList.Do(x =>
         {
-            if (x.Value != null && seer.PlayerId == x.Key && x.Value.Contains(target.PlayerId) && Utils.GetPlayerById(x.Key).IsAlive())
+            if (x.Value != null && seer.PlayerId == x.Key && x.Value.Contains(target.PlayerId) && GetPlayerById(x.Key).IsAlive())
                 IsWatch = true;
         });
         return IsWatch;
@@ -252,7 +252,7 @@ internal class PotionMaster : CovenManager
         hud.KillButton.OverrideText(GetString("PotionMasterKillButtonText"));
     }
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
-    => BarrierList[seer.PlayerId].Contains(seen.PlayerId) ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.PotionMaster), "✚") : string.Empty;
+    => BarrierList[seer.PlayerId].Contains(seen.PlayerId) ? ColorString(GetRoleColor(CustomRoles.PotionMaster), "✚") : string.Empty;
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
         if (_Player == null) return string.Empty;
@@ -267,5 +267,5 @@ internal class PotionMaster : CovenManager
     public override bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target)
         => KnowRoleTarget(seer, target);
 
-    public override string GetProgressText(byte playerId, bool coooonms) => Utils.ColorString(RevealLimit[playerId] > 0 ? GetRoleColor(CustomRoles.PotionMaster).ShadeColor(0.25f) : Color.gray, $"({RevealLimit[playerId]})") + ColorString(BarrierLimit[playerId] > 0 ? GetRoleColor(CustomRoles.Medic).ShadeColor(0.25f) : Color.gray, $" ({BarrierLimit[playerId]})");
+    public override string GetProgressText(byte playerId, bool coooonms) => ColorString(RevealLimit[playerId] > 0 ? GetRoleColor(CustomRoles.PotionMaster).ShadeColor(0.25f) : Color.gray, $"({RevealLimit[playerId]})") + ColorString(BarrierLimit[playerId] > 0 ? GetRoleColor(CustomRoles.Medic).ShadeColor(0.25f) : Color.gray, $" ({BarrierLimit[playerId]})");
 }

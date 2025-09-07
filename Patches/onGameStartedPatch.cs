@@ -234,6 +234,10 @@ internal class ChangeRoleSettings
             //Speed Run
             SpeedRun.Init();
 
+            //Tag Mode
+            if (Options.CurrentGameMode == CustomGameMode.TagMode)
+                TagMode.Init();
+
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
             AntiBlackout.Reset();
@@ -532,6 +536,9 @@ internal class StartGameHostPatch
                     break;
                 case CustomGameMode.SpeedRun:
                     GameEndCheckerForNormal.SetPredicateToSpeedRun();
+                    break;
+                case CustomGameMode.TagMode:
+                    GameEndCheckerForNormal.SetPredicateToTagMode();
                     break;
             }
 

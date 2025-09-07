@@ -348,7 +348,7 @@ public class SabotageSystemPatch
                     return false;
             }
 
-            if (Options.CurrentGameMode is CustomGameMode.SpeedRun)
+            if (Options.CurrentGameMode is CustomGameMode.SpeedRun or CustomGameMode.TagMode)
             {
                 return false;
             }

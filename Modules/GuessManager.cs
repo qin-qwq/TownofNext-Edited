@@ -241,6 +241,7 @@ public static class GuessManager
                 if (Medic.IsProtected(target.PlayerId) && !Medic.GuesserIgnoreShield.GetBool())
                 {
                     pc.ShowInfoMessage(isUI, GetString("GuessShielded"));
+                    if (pc.IsHost()) Utils.FlashColor(Utils.GetRoleColor(CustomRoles.Medic));
                     return true;
                 }
                 if (NarcManager.CheckBlockGuesses(pc, target, isUI)) return true;
@@ -989,6 +990,12 @@ public static class GuessManager
                 }
 
                 if (CustomRoles.SoulCollector.IsEnable())
+                {
+                    if (!listOfRoles.Contains(CustomRoles.Death))
+                        listOfRoles.Add(CustomRoles.Death);
+                }
+
+                if (CustomRoles.Lich.IsEnable())
                 {
                     if (!listOfRoles.Contains(CustomRoles.Death))
                         listOfRoles.Add(CustomRoles.Death);

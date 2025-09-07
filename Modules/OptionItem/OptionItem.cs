@@ -31,6 +31,7 @@ public abstract class OptionItem
     public CustomGameMode HideOptionInFFA { get; protected set; }
     public CustomGameMode HideOptionInHnS { get; protected set; }
     public CustomGameMode HideOptionInSpeedRun { get; protected set; }
+    public CustomGameMode HideOptionInTagMode { get; protected set; }
     public bool IsHeader { get; protected set; }
     public bool IsHidden { get; protected set; }
     public bool IsText { get; protected set; }
@@ -80,6 +81,7 @@ public abstract class OptionItem
         HideOptionInFFA = CustomGameMode.All;
         HideOptionInHnS = CustomGameMode.All;
         HideOptionInSpeedRun = CustomGameMode.All;
+        HideOptionInTagMode = CustomGameMode.All;
         IsHeader = false;
         IsHidden = false;
         IsText = false;
@@ -135,6 +137,7 @@ public abstract class OptionItem
     public OptionItem HideInFFA(CustomGameMode value = CustomGameMode.FFA) => Do(i => i.HideOptionInFFA = value);
     public OptionItem HideInHnS(CustomGameMode value = CustomGameMode.HidenSeekTOHE) => Do(i => i.HideOptionInHnS = value);
     public OptionItem HideInSpeedRun(CustomGameMode value = CustomGameMode.SpeedRun) => Do(i => i.HideOptionInSpeedRun = value);
+    public OptionItem HideInTagMode(CustomGameMode value = CustomGameMode.TagMode) => Do(i => i.HideOptionInTagMode = value);
 
     public OptionItem SetParent(OptionItem parent, bool OverrideRoleName = true) => Do(i =>
     {
@@ -193,6 +196,7 @@ public abstract class OptionItem
             || (HideOptionInFFA != CustomGameMode.All && HideOptionInFFA == mode)
             || (HideOptionInHnS != CustomGameMode.All && HideOptionInHnS == mode)
             || (HideOptionInSpeedRun != CustomGameMode.All && HideOptionInSpeedRun == mode)
+            || (HideOptionInTagMode != CustomGameMode.All && HideOptionInTagMode == mode)
             || (GameMode != CustomGameMode.All && GameMode != mode);
     }
     public string ApplyFormat(string value)

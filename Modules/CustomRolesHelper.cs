@@ -137,6 +137,7 @@ public static class CustomRolesHelper
             CustomRoles.Stalker or
             CustomRoles.Doomsayer or
             CustomRoles.SoulCollector or
+            CustomRoles.Lich or
             CustomRoles.Death or
             CustomRoles.Berserker or
             CustomRoles.War or
@@ -496,7 +497,7 @@ public static class CustomRolesHelper
             CustomRoles.Infected => Infectious.CanBeBitten(target),
             CustomRoles.Contagious => target.CanBeInfected(),
             CustomRoles.Soulless => CursedSoul.CanBeSoulless(target),//Cursed Soul recruits players to Soulless by default
-            _ => false
+            _ => true
         };
     }
 
@@ -570,8 +571,10 @@ public static class CustomRolesHelper
         else if ((pc.Is(CustomRoles.RuthlessRomantic) || pc.Is(CustomRoles.Romantic) || pc.Is(CustomRoles.VengefulRomantic)) && role is CustomRoles.Lovers) return false;
 
         if (checkLimitAddons)
+        {
             if (pc.HasSubRole() && pc.GetCustomSubRoles().Count >= Options.NoLimitAddonsNumMax.GetInt()) return false;
-
+            if (Options.NoLimitAddonsNumMax.GetInt() == 0) return false;
+        }
 
         // Checking for conflicts with roles and other add-ons
         switch (role)
@@ -862,7 +865,8 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.Doctor)
                     || pc.Is(CustomRoles.God)
                     || pc.Is(CustomRoles.Visionary)
-                    || pc.Is(CustomRoles.GuardianAngelTOHE))
+                    || pc.Is(CustomRoles.GuardianAngelTOHE)
+                    || pc.Is(CustomRoles.Mimic))
                     return false;
                 break;
 
@@ -974,7 +978,8 @@ public static class CustomRolesHelper
 
             case CustomRoles.Mimic:
                 if (pc.Is(CustomRoles.Nemesis)
-                    || pc.Is(CustomRoles.Narc))
+                    || pc.Is(CustomRoles.Narc)
+                    || pc.Is(CustomRoles.Necroview))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1471,6 +1476,7 @@ public static class CustomRolesHelper
            CustomRoles.Quizmaster => Quizmaster.CanKillsAfterMark() ? CountTypes.Quizmaster : CountTypes.Crew,
            CustomRoles.Juggernaut => CountTypes.Juggernaut,
            CustomRoles.Infectious or CustomRoles.Infected => CountTypes.Infectious,
+           CustomRoles.Inquisitor => CountTypes.Inquisitor,
            CustomRoles.Crewpostor => CountTypes.Impostor,
            CustomRoles.Pyromaniac => CountTypes.Pyromaniac,
            CustomRoles.PlagueDoctor => CountTypes.PlagueDoctor,
@@ -1507,6 +1513,7 @@ public static class CustomRolesHelper
             CustomRoles.God => CustomWinner.God,
             CustomRoles.Vector => CustomWinner.Vector,
             CustomRoles.Innocent => CustomWinner.Innocent,
+            CustomRoles.Inquisitor => CustomWinner.Inquisitor,
             CustomRoles.Pelican => CustomWinner.Pelican,
             CustomRoles.Youtuber => CustomWinner.Youtuber,
             CustomRoles.Egoist => CustomWinner.Egoist,
@@ -1567,6 +1574,7 @@ public static class CustomRolesHelper
             CountTypes.Quizmaster => CustomRoles.Quizmaster,
             CountTypes.Juggernaut => CustomRoles.Juggernaut,
             CountTypes.Infectious => CustomRoles.Infectious,
+            CountTypes.Inquisitor => CustomRoles.Inquisitor,
             CountTypes.Pyromaniac => CustomRoles.Pyromaniac,
             CountTypes.Virus => CustomRoles.Virus,
             CountTypes.Pickpocket => CustomRoles.Pickpocket,
@@ -1648,6 +1656,7 @@ public enum CountTypes
     SerialKiller,
     Juggernaut,
     Infectious,
+    Inquisitor,
     Virus,
     Stalker,
     Pickpocket,

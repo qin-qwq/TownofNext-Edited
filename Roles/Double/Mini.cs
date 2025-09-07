@@ -170,10 +170,18 @@ internal class Mini : RoleBase
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {
         if (role is not CustomRoles.NiceMini or CustomRoles.EvilMini) return false;
-        if (Age < 18 && (target.Is(CustomRoles.NiceMini) || !CanGuessEvil.GetBool() && target.Is(CustomRoles.EvilMini)))
+        if (Age < 18)
         {
-            guesser.ShowInfoMessage(isUI, GetString("GuessMini"));
-            return true;
+            if (target.Is(CustomRoles.NiceMini))
+            {
+                guesser.ShowInfoMessage(isUI, GetString("GuessMini"));
+                return true;
+            }
+            else if (!CanGuessEvil.GetBool() && target.Is(CustomRoles.EvilMini))
+            {
+                guesser.ShowInfoMessage(isUI, GetString("GuessMini"));
+                return true;
+            }
         }
         return false;
     }
@@ -218,6 +226,6 @@ internal class Mini : RoleBase
 
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)
         => EveryoneCanKnowMini.GetBool() && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini))
-            ? CustomRoles.Mini.GetColoredTextByRole(Age != 18 && UpDateAge.GetBool() ? Age.ToString() : string.Empty)
+            ? CustomRoles.Mini.GetColoredTextByRole(Age != 18 && UpDateAge.GetBool() ? $"({Age.ToString()})" : string.Empty)
             : string.Empty;
 }

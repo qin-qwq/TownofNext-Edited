@@ -3,6 +3,7 @@ using Hazel;
 using InnerNet;
 using System;
 using TOHE.Modules.Rpc;
+using TOHE.Roles.Impostor;
 using UnityEngine;
 
 
@@ -465,7 +466,8 @@ namespace TOHE.Modules
         internal BlackHole(Vector2 position, byte OwnerId)
         {
             if (!AmongUsClient.Instance.AmHost) return; // Spawning gets ignored for abyssbringer RPC, because it already does an rpc as Host
-            CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#000000>█<#19131c>█<#000000>█<#000000>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#412847>█<#000000>█<#19131c>█<#000000>█<#412847>█<#260f26>█<alpha=#00>█<br><#000000>█<#412847>█<#412847>█<#000000>█<#260f26>█<#1c0d1c>█<#19131c>█<#000000>█<br><#19131c>█<#000000>█<#412847>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#19131c>█<#000000>█<br><#000000>█<#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#000000>█<#260f26>█<br><#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#19131c>█<#412847>█<#412847>█<#19131c>█<br><alpha=#00>█<#260f26>█<#412847>█<#412847>█<#19131c>█<#260f26>█<#19131c>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#412847>█<#260f26>█<#260f26>█<#000000>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
+            if (!AbyssBringer.BlackHoleSkin.GetBool()) CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#000000>█<#19131c>█<#000000>█<#000000>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#412847>█<#000000>█<#19131c>█<#000000>█<#412847>█<#260f26>█<alpha=#00>█<br><#000000>█<#412847>█<#412847>█<#000000>█<#260f26>█<#1c0d1c>█<#19131c>█<#000000>█<br><#19131c>█<#000000>█<#412847>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#19131c>█<#000000>█<br><#000000>█<#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#000000>█<#260f26>█<br><#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#19131c>█<#412847>█<#412847>█<#19131c>█<br><alpha=#00>█<#260f26>█<#412847>█<#412847>█<#19131c>█<#260f26>█<#19131c>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#412847>█<#260f26>█<#260f26>█<#000000>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
+            else CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
             this.OwnerId = OwnerId;
         }
     }
@@ -485,15 +487,6 @@ namespace TOHE.Modules
             if (!AmongUsClient.Instance.AmHost) return; // Spawning gets ignored for rift maker RPC, because it already does an rpc as Host
             CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#e81111>█<#e81111>█<#e81111>█<#e81111>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#e81111>█<#ac2020>█<#ac2020>█<#ac2020>█<#ac2020>█<#e81111>█<alpha=#00>█<br><#e81111>█<#ac2020>█<#db5c5c>█<#db5c5c>█<#db5c5c>█<#db5c5c>█<#ac2020>█<#e81111>█<br><#e81111>█<#ac2020>█<#db5c5c>█<#ac2020>█<#ac2020>█<#db5c5c>█<#ac2020>█<#e81111>█<br><#e81111>█<#ac2020>█<#db5c5c>█<#ac2020>█<#db5c5c>█<#db5c5c>█<#ac2020>█<#e81111>█<br><#e81111>█<#ac2020>█<#db5c5c>█<#ac2020>█<#ac2020>█<#ac2020>█<#ac2020>█<#e81111>█<br><alpha=#00>█<#e81111>█<#ac2020>█<#db5c5c>█<#db5c5c>█<#db5c5c>█<#e81111>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#e81111>█<#ac2020>█<#ac2020>█<#ac2020>█<alpha=#00>█<alpha=#00>█<br></color></line-height></font></size>", position);
             Main.AllAlivePlayerControls.ExceptBy(visibleList, x => x.PlayerId).Do(Hide);
-            this.OwnerId = OwnerId;
-        }
-    }
-    internal sealed class Hole : CustomNetObject
-    {
-        internal Hole(Vector2 position, List<byte> visibleList, byte OwnerId)
-        {
-            if (!AmongUsClient.Instance.AmHost) return; // Spawning gets ignored for rift maker RPC, because it already does an rpc as Host
-            CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=72%><alpha=#00>█<alpha=#00>█<alpha=#00>█<#ab6421>█<#ab6421>█<#ab6421>█<#ab6421>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ab6421>█<#875222>█<#875222>█<#875222>█<#875222>█<#ab6421>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<alpha=#00>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<br><alpha=#00>█<#ab6421>█<#875222>█<#352617>█<#352617>█<#352617>█<#352617>█<#875222>█<#ab6421>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ab6421>█<#875222>█<#875222>█<#875222>█<#875222>█<#ab6421>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<alpha=#00>█<#ab6421>█<#ab6421>█<#ab6421>█<#ab6421>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<br></color></line-height></font></size>", position);
             this.OwnerId = OwnerId;
         }
     }

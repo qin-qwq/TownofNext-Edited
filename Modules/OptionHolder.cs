@@ -15,6 +15,7 @@ public enum CustomGameMode
     FFA = 0x02,
 
     SpeedRun = 0x04,
+    TagMode = 0x05,
 
     HidenSeekTOHE = 0x08, // HidenSeekTOHE must be after other game modes
     All = int.MaxValue
@@ -53,15 +54,18 @@ public static class Options
             1 => CustomGameMode.FFA,
 
             2 => CustomGameMode.SpeedRun,
-            3 => CustomGameMode.HidenSeekTOHE, // HidenSeekTOHE must be after other game modes
+            3 => CustomGameMode.TagMode,
+            4 => CustomGameMode.HidenSeekTOHE, // HidenSeekTOHE must be after other game modes
             _ => CustomGameMode.Standard
         };
+    public static int prevGameMode = 0;
     public static readonly string[] gameModes =
     [
         "Standard",
         "FFA",
 
         "SpeedRun",
+        "TagMode",
 
         "Hide&SeekTOHE", // HidenSeekTOHE must be after other game modes
     ];
@@ -287,6 +291,7 @@ public static class Options
     public static OptionItem NumImpostorsHnS;
 
     // Confirm Ejection
+    public static OptionItem PlayEjectSfx;
     public static OptionItem CEMode;
     public static OptionItem ShowImpRemainOnEject;
     public static OptionItem ShowNKRemainOnEject;
@@ -611,6 +616,8 @@ public static class Options
     public static OptionItem LoverSpawnChances;
     public static OptionItem LoverKnowRoles;
     public static OptionItem LoverSuicide;
+    public static OptionItem PrivateChat;
+    public static OptionItem PreventModdedClientSee;
     public static OptionItem ImpCanBeInLove;
     public static OptionItem CrewCanBeInLove;
     public static OptionItem NeutralCanBeInLove;
@@ -721,7 +728,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 32700 last id for roles/add-ons (Next use 32800)
+        // 33100 last id for roles/add-ons (Next use 33200)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1358,6 +1365,9 @@ public static class Options
         //Speed Run
         SpeedRun.SetupCustomOption();
 
+        //Tag Mode
+        TagMode.SetupCustomOption();
+
         // Hide & Seek
         TextOptionItem.Create(10000055, "MenuTitle.Hide&Seek", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.HidenSeekTOHE)
@@ -1376,6 +1386,11 @@ public static class Options
         TextOptionItem.Create(10000024, "MenuTitle.Ejections", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 238, 232, byte.MaxValue));
+
+        PlayEjectSfx = BooleanOptionItem.Create(60439, "PlayEjectSfx", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 238, 232, byte.MaxValue));
+
         CEMode = StringOptionItem.Create(60440, "ConfirmEjectionsMode", ConfirmEjectionsMode, 2, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
@@ -2031,12 +2046,14 @@ public static class Options
         TextOptionItem.Create(10000031, "MenuTitle.Other", TabGroup.ModSettings)
             .HideInFFA()
             .HideInSpeedRun()
+            .HideInTagMode()
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
         // 梯子摔死
         LadderDeath = BooleanOptionItem.Create(60760, "LadderDeath", false, TabGroup.ModSettings, false)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue))
             .HideInFFA()
-            .HideInSpeedRun();
+            .HideInSpeedRun()
+            .HideInTagMode();
         LadderDeathChance = StringOptionItem.Create(60761, "LadderDeathChance", EnumHelper.GetAllNames<SpawnChance>()[1..], 0, TabGroup.ModSettings, false)
             .SetParent(LadderDeath);
 
@@ -2178,19 +2195,29 @@ public static class Options
         .SetParent(spawnOption)
             .SetGameMode(customGameMode);
 
-        ImpCanBeInLove = BooleanOptionItem.Create(id + 5, "ImpCanBeInLove", true, TabGroup.Addons, false)
+        PrivateChat = BooleanOptionItem.Create(id + 5, "PrivateChat", false, TabGroup.Addons, false)
+        .SetParent(spawnOption)
+        .SetColor(Color.green)
+            .SetGameMode(customGameMode);
+
+        PreventModdedClientSee = BooleanOptionItem.Create(id + 6, "PreventModdedClientSee", false, TabGroup.Addons, false)
+        .SetParent(PrivateChat)
+        .SetColor(Color.green)
+            .SetGameMode(customGameMode);
+
+        ImpCanBeInLove = BooleanOptionItem.Create(id + 7, "ImpCanBeInLove", true, TabGroup.Addons, false)
         .SetParent(spawnOption)
             .SetGameMode(customGameMode);
 
-        CrewCanBeInLove = BooleanOptionItem.Create(id + 6, "CrewCanBeInLove", true, TabGroup.Addons, false)
+        CrewCanBeInLove = BooleanOptionItem.Create(id + 8, "CrewCanBeInLove", true, TabGroup.Addons, false)
         .SetParent(spawnOption)
             .SetGameMode(customGameMode);
 
-        NeutralCanBeInLove = BooleanOptionItem.Create(id + 7, "NeutralCanBeInLove", true, TabGroup.Addons, false)
+        NeutralCanBeInLove = BooleanOptionItem.Create(id + 9, "NeutralCanBeInLove", true, TabGroup.Addons, false)
         .SetParent(spawnOption)
             .SetGameMode(customGameMode);
 
-        CovenCanBeInLove = BooleanOptionItem.Create(id + 8, "CovenCanBeInLove", true, TabGroup.Addons, false)
+        CovenCanBeInLove = BooleanOptionItem.Create(id + 10, "CovenCanBeInLove", true, TabGroup.Addons, false)
         .SetParent(spawnOption)
             .SetGameMode(customGameMode);
 

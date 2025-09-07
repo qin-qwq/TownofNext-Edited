@@ -141,6 +141,11 @@ class CheckForEndVotingPatch
                         pc.GetRoleClass()?.OnVote(pc, voteTarget); // Role has voted
                         voteTarget.GetRoleClass()?.OnVoted(voteTarget, pc); // Role is voted
 
+                        if (Lich.IsCursed(pc))
+                        {
+                            Lich.OnTargetVote(pc);
+                        }
+
                         if (voteTarget.Is(CustomRoles.Aware))
                         {
                             Aware.OnVoted(pc, pva);
@@ -438,6 +443,9 @@ class CheckForEndVotingPatch
 
         var exileId = exiledPlayer.PlayerId;
         if (exileId is < 0 or > 254) return;
+
+        if (Options.PlayEjectSfx.GetBool())
+            CustomSoundsManager.RPCPlayCustomSoundAll("Dramatic");
 
         var realName = Main.AllPlayerNames[exiledPlayer.PlayerId];
         Main.LastVotedPlayer = realName;
@@ -1065,6 +1073,9 @@ class MeetingHudStartPatch
         if (Eavesdropper.IsEnable)
             Eavesdropper.GetMessage();
 
+        if (Rat.IsEnable)
+            Rat.GetMessage();
+
         // Add Mimic msg
         if (MimicMsg != "")
         {
@@ -1192,14 +1203,24 @@ class MeetingHudStartPatch
                 if (Illusionist.IsNonCovIllusioned(targetId))
                 {
                     var randomRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement();
-                    blankRT.Clear().Append(ColorString(GetRoleColor(randomRole), GetString(randomRole.ToString())));
+                    blankRT.Clear().Append(ColorString(GetRoleColor(randomRole), GetString(randomRole.GetActualRoleName())));
                     if (randomRole.GetStaticRoleClass().IsMethodOverridden("GetProgressText")) // Roles with Ability Uses
                     {
                         blankRT.Append(randomRole.GetStaticRoleClass().GetProgressText(playerId, false));
                     }
                     result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
                 }
+                if (Lich.IsCursed(target) && Lich.IsDeceived(player, target))
+                {
+                    blankRT.Clear().Append(CustomRoles.Lich.ToColoredString());
+                    result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
+                }
                 roleTextMeeting.text = result.ToString();
+            }
+            if (player.IsAlive() && !target.AmOwner && ExtendedPlayerControl.KnowRoleTarget(player, target) && Lich.IsCursed(target) && Lich.IsDeceived(player, target))
+            {
+                string blankRT = CustomRoles.Lich.ToColoredString();
+                roleTextMeeting.text = $"<size={roleTextMeeting.fontSize}>{blankRT}</size>";
             }
 
             var suffixBuilder = new StringBuilder(32);
@@ -1227,7 +1248,7 @@ class MeetingHudStartPatch
         {
             if (ReportDeadBodyPatch.ReportTarget == null && !Balancer.Choose)
                 SendMessage(GetString("Message.isButton"));
-            else if (ReportDeadBodyPatch.ReportTarget != null)
+            else if (ReportDeadBodyPatch.ReportTarget != null && !Balancer.Choose)
                 SendMessage(string.Format(GetString("Message.isReport"), ColorString(Main.PlayerColors[ReportDeadBodyPatch.ReportTarget.PlayerId], ReportDeadBodyPatch.ReportTarget.PlayerName)));
         }
 
@@ -1314,7 +1335,7 @@ class MeetingHudStartPatch
 
             var sb = new StringBuilder();
 
-            //pva.NameText.text = target.GetRealName(isMeeting: true);
+            pva.NameText.text = target.GetRealName(isMeeting: true);
             pva.NameText.text = pva.NameText.text.ApplyNameColorData(seer, target, true);
 
             //if (seer.KnowDeathReason(target))
@@ -1357,6 +1378,9 @@ class MeetingHudStartPatch
 
             pva.NameText.text += sb.ToString();
             pva.ColorBlindName.transform.localPosition -= new Vector3(1.35f, 0f, 0f);
+
+
+            pva.TargetPlayerId = target.PlayerId;
         }
 
         __instance.SortButtons();

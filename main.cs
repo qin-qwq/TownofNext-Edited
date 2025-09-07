@@ -53,16 +53,16 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.3.1"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.4.0 Alpha 1";
+    public const string PluginVersion = "1.3.5"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.4.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 4, 15, 0) // 2025.4.15 & 16.0.5 & 16.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = true; // Latest: V1.4.0 Alpha 1
-    public static readonly bool canaryRelease = false; // Latest: V1.3.0 Beta 2
+    public static readonly bool devRelease = false; // Latest: V1.4.0 Alpha 4
+    public static readonly bool canaryRelease = true; // Latest: V1.4.0 Beta 1
     public static readonly bool fullRelease = false; // Latest: V1.3.0
 
     public static bool hasAccess = true;
@@ -920,10 +920,12 @@ public enum CustomRoles
     Imitator,
     Infectious,
     Innocent,
+    Inquisitor,
     Jackal,
     Jester,
     Juggernaut,
     Lawyer,
+    Lich,
     Maverick,
     Opportunist,
     Pelican,
@@ -959,6 +961,7 @@ public enum CustomRoles
     Terrorist,
     Traitor,
     Troller,
+    Tunny,
     Vector,
     VengefulRomantic,
     Virus,
@@ -999,6 +1002,10 @@ public enum CustomRoles
 
     // Speed run
     Runner,
+
+    // Tag Mode
+    TZombie,
+    TCrewmate,
 
     // Sub-role after 500
     NotAssigned = 500,
@@ -1045,6 +1052,7 @@ public enum CustomRoles
     Lucky,
     Madmate,
     Mare,
+    Rat,
     Randomizer,
     Rebirth,
     Mimic,
@@ -1111,6 +1119,7 @@ public enum CustomWinner
     God = CustomRoles.God,
     Vector = CustomRoles.Vector,
     Innocent = CustomRoles.Innocent,
+    Inquisitor = CustomRoles.Inquisitor,
     Pelican = CustomRoles.Pelican,
     Youtuber = CustomRoles.Youtuber,
     Egoist = CustomRoles.Egoist,
@@ -1156,6 +1165,9 @@ public enum CustomWinner
     Shocker = CustomRoles.Shocker,
     Apocalypse = CustomRoles.Apocalypse,
     Coven = CustomRoles.Coven,
+    Tunny = CustomRoles.Tunny,
+    TZombie = CustomRoles.TZombie,
+    TCrewmate = CustomRoles.TCrewmate,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners
@@ -1163,6 +1175,7 @@ public enum AdditionalWinners
     None = -1,
     Lovers = CustomRoles.Lovers,
     Opportunist = CustomRoles.Opportunist,
+    Tunny = CustomRoles.Tunny,
     Summoned = CustomRoles.Summoned,
     Executioner = CustomRoles.Executioner,
     Lawyer = CustomRoles.Lawyer,

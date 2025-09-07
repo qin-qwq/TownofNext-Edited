@@ -1,9 +1,9 @@
 using System.Text;
 using TOHE.Roles.Core;
+using TOHE.Roles.Neutral;
 using static TOHE.MeetingHudStartPatch;
 using static TOHE.Options;
 using static TOHE.Translator;
-using static UnityEngine.GraphicsBuffer;
 
 namespace TOHE.Roles.Crewmate;
 
@@ -53,6 +53,11 @@ internal class Detective : RoleBase
 
         InfoAboutDeadPlayerAndKiller[killer.PlayerId] = Utils.GetRoleName(killer.GetCustomRole());
         InfoAboutDeadPlayerAndKiller[target.PlayerId] = Utils.GetRoleName(target.GetCustomRole());
+
+        if (Lich.IsCursed(killer))
+            InfoAboutDeadPlayerAndKiller[killer.PlayerId] = Utils.GetRoleName(CustomRoles.Lich);
+        if (Lich.IsCursed(target))
+            InfoAboutDeadPlayerAndKiller[target.PlayerId] = Utils.GetRoleName(CustomRoles.Lich);
     }
     public override void OnReportDeadBody(PlayerControl player, NetworkedPlayerInfo deadBody)
     {

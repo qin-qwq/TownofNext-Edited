@@ -60,6 +60,7 @@ internal class Ventguard : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.AbilityButton.OverrideText(GetString("VentguardVentButtonText"));
+        hud.AbilityButton.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Block");
 
