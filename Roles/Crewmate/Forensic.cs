@@ -1,4 +1,4 @@
-using System.Text;
+/*using System.Text;
 using TOHE.Roles.Core;
 using TOHE.Roles.Neutral;
 using static TOHE.MeetingHudStartPatch;
@@ -7,16 +7,17 @@ using static TOHE.Translator;
 
 namespace TOHE.Roles.Crewmate;
 
-internal class Detective : RoleBase
+internal class Forensic : RoleBase
 {
     //===========================SETUP================================\\
-    public override CustomRoles Role => CustomRoles.Detective;
+    public override CustomRoles Role => CustomRoles.Forensic;
     private const int Id = 7900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
 
     private static OptionItem DetectiveCanknowKiller;
+    private static OptionItem DetectiveCanknowDeathReason;
     private static OptionItem DetectiveCanknowRealKiller;
     private static OptionItem FindKillerProbability;
 
@@ -26,11 +27,13 @@ internal class Detective : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Detective);
+        SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Forensic);
         DetectiveCanknowKiller = BooleanOptionItem.Create(7902, "DetectiveCanknowKiller", true, TabGroup.CrewmateRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Detective]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
+        DetectiveCanknowDeathReason = BooleanOptionItem.Create(7910, "DetectiveCanknowDeathReason", true, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
         DetectiveCanknowRealKiller = BooleanOptionItem.Create(Id + 11, "DetectiveCanknowRealKiller", true, TabGroup.CrewmateRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Detective]);
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
         FindKillerProbability = IntegerOptionItem.Create(Id + 12, "FindKillerProbability", new(0, 100, 5), 50, TabGroup.CrewmateRoles, false)
             .SetParent(DetectiveCanknowRealKiller)
             .SetValueFormat(OptionFormat.Percent);
@@ -63,17 +66,22 @@ internal class Detective : RoleBase
     {
         if (deadBody == null) return;
 
-        if (player != null && player.Is(CustomRoles.Detective) && player.PlayerId != deadBody.PlayerId)
+        if (player != null && player.Is(CustomRoles.Forensic) && player.PlayerId != deadBody.PlayerId)
         {
             var msg = new StringBuilder();
             var RoleDeadBodyInfo = InfoAboutDeadPlayerAndKiller.GetValueOrDefault(deadBody.PlayerId);
             msg.Append(string.Format(GetString("DetectiveNoticeVictim"), deadBody.PlayerName, RoleDeadBodyInfo));
 
+            if (DetectiveCanknowDeathReason.GetBool())
+            {
+                var DeadReason = GetString($"DeathReason.{deadBody.PlayerId.GetDeathReason()}");
+                msg.Append($"；\n{string.Format(GetString("DetectiveNoticeDeathReason"), DeadReason)}");
+            }
             if (DetectiveCanknowKiller.GetBool())
             {
                 var realKiller = deadBody.PlayerId.GetRealKillerById();
 
-                 var rd = IRandom.Instance;
+                var rd = IRandom.Instance;
                 if (DetectiveCanknowRealKiller.GetBool() && rd.Next(0, 101) < FindKillerProbability.GetInt() && !KillerList.Contains(realKiller.PlayerId))
                 {
                     KillerList.Add(realKiller.PlayerId);
@@ -93,7 +101,7 @@ internal class Detective : RoleBase
                             ? Utils.GetRoleName(killerState.MainRole) : string.Empty;
 
                         if (string.IsNullOrEmpty(RoleKillerInfo))
-                            Logger.Warn($"Killer role still empty - role: {killerState?.MainRole} - from translations: {Utils.GetRoleName(killerState.MainRole) ?? string.Empty}", "Detective");
+                            Logger.Warn($"Killer role still empty - role: {killerState?.MainRole} - from translations: {Utils.GetRoleName(killerState.MainRole) ?? string.Empty}", "Forensic");
                     }
                     msg.Append($"；\n{string.Format(GetString("DetectiveNoticeKiller"), RoleKillerInfo)}");
                 }
@@ -105,9 +113,9 @@ internal class Detective : RoleBase
 
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
-        if ((!seer.IsAlive() || seer.Is(CustomRoles.Detective)) && KillerList.Contains(target.PlayerId))
+        if ((!seer.IsAlive() || seer.Is(CustomRoles.Forensic)) && KillerList.Contains(target.PlayerId))
         {
-            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Detective), "○");
+            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Forensic), "○");
         }
         return string.Empty;
     }
@@ -116,11 +124,11 @@ internal class Detective : RoleBase
     {
         if (!_Player.IsAlive() || _Player.PlayerId != pc.PlayerId || string.IsNullOrEmpty(Notify)) return;
 
-        AddMsg(Notify, pc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Detective), GetString("DetectiveNoticeTitle")));
+        AddMsg(Notify, pc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Forensic), GetString("DetectiveNoticeTitle")));
     }
     public override void MeetingHudClear()
     {
         Notify = string.Empty;
         InfoAboutDeadPlayerAndKiller.Clear();
     }
-}
+}*/

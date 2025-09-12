@@ -13,6 +13,7 @@ namespace TOHE;
 
 public class PlayerState(byte playerId)
 {
+    public readonly PlayerControl Player = GetPlayerById(playerId);
     public readonly byte PlayerId = playerId;
     public RoleBase RoleClass = new DefaultSetup();
     public CustomRoles MainRole = CustomRoles.NotAssigned;
@@ -37,7 +38,7 @@ public class PlayerState(byte playerId)
         }
     }
     public bool IsNecromancer { get; set; } = false;
-    public (DateTime, byte) RealKiller = (DateTime.MinValue, byte.MaxValue);
+    public (DateTime TimeStamp, byte) RealKiller = (DateTime.MinValue, byte.MaxValue);
     public List<(DateTime, CustomRoles)> MainRoleLogs = [];
     public PlainShipRoom LastRoom = null;
     public bool HasSpawned { get; set; } = false;
@@ -271,7 +272,7 @@ public class PlayerState(byte playerId)
         }
 
         if (!AmongUsClient.Instance.AmHost) return;
-        var msg = new RpcRemoveSubRole(PlayerControl.LocalPlayer.NetId, playerId, addOn);
+        var msg = new RpcRemoveSubRole(PlayerControl.LocalPlayer.NetId, PlayerId, addOn);
         RpcUtils.LateBroadcastReliableMessage(msg);
         
     }

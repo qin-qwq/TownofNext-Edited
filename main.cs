@@ -53,16 +53,16 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.3.5"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.4.0 Beta 1";
+    public const string PluginVersion = "1.3.6"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.4.0 Beta 2";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 4, 15, 0) // 2025.4.15 & 16.0.5 & 16.1.0
+            (2025, 9, 9, 0) // 2025.9.9 & 17.0.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V1.4.0 Alpha 4
-    public static readonly bool canaryRelease = true; // Latest: V1.4.0 Beta 1
+    public static readonly bool canaryRelease = true; // Latest: V1.4.0 Beta 2
     public static readonly bool fullRelease = false; // Latest: V1.3.0
 
     public static bool hasAccess = true;
@@ -91,8 +91,8 @@ public class Main : BasePlugin
     public static string credentialsText;
     public Coroutines coroutines;
     public Dispatcher dispatcher;
-    public static NormalGameOptionsV09 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-    public static HideNSeekGameOptionsV09 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+    public static NormalGameOptionsV10 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+    public static HideNSeekGameOptionsV10 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
     //Client Options
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
@@ -682,9 +682,9 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalGameOptionsV09.RecommendedImpostors = NormalGameOptionsV09.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
-        NormalGameOptionsV09.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
-        HideNSeekGameOptionsV09.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        NormalGameOptionsV10.RecommendedImpostors = NormalGameOptionsV10.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
+        NormalGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        HideNSeekGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll();
@@ -693,7 +693,7 @@ public class Main : BasePlugin
         if (DebugModeManager.AmDebugger) ConsoleManager.CreateConsole();
 
         // InitializeFileHash();
-        FileHash = "niko_is_testing_shit_for_2025_04_15";
+        FileHash = "Support_2025_09_09";
         TOHE.Logger.Msg("========= TOHE loaded! =========", "Plugin Load");
     }
 }
@@ -707,11 +707,13 @@ public enum CustomRoles
     Noisemaker,
     Scientist,
     Tracker,
+    Detective,
 
     // Impostor(Vanilla)
     Impostor,
     Phantom,
     Shapeshifter,
+    Viper,
 
     // Crewmate Vanilla Remakes
     CrewmateTOHE,
@@ -720,11 +722,13 @@ public enum CustomRoles
     NoisemakerTOHE,
     ScientistTOHE,
     TrackerTOHE,
+    DetectiveTOHE,
 
     // Impostor Vanilla Remakes
     ImpostorTOHE,
     PhantomTOHE,
     ShapeshifterTOHE,
+    ViperTOHE,
 
     // Impostor Ghost
     Bloodmoon,
@@ -837,7 +841,7 @@ public enum CustomRoles
     Crusader,
     Deceiver,
     Deputy,
-    Detective,
+    //Forensic,
     Dictator,
     Doctor,
     Enigma,

@@ -11,6 +11,7 @@ using TOHE.Modules.Rpc;
 using TOHE.Patches;
 using TOHE.Roles.Core;
 using TOHE.Roles.Core.AssignManager;
+using TOHE.Roles.Core.DraftAssign;
 using UnityEngine;
 using static TOHE.Translator;
 
@@ -270,7 +271,7 @@ internal class StartGameHostPatch
 {
     private static AmongUsClient thiz;
 
-    private static RoleOptionsCollectionV09 RoleOpt => Main.NormalOptions.roleOptions;
+    private static RoleOptionsCollectionV10 RoleOpt => Main.NormalOptions.roleOptions;
     private static Dictionary<RoleTypes, int> RoleTypeNums = [];
     public static void UpdateRoleTypeNums()
     {
@@ -281,7 +282,9 @@ internal class StartGameHostPatch
             { RoleTypes.Shapeshifter, RoleAssign.AddShapeshifterNum },
             { RoleTypes.Noisemaker, RoleAssign.AddNoisemakerNum },
             { RoleTypes.Phantom, RoleAssign.AddPhantomNum },
-            { RoleTypes.Tracker, RoleAssign.AddTrackerNum }
+            { RoleTypes.Tracker, RoleAssign.AddTrackerNum },
+            { RoleTypes.Detective, RoleAssign.AddDetectiveNum },
+            { RoleTypes.Viper, RoleAssign.AddViperNum },
         };
     }
 
@@ -388,7 +391,11 @@ internal class StartGameHostPatch
 
             // Select custom Roles/Add-ons
             EAC.OriginalRoles = [];
-            RoleAssign.StartSelect();
+
+            if (Options.DraftMode.GetBool() && Options.devEnableDraft)
+                DraftAssign.StartSelect();
+            else
+                RoleAssign.StartSelect();
             AddonAssign.StartSelect();
 
             // Set count Vanilla Roles
@@ -444,6 +451,8 @@ internal class StartGameHostPatch
                     RoleTypes.Noisemaker => CustomRoles.Noisemaker,
                     RoleTypes.Phantom => CustomRoles.Phantom,
                     RoleTypes.Tracker => CustomRoles.Tracker,
+                    RoleTypes.Detective => CustomRoles.Detective,
+                    RoleTypes.Viper => CustomRoles.Viper,
                     _ => CustomRoles.NotAssigned
                 };
                 if (role == CustomRoles.NotAssigned) Logger.SendInGame(string.Format(GetString("Error.InvalidRoleAssignment"), pc?.Data?.PlayerName));

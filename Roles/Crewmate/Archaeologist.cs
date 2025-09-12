@@ -92,7 +92,7 @@ internal class Archaeologist : RoleBase
                     if (player == null) return;
 
                     var rand = IRandom.Instance;
-                    AntiqueID = (byte)rand.Next(1, 16);
+                    AntiqueID = (byte)rand.Next(1, 18);
 
                     switch (AntiqueID)
                     {
@@ -141,6 +141,12 @@ internal class Archaeologist : RoleBase
                         case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
                             player.Notify(GetString("GotProphecy"), 15f);
                             break;
+                        case 16: // 无线按钮 - 召开一次会议
+                            player.Notify(GetString("GetButton"), 15f);
+                            break;
+                        case 17: // 万能钥匙 - 打开所有的门
+                            player.Notify(GetString("GetKey"), 15f);
+                            break;
                         default: // just in case
                             break;
                     }
@@ -163,7 +169,7 @@ internal class Archaeologist : RoleBase
         if (!player.IsAlive()) return;
 
         var rand = IRandom.Instance;
-        AntiqueID = (byte)rand.Next(1, 16);
+        AntiqueID = (byte)rand.Next(1, 18);
         FixNextSabo = false;
         HasGrail = false;
         LifeConnection = false;
@@ -214,6 +220,12 @@ internal class Archaeologist : RoleBase
                 break;
             case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
                 player.Notify(GetString("GotProphecy"), 15f);
+                break;
+            case 16: // 无线按钮 - 召开一次会议
+                player.Notify(GetString("GetButton"), 15f);
+                break;
+            case 17: // 万能钥匙 - 打开所有的门
+                player.Notify(GetString("GetKey"), 15f);
                 break;
             default: // just in case
                 break;
@@ -390,6 +402,14 @@ internal class Archaeologist : RoleBase
                 player.RpcGuardAndKill();
                 FixNextSabo = true;
                 break;
+            case 16: // 无线按钮 - 召开一次会议
+                player?.MyPhysics?.RpcBootFromVent(vent.Id);
+                player?.NoCheckStartMeeting(null);
+                break;
+            case 17: // 万能钥匙 - 打开所有的门
+                player.Notify(GetString("ArOpenAllDoors"));
+                DoorsReset.OpenAllDoors();
+                break;
             default: // just in case
                 break;
         }
@@ -528,6 +548,12 @@ internal class Archaeologist : RoleBase
                 break;
             case 14: // 时光沙漏
                 str.Append(GetString("PotionStore") + GetString("Arn"));
+                break;
+            case 16: // 无线按钮
+                str.Append(GetString("PotionStore") + GetString("Arp"));
+                break;
+            case 17: // 万能钥匙
+                str.Append(GetString("PotionStore") + GetString("Arq"));
                 break;
             default: // just in case
                 break;

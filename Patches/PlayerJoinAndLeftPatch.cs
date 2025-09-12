@@ -9,6 +9,7 @@ using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Patches;
 using TOHE.Roles.Core.AssignManager;
+using TOHE.Roles.Core.DraftAssign;
 using TOHE.Roles.Crewmate;
 using static TOHE.Translator;
 
@@ -58,6 +59,7 @@ class OnGameJoinedPatch
 
             GameStartManagerPatch.GameStartManagerUpdatePatch.exitTimer = -1;
             Main.DoBlockNameChange = false;
+            DraftAssign.Reset();
             RoleAssign.SetRoles = [];
             GhostRoleAssign.forceRole = [];
             EAC.DeNum = new();

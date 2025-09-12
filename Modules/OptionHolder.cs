@@ -3,6 +3,7 @@ using TOHE.Modules;
 using TOHE.Roles.AddOns;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
+using TOHE.Roles.Core.DraftAssign;
 using UnityEngine;
 
 namespace TOHE;
@@ -70,7 +71,19 @@ public static class Options
         "Hide&SeekTOHE", // HidenSeekTOHE must be after other game modes
     ];
 
-
+    public static OptionItem DraftHeader;
+    public static OptionItem DraftMode;
+    public static OptionItem DraftableCount;
+    public static OptionItem BucketCount;
+    public static bool devEnableDraft = false;
+    public static readonly string[] roleBuckets =
+    [
+        .. EnumHelper.GetAllValues<RoleBucket>().Where(x => x != RoleBucket.None).Select(x => x.ToColoredString()),
+        .. CustomRolesHelper.AllRoles.Where(role => role.IsBucketableRole()).Select(x => x.ToColoredString()),
+    ];
+    public static MultipleStringOptionItem DraftBuckets;
+    public static OptionItem[] draftBuckets = new OptionItem[15];
+    public static string ConvertRoleBucketToString(RoleBucket bucket) => $"RoleBucket.{bucket}";
 
     // 役職数・確率
     public static Dictionary<CustomRoles, int> roleCounts;
@@ -728,7 +741,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33100 last id for roles/add-ons (Next use 33200)
+        // 33200 last id for roles/add-ons (Next use 33300)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1380,7 +1393,38 @@ public static class Options
             .SetGameMode(CustomGameMode.HidenSeekTOHE)
             .SetValueFormat(OptionFormat.Players);
 
+        Logger.Info("Start of Draft Setup", "Draft Setup");
+        // Draft Mode
+        DraftHeader = TextOptionItem.Create(10000033, "MenuTitle.Draft", TabGroup.ModSettings)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 238, 232, byte.MaxValue))
+            .SetHidden((!PlayerControl.LocalPlayer?.FriendCode?.GetDevUser().IsDev) ?? true);
 
+        DraftMode = BooleanOptionItem.Create(61000, "UseDraftMode", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true);
+
+        DraftableCount = IntegerOptionItem.Create(61001, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetParent(DraftMode);
+
+        BucketCount = IntegerOptionItem.Create(61002, "BucketCount", new(5, 225, 1), 15, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetParent(DraftMode)
+            .RegisterUpdateValueEvent((obj, args) => BucketCountChanged(args));
+
+        DraftBuckets = MultipleStringOptionItem.Create(61003, 225, BucketCount.GetInt() + 5, "RoleBucket", roleBuckets, 0, TabGroup.ModSettings, false, useGetString: false)
+            .SetParent(BucketCount)
+            .SetGameMode(CustomGameMode.Standard);
+
+        Logger.Info("Draft Bucket Options set up", "OptionsHolder.CoLoadOptions");
+
+        if ((!PlayerControl.LocalPlayer?.FriendCode?.GetDevUser().IsDev) ?? true)
+        {
+            DraftMode.SetHidden(true);
+        }
+
+        Logger.Info("End of Draft Setup", "Draft Setup");
 
         // Confirm Ejections Mode
         TextOptionItem.Create(10000024, "MenuTitle.Ejections", TabGroup.ModSettings)
@@ -2298,6 +2342,11 @@ public static class Options
 
         CustomRoleSpawnChances.Add(role, spawnOption);
         CustomRoleCounts.Add(role, countOption);
+    }
+    static void BucketCountChanged(OptionItem.UpdateValueEventArgs args)
+    {
+        DraftBuckets.Count = args.CurrentValue + 5;
+        DraftBuckets.Refresh();
     }
     public class OverrideTasksData
     {

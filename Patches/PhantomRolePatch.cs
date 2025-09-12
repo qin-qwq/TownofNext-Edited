@@ -2,6 +2,8 @@ using AmongUs.GameOptions;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using TOHE.Roles.Core;
+using TOHE.Roles.Crewmate;
+using TOHE.Roles.Impostor;
 using UnityEngine;
 
 namespace TOHE.Patches;
@@ -54,7 +56,7 @@ public static class PhantomRolePatch
         Logger.Info($"Player: {phantom.GetRealName()}", "CheckVanish");
         var role = phantom.GetRoleClass();
 
-        if (role?.OnCheckVanish(phantom) == false)
+        if (role?.OnCheckVanish(phantom) == false || TimeMaster.Rewinding)
         {
             if (phantom.AmOwner)
             {
@@ -243,7 +245,7 @@ public static class PhantomRoleUseAbilityPatch
                 }
                 DestroyableSingleton<HudManager>.Instance.AbilityButton.SetSecondImage(__instance.Ability);
                 DestroyableSingleton<HudManager>.Instance.AbilityButton.OverrideText(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.PhantomAbilityUndo, new Il2CppReferenceArray<Il2CppSystem.Object>(0)));
-                __instance.Player.CmdCheckVanish(GameManager.Instance.LogicOptions.GetPhantomDuration());
+                __instance.Player.CmdCheckVanish(GameManager.Instance.LogicOptions.GetRoleFloat(FloatOptionNames.PhantomDuration));
                 return false;
             }
         }
