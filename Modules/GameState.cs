@@ -45,7 +45,7 @@ public class PlayerState(byte playerId)
     public Dictionary<byte, string> TargetColorData = [];
     public NetworkedPlayerInfo.PlayerOutfit NormalOutfit;
 
-    public void SetMainRole(CustomRoles role)
+    public void SetMainRole(CustomRoles role, bool record = true)
     {
         CustomRoles preMainRole = MainRole;
 
@@ -123,7 +123,7 @@ public class PlayerState(byte playerId)
             countTypes = CountTypes.Coven;
         }
 
-        MainRoleLogs.Add((DateTime.Now, role));
+        if (record) MainRoleLogs.Add((DateTime.Now, role));
 
         if (GameStates.IsInGame && preMainRole != CustomRoles.NotAssigned)
         {

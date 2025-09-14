@@ -7,6 +7,7 @@
 		<GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
 		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
 		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+		<AssemblyName>TONE</AssemblyName>
 		<Description>Town Of Next Edited</Description>
 		<Authors>Qin-qwq</Authors>
 		<LangVersion>12.0</LangVersion>

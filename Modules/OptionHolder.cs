@@ -741,7 +741,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33200 last id for roles/add-ons (Next use 33300)
+        // 33300 last id for roles/add-ons (Next use 33400)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -751,6 +751,7 @@ public static class Options
         OptionSaver.Initialize();
         GroupAddons();
 
+        Logger.Info("Settings loaded", "Load Options");
         yield return null;
 
         // Preset Option
@@ -885,7 +886,7 @@ public static class Options
         RemoveIncompatibleAddOnsMidGame = BooleanOptionItem.Create(60034, "RemoveIncompatibleAddOnsMidGame", true, TabGroup.Addons, false)
             .SetGameMode(CustomGameMode.Standard);
         #endregion
-
+        Logger.Info("Role/Addon settings setup", "Load Options");
         yield return null;
 
         #region Impostors Settings
@@ -961,7 +962,7 @@ public static class Options
         CustomRoleManager.GetNormalOptions(Custom_RoleType.ImpostorGhosts).ForEach(r => r.SetupCustomOption());
 
         #endregion
-
+        Logger.Info("Impostor settings setup", "Load Options");
         yield return null;
 
         #region Crewmates Settings
@@ -1038,7 +1039,7 @@ public static class Options
 
 
         #endregion
-
+        Logger.Info("Crewmate settings setup", "Load Options");
         yield return null;
 
         #region Neutrals Settings
@@ -1092,7 +1093,7 @@ public static class Options
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralApocalypse).ForEach(r => r.SetupCustomOption());
         #endregion
-
+        Logger.Info("Neutral settings setup", "Load Options");
         yield return null;
 
         #region Coven Settings
@@ -1131,7 +1132,7 @@ public static class Options
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenUtility).ForEach(r => r.SetupCustomOption());
         #endregion
-
+        Logger.Info("Coven settings setup", "Load Options");
         yield return null;
 
         #region Add-Ons Settings
@@ -1188,7 +1189,7 @@ public static class Options
 
 
         #endregion
-
+        Logger.Info("Addon settings setup", "Load Options");
         yield return null;
 
         #region Experimental Roles/Add-ons Settings
@@ -1368,7 +1369,7 @@ public static class Options
             .SetColor(Color.cyan)
             .SetHeader(true);
         #endregion 
-
+        Logger.Info("System settings setup", "Load Options");
         yield return null;
 
         #region Game Settings

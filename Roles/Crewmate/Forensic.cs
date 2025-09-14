@@ -1,4 +1,5 @@
-/*using System.Text;
+using AmongUs.GameOptions;
+using System.Text;
 using TOHE.Roles.Core;
 using TOHE.Roles.Neutral;
 using static TOHE.MeetingHudStartPatch;
@@ -12,10 +13,11 @@ internal class Forensic : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Forensic;
     private const int Id = 7900;
-    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
+    public override CustomRoles ThisRoleBase => CustomRoles.Detective;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
 
+    private static OptionItem DetectiveSuspectLimit;
     private static OptionItem DetectiveCanknowKiller;
     private static OptionItem DetectiveCanknowDeathReason;
     private static OptionItem DetectiveCanknowRealKiller;
@@ -28,13 +30,16 @@ internal class Forensic : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Forensic);
-        DetectiveCanknowKiller = BooleanOptionItem.Create(7902, "DetectiveCanknowKiller", true, TabGroup.CrewmateRoles, false)
+        DetectiveSuspectLimit = IntegerOptionItem.Create(Id + 10, GeneralOption.DetectiveBase_DetectiveSuspectLimit, new(2, 4, 1), 2, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic])
+            .SetValueFormat(OptionFormat.Players);
+        DetectiveCanknowKiller = BooleanOptionItem.Create(Id + 11, "DetectiveCanknowKiller", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
-        DetectiveCanknowDeathReason = BooleanOptionItem.Create(7910, "DetectiveCanknowDeathReason", true, TabGroup.CrewmateRoles, false)
+        DetectiveCanknowDeathReason = BooleanOptionItem.Create(Id + 12, "DetectiveCanknowDeathReason", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
-        DetectiveCanknowRealKiller = BooleanOptionItem.Create(Id + 11, "DetectiveCanknowRealKiller", true, TabGroup.CrewmateRoles, false)
+        DetectiveCanknowRealKiller = BooleanOptionItem.Create(Id + 13, "DetectiveCanknowRealKiller", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
-        FindKillerProbability = IntegerOptionItem.Create(Id + 12, "FindKillerProbability", new(0, 100, 5), 50, TabGroup.CrewmateRoles, false)
+        FindKillerProbability = IntegerOptionItem.Create(Id + 14, "FindKillerProbability", new(0, 100, 5), 50, TabGroup.CrewmateRoles, false)
             .SetParent(DetectiveCanknowRealKiller)
             .SetValueFormat(OptionFormat.Percent);
     }
@@ -49,6 +54,10 @@ internal class Forensic : RoleBase
     public override void Add(byte playerId)
     {
         CustomRoleManager.CheckDeadBodyOthers.Add(GetInfoFromDeadBody);
+    }
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.DetectiveSuspectLimit = DetectiveSuspectLimit.GetInt();
     }
     private void GetInfoFromDeadBody(PlayerControl killer, PlayerControl target, bool inMeeting)
     {
@@ -131,4 +140,4 @@ internal class Forensic : RoleBase
         Notify = string.Empty;
         InfoAboutDeadPlayerAndKiller.Clear();
     }
-}*/
+}

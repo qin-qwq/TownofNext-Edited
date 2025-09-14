@@ -20,7 +20,7 @@ internal class Tunny : RoleBase
 
     private static readonly Dictionary<byte, float> MoveTime = [];
     private static readonly Dictionary<byte, Vector2> NowPosition = [];
-    private bool Prevent;
+    private bool Prevent = true;
 
     public override void SetupCustomOption()
     {
@@ -39,11 +39,10 @@ internal class Tunny : RoleBase
     {
         MoveTime.Clear();
         NowPosition.Clear();
-        Prevent = false;
+        Prevent = true;
     }
     public override void Add(byte playerId)
     {
-        MoveTime[playerId] = 8 + CanWaitTime.GetInt();
         NowPosition[playerId] = Vector2.zero;
     }
 

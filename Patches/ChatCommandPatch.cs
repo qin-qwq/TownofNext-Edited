@@ -1783,7 +1783,7 @@ internal class ChatCommands
                     Logger.Info("Game Starting", "ChatCommand");
                     break;
                 case "/draft":
-                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev || Options.devEnableDraft)
+                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft)
                     {
                         break;
                     }
@@ -1835,7 +1835,7 @@ internal class ChatCommands
                         Options.devEnableDraft = true;
                         Options.DraftHeader.SetHidden(false);
                         Options.DraftMode.SetHidden(false);
-                        Utils.SendMessage($"{PlayerControl.LocalPlayer.GetRealName()} has enabled draft for you. (No leaks yet please)", PlayerControl.LocalPlayer.PlayerId);
+                        Utils.SendMessage($"{PlayerControl.LocalPlayer.GetRealName()}启用了轮抽选角", PlayerControl.LocalPlayer.PlayerId);
                     }
                     else
                     {
@@ -3817,7 +3817,7 @@ internal class ChatCommands
                 GameManager.Instance.LogicFlow.CheckEndCriteria();
                 break;
             case "/draft":
-                if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev || Options.devEnableDraft || player.FriendCode.GetDevUser().IsDev)
+                if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft && !player.FriendCode.GetDevUser().IsDev)
                 {
                     break;
                 }
@@ -3885,7 +3885,7 @@ internal class ChatCommands
                     Options.devEnableDraft = true;
                     Options.DraftHeader.SetHidden(false);
                     Options.DraftMode.SetHidden(false);
-                    Utils.SendMessage($"Developer {player.GetRealName()} has enabled draft for you. (No leaks yet please)", PlayerControl.LocalPlayer.PlayerId);
+                    Utils.SendMessage($"开发者{player.GetRealName()}为你启用了轮抽选角", PlayerControl.LocalPlayer.PlayerId);
                 }
                 else
                 {

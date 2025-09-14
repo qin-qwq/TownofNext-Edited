@@ -220,6 +220,12 @@ internal class RPCHandlerPatch
     }
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
+        switch (callId)
+        {
+            case 62 when GameStates.IsInTask && Main.IntroDestroyed && !ExileController.Instance && !AntiBlackout.SkipTasks:
+                PhantomRolePatch.CheckTrigger(__instance);
+                break;
+        }
         // Process nothing but CustomRPC
         if (callId < (byte)CustomRPC.VersionCheck) return;
 

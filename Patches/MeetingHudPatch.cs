@@ -1335,7 +1335,7 @@ class MeetingHudStartPatch
 
             var sb = new StringBuilder();
 
-            pva.NameText.text = target.GetRealName(isMeeting: true);
+            //pva.NameText.text = target.GetRealName(isMeeting: true);
             pva.NameText.text = pva.NameText.text.ApplyNameColorData(seer, target, true);
 
             //if (seer.KnowDeathReason(target))
@@ -1378,9 +1378,6 @@ class MeetingHudStartPatch
 
             pva.NameText.text += sb.ToString();
             pva.ColorBlindName.transform.localPosition -= new Vector3(1.35f, 0f, 0f);
-
-
-            pva.TargetPlayerId = target.PlayerId;
         }
 
         __instance.SortButtons();
@@ -1459,7 +1456,7 @@ class MeetingHudUpdatePatch
             //__instance.playerStates.Where(x => !x.TargetPlayerId.GetPlayer().IsAlive() && !x.AmDead)
             //    .Do(x => x.SetDead(x.DidReport, true, x.GAIcon));
 
-            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper or CustomRoles.Balancer && !PlayerControl.LocalPlayer.IsAlive())
+            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper or CustomRoles.Balancer or CustomRoles.Dictator && !PlayerControl.LocalPlayer.IsAlive())
                 ClearShootButton(__instance, true);
 
             if (myRole is CustomRoles.Nemesis && !PlayerControl.LocalPlayer.IsAlive() && GameObject.Find("ShootButton") == null)

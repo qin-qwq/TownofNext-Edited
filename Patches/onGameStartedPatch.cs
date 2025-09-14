@@ -456,7 +456,7 @@ internal class StartGameHostPatch
                     _ => CustomRoles.NotAssigned
                 };
                 if (role == CustomRoles.NotAssigned) Logger.SendInGame(string.Format(GetString("Error.InvalidRoleAssignment"), pc?.Data?.PlayerName));
-                Main.PlayerStates[pc.PlayerId].SetMainRole(role);
+                Main.PlayerStates[pc.PlayerId].SetMainRole(role, false);
             }
 
             if (Options.CurrentGameMode is CustomGameMode.FFA)
@@ -626,7 +626,7 @@ internal class StartGameHostPatch
     private static void AssignCustomRole(CustomRoles role, PlayerControl player)
     {
         if (player == null) return;
-        Main.PlayerStates[player.PlayerId].SetMainRole(role);
+        Main.PlayerStates[player.PlayerId].SetMainRole(role, false);
     }
 }
 [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SelectRoles))]
@@ -709,7 +709,7 @@ public static class RpcSetRoleReplacer
 
             if (player == null) continue;
 
-            Main.PlayerStates[playerId].SetMainRole(role);
+            Main.PlayerStates[playerId].SetMainRole(role, false);
 
             if (role.IsDesyncRole())
             {

@@ -875,7 +875,7 @@ public static class CustomRolesHelper
 
             case CustomRoles.Sleuth:
                 if (pc.Is(CustomRoles.Oblivious)
-                    //|| pc.Is(CustomRoles.Forensic)
+                    || pc.Is(CustomRoles.Forensic)
                     || pc.Is(CustomRoles.Mortician)
                     || pc.Is(CustomRoles.Cleaner)
                     || pc.Is(CustomRoles.Medusa)
@@ -941,7 +941,7 @@ public static class CustomRolesHelper
 
             case CustomRoles.Oblivious:
                 if (pc.Is(CustomRoles.Vulture)
-                    //|| pc.Is(CustomRoles.Forensic)
+                    || pc.Is(CustomRoles.Forensic)
                     || pc.Is(CustomRoles.Sleuth)
                     || pc.Is(CustomRoles.Cleaner)
                     || pc.Is(CustomRoles.Amnesiac)

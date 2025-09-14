@@ -53,8 +53,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.3.6"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.4.0 Beta 2";
+    public const string PluginVersion = "1.3.7"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.4.0 Beta 2 Hotfix 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 17.0.0
@@ -62,8 +62,8 @@ public class Main : BasePlugin
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V1.4.0 Alpha 4
-    public static readonly bool canaryRelease = true; // Latest: V1.4.0 Beta 2
-    public static readonly bool fullRelease = false; // Latest: V1.3.0
+    public static readonly bool canaryRelease = true; // Latest: V1.4.0 Beta 2 Hotfix 1
+    public static readonly bool fullRelease = false; // Latest: V1.4.0
 
     public static bool hasAccess = true;
 
@@ -832,6 +832,7 @@ public enum CustomRoles
     Bodyguard,
     Brave,
     Captain,
+    Catalyst,
     Celebrity,
     Chameleon,
     ChiefOfPolice,
@@ -841,7 +842,7 @@ public enum CustomRoles
     Crusader,
     Deceiver,
     Deputy,
-    //Forensic,
+    Forensic,
     Dictator,
     Doctor,
     Enigma,

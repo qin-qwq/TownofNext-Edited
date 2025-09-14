@@ -511,16 +511,23 @@ class BeginCrewmatePatch
             case CustomRoles.PhantomTOHE:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Phantom);
                 break;
-            case CustomRoles.Coroner:
             case CustomRoles.TrackerTOHE:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Tracker);
                 break;
             case CustomRoles.DetectiveTOHE:
-            //case CustomRoles.Forensic:
+            case CustomRoles.Forensic:
+            case CustomRoles.FortuneTeller:
+            case CustomRoles.Overseer:
+            case CustomRoles.Coroner:
+            case CustomRoles.Oracle:
+            case CustomRoles.Inspector:
+            case CustomRoles.Snitch:
+            case CustomRoles.Investigator:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Detective);
                 break;
             case CustomRoles.ViperTOHE:
             case CustomRoles.Vampire:
+            case CustomRoles.Scavenger:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Viper);
                 break;
             case CustomRoles.Celebrity:
@@ -551,7 +558,6 @@ class BeginCrewmatePatch
                 break;
 
             case CustomRoles.Workaholic:
-            case CustomRoles.Snitch:
             case CustomRoles.TaskManager:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = DestroyableSingleton<HudManager>.Instance.TaskCompleteSound;
                 break;

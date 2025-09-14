@@ -121,7 +121,11 @@ internal class AbyssBringer : RoleBase
         shapeshifter.ResetKillCooldown();
         shapeshifter.SetKillCooldown(forceAnime: true);
     }
-    public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
+        hud.AbilityButton.SetUsesRemaining(BlackHoleCountLimit.GetInt() - BlackHoles.Count);
+    }
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
     {
         var abyssbringer = _Player;

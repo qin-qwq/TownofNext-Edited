@@ -478,7 +478,8 @@ public static class Utils
                     targetSubRoles = Main.PlayerStates[DollMaster.DollMasterTarget.PlayerId].SubRoles;
             }
         }
-        if (Lich.IsCursed(GetPlayerById(targetId)) && Lich.IsDeceived(GetPlayerById(seerId), GetPlayerById(targetId)))
+
+        if (GetPlayerById(targetId) != null && GetPlayerById(seerId) != null && Lich.IsCursed(GetPlayerById(targetId)) && Lich.IsDeceived(GetPlayerById(seerId), GetPlayerById(targetId)))
         {
             targetMainRole = CustomRoles.Lich;
         }
@@ -965,11 +966,12 @@ public static class Utils
 
         sb.Append($"<#ffffff>{GetString("RoleSummaryText")}</color>");
 
-        List<byte> cloneRoles = new(Main.PlayerStates.Keys);
+        List<byte> cloneRoles = [.. Main.PlayerStates.Keys];
         foreach (byte id in Main.winnerList.ToArray())
         {
-            if (EndGamePatch.SummaryText[id].Contains("<INVALID:NotAssigned>")) continue;
-            sb.Append($"\n<#c4aa02>★</color> ").Append(EndGamePatch.SummaryText[id]/*.RemoveHtmlTags()*/);
+            if (!EndGamePatch.SummaryText.TryGetValue(id, out string winner)) continue;
+            if (winner.Contains("<INVALID:NotAssigned>")) continue;
+            sb.Append($"\n<#c4aa02>★</color> ").Append(winner/*.RemoveHtmlTags()*/);
             cloneRoles.Remove(id);
         }
         switch (Options.CurrentGameMode)
@@ -983,7 +985,8 @@ public static class Utils
                 listFFA.Sort();
                 foreach ((int, byte) id in listFFA.ToArray())
                 {
-                    sb.Append($"\n　 ").Append(EndGamePatch.SummaryText[id.Item2]);
+                    if (EndGamePatch.SummaryText.TryGetValue(id.Item2, out string winner))
+                        sb.Append($"\n　 ").Append(winner);
                 }
                 break;
             case CustomGameMode.SpeedRun:
@@ -993,9 +996,9 @@ public static class Utils
             default: // Normal game
                 foreach (byte id in cloneRoles.ToArray())
                 {
-                    if (EndGamePatch.SummaryText[id].Contains("<INVALID:NotAssigned>"))
-                        continue;
-                    sb.Append($"\n　 ").Append(EndGamePatch.SummaryText[id]);
+                    if (!EndGamePatch.SummaryText.TryGetValue(id, out string loser)) continue;
+                    if (loser.Contains("<INVALID:NotAssigned>")) continue;
+                    sb.Append($"\n　 ").Append(loser);
 
                 }
                 break;
@@ -1337,7 +1340,7 @@ public static class Utils
     public static void SendMessage(string text, byte sendTo = byte.MaxValue, string title = "", bool logforChatManager = false, bool noReplay = false, bool ShouldSplit = false)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        if (title == "") title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
+        if (title.IsNullOrWhiteSpace()) title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
         if (title.Count(x => x == '\u2605') == 2 && !title.Contains('\n'))
         {
             if (title.Contains('<') && title.Contains('>') && title.Contains('#'))
@@ -1622,9 +1625,7 @@ public static class Utils
         }
         if (player.FriendCode != PlayerControl.LocalPlayer.FriendCode && TagManager.CheckFriendCode(player.FriendCode, false))
         {
-            if ((TagManager.ReadTagColor(player.FriendCode) == " " || TagManager.ReadTagColor(player.FriendCode) == "") && (TagManager.ReadTagName(player.FriendCode) != "" && TagManager.ReadTagName(player.FriendCode) != " ")) modtag = $"{TagManager.ReadTagName(player.FriendCode)}";
-            else if (TagManager.ReadTagName(player.FriendCode) == " " || TagManager.ReadTagName(player.FriendCode) == "") modtag = "";
-            else modtag = $"<color=#{TagManager.ReadTagColor(player.FriendCode)}>{TagManager.ReadTagName(player.FriendCode)}</color>";
+            modtag = TagManager.ReadColoredTag(player.FriendCode);
         }
 
         if (player.AmOwner)
