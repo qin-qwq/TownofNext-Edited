@@ -227,26 +227,46 @@ namespace TOHE.Modules.Rpc
         private readonly List<byte> snList;
     }
 
-    class RpcSetLoversPlayers : BaseModdedRpc
+    // class RpcSetLoversPlayers : BaseModdedRpc
+    // {
+    //     public override byte RpcType => (byte)CustomRPC.SetLoversPlayers;
+    //     public RpcSetLoversPlayers(uint netId, int count, HashSet<PlayerControl> loversList) : base(netId)
+    //     {
+    //         this.count = count;
+    //         this.loversList = loversList;
+    //     }
+
+    //     public override void SerializeRpcValues(MessageWriter msg)
+    //     {
+    //         msg.Write(count);
+    //         foreach (var lp in loversList)
+    //         {
+    //             msg.Write(lp.PlayerId);
+    //         }
+    //     }
+
+    //     private readonly int count;
+    //     private readonly HashSet<PlayerControl> loversList;
+    // }
+
+    class RpcSetLoverPairs(uint netId, int pairCount, List<(byte, byte)> loverPairs, byte loverless) : BaseModdedRpc(netId)
     {
-        public override byte RpcType => (byte)CustomRPC.SetLoversPlayers;
-        public RpcSetLoversPlayers(uint netId, int count, HashSet<PlayerControl> loversList) : base(netId)
-        {
-            this.count = count;
-            this.loversList = loversList;
-        }
+        public override byte RpcType => (byte)CustomRPC.SetLoverPairs;
 
         public override void SerializeRpcValues(MessageWriter msg)
         {
-            msg.Write(count);
-            foreach (var lp in loversList)
+            msg.Write(pairCount);
+            foreach (var pair in loverPairs)
             {
-                msg.Write(lp.PlayerId);
+                msg.Write(pair.Item1);
+                msg.Write(pair.Item2);
             }
+            msg.Write(loverless);
         }
 
-        private readonly int count;
-        private readonly HashSet<PlayerControl> loversList;
+        private readonly int pairCount = pairCount;
+        private readonly List<(byte, byte)> loverPairs = loverPairs;
+        private readonly byte loverless = loverless;
     }
 
     class RpcSendFireworkerState : BaseModdedRpc

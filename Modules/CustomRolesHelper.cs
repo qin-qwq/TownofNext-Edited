@@ -430,8 +430,7 @@ public static class CustomRolesHelper
         || role is CustomRoles.Knighted
                 or CustomRoles.Cleansed
                 or CustomRoles.Workhorse
-                or CustomRoles.LastImpostor
-                or CustomRoles.Lovers;
+                or CustomRoles.LastImpostor;
 
     public static bool IsImpOnlyAddon(this CustomRoles role)
     {
@@ -591,7 +590,7 @@ public static class CustomRolesHelper
         }
 
         // Checking Lovers and Romantics
-        else if ((pc.Is(CustomRoles.RuthlessRomantic) || pc.Is(CustomRoles.Romantic) || pc.Is(CustomRoles.VengefulRomantic)) && role is CustomRoles.Lovers) return false;
+        //else if ((pc.Is(CustomRoles.RuthlessRomantic) || pc.Is(CustomRoles.Romantic) || pc.Is(CustomRoles.VengefulRomantic)) && role is CustomRoles.Lovers) return false;
 
         if (checkLimitAddons)
         {
@@ -607,6 +606,7 @@ public static class CustomRolesHelper
 
             case CustomRoles.Autopsy:
                 if (pc.Is(CustomRoles.Doctor)
+                    || pc.Is(CustomRoles.Forensic)
                     || pc.Is(CustomRoles.Tracefinder)
                     || pc.Is(CustomRoles.ScientistTOHE)
                     || pc.Is(CustomRoles.Sunnyboy))
@@ -1326,6 +1326,26 @@ public static class CustomRolesHelper
                 break;
             case CustomRoles.Evader:
                 if (pc.IsNeutralApocalypse())
+                    return false;
+                break;
+
+            case CustomRoles.Lovers:
+                if (pc.Is(CustomRoles.Dictator)
+                    || pc.Is(CustomRoles.God)
+                    || pc.Is(CustomRoles.Hater)
+                    || pc.Is(CustomRoles.Sunnyboy)
+                    || pc.Is(CustomRoles.Bomber)
+                    || pc.Is(CustomRoles.Provocateur)
+                    || pc.Is(CustomRoles.RuthlessRomantic)
+                    || pc.Is(CustomRoles.Romantic)
+                    || pc.Is(CustomRoles.VengefulRomantic)
+                    || pc.Is(CustomRoles.Workaholic)
+                    || pc.Is(CustomRoles.Solsticer)
+                    || pc.Is(CustomRoles.Mini)
+                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.EvilMini)
+                    || pc.Is(CustomRoles.Cupid)
+                )
                     return false;
                 break;
         }

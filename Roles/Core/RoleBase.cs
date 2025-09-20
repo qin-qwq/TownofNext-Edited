@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
 using TOHE.Roles.Core;
+using TOHE.Roles.Neutral;
 using UnityEngine;
 
 namespace TOHE;
@@ -263,6 +264,8 @@ public abstract class RoleBase
     /// Called after check Shapeshift
     /// </summary>
     public virtual void OnShapeshift(PlayerControl shapeshifter, PlayerControl target, bool IsAnimate, bool shapeshifting)
+    { }
+    public virtual void OnVoteKick(PlayerControl pc, PlayerControl target)
     { }
     public virtual bool OnCheckVanish(PlayerControl phantom) => true;
 

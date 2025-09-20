@@ -1,4 +1,5 @@
 using AmongUs.Data;
+using System.Collections;
 using TOHE.Modules;
 using TOHE.Roles.Impostor;
 
@@ -62,6 +63,7 @@ public static class Camouflage
 
     public static List<byte> ResetSkinAfterDeathPlayers = [];
     public static Dictionary<byte, NetworkedPlayerInfo.PlayerOutfit> PlayerSkins = [];
+    private static HashSet<byte> WaitingForSkinChange = [];
     public static bool IsActive;
 
     public static void Init()
@@ -69,6 +71,7 @@ public static class Camouflage
         IsCamouflage = false;
         PlayerSkins.Clear();
         ResetSkinAfterDeathPlayers.Clear();
+        WaitingForSkinChange = [];
 
         IsActive = Options.CommsCamouflage.GetBool() && !(Options.DisableOnSomeMaps.GetBool() &&
             (
@@ -153,17 +156,8 @@ public static class Camouflage
         {
             foreach (var pc in Main.AllPlayerControls)
             {
-                RpcSetSkin(pc);
-
-                if (!IsCamouflage && !pc.IsAlive())
-                {
-                    pc.RpcRemovePet();
-                }
-
-                if (pc.inVent)
-                {
-                    pc.currentRoleAnimations.ToArray().ForEach(x => x.ToggleRenderer(false));
-                }
+                WaitingForSkinChange = [];
+                Main.Instance.StartCoroutine(UpdateCamouflageStatusAsync());
             }
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
             {
@@ -174,6 +168,23 @@ public static class Camouflage
                 Utils.NotifyRoles();
             }
         }
+    }
+    private static IEnumerator UpdateCamouflageStatusAsync()
+    {
+        foreach (PlayerControl pc in Main.AllPlayerControls)
+        {
+            if (pc.inVent || pc.walkingToVent || pc.onLadder || pc.inMovingPlat)
+            {
+                WaitingForSkinChange.Add(pc.PlayerId);
+                continue;
+            }
+
+            RpcSetSkin(pc);
+
+            yield return null;
+        }
+
+        yield return Utils.NotifyEveryoneAsync(speed: 5);
     }
     public static void RpcSetSkin(PlayerControl target, bool ForceRevert = false, bool RevertToDefault = false, bool GameEnd = false)
     {
@@ -230,5 +241,19 @@ public static class Camouflage
 
         Logger.Info($"playerId {target.PlayerId} newOutfit={newOutfit.GetString().RemoveHtmlTags()}", "RpcSetSkin");
         target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false);
+    }
+    public static void OnFixedUpdate(PlayerControl pc)
+    {
+        if (pc.IsHost()) CheckCamouflage();
+
+        if (!WaitingForSkinChange.Contains(pc.PlayerId) || pc.inVent || pc.walkingToVent || pc.onLadder || pc.inMovingPlat) return;
+
+        RpcSetSkin(pc);
+        WaitingForSkinChange.Remove(pc.PlayerId);
+
+        if (!IsCamouflage && !pc.IsAlive()) pc.RpcRemovePet();
+
+        Utils.NotifyRoles(SpecifySeer: pc);
+        Utils.NotifyRoles(SpecifyTarget: pc);
     }
 }

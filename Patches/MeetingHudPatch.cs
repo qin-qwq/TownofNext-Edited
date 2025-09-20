@@ -671,12 +671,14 @@ class CheckForEndVotingPatch
             }
         }
 
+        Lovers.OnCheckForEndVoting(deathReason, playerIds);
+
         foreach (var playerId in playerIds)
         {
-            if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Main.isLoversDead && Main.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
-            {
-                FixedUpdateInNormalGamePatch.LoversSuicide(playerId, true);
-            }
+            // if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Main.isLoversDead && Main.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
+            // {
+            //     FixedUpdateInNormalGamePatch.LoversSuicide(playerId, true);
+            // }
 
             RevengeOnExile(playerId);
         }
@@ -1210,11 +1212,11 @@ class MeetingHudStartPatch
                     }
                     result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
                 }
-                if (Lich.IsCursed(target) && Lich.IsDeceived(player, target))
-                {
-                    blankRT.Clear().Append(CustomRoles.Lich.ToColoredString());
-                    result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
-                }
+                // if (Lich.IsCursed(target) && Lich.IsDeceived(player, target))
+                // {
+                //     blankRT.Clear().Append(CustomRoles.Lich.ToColoredString());
+                //     result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
+                // }
                 roleTextMeeting.text = result.ToString();
             }
             if (player.IsAlive() && !target.AmOwner && ExtendedPlayerControl.KnowRoleTarget(player, target) && Lich.IsCursed(target) && Lich.IsDeceived(player, target))
@@ -1363,11 +1365,12 @@ class MeetingHudStartPatch
                 switch (TargetSubRole)
                 {
                     case CustomRoles.Lovers:
-                        if (seer.Is(CustomRoles.Lovers) || seer.Data.IsDead)
-                        {
-                            sb.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
-                            //isLover = true;
-                        }
+                        // if (seer.Is(CustomRoles.Lovers) || seer.Data.IsDead)
+                        // {
+                        //     sb.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
+                        //     //isLover = true;
+                        // }
+                        sb.Append(Lovers.GetMarkOthers(seer, target));
                         break;
                     case CustomRoles.Cyber when Cyber.CyberKnown.GetBool():
                         sb.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));

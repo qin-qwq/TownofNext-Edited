@@ -53,16 +53,16 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.3.7"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.4.0 Beta 2 Hotfix 1";
+    public const string PluginVersion = "1.3.8"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.4.0 Alpha 5";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 17.0.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.4.0 Alpha 4
-    public static readonly bool canaryRelease = true; // Latest: V1.4.0 Beta 2 Hotfix 1
+    public static readonly bool devRelease = true; // Latest: V1.4.0 Alpha 5
+    public static readonly bool canaryRelease = false; // Latest: V1.4.0 Beta 3
     public static readonly bool fullRelease = false; // Latest: V1.4.0
 
     public static bool hasAccess = true;
@@ -194,8 +194,8 @@ public class Main : BasePlugin
 
     public static bool GameIsLoaded { get; set; } = false;
 
-    public static bool isLoversDead = true;
-    public static readonly HashSet<PlayerControl> LoversPlayers = [];
+    // public static bool isLoversDead = true;
+    // public static readonly HashSet<PlayerControl> LoversPlayers = [];
 
     public static bool DoBlockNameChange = false;
     public static int updateTime;
@@ -807,7 +807,6 @@ public enum CustomRoles
     Underdog,
     Undertaker,
     Vampire,
-    //Vanisher,
     Vindicator,
     Visionary,
     Warlock,
@@ -910,6 +909,7 @@ public enum CustomRoles
     BloodKnight,
     Collector,
     Cultist,
+    Cupid,
     CursedSoul,
     Death,
     Demon,
@@ -1179,6 +1179,7 @@ public enum AdditionalWinners
 {
     None = -1,
     Lovers = CustomRoles.Lovers,
+    Cupid = CustomRoles.Cupid,
     Opportunist = CustomRoles.Opportunist,
     Tunny = CustomRoles.Tunny,
     Summoned = CustomRoles.Summoned,

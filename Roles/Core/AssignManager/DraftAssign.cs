@@ -166,6 +166,13 @@ public static class DraftAssign
                     AlwaysRoles.Add(item.Role);
                 }
             }
+            else if (Options.CompatibilityMode.GetBool() && item.SpawnChance > 0 && item.SpawnChance < 100)
+            {
+                for (int j = 0; j < item.MaxCount; j++)
+                {
+                    AlwaysRoles.Add(item.Role);
+                }
+            }
             else
             {
                 for (int k = 0; k < item.MaxCount; k++)

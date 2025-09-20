@@ -1,6 +1,7 @@
 using System;
 using TOHE.Modules;
 using TOHE.Patches;
+using TOHE.Roles.AddOns.Common;
 using UnityEngine;
 using static TOHE.Translator;
 
@@ -171,7 +172,7 @@ internal class ControllerManagerUpdatePatch
             }
 
             // Show chat
-            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift) && !Options.PreventModdedClientSee.GetBool())
+            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift) && !Lovers.PreventModdedClientSee.GetBool())
             {
                 HudManager.Instance.Chat.SetVisible(true);
             }

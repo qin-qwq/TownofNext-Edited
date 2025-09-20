@@ -310,8 +310,8 @@ public static class Utils
             return string.Empty;
 
         string mode = GetChance(role.GetMode());
-        if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
-        else if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
+        // if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
+        if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
         {
             mode = GetChance(Options.CustomAdtRoleSpawnRate[role].GetFloat());
 
@@ -899,8 +899,8 @@ public static class Utils
             string mode = GetChance(role.GetMode());
             if (role.IsEnable())
             {
-                if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
-                else if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
+                // if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
+                if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
                 {
                     mode = GetChance(Options.CustomAdtRoleSpawnRate[role].GetFloat());
 
@@ -2052,20 +2052,22 @@ public static class Utils
 
                         if ((seer.IsPlayerCoven() && target.IsPlayerCoven()) && (CovenManager.HasNecronomicon(target)))
                         {
-                            TargetMark.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), "♣"));
+                            TargetMark.Append(ColorString(GetRoleColor(CustomRoles.Coven), "♣"));
                         }
 
                         if (target.Is(CustomRoles.Cyber) && Cyber.CyberKnown.GetBool())
                             TargetMark.Append(ColorString(GetRoleColor(CustomRoles.Cyber), "★"));
 
-                        if (seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
-                        {
-                            TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
-                        }
-                        else if (seer.Data.IsDead && !seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
-                        {
-                            TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
-                        }
+
+                        TargetMark.Append(Lovers.GetMarkOthers(seer, target));
+                        // if (seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
+                        // {
+                        //     TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                        // }
+                        // else if (seer.Data.IsDead && !seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
+                        // {
+                        //     TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                        // }
 
                         // ====== Seer know target role ======
 
@@ -2425,7 +2427,7 @@ public static class Utils
             // Will be synced by ShipStatus patch, SetAllVentInteractions
         }
 
-        if (Options.PrivateChat.GetBool())
+        if (Lovers.PrivateChat.GetBool())
         {
             foreach (var target in Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Lovers)))
             if (target.IsAlive())

@@ -14,7 +14,7 @@ internal class AbyssBringer : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Abyssbringer;
     const int Id = 31300;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -61,8 +61,7 @@ internal class AbyssBringer : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = BlackHolePlaceCooldown.GetInt();
-        AURoleOptions.ShapeshifterDuration = 1f;
+        AURoleOptions.PhantomCooldown = BlackHolePlaceCooldown.GetInt();
     }
 
     public override void Init()
@@ -99,17 +98,17 @@ internal class AbyssBringer : RoleBase
         throw new InvalidOperationException("No available BlackHole ID.");
     }
 
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         if (!Main.AllAlivePlayerControls.Where(x => x.PlayerId != shapeshifter.PlayerId).Any())
         {
-            return;
+            return false;
         }
         // When no player exists, Instantly spawm and despawn networked object will cause error spam
 
         if (BlackHoles.Count >= BlackHoleCountLimit.GetInt())
         {
-            return;
+            return false;
         }
 
         var pos = shapeshifter.GetCustomPosition();
@@ -120,6 +119,7 @@ internal class AbyssBringer : RoleBase
         Utils.SendRPC(CustomRPC.SyncRoleSkill, _Player, 1, blackHoleId, pos, roomName);
         shapeshifter.ResetKillCooldown();
         shapeshifter.SetKillCooldown(forceAnime: true);
+        return false;
     }
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {

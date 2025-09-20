@@ -1830,7 +1830,7 @@ internal class ChatCommands
                     {
                         DraftAssign.Reset();
                     }
-                    else if (args[1] == "enable" &&  PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
+                    else if (args[1] == "enable" && PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
                     {
                         Options.devEnableDraft = true;
                         Options.DraftHeader.SetHidden(false);
@@ -2942,9 +2942,8 @@ internal class ChatCommands
             case "/айди":
             case "/编号":
             case "/玩家编号":
-                /*if (TagManager.ReadPermission(player.FriendCode) < 2) break;
-                else if (TagManager.ReadPermission(player.FriendCode) < 2 && (Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode))
-                    && !Options.EnableVoteCommand.GetBool()) break;*/
+                if (TagManager.ReadPermission(player.FriendCode) < 2 && (Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode))
+                    && !Options.EnableVoteCommand.GetBool()) break;
 
                 string msgText = GetString("PlayerIdList");
                 foreach (var pc in Main.AllPlayerControls)

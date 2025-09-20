@@ -44,6 +44,9 @@ public static class NameColorManager
 
         color = seer.GetRoleClass()?.PlayerKnowTargetColor(seer, target); // returns "" unless overriden
 
+        // Balancer
+        if (Balancer.Choose && (Balancer.Target1 == target.PlayerId || Balancer.Target2 == target.PlayerId) && isMeeting) color = Main.roleColors[CustomRoles.Balancer];
+
         // Impostor & Madmate
         if (seer.CheckImpCanSeeAllies(CheckAsSeer: true) && target.CheckImpCanSeeAllies(CheckAsTarget: true)) color = (seer.Is(CustomRoles.Egoist) && target.Is(CustomRoles.Egoist) && Egoist.ImpEgoistVisibalToAllies.GetBool() && seer != target) ? Main.roleColors[CustomRoles.Egoist] : Main.roleColors[CustomRoles.Impostor];
         if (seer.Is(CustomRoles.Madmate) && target.CheckImpCanSeeAllies(CheckAsTarget: true) && Madmate.MadmateKnowWhosImp.GetBool()) color = Main.roleColors[CustomRoles.Impostor];
@@ -72,10 +75,6 @@ public static class NameColorManager
         // Bounties
         if (seer.Is(CustomRoles.BountyHunter) && BountyHunter.GetTarget(seer) == target.PlayerId) color = "bf1313";
 
-        // This is probably redundant with Inquisitor.PlayerKnowTargetColor
-        // // Heretics
-        // if (seer.Is(CustomRoles.Inquisitor) && Inquisitor.CanSeeIsHeretic(seer, target)) color = "a21b16ff";
-
         // Amnesiac
         if (seer.GetCustomRole() == target.GetCustomRole() && seer.GetCustomRole().IsNK()) color = Main.roleColors[seer.GetCustomRole()];
 
@@ -98,8 +97,6 @@ public static class NameColorManager
         if (Jackal.JackalKnowRole(seer, target)) color = Main.roleColors[CustomRoles.Jackal];
 
         if (target.Is(CustomRoles.Mare) && Utils.IsActive(SystemTypes.Electrical) && !isMeeting) color = Main.roleColors[CustomRoles.Mare];
-
-        if (Balancer.Choose && (Balancer.Target1 == target.PlayerId || Balancer.Target2 == target.PlayerId) && isMeeting) color = Main.roleColors[CustomRoles.Balancer];
 
         //Virus
         if (Virus.KnowRoleColor(seer, target) != "") color = Virus.KnowRoleColor(seer, target);

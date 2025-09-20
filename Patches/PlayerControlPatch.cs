@@ -794,7 +794,7 @@ class ReportDeadBodyPatch
                     Logger.Info("The button has been canceled because the sabotage is active", "ReportDeadBody");
                     return false;
                 }
-                if (playerRoleClass.OnCheckStartMeeting(__instance) == false)
+                if (playerRoleClass.OnCheckStartMeeting(__instance) == false || (Necromancer.Killer == __instance && Necromancer.PreventKillerButtoning.GetBool()))
                 {
                     Logger.Info($"Player has role class: {playerRoleClass} - the start of the meeting has been cancelled", "ReportDeadBody");
                     return false;
@@ -901,7 +901,7 @@ class ReportDeadBodyPatch
         // Hereinafter, it is assumed that the button is confirmed to be pressed
         //=============================================
 
-        if (Options.PrivateChat.GetBool()) Summoner.HideSummonCommand();
+        if (Lovers.PrivateChat.GetBool()) Summoner.HideSummonCommand();
 
         try
         {
@@ -1214,7 +1214,7 @@ class FixedUpdateInNormalGamePatch
                         CovenManager.NecronomiconCheck();
 
                         if (CustomRoles.Lovers.IsEnable())
-                            LoversSuicide();
+                            Lovers.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
 
                         if (Rainbow.IsEnabled && Main.IntroDestroyed)
                             Rainbow.OnFixedUpdate();
@@ -1223,6 +1223,7 @@ class FixedUpdateInNormalGamePatch
 
                 if (!lowLoad)
                 {
+                    Camouflage.OnFixedUpdate(player);
                     if (Main.RefixCooldownDelay <= 0)
                     {
                         if (player.Is(CustomRoles.Vampire) || player.Is(CustomRoles.Warlock) || player.Is(CustomRoles.Ninja))
@@ -1370,19 +1371,22 @@ class FixedUpdateInNormalGamePatch
                     }
                     result.Clear().Append($"<size=1.3>{blankRT}</size>");
                 }
-                if (Lich.IsCursed(player) && Lich.IsDeceived(localPlayer, player))
-                {
-                    blankRT.Clear().Append(CustomRoles.Lich.ToColoredString());
-                    result.Clear().Append($"<size=1.3>{blankRT}</size>");
-                }
+
+                // if (Lich.IsCursed(player) && Lich.IsDeceived(localPlayer, player))
+                // {
+                //     blankRT.Clear().Append(CustomRoles.Lich.ToColoredString());
+                //     blankRT.Append(CustomRoles.Lich.GetStaticRoleClass().GetProgressText(localPlayerId, false));
+                //     result.Clear().Append($"<size=1.3>{blankRT}</size>");
+                // }
                 roleText.text = result.ToString();
             }
 
-            if (localPlayer.IsAlive() && ExtendedPlayerControl.KnowRoleTarget(localPlayer, player) && Lich.IsCursed(player) && Lich.IsDeceived(localPlayer, player))
-            {
-                string blankRT = CustomRoles.Lich.ToColoredString();
-                roleText.text = $"<size=1.3>{blankRT}</size>";
-            }
+            // if (localPlayer.IsAlive() && Lich.IsCursed(player) && Lich.IsDeceived(localPlayer, player))
+            // {
+            //     StringBuilder blankRT = new(CustomRoles.Lich.ToColoredString());
+            //     blankRT.Append(CustomRoles.Lich.GetStaticRoleClass().GetProgressText(localPlayerId, false));
+            //     roleText.text = $"<size=1.3>{blankRT}</size>";
+            // }
 
             if (!amongUsClient.IsGameStarted && amongUsClient.NetworkMode != NetworkModes.FreePlay)
             {
@@ -1390,6 +1394,9 @@ class FixedUpdateInNormalGamePatch
                 if (!playerAmOwner)
                     player.cosmetics.nameText.text = playerData?.PlayerName;
             }
+
+            if (!roleText.isActiveAndEnabled && roleText.enabled)
+                roleText.gameObject.SetActive(true);
 
             if (Main.VisibleTasksCount)
                 roleText.text += Utils.GetProgressText(player);
@@ -1469,14 +1476,15 @@ class FixedUpdateInNormalGamePatch
                     if (player.Is(CustomRoles.Cyber) && Cyber.CyberKnown.GetBool())
                         Mark.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
 
-                    if (player.Is(CustomRoles.Lovers) && localPlayer.Is(CustomRoles.Lovers))
-                    {
-                        Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
-                    }
-                    else if (player.Is(CustomRoles.Lovers) && localPlayer.Data.IsDead)
-                    {
-                        Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
-                    }
+                    Mark.Append(Lovers.GetMarkOthers(localPlayer, player));
+                    // if (player.Is(CustomRoles.Lovers) && localPlayer.Is(CustomRoles.Lovers))
+                    // {
+                    //     Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
+                    // }
+                    // else if (player.Is(CustomRoles.Lovers) && localPlayer.Data.IsDead)
+                    // {
+                    //     Mark.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
+                    // }
                     break;
             }
 
@@ -1538,6 +1546,7 @@ class FixedUpdateInNormalGamePatch
                 roleText.transform.SetLocalY(offset);
                 player.cosmetics.colorBlindText.transform.SetLocalY(colorBlind);
             }
+            // Logger.Info($"Role Name for {player.GetRealName()}: {roleText.text}; is enabled: {roleText.enabled}; {roleText.fontSize}", "FixedUpdateInNormalGame.DoPostfix");
         }
         else
         {
@@ -1545,54 +1554,55 @@ class FixedUpdateInNormalGamePatch
             player.cosmetics.colorBlindText.transform.SetLocalY(-0.32f);
         }
     }
-    public static void LoversSuicide(byte deathId = 0x7f, bool isExiled = false)
-    {
-        if (Options.LoverSuicide.GetBool() && Main.isLoversDead == false)
-        {
-            foreach (var loversPlayer in Main.LoversPlayers.ToArray())
-            {
-                if (loversPlayer.IsAlive() && loversPlayer.PlayerId != deathId) continue;
+    // public static void LoversSuicide(byte deathId = 0x7f, bool isExiled = false)
+    // {
+    //     if (Options.LoverSuicide.GetBool() && Main.isLoversDead == false)
+    //     {
+    //         foreach (var loversPlayer in Main.LoversPlayers.ToArray())
+    //         {
+    //             if (!loversPlayer.Is(CustomRoles.Lovers)) continue;
+    //             if (loversPlayer.IsAlive() && loversPlayer.PlayerId != deathId) continue;
 
-                Main.isLoversDead = true;
-                foreach (var partnerPlayer in Main.LoversPlayers.ToArray())
-                {
-                    if (loversPlayer.PlayerId == partnerPlayer.PlayerId) continue;
+    //             Main.isLoversDead = true;
+    //             foreach (var partnerPlayer in Main.LoversPlayers.ToArray())
+    //             {
+    //                 if (loversPlayer.PlayerId == partnerPlayer.PlayerId) continue;
 
-                    if (partnerPlayer.PlayerId != deathId && partnerPlayer.IsAlive())
-                    {
-                        if (partnerPlayer.Is(CustomRoles.Lovers))
-                        {
-                            partnerPlayer.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
+    //                 if (partnerPlayer.PlayerId != deathId && partnerPlayer.IsAlive())
+    //                 {
+    //                     if (partnerPlayer.Is(CustomRoles.Lovers))
+    //                     {
+    //                         partnerPlayer.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
 
-                            if (isExiled)
-                            {
-                                if (Main.PlayersDiedInMeeting.Contains(deathId))
-                                {
-                                    partnerPlayer.Data.IsDead = true;
-                                    partnerPlayer.RpcExileV2();
-                                    Main.PlayerStates[partnerPlayer.PlayerId].SetDead();
-                                    if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
-                                    {
-                                        MeetingHud.Instance?.CheckForEndVoting();
-                                    }
-                                    MurderPlayerPatch.AfterPlayerDeathTasks(partnerPlayer, partnerPlayer, true);
-                                    _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
-                                }
-                                else
-                                {
-                                    CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
-                                }
-                            }
-                            else
-                            {
-                                partnerPlayer.RpcMurderPlayer(partnerPlayer);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    //                         if (isExiled)
+    //                         {
+    //                             if (Main.PlayersDiedInMeeting.Contains(deathId))
+    //                             {
+    //                                 partnerPlayer.Data.IsDead = true;
+    //                                 partnerPlayer.RpcExileV2();
+    //                                 Main.PlayerStates[partnerPlayer.PlayerId].SetDead();
+    //                                 if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+    //                                 {
+    //                                     MeetingHud.Instance?.CheckForEndVoting();
+    //                                 }
+    //                                 MurderPlayerPatch.AfterPlayerDeathTasks(partnerPlayer, partnerPlayer, true);
+    //                                 _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
+    //                             }
+    //                             else
+    //                             {
+    //                                 CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
+    //                             }
+    //                         }
+    //                         else
+    //                         {
+    //                             partnerPlayer.RpcMurderPlayer(partnerPlayer);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }
 [HarmonyPatch(typeof(PlayerControl._Start_d__82), nameof(PlayerControl._Start_d__82.MoveNext))]
 class PlayerStartPatch

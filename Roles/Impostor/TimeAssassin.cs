@@ -10,7 +10,7 @@ internal class TimeAssassin : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.TimeAssassin;
     private const int Id = 32200;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
 
@@ -28,12 +28,12 @@ internal class TimeAssassin : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = TimeAssassinSkillCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = TimeAssassinSkillCooldown.GetFloat();
     }
 
-    public override void UnShapeShiftButton(PlayerControl player)
+    public override bool OnCheckVanish(PlayerControl player)
     {
-        if (AnySabotageIsActive()) return;
+        if (AnySabotageIsActive()) return false;
         foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin) && !x.Is(CustomRoles.GM)))
         {
             player.Notify(GetString("TimeStopStart"));
@@ -53,6 +53,7 @@ internal class TimeAssassin : RoleBase
                 target.MarkDirtySettings();
             }, TimeAssassinSkillDuration.GetFloat(), "TimeAssassin Stop Time");
         }
+        return false;
     }
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {

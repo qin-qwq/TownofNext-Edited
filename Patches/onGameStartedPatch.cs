@@ -481,7 +481,7 @@ internal class StartGameHostPatch
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
-                    AddonAssign.InitAndStartAssignLovers();
+                    //AddonAssign.InitAndStartAssignLovers();
                     AddonAssign.StartSortAndAssign();
                 }
             }

@@ -1,6 +1,4 @@
-using Hazel;
 using TOHE.Modules;
-using TOHE.Modules.Rpc;
 using UnityEngine;
 using static TOHE.CheckForEndVotingPatch;
 using static TOHE.Translator;
@@ -71,7 +69,6 @@ internal class Balancer : RoleBase
             MeetingHud.Instance.RpcClose();
             Choose = true;
             Choose2 = true;
-            SendRPC();
             return false;
         }
         Target1 = target.PlayerId;
@@ -135,19 +132,6 @@ internal class Balancer : RoleBase
         Target1 = 253;
         Target2 = 253;
         Choose = false;
-        SendRPC();
-    }
-    public void SendRPC()
-    {
-        var writer = MessageWriter.Get(SendOption.Reliable);
-        writer.Write(Choose);
-        writer.Write(Choose2);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
-    }
-    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
-    {
-        Choose = reader.ReadBoolean();
-        Choose2 = reader.ReadBoolean();
     }
     private static void BalancerOnClick(byte targetId /*, MeetingHud __instance*/)
     {

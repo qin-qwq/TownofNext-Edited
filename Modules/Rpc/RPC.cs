@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Patches;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
 using TOHE.Roles.Coven;
@@ -18,7 +19,7 @@ namespace TOHE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 175/255 USED
+public enum CustomRPC : byte // 180/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -77,7 +78,8 @@ public enum CustomRPC : byte // 175/255 USED
     DoSpell,
     DoHex,
     SniperSync,
-    SetLoversPlayers,
+    //SetLoversPlayers,
+    SetLoverPairs,
     SendFireworkerState,
     SetCurrentDousingTarget,
     SetEvilTrackerTarget,
@@ -460,11 +462,14 @@ internal class RPCHandlerPatch
             case CustomRPC.UndertakerLocationSync:
                 Undertaker.ReceiveRPC(reader);
                 break;
-            case CustomRPC.SetLoversPlayers:
-                Main.LoversPlayers.Clear();
-                int count = reader.ReadInt32();
-                for (int i = 0; i < count; i++)
-                    Main.LoversPlayers.Add(Utils.GetPlayerById(reader.ReadByte()));
+            // case CustomRPC.SetLoversPlayers:
+            //     Main.LoversPlayers.Clear();
+            //     int count = reader.ReadInt32();
+            //     for (int i = 0; i < count; i++)
+            //         Main.LoversPlayers.Add(Utils.GetPlayerById(reader.ReadByte()));
+            //     break;
+            case CustomRPC.SetLoverPairs:
+                Lovers.ReceiveRPC(reader);
                 break;
             case CustomRPC.BetterCheck: // Better Among Us RPC
                 {
@@ -1026,13 +1031,13 @@ internal static class RPC
             Logger.Error($" Error RPC:{error}", "SyncRoleSkillReader");
         }
     }
-    public static void SyncLoversPlayers()
-    {
-        if (!AmongUsClient.Instance.AmHost) return;
+    // public static void SyncLoversPlayers()
+    // {
+    //     if (!AmongUsClient.Instance.AmHost) return;
 
-        var msg = new RpcSetLoversPlayers(PlayerControl.LocalPlayer.NetId, Main.LoversPlayers.Count, Main.LoversPlayers);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
+    //     var msg = new RpcSetLoversPlayers(PlayerControl.LocalPlayer.NetId, Main.LoversPlayers.Count, Main.LoversPlayers);
+    //     RpcUtils.LateBroadcastReliableMessage(msg);
+    // }
     public static void SyncDeadPassedMeetingList()
     {
         if (!AmongUsClient.Instance.AmHost) return;

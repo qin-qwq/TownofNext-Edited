@@ -1,10 +1,10 @@
 {
   "LanguageID": "0",
   "HostText": "Host",
-  "HostColor": "#902efd",
-  "IconColor": "#4bf4ff",
-  "Icon": "♥",
-  "NameColor": "#ffc0cb",
+  "HostColor": "#ffc0cb",
+  "IconColor": "#caf3da",
+  "Icon": "★",
+  "NameColor": "#00a5ff",
 
   "HideHostText": "Hide 'Host♥' Text",
   "HideAllTagsAndText": "Hide All Tags (for «AutoMuteUs»)",
@@ -1683,7 +1683,7 @@
   "FlashSpeed": "<color=#ff8400>Flash</color> Speed",
   "SlothSpeed": "<color=#376db8>Sloth</color> Speed",
   "LoverSuicide": "<color=#ff9ace>Lovers</color> die together",
-  "NumberOfLovers": "Number of <color=#ff9ace>Lover Pairs</color> (x2 members)",
+  "NumberOfLovers": "Number of <color=#ff9ace>Lovers</color>",
   "LoverKnowRoles": "<color=#ff9ace>Lovers</color> know the roles of each other",
   "FreezeTime": "Freeze time",
   "TimeThiefDecreaseMeetingTime": "Lower Meeting Time by",
@@ -4285,11 +4285,6 @@
   "TimeAssassinShapeShifterButtonText": "Time stops",
   "TimeStopStart": "Time stops and starts",
   "TimeStopEnd": "Time resumes",
-  "Vanisher": "Eraser",
-  "VanisherInfo": "Leave No Trace",
-  "VanisherInfoLong": "(Impostors)\nThe Eraser can use deformation to erase the target, rendering them invisible.IF the target is an Impostor.Otherwise, the player will not know that he has been deleted",
-  "VanisherMakeYouInvisible": "The Eraser erased you,you are now invisible!",
-  "VanisherButtonText": "Erase",
   "Talented": "Talented",
   "TalentedInfo": "What crime",
   "TalentedInfoLong": "(Crewmates)\nTalented Gain a rewarding additional career per completed task",
@@ -4454,5 +4449,26 @@
   "CatalystCatalyzeText": "Overcharge",
 
   "DetectiveCanknowDeathReason": "Cause of death revealed",
-  "DetectiveNoticeDeathReason": "The victim's cause of death is <b>{0}</b>"
+  "DetectiveNoticeDeathReason": "The victim's cause of death is <b>{0}</b>",
+
+  "Cupid": "Cupid",
+  "CupidInfo": "Spread the Love!",
+  "CupidInfoLong": "(Neutrals):\nAs Cupid, shapeshift to choose two players to charm. The charmed players will become lovers.\n\nYou win with the lovers you charmed, and they can't die of heartbreak.",
+  "CupidSettings.CharmCooldown": "Charm Cooldown",
+  "CupidSettings.LoversKnowCupid": "Lovers Know Who Cupid is",
+  "CupidSettings.ProtectCooldown": "Protect Cooldown",
+  "CupidSettings.ProtectDuration": "Protect Duration",
+  "Cupid.ProtectLovers": "Protecting Lovers",
+  "Cupid.ProtectingOver": "Protection Expired",
+  "Cupid.AlreadyHasPair": "Lovers already Charmed",
+  "Cupid.CantCharm": "Target is immune to being Charmed",
+  "Cupid.PlayerAdded": "Target charmed",
+  "Cupid.Protect": "Protect",
+  "Cupid.Charm": "Charm",
+
+  "PotionMasterRevealsPersist": "<#ac42f2>Coven</color> can see Reveals after Potion Master dies",
+  "BakerRevealsPersist": "<color=#ff174f>Apocalypse</color> can see Reveals after Baker dies",
+  "ConsigliereRevealsPersist": "<color=#ff1919>Impostors</color> can see Reveals after Consigliere dies",
+  "JudgeCanTrialAdmired": "Can trial <color=#ee43c3>Admired</color> players",
+  "Necromancer.PreventKillerButtoning": "Prevent killer from callling meeting while hunted"
 }

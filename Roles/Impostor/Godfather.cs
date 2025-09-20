@@ -30,6 +30,7 @@ internal class Godfather : RoleBase
         if (voter.PlayerId == target.PlayerId && voter.GetAbilityUseLimit() > 0)
         {
             voter.RpcRemoveAbilityUse();
+            Utils.SendMessage(Translator.GetString("GodfatherCloseMeeting"), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Godfather), Translator.GetString("Godfather").ToUpper()));
             List<MeetingHud.VoterState> statesList = [];
             MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
             MeetingHud.Instance.RpcClose();

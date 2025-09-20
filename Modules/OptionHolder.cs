@@ -73,6 +73,7 @@ public static class Options
 
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
+    public static OptionItem CompatibilityMode;
     public static OptionItem DraftableCount;
     public static OptionItem BucketCount;
     public static bool devEnableDraft = false;
@@ -741,7 +742,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33300 last id for roles/add-ons (Next use 33400)
+        // 33400 last id for roles/add-ons (Next use 33500)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -821,11 +822,11 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Players);
 
-        NeutralApocalypseRolesMinPlayer = IntegerOptionItem.Create(60022, "NeutralApocalypseRolesMinPlayer", new(0, 4, 1), 0, TabGroup.NeutralRoles, false)
+        NeutralApocalypseRolesMinPlayer = IntegerOptionItem.Create(60022, "NeutralApocalypseRolesMinPlayer", new(0, 5, 1), 0, TabGroup.NeutralRoles, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetValueFormat(OptionFormat.Players);
-        NeutralApocalypseRolesMaxPlayer = IntegerOptionItem.Create(60023, "NeutralApocalypseRolesMaxPlayer", new(0, 4, 1), 0, TabGroup.NeutralRoles, false)
+        NeutralApocalypseRolesMaxPlayer = IntegerOptionItem.Create(60023, "NeutralApocalypseRolesMaxPlayer", new(0, 5, 1), 0, TabGroup.NeutralRoles, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Players);
 
@@ -1161,8 +1162,8 @@ public static class Options
             if (addonType.Key == AddonTypes.Impostor)
                 Madmate.SetupCustomMenuOptions();
 
-            if (addonType.Key == AddonTypes.Misc)
-                SetupLoversRoleOptionsToggle(23600);
+            // if (addonType.Key == AddonTypes.Misc)
+            //     SetupLoversRoleOptionsToggle(23600);
 
             if (addonType.Key == AddonTypes.Experimental)
                 NarcManager.SetUpOptionsForNarc();
@@ -1405,16 +1406,20 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true);
 
-        DraftableCount = IntegerOptionItem.Create(61001, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
+        CompatibilityMode = BooleanOptionItem.Create(61001, "CompatibilityMode", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode);
 
-        BucketCount = IntegerOptionItem.Create(61002, "BucketCount", new(5, 225, 1), 15, TabGroup.ModSettings, false)
+        DraftableCount = IntegerOptionItem.Create(61002, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetParent(DraftMode);
+
+        BucketCount = IntegerOptionItem.Create(61003, "BucketCount", new(5, 225, 1), 15, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode)
             .RegisterUpdateValueEvent((obj, args) => BucketCountChanged(args));
 
-        DraftBuckets = MultipleStringOptionItem.Create(61003, 225, BucketCount.GetInt() + 5, "RoleBucket", roleBuckets, 0, TabGroup.ModSettings, false, useGetString: false)
+        DraftBuckets = MultipleStringOptionItem.Create(61004, 225, BucketCount.GetInt() + 5, "RoleBucket", roleBuckets, 0, TabGroup.ModSettings, false, useGetString: false)
             .SetParent(BucketCount)
             .SetGameMode(CustomGameMode.Standard);
 

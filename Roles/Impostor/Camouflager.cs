@@ -109,7 +109,7 @@ internal class Camouflager : RoleBase
         AbilityActivated = true;
         SendRPC();
 
-        var timer = ShowShapeshiftAnimationsOpt.GetBool() ? 1.2f : 0.5f;
+        var timer = ShowShapeshiftAnimationsOpt.GetBool() ? 1.2f : 0f;
 
         _ = new LateTask(() =>
         {
