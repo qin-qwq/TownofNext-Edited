@@ -3,6 +3,7 @@ using System;
 using System.Text;
 using TOHE.Modules;
 using TOHE.Roles.Core;
+using TOHE.Roles.Crewmate;
 using TOHE.Roles.Coven;
 using UnityEngine;
 using static TOHE.MeetingHudStartPatch;
@@ -147,7 +148,7 @@ internal class Doomsayer : RoleBase
 
     public override bool GuessCheck(bool isUI, PlayerControl guesser, PlayerControl target, CustomRoles role, ref bool guesserSuicide)
     {
-        if (CheckCantGuess || GuessesCountPerMeeting >= MaxNumberOfGuessesPerMeeting.GetInt())
+        if (CantGuess || GuessesCountPerMeeting >= MaxNumberOfGuessesPerMeeting.GetInt())
         {
             guesser.ShowInfoMessage(isUI, GetString("DoomsayerCantGuess"));
             return true;
@@ -191,7 +192,7 @@ internal class Doomsayer : RoleBase
         }
         else if (AdvancedSettings.GetBool())
         {
-            if (GuessesCountPerMeeting >= MaxNumberOfGuessesPerMeeting.GetInt() && guesser.PlayerId != target.PlayerId)
+            if ((GuessesCountPerMeeting >= MaxNumberOfGuessesPerMeeting.GetInt() || CantGuess) && guesser.PlayerId != target.PlayerId)
             {
                 CantGuess = true;
                 guesser.ShowInfoMessage(isUI, GetString("DoomsayerCantGuess"));
@@ -287,6 +288,7 @@ internal class Doomsayer : RoleBase
     }
     public override void OnMeetingHudStart(PlayerControl pc)
     {
+        if (Balancer.Choose) return;
         if (DoomsayerTarget[pc.PlayerId] != byte.MaxValue)
         {
             foreach (var targetId in DoomsayerTarget.Values)
@@ -306,7 +308,7 @@ internal class Doomsayer : RoleBase
                 if (Illusionist.IsCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate()).ToList().RandomElement();
                 else if (Illusionist.IsNonCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement();
                 else if (target.Is(CustomRoles.Narc)) targetRole = CustomRoles.Sheriff;
-                var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && !role.IsAdditionRole()).ToList();
+                var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && !role.IsAdditionRole() && !role.IsGhostRole() && role != CustomRoles.Doomsayer).ToList();
                 var count = Math.Min(RoleNumber.GetInt() - 1, activeRoleList.Count);
                 List<CustomRoles> roleList = [targetRole];
                 var rand = IRandom.Instance;

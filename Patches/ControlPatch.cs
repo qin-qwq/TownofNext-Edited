@@ -1,7 +1,7 @@
 using System;
-using System.Text;
 using TOHE.Modules;
 using TOHE.Patches;
+using TOHE.Roles.AddOns.Common;
 using UnityEngine;
 using static TOHE.Translator;
 
@@ -13,8 +13,8 @@ internal class ControllerManagerUpdatePatch
     private static readonly (int, int)[] resolutions = [(480, 270), (640, 360), (800, 450), (1280, 720), (1600, 900), (1920, 1080)];
     private static int resolutionIndex = 0;
 
-    private static int addonInfoIndex = -1;
-    private static int addonSettingsIndex = -1;
+    //private static int addonInfoIndex = -1;
+    //private static int addonSettingsIndex = -1;
 
     public static void Postfix(/*ControllerManager __instance*/)
     {
@@ -172,7 +172,7 @@ internal class ControllerManagerUpdatePatch
             }
 
             // Show chat
-            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift))
+            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift) && !Lovers.PreventModdedClientSee.GetBool())
             {
                 HudManager.Instance.Chat.SetVisible(true);
             }

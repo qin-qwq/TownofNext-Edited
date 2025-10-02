@@ -12,7 +12,7 @@ internal class Disperser : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Disperser;
     private const int Id = 24400;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
     public override void SetAbilityButtonText(HudManager hud, byte id)
@@ -26,15 +26,15 @@ internal class Disperser : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Disperser);
-        DisperserShapeshiftCooldown = FloatOptionItem.Create(Id + 5, GeneralOption.ShapeshifterBase_ShapeshiftCooldown, new(1f, 180f, 1f), 20f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Disperser])
+        DisperserShapeshiftCooldown = FloatOptionItem.Create(Id + 5, GeneralOption.AbilityCooldown, new(1f, 180f, 1f), 20f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Disperser])
             .SetValueFormat(OptionFormat.Seconds);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = DisperserShapeshiftCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = DisperserShapeshiftCooldown.GetFloat();
     }
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         foreach (var pc in Main.AllAlivePlayerControls)
         {
@@ -48,5 +48,6 @@ internal class Disperser : RoleBase
             pc.RpcRandomVentTeleport();
             pc.Notify(ColorString(GetRoleColor(CustomRoles.Disperser), GetString("TeleportedInRndVentByDisperser")));
         }
+        return false;
     }
 }

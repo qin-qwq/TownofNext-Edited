@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using Hazel;
 using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core;
+using TOHE.Roles.Crewmate;
 using TOHE.Roles.Impostor;
 
 namespace TOHE;
@@ -348,11 +349,15 @@ public class SabotageSystemPatch
                     return false;
             }
 
-            if (Options.CurrentGameMode is CustomGameMode.SpeedRun)
+            if (Options.CurrentGameMode is CustomGameMode.SpeedRun or CustomGameMode.TagMode)
             {
                 return false;
             }
 
+            if (TimeMaster.Rewinding)
+            {
+                return false;
+            }
             return player.CanUseSabotage();
         }
 

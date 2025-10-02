@@ -13,7 +13,7 @@ internal class Medusa : CovenManager
     public override CustomRoles Role => CustomRoles.Medusa;
     private const int Id = 17000;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
     //==================================================================\\
 
@@ -71,7 +71,10 @@ internal class Medusa : CovenManager
         StonedPlayers[playerId].Add(reader.ReadByte());
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = StoneCooldown.GetFloat();
-    //public override void ApplyGameOptions(IGameOptions opt, byte id) => opt.SetVision(HasImpostorVision.GetBool());
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.PhantomCooldown = 1f;
+    }
     public override bool CanUseKillButton(PlayerControl pc) => true;
     //public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
 
@@ -116,7 +119,7 @@ internal class Medusa : CovenManager
         killer.SetKillCooldown();
         killer.Notify(string.Format(GetString("MedusaStonedPlayer"), target.GetRealName()));
     }
-    public override void UnShapeShiftButton(PlayerControl dusa)
+    public override bool OnCheckVanish(PlayerControl dusa, float killCooldown)
     {
         foreach (var player in StonedPlayers[dusa.PlayerId])
         {
@@ -138,6 +141,7 @@ internal class Medusa : CovenManager
                 StonedPlayers[dusa.PlayerId].Remove(player);
             }, StoneDuration.GetFloat(), "Medusa Revert Stone");
         }
+        return false;
     }
     public static void SetStoned(PlayerControl player, IGameOptions opt)
     {

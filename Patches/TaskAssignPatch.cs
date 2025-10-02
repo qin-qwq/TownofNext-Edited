@@ -168,6 +168,13 @@ class RpcSetTasksPatch
             NumShortTasks = SpeedRun.SpeedRun_NumShortTasks.GetInt();
         }
 
+        if (Options.CurrentGameMode is CustomGameMode.TagMode)
+        {
+            hasCommonTasks = true;
+            NumLongTasks = 1;
+            NumShortTasks = 1;
+        }
+
         // GM - no have tasks, Lazy Gay and Lazy have 1 task, FFA all are killers so need to assign any tasks
         if (pc.Is(CustomRoles.GM) || pc.Is(CustomRoles.LazyGuy) || pc.Is(CustomRoles.Lazy) || Options.CurrentGameMode == CustomGameMode.FFA)
         {
@@ -230,6 +237,11 @@ class RpcSetTasksPatch
         if (Options.CurrentGameMode is CustomGameMode.SpeedRun)
         {
             defaultcommoncount = SpeedRun.SpeedRun_NumCommonTasks.GetInt();
+        }
+
+        if (Options.CurrentGameMode is CustomGameMode.TagMode)
+        {
+            defaultcommoncount = 1;
         }
 
         int commonTasksNum = System.Math.Min(commonTasks.Count, defaultcommoncount);

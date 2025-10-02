@@ -12,7 +12,7 @@ internal class Fury : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Fury;
     private const int Id = 32000;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -45,17 +45,17 @@ internal class Fury : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = AngryCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = AngryCooldown.GetFloat();
     }
 
-    public override void UnShapeShiftButton(PlayerControl player)
+    public override bool OnCheckVanish(PlayerControl player, float KillCooldown)
     {
-        if (PlayerToAngry.Contains(player.PlayerId)) return;
+        if (PlayerToAngry.Contains(player.PlayerId)) return false;
         PlayerToAngry.Add(player.PlayerId);
-        player.SetKillCooldown(AngryKillCooldown.GetFloat());
+        KillCooldown = AngryKillCooldown.GetFloat();
         foreach (var target in Main.AllPlayerControls)
         {
-            target.KillFlash();
+            if (!target.IsModded()) target.KillFlash();
             RPC.PlaySoundRPC(Sounds.ImpTransform, target.PlayerId);
             target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Fury), GetString("SeerFuryInRage")));
         }
@@ -74,6 +74,7 @@ internal class Fury : RoleBase
             player.Notify(GetString("FuryInCalm"), 5f);
             player.MarkDirtySettings();
         }, AngryDuration.GetFloat());
+        return false;
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

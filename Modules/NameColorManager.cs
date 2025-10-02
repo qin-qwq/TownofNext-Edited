@@ -95,6 +95,7 @@ public static class NameColorManager
 
         if (target.Is(CustomRoles.Mare) && Utils.IsActive(SystemTypes.Electrical) && !isMeeting) color = Main.roleColors[CustomRoles.Mare];
 
+        // Balancer
         if (Balancer.Choose && (Balancer.Target1 == target.PlayerId || Balancer.Target2 == target.PlayerId) && isMeeting) color = Main.roleColors[CustomRoles.Balancer];
 
         //Virus

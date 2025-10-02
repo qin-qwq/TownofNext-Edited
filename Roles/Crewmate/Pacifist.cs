@@ -81,5 +81,6 @@ internal class Pacifist : RoleBase
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
         hud.AbilityButton.buttonLabelText.text = GetString("PacifistVentButtonText");
+        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
 }

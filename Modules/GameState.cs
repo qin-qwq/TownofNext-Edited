@@ -13,6 +13,7 @@ namespace TOHE;
 
 public class PlayerState(byte playerId)
 {
+    public readonly PlayerControl Player = GetPlayerById(playerId);
     public readonly byte PlayerId = playerId;
     public RoleBase RoleClass = new DefaultSetup();
     public CustomRoles MainRole = CustomRoles.NotAssigned;
@@ -37,14 +38,14 @@ public class PlayerState(byte playerId)
         }
     }
     public bool IsNecromancer { get; set; } = false;
-    public (DateTime, byte) RealKiller = (DateTime.MinValue, byte.MaxValue);
+    public (DateTime TimeStamp, byte) RealKiller = (DateTime.MinValue, byte.MaxValue);
     public List<(DateTime, CustomRoles)> MainRoleLogs = [];
     public PlainShipRoom LastRoom = null;
     public bool HasSpawned { get; set; } = false;
     public Dictionary<byte, string> TargetColorData = [];
     public NetworkedPlayerInfo.PlayerOutfit NormalOutfit;
 
-    public void SetMainRole(CustomRoles role)
+    public void SetMainRole(CustomRoles role, bool record = true)
     {
         CustomRoles preMainRole = MainRole;
 
@@ -122,7 +123,7 @@ public class PlayerState(byte playerId)
             countTypes = CountTypes.Coven;
         }
 
-        MainRoleLogs.Add((DateTime.Now, role));
+        if (record) MainRoleLogs.Add((DateTime.Now, role));
 
         if (GameStates.IsInGame && preMainRole != CustomRoles.NotAssigned)
         {
@@ -152,12 +153,12 @@ public class PlayerState(byte playerId)
         {
             if (pc != null) countTypes = pc.GetCustomRole().GetCountTypes();
 
-            // Remove lovers on Cleansed
-            if (pc.Is(CustomRoles.Lovers))
-            {
-                var lover = Main.PlayerStates.Values.FirstOrDefault(x => x.PlayerId != pc.PlayerId && x.SubRoles.Contains(CustomRoles.Lovers));
-                lover?.RemoveSubRole(CustomRoles.Lovers);
-            }
+            // // Remove lovers on Cleansed
+            // if (pc.Is(CustomRoles.Lovers))
+            // {
+            //     var lover = Main.PlayerStates.Values.FirstOrDefault(x => x.PlayerId != pc.PlayerId && x.SubRoles.Contains(CustomRoles.Lovers));
+            //     lover?.RemoveSubRole(CustomRoles.Lovers);
+            // }
 
             foreach (var subRole in SubRoles.ToArray())
             {
@@ -271,7 +272,7 @@ public class PlayerState(byte playerId)
         }
 
         if (!AmongUsClient.Instance.AmHost) return;
-        var msg = new RpcRemoveSubRole(PlayerControl.LocalPlayer.NetId, playerId, addOn);
+        var msg = new RpcRemoveSubRole(PlayerControl.LocalPlayer.NetId, PlayerId, addOn);
         RpcUtils.LateBroadcastReliableMessage(msg);
         
     }
@@ -354,6 +355,7 @@ public class PlayerState(byte playerId)
         Scavenged,
         BlastedOff,
         Expired,
+        Suffocate,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

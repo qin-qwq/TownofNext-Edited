@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
 using TOHE.Modules.Rpc;
@@ -14,7 +15,7 @@ internal class PotionMaster : CovenManager
     public override CustomRoles Role => CustomRoles.PotionMaster;
     private const int Id = 17700;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
     //==================================================================\\
 
@@ -22,6 +23,7 @@ internal class PotionMaster : CovenManager
     private static OptionItem RevealMaxCount;
     private static OptionItem BarrierMaxCount;
     private static OptionItem CovenCanSeeReveals;
+    private static OptionItem RevealsPersist;
     //private static OptionItem CanVent;
     //private static OptionItem HasImpostorVision;
 
@@ -43,6 +45,8 @@ internal class PotionMaster : CovenManager
         BarrierMaxCount = IntegerOptionItem.Create(Id + 15, "PotionMasterMaxBarriers", new(1, 100, 1), 5, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster])
             .SetValueFormat(OptionFormat.Times);
         CovenCanSeeReveals = BooleanOptionItem.Create(Id + 12, "PotionMasterCovenCanSeeReveals", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);
+        RevealsPersist = BooleanOptionItem.Create(Id + 13, "PotionMasterRevealsPersist", true, TabGroup.CovenRoles, false)
+            .SetParent(CovenCanSeeReveals);
         //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);
         //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);
     }
@@ -61,7 +65,7 @@ internal class PotionMaster : CovenManager
         BarrierLimit[playerId] = BarrierMaxCount.GetInt();
         PotionMode = 0;
 
-        var pc = Utils.GetPlayerById(playerId);
+        var pc = GetPlayerById(playerId);
         pc?.AddDoubleTrigger();
     }
 
@@ -94,7 +98,10 @@ internal class PotionMaster : CovenManager
                 break;
         }
     }
-    //public override void ApplyGameOptions(IGameOptions opt, byte id) => opt.SetVision(HasImpostorVision.GetBool());
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.PhantomCooldown = 1f;
+    }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc) => true;
     //public override bool CanUseSabotage(PlayerControl pc) => true;
@@ -168,7 +175,7 @@ internal class PotionMaster : CovenManager
                 break;
         }
     }
-    public override void UnShapeShiftButton(PlayerControl pm)
+    public override bool OnCheckVanish(PlayerControl pm, float killCooldown)
     {
         switch (PotionMode)
         {
@@ -181,6 +188,7 @@ internal class PotionMaster : CovenManager
                 pm.Notify(string.Format(GetString("PotionMasterPotionSwitch"), GetString("PotionMasterReveal")));
                 break;
         }
+        return false;
     }
     public static byte CurrentPotion() => PotionMode;
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
@@ -206,7 +214,7 @@ internal class PotionMaster : CovenManager
         var IsWatch = false;
         RevealList.Do(x =>
         {
-            if (x.Value != null && seer.PlayerId == x.Key && x.Value.Contains(target.PlayerId) && Utils.GetPlayerById(x.Key).IsAlive())
+            if (x.Value != null && seer.PlayerId == x.Key && x.Value.Contains(target.PlayerId) && GetPlayerById(x.Key).IsAlive())
                 IsWatch = true;
         });
         return IsWatch;
@@ -219,6 +227,7 @@ internal class PotionMaster : CovenManager
         foreach (var pm in RevealList.Keys)
         {
             if (RevealList[pm].Contains(target.PlayerId)) result = true;
+            if (!pm.GetPlayer().IsAlive() && !RevealsPersist.GetBool()) result = false;
         }
         return result;
     }
@@ -252,7 +261,7 @@ internal class PotionMaster : CovenManager
         hud.KillButton.OverrideText(GetString("PotionMasterKillButtonText"));
     }
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
-    => BarrierList[seer.PlayerId].Contains(seen.PlayerId) ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.PotionMaster), "✚") : string.Empty;
+    => BarrierList[seer.PlayerId].Contains(seen.PlayerId) ? ColorString(GetRoleColor(CustomRoles.PotionMaster), "✚") : string.Empty;
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
         if (_Player == null) return string.Empty;
@@ -267,5 +276,5 @@ internal class PotionMaster : CovenManager
     public override bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target)
         => KnowRoleTarget(seer, target);
 
-    public override string GetProgressText(byte playerId, bool coooonms) => Utils.ColorString(RevealLimit[playerId] > 0 ? GetRoleColor(CustomRoles.PotionMaster).ShadeColor(0.25f) : Color.gray, $"({RevealLimit[playerId]})") + ColorString(BarrierLimit[playerId] > 0 ? GetRoleColor(CustomRoles.Medic).ShadeColor(0.25f) : Color.gray, $" ({BarrierLimit[playerId]})");
+    public override string GetProgressText(byte playerId, bool coooonms) => ColorString(RevealLimit[playerId] > 0 ? GetRoleColor(CustomRoles.PotionMaster).ShadeColor(0.25f) : Color.gray, $"({RevealLimit[playerId]})") + ColorString(BarrierLimit[playerId] > 0 ? GetRoleColor(CustomRoles.Medic).ShadeColor(0.25f) : Color.gray, $" ({BarrierLimit[playerId]})");
 }

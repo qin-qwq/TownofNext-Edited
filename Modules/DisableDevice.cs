@@ -63,10 +63,10 @@ class DisableDevice
                         (Options.DisableDevicesIgnoreCoven.GetBool() && pc.Is(Custom_Team.Coven)) ||
                         (Options.DisableDevicesIgnoreAfterAnyoneDied.GetBool() && GameStates.AlreadyDied);
 
-                var mapId = Utils.GetActiveMapId();
+                var mapId = GetActiveMapId();
                 var mapName = (MapNames)mapId;
 
-                if (pc.IsAlive() && !Utils.IsActive(SystemTypes.Comms))
+                if (pc.IsAlive() && !IsActive(SystemTypes.Comms))
                 {
                     switch (mapId)
                     {
@@ -125,7 +125,7 @@ class DisableDevice
 
                     pc.RpcDesyncUpdateSystem(SystemTypes.Comms, 128);
                 }
-                else if (!Utils.IsActive(SystemTypes.Comms) && DesyncComms.Contains(pc.PlayerId))
+                else if (!IsActive(SystemTypes.Comms) && DesyncComms.Contains(pc.PlayerId))
                 {
                     DesyncComms.Remove(pc.PlayerId);
                     pc.RpcDesyncUpdateSystem(SystemTypes.Comms, 16);
@@ -165,7 +165,7 @@ public class RemoveDisableDevicesPatch
         var consoles = UnityEngine.Object.FindObjectsOfType<SystemConsole>(true);
         if (admins == null || consoles == null) return;
 
-        switch (Utils.GetActiveMapId())
+        switch (GetActiveMapId())
         {
             case 0:
             case 3:

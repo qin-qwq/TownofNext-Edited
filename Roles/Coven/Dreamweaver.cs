@@ -87,7 +87,6 @@ internal class Dreamweaver : CovenManager
         }
         if (IsDreamwoven(seen.PlayerId))
         {
-            isForMeeting = true;
             return ColorString(new Color32(255, 255, 255, 255), "☁");
         }
         return string.Empty;
@@ -102,8 +101,8 @@ internal class Dreamweaver : CovenManager
         }
         if (IsDreamwoven(target.PlayerId) && (seer.IsPlayerCovenTeam() || target.PlayerId == seer.PlayerId || !seer.IsAlive()))
         {
-            isForMeeting = true;
-            return ColorString(new Color32(255, 255, 255, 255), "☁");
+            if (isForMeeting)
+                return ColorString(new Color32(255, 255, 255, 255), "☁");
         }
         return string.Empty;
     }
@@ -142,9 +141,7 @@ internal class Dreamweaver : CovenManager
         InsomniaList[killer.PlayerId].Add(target.PlayerId);
         SendRPC(1, killer, target);
         target.Notify(GetString("Dreamweaver.InsomniaNotification"));
-        target.SetAbilityUseLimit(0);
-        target.SetKillCooldownV3(999);
-        target.ResetKillCooldown();
+        ApplyInsomnia(target);
     }
     private static bool IsDreamwoven(byte target)
     {
@@ -191,6 +188,11 @@ internal class Dreamweaver : CovenManager
             }
             else
             {
+                foreach (var target in InsomniaList[player])
+                {
+                    var targ = GetPlayerById(target);
+                    ApplyInsomnia(targ);
+                }
                 foreach (var target in DreamwovenList[player])
                 {
                     SetInsomnia(GetPlayerById(player), GetPlayerById(target));
@@ -209,12 +211,16 @@ internal class Dreamweaver : CovenManager
                 InsomniaList[player.PlayerId].Remove(target);
                 continue;
             }
-            if (targetPc.GetAbilityUseLimit() > 0) targetPc.SetAbilityUseLimit(0);
-            if (targetPc.GetKillTimer() < 1)
-            {
-                targetPc.SetKillCooldownV3(999);
-                targetPc.ResetKillCooldown();
-            }
+            ApplyInsomnia(targetPc);
+        }
+    }
+    private static void ApplyInsomnia(PlayerControl player)
+    {
+        if (player.GetAbilityUseLimit() > 0 && player.CanAbilityLimitBeManip()) player.SetAbilityUseLimit(0);
+        if (player.GetKillTimer() < 1)
+        {
+            player.SetKillCooldownV3(999);
+            player.ResetKillCooldown();
         }
     }
     private void ResetInsomnia(byte dreamweaver)
@@ -242,4 +248,3 @@ internal class Dreamweaver : CovenManager
         }
     }
 }
-

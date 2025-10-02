@@ -11,7 +11,7 @@ internal class Escapist : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Escapist;
     private const int Id = 4000;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("abscond");
@@ -23,7 +23,7 @@ internal class Escapist : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Escapist);
-        ShapeshiftCooldown = FloatOptionItem.Create(Id + 3, GeneralOption.ShapeshifterBase_ShapeshiftCooldown, new(1f, 180f, 1f), 5f, TabGroup.ImpostorRoles, false)
+        ShapeshiftCooldown = FloatOptionItem.Create(Id + 3, GeneralOption.AbilityCooldown, new(1f, 180f, 1f), 5f, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Escapist])
             .SetValueFormat(OptionFormat.Seconds);
     }
@@ -34,10 +34,10 @@ internal class Escapist : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = EscapeLocation.ContainsKey(playerId) ? ShapeshiftCooldown.GetFloat() : 1f;
+        AURoleOptions.PhantomCooldown = EscapeLocation.ContainsKey(playerId) ? ShapeshiftCooldown.GetFloat() : 1f;
     }
 
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         if (EscapeLocation.TryGetValue(shapeshifter.PlayerId, out var position))
         {
@@ -52,5 +52,6 @@ internal class Escapist : RoleBase
             shapeshifter.SyncSettings();
             shapeshifter.Notify(GetString("EscapisMtarkedPosition"));
         }
+        return false;
     }
 }

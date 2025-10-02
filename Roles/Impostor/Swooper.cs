@@ -15,7 +15,7 @@ internal class Swooper : RoleBase
     public override CustomRoles Role => CustomRoles.Swooper;
     private const int Id = 4700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swooper);
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -32,9 +32,9 @@ internal class Swooper : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = SwooperCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = SwooperCooldown.GetFloat();
     }
-    public override void UnShapeShiftButton(PlayerControl player)
+    public override bool OnCheckVanish(PlayerControl player, float killCooldown)
     {
         player.RpcMakeInvisible();
         _ = new LateTask(() =>
@@ -51,6 +51,18 @@ internal class Swooper : RoleBase
             player.Notify(GetString("SwooperInvisStateOut"), 5f);
             player.RpcMakeVisible();
         }, SwooperDuration.GetFloat());
+        return false;
+    }
+    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (Main.Invisible.Contains(killer.PlayerId))
+        {
+            target.RpcMurderPlayer(target);
+            target.SetRealKiller(killer);
+            killer.SetKillCooldown();
+            return false;
+        }
+        return true;
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

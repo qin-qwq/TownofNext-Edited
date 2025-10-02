@@ -160,5 +160,6 @@ internal class Grenadier : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.AbilityButton.buttonLabelText.text = GetString("GrenadierVentButtonText");
+        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
 }

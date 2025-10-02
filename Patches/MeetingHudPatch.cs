@@ -141,6 +141,11 @@ class CheckForEndVotingPatch
                         pc.GetRoleClass()?.OnVote(pc, voteTarget); // Role has voted
                         voteTarget.GetRoleClass()?.OnVoted(voteTarget, pc); // Role is voted
 
+                        if (Lich.IsCursed(pc))
+                        {
+                            Lich.OnTargetVote(pc);
+                        }
+
                         if (voteTarget.Is(CustomRoles.Aware))
                         {
                             Aware.OnVoted(pc, pva);
@@ -347,11 +352,34 @@ class CheckForEndVotingPatch
 
             if (Balancer.Choose && tie)
             {
-                var exileIds = VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).Select(kvp => kvp.Key).ToArray();
-                foreach (var playerId in exileIds)
-                GetPlayerById(playerId).SetRealKiller(null);
-                TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);
-                exiledPlayer = null;
+                byte targetId = byte.MaxValue;
+                foreach (var data in VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).ToArray())
+                {
+                    if (Tiebreaker.VoteFor.Contains(data.Key))
+                    {
+                        if (targetId != byte.MaxValue)
+                        {
+                            targetId = byte.MaxValue;
+                            break;
+                        }
+                        targetId = data.Key;
+                    }
+                }
+                if (targetId != byte.MaxValue)
+                {
+                    Logger.Info("Flat breakers cover expulsion of players", "Tiebreaker Vote");
+                    exiledPlayer = GetPlayerInfoById(targetId);
+                    tie = false;
+                    braked = true;
+                }
+                else
+                {
+                    var exileIds = VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).Select(kvp => kvp.Key).ToArray();
+                    foreach (var playerId in exileIds)
+                        GetPlayerById(playerId).SetRealKiller(null);
+                    TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);
+                    exiledPlayer = null;
+                }
             }
             if (Options.VoteMode.GetBool() && Options.WhenTie.GetBool() && tie)
             {
@@ -413,7 +441,7 @@ class CheckForEndVotingPatch
             {
                 if (exiledPlayer != null)
                 {
-                    ConfirmEjections(exiledPlayer);
+                    ConfirmEjections(exiledPlayer, Tiebreaker: braked);
                 }
 
                 __instance.RpcVotingComplete(states, exiledPlayer, tie); // Normal processing
@@ -431,7 +459,7 @@ class CheckForEndVotingPatch
     }
 
     // Credit：https://github.com/music-discussion/TownOfHost-TheOtherRoles
-    public static void ConfirmEjections(NetworkedPlayerInfo exiledPlayer, bool AntiBlackoutStore = false)
+    public static void ConfirmEjections(NetworkedPlayerInfo exiledPlayer, bool AntiBlackoutStore = false, bool Tiebreaker = false)
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (exiledPlayer == null) return;
@@ -439,8 +467,12 @@ class CheckForEndVotingPatch
         var exileId = exiledPlayer.PlayerId;
         if (exileId is < 0 or > 254) return;
 
+        if (Options.PlayEjectSfx.GetBool())
+            CustomSoundsManager.RPCPlayCustomSoundAll("Dramatic");
+
         var realName = Main.AllPlayerNames[exiledPlayer.PlayerId];
         Main.LastVotedPlayer = realName;
+        string coloredRealName = ColorString(Main.PlayerColors[exiledPlayer.PlayerId], realName);
 
         var player = GetPlayerById(exiledPlayer.PlayerId);
         var role = GetString(exiledPlayer.GetCustomRole().ToString());
@@ -488,37 +520,37 @@ class CheckForEndVotingPatch
         switch (Options.CEMode.GetInt())
         {
             case 0:
-                name = string.Format(GetString("PlayerExiled"), realName);
+                name = string.Format(GetString("PlayerExiled"), coloredRealName);
                 break;
             case 1:
                 if (Options.ShowBetrayalAddonsOnEject.GetBool() && player.IsAnySubRole(x => x.IsBetrayalAddonV2() && x != CustomRoles.Narc && (x != CustomRoles.Egoist || Egoist.EgoistCountAsConverted.GetBool())))
                 {
                     if (player.Is(CustomRoles.Madmate))
-                        name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
+                        name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
                     else if (player.Is(CustomRoles.Admired))
-                        name = string.Format(GetString("IsGood"), realName);
+                        name = string.Format(GetString("IsGood"), coloredRealName);
                     else if (player.IsAnySubRole(x => x.IsConverted() && x is not CustomRoles.Madmate and not CustomRoles.Enchanted))
-                        name = string.Format(GetString("BelongTo"), realName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
+                        name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
                     else if (player.Is(CustomRoles.Enchanted))
-                        name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
+                        name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
                 }
 
                 else if (player.GetCustomRole().IsImpostorTeamV3() && !player.Is(CustomRoles.Narc))
-                    name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
+                    name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Impostor), GetString("TeamImpostor")));
 
                 else if (player.GetCustomRole().IsCrewmate() || player.Is(CustomRoles.Narc))
-                    name = string.Format(GetString("IsGood"), realName);
+                    name = string.Format(GetString("IsGood"), coloredRealName);
 
                 else if (player.GetCustomRole().IsNeutral() && !player.GetCustomRole().IsMadmate())
-                    name = string.Format(GetString("BelongTo"), realName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
+                    name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(new Color32(127, 140, 141, byte.MaxValue), GetString("TeamNeutral")));
 
                 else if (player.GetCustomRole().IsCoven())
-                    name = string.Format(GetString("BelongTo"), realName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
+                    name = string.Format(GetString("BelongTo"), coloredRealName, ColorString(GetRoleColor(CustomRoles.Coven), GetString("TeamCoven")));
 
                 break;
             case 2:
                 var ejectedRoleText = Options.ShowBetrayalAddonsOnEject.GetBool() || player.Is(CustomRoles.Narc) ? coloredRole : player.GetCustomRole().ToColoredString();
-                name = string.Format(GetString("PlayerIsRole"), realName, ejectedRoleText);
+                name = string.Format(GetString("PlayerIsRole"), coloredRealName, ejectedRoleText);
                 if (Options.ShowTeamNextToRoleNameOnEject.GetBool())
                 {
                     name += " (";
@@ -551,6 +583,7 @@ class CheckForEndVotingPatch
 
         CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiledPlayer, ref DecidedWinner, isMeetingHud: true, name: ref name));
 
+        if (Tiebreaker) name += $"({Utils.ColorString(Utils.GetRoleColor(CustomRoles.Tiebreaker), GetString("Tiebreaker"))})";
         if (DecidedWinner) name += "<size=0>";
         if (Options.ShowImpRemainOnEject.GetBool() && !DecidedWinner)
         {
@@ -662,12 +695,14 @@ class CheckForEndVotingPatch
             }
         }
 
+        Lovers.OnCheckForEndVoting(deathReason, playerIds);
+
         foreach (var playerId in playerIds)
         {
-            if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Main.isLoversDead && Main.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
-            {
-                FixedUpdateInNormalGamePatch.LoversSuicide(playerId, true);
-            }
+            // if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Main.isLoversDead && Main.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
+            // {
+            //     FixedUpdateInNormalGamePatch.LoversSuicide(playerId, true);
+            // }
 
             RevengeOnExile(playerId);
         }
@@ -1064,6 +1099,9 @@ class MeetingHudStartPatch
         if (Eavesdropper.IsEnable)
             Eavesdropper.GetMessage();
 
+        if (Rat.IsEnable)
+            Rat.GetMessage();
+
         // Add Mimic msg
         if (MimicMsg != "")
         {
@@ -1191,14 +1229,24 @@ class MeetingHudStartPatch
                 if (Illusionist.IsNonCovIllusioned(targetId))
                 {
                     var randomRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement();
-                    blankRT.Clear().Append(ColorString(GetRoleColor(randomRole), GetString(randomRole.ToString())));
+                    blankRT.Clear().Append(ColorString(GetRoleColor(randomRole), GetString(randomRole.GetActualRoleName())));
                     if (randomRole.GetStaticRoleClass().IsMethodOverridden("GetProgressText")) // Roles with Ability Uses
                     {
                         blankRT.Append(randomRole.GetStaticRoleClass().GetProgressText(playerId, false));
                     }
                     result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
                 }
+                // if (Lich.IsCursed(target) && Lich.IsDeceived(player, target))
+                // {
+                //     blankRT.Clear().Append(CustomRoles.Lich.ToColoredString());
+                //     result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
+                // }
                 roleTextMeeting.text = result.ToString();
+            }
+            if (player.IsAlive() && !target.AmOwner && ExtendedPlayerControl.KnowRoleTarget(player, target) && Lich.IsCursed(target) && Lich.IsDeceived(player, target))
+            {
+                string blankRT = CustomRoles.Lich.ToColoredString();
+                roleTextMeeting.text = $"<size={roleTextMeeting.fontSize}>{blankRT}</size>";
             }
 
             var suffixBuilder = new StringBuilder(32);
@@ -1221,6 +1269,13 @@ class MeetingHudStartPatch
         {
             SendMessage(string.Format(GetString("Message.SyncButtonLeft"), Options.SyncedButtonCount.GetFloat() - Options.UsedButtonCount));
             Logger.Info("Number of remaining buttons: " + (Options.SyncedButtonCount.GetFloat() - Options.UsedButtonCount), "SyncButtonMode");
+        }
+        if (Options.ShowMeetingReason.GetBool())
+        {
+            if (ReportDeadBodyPatch.ReportTarget == null && !Balancer.Choose)
+                SendMessage(GetString("Message.isButton"));
+            else if (ReportDeadBodyPatch.ReportTarget != null && !Balancer.Choose)
+                SendMessage(string.Format(GetString("Message.isReport"), ColorString(Main.PlayerColors[ReportDeadBodyPatch.ReportTarget.PlayerId], ReportDeadBodyPatch.ReportTarget.PlayerName)));
         }
 
         // AntiBlackout Message
@@ -1279,6 +1334,24 @@ class MeetingHudStartPatch
                 }
                 ChatUpdatePatch.DoBlockChat = false;
             }, 3f, "SetName To Chat");
+
+            if (Options.UseMeetingShapeshift.GetBool())
+            {
+                _ = new LateTask(() =>
+                {
+                    if (!MeetingHud.Instance || MeetingHud.Instance.state is MeetingHud.VoteStates.Results or MeetingHud.VoteStates.Proceeding) return;
+
+                    foreach (var pc in Main.AllAlivePlayerControls)
+                    {
+                        if (pc.UsesMeetingShapeshift())
+                        {
+                            pc.RpcSetRoleDesync(RoleTypes.Shapeshifter, pc.GetClientId());
+                            if (pc.GetCustomRole().IsImpostor())
+                                pc.RpcSetRoleDesync(RoleTypes.Crewmate, pc.GetClientId());
+                        }
+                    }
+                }, 8f, "Set Shapeshifter Role For Meeting Use");
+            }
         }
 
         foreach (var pva in __instance.playerStates)
@@ -1334,11 +1407,12 @@ class MeetingHudStartPatch
                 switch (TargetSubRole)
                 {
                     case CustomRoles.Lovers:
-                        if (seer.Is(CustomRoles.Lovers) || seer.Data.IsDead)
-                        {
-                            sb.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
-                            //isLover = true;
-                        }
+                        // if (seer.Is(CustomRoles.Lovers) || seer.Data.IsDead)
+                        // {
+                        //     sb.Append(CustomRoles.Lovers.GetColoredTextByRole("♥"));
+                        //     //isLover = true;
+                        // }
+                        sb.Append(Lovers.GetMarkOthers(seer, target));
                         break;
                     case CustomRoles.Cyber when Cyber.CyberKnown.GetBool():
                         sb.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
@@ -1427,7 +1501,7 @@ class MeetingHudUpdatePatch
             //__instance.playerStates.Where(x => !x.TargetPlayerId.GetPlayer().IsAlive() && !x.AmDead)
             //    .Do(x => x.SetDead(x.DidReport, true, x.GAIcon));
 
-            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper && !PlayerControl.LocalPlayer.IsAlive())
+            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper or CustomRoles.Balancer or CustomRoles.Dictator && !PlayerControl.LocalPlayer.IsAlive())
                 ClearShootButton(__instance, true);
 
             if (myRole is CustomRoles.Nemesis && !PlayerControl.LocalPlayer.IsAlive() && GameObject.Find("ShootButton") == null)
@@ -1484,6 +1558,12 @@ class MeetingHudOnDestroyPatch
             AntiBlackout.SetIsDead();
 
             Main.LastVotedPlayerInfo = null;
+            if (Options.UseMeetingShapeshift.GetBool() && !AntiBlackout.SkipTasks)
+            {
+                var pc = Main.AllAlivePlayerControls;
+                pc.DoIf(x => x.UsesMeetingShapeshift(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
+                pc.DoIf(x => x.GetCustomRole().IsImpostor(), x => x.RpcSetRoleGlobal(x.GetCustomRole().GetRoleTypes()));
+            }
             EAC.ReportTimes = [];
         }
     }

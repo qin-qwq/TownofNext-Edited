@@ -53,17 +53,17 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.3.0"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.3.0";
+    public const string PluginVersion = "1.4.0"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.4.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 4, 15, 0) // 2025.4.15 & 16.0.5 & 16.1.0
+            (2025, 9, 9, 0) // 2025.9.9 & 17.0.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.3.0 Alpha 5
-    public static readonly bool canaryRelease = false; // Latest: V1.3.0 Beta 2
-    public static readonly bool fullRelease = true; // Latest: V1.3.0
+    public static readonly bool devRelease = false; // Latest: V1.4.0 Alpha 6
+    public static readonly bool canaryRelease = false; // Latest: V1.4.0 Beta 3
+    public static readonly bool fullRelease = true; // Latest: V1.4.0
 
     public static bool hasAccess = true;
 
@@ -91,8 +91,8 @@ public class Main : BasePlugin
     public static string credentialsText;
     public Coroutines coroutines;
     public Dispatcher dispatcher;
-    public static NormalGameOptionsV09 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-    public static HideNSeekGameOptionsV09 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+    public static NormalGameOptionsV10 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+    public static HideNSeekGameOptionsV10 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
     //Client Options
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
@@ -148,14 +148,10 @@ public class Main : BasePlugin
     public static readonly Dictionary<byte, PlayerState.DeathReason> AfterMeetingDeathPlayers = [];
     public static readonly Dictionary<CustomRoles, string> roleColors = [];
 
-    public const string TONE_DATA_FOLDER_NAME = "TONE-DATA";
-
-#if DEBUGANDROID || BETAANDROID || RELEASEANDROID
-    public static readonly string TONE_Initial_Path = @$"{Application.persistentDataPath}/{TONE_DATA_FOLDER_NAME}";
-        public static readonly string LANGUAGE_FOLDER_NAME = $"{TONE_Initial_Path}/Language";
+#if ANDROID
+    public static readonly string LANGUAGE_FOLDER_NAME = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Language");
 #else
-    public static readonly string TONE_Initial_Path = $"./{TONE_DATA_FOLDER_NAME}";
-    public static readonly string LANGUAGE_FOLDER_NAME = $"{TONE_DATA_FOLDER_NAME}/Language";
+    public const string LANGUAGE_FOLDER_NAME = "TONE-DATA/Language";
 #endif
 
     public static bool IsFixedCooldown => CustomRoles.Vampire.IsEnable() || CustomRoles.Poisoner.IsEnable();
@@ -194,8 +190,8 @@ public class Main : BasePlugin
 
     public static bool GameIsLoaded { get; set; } = false;
 
-    public static bool isLoversDead = true;
-    public static readonly HashSet<PlayerControl> LoversPlayers = [];
+    // public static bool isLoversDead = true;
+    // public static readonly HashSet<PlayerControl> LoversPlayers = [];
 
     public static bool DoBlockNameChange = false;
     public static int updateTime;
@@ -227,7 +223,6 @@ public class Main : BasePlugin
     public static int BardCreations = 0;
     public static int MeetingsPassed = 0;
     public static long LastMeetingEnded = Utils.GetTimeStamp();
-    public static MapNames CurrentMap => (MapNames)NormalOptions.MapId;
     public static readonly HashSet<byte> Invisible = [];
 
 
@@ -291,12 +286,12 @@ public class Main : BasePlugin
     {
         var sb = new StringBuilder();
         foreach (var title in roleColors) sb.Append($"{title.Key}:\n");
-        File.WriteAllText(@$"./{LANGUAGE_FOLDER_NAME}/templateRoleColor.dat", sb.ToString());
+        File.WriteAllText(Path.Combine(LANGUAGE_FOLDER_NAME, "templateRoleColor.dat"), sb.ToString());
     }
     public static void LoadCustomRoleColor()
     {
         const string filename = "RoleColor.dat";
-        string path = @$"./{LANGUAGE_FOLDER_NAME}/{filename}";
+        string path = Path.Combine(LANGUAGE_FOLDER_NAME, filename);
         if (File.Exists(path))
         {
             TOHE.Logger.Info($"Load custom Role Color file：{filename}", "LoadCustomRoleColor");
@@ -406,7 +401,7 @@ public class Main : BasePlugin
             }
             if (!Directory.Exists(LANGUAGE_FOLDER_NAME)) Directory.CreateDirectory(LANGUAGE_FOLDER_NAME);
             CreateTemplateRoleColorFile();
-            if (File.Exists(@$"./{LANGUAGE_FOLDER_NAME}/RoleColor.dat"))
+            if (File.Exists(Path.Combine(LANGUAGE_FOLDER_NAME, "RoleColor.dat")))
             {
                 UpdateCustomTranslation();
                 LoadCustomRoleColor();
@@ -492,7 +487,7 @@ public class Main : BasePlugin
     }
     static void UpdateCustomTranslation()
     {
-        string path = @$"./{LANGUAGE_FOLDER_NAME}/RoleColor.dat";
+        string path = Path.Combine(LANGUAGE_FOLDER_NAME, "RoleColor.dat");
         if (File.Exists(path))
         {
             TOHE.Logger.Info("Updating Custom Role Colors", "UpdateRoleColors");
@@ -540,7 +535,7 @@ public class Main : BasePlugin
         {
             sb.Append($"{kvp.Key.ToString()}:{kvp.Value}\n");
         }
-        File.WriteAllText(@$"./{LANGUAGE_FOLDER_NAME}/export_RoleColor.dat", sb.ToString());
+        File.WriteAllText(Path.Combine(LANGUAGE_FOLDER_NAME, "export_RoleColor.dat"), sb.ToString());
     }
 
     private static void InitializeFileHash()
@@ -683,9 +678,9 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalGameOptionsV09.RecommendedImpostors = NormalGameOptionsV09.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
-        NormalGameOptionsV09.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
-        HideNSeekGameOptionsV09.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        NormalGameOptionsV10.RecommendedImpostors = NormalGameOptionsV10.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
+        NormalGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        HideNSeekGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll();
@@ -694,8 +689,8 @@ public class Main : BasePlugin
         if (DebugModeManager.AmDebugger) ConsoleManager.CreateConsole();
 
         // InitializeFileHash();
-        FileHash = "niko_is_testing_shit_for_2025_04_15";
-        TOHE.Logger.Msg("========= TOHE loaded! =========", "Plugin Load");
+        FileHash = "Support_2025_09_09";
+        TOHE.Logger.Msg("========= TONE loaded! =========", "Plugin Load");
     }
 }
 [Obfuscation(Exclude = true)]
@@ -708,11 +703,13 @@ public enum CustomRoles
     Noisemaker,
     Scientist,
     Tracker,
+    Detective,
 
     // Impostor(Vanilla)
     Impostor,
     Phantom,
     Shapeshifter,
+    Viper,
 
     // Crewmate Vanilla Remakes
     CrewmateTOHE,
@@ -721,11 +718,13 @@ public enum CustomRoles
     NoisemakerTOHE,
     ScientistTOHE,
     TrackerTOHE,
+    DetectiveTOHE,
 
     // Impostor Vanilla Remakes
     ImpostorTOHE,
     PhantomTOHE,
     ShapeshifterTOHE,
+    ViperTOHE,
 
     // Impostor Ghost
     Bloodmoon,
@@ -739,6 +738,7 @@ public enum CustomRoles
     Arrogance,
     Bard,
     Blackmailer,
+    Blaster,
     Bomber,
     BountyHunter,
     Butcher,
@@ -804,7 +804,6 @@ public enum CustomRoles
     Underdog,
     Undertaker,
     Vampire,
-    Vanisher,
     Vindicator,
     Visionary,
     Warlock,
@@ -829,6 +828,7 @@ public enum CustomRoles
     Bodyguard,
     Brave,
     Captain,
+    Catalyst,
     Celebrity,
     Chameleon,
     ChiefOfPolice,
@@ -838,7 +838,7 @@ public enum CustomRoles
     Crusader,
     Deceiver,
     Deputy,
-    Detective,
+    Forensic,
     Dictator,
     Doctor,
     Enigma,
@@ -906,6 +906,7 @@ public enum CustomRoles
     BloodKnight,
     Collector,
     Cultist,
+    Cupid,
     CursedSoul,
     Death,
     Demon,
@@ -921,10 +922,12 @@ public enum CustomRoles
     Imitator,
     Infectious,
     Innocent,
+    Inquisitor,
     Jackal,
     Jester,
     Juggernaut,
     Lawyer,
+    Lich,
     Maverick,
     Opportunist,
     Pelican,
@@ -960,6 +963,7 @@ public enum CustomRoles
     Terrorist,
     Traitor,
     Troller,
+    Tunny,
     Vector,
     VengefulRomantic,
     Virus,
@@ -1000,6 +1004,10 @@ public enum CustomRoles
 
     // Speed run
     Runner,
+
+    // Tag Mode
+    TZombie,
+    TCrewmate,
 
     // Sub-role after 500
     NotAssigned = 500,
@@ -1046,6 +1054,7 @@ public enum CustomRoles
     Lucky,
     Madmate,
     Mare,
+    Rat,
     Randomizer,
     Rebirth,
     Mimic,
@@ -1112,6 +1121,7 @@ public enum CustomWinner
     God = CustomRoles.God,
     Vector = CustomRoles.Vector,
     Innocent = CustomRoles.Innocent,
+    Inquisitor = CustomRoles.Inquisitor,
     Pelican = CustomRoles.Pelican,
     Youtuber = CustomRoles.Youtuber,
     Egoist = CustomRoles.Egoist,
@@ -1157,13 +1167,18 @@ public enum CustomWinner
     Shocker = CustomRoles.Shocker,
     Apocalypse = CustomRoles.Apocalypse,
     Coven = CustomRoles.Coven,
+    Tunny = CustomRoles.Tunny,
+    TZombie = CustomRoles.TZombie,
+    TCrewmate = CustomRoles.TCrewmate,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners
 {
     None = -1,
     Lovers = CustomRoles.Lovers,
+    Cupid = CustomRoles.Cupid,
     Opportunist = CustomRoles.Opportunist,
+    Tunny = CustomRoles.Tunny,
     Summoned = CustomRoles.Summoned,
     Executioner = CustomRoles.Executioner,
     Lawyer = CustomRoles.Lawyer,

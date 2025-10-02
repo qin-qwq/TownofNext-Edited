@@ -76,6 +76,14 @@ class GameEndCheckerForNormal
                     predicate = null;
                 }
                 return false;
+            case CustomGameMode.TagMode:
+                if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
+                {
+                    ShipStatus.Instance.enabled = false;
+                    StartEndGame(reason);
+                    predicate = null;
+                }
+                return false;
         }
 
         // Start end game
@@ -218,6 +226,14 @@ class GameEndCheckerForNormal
                                 WinnerIds.Add(pc.PlayerId);
                             }
                             break;
+                        case CustomRoles.Tunny when pc.IsAlive() && Tunny.SnatchesWin.GetBool():
+                            reason = GameOverReason.ImpostorsByKill;
+                            if (!CheckForConvertedWinner(pc.PlayerId))
+                            {
+                                ResetAndSetWinner(CustomWinner.Tunny);
+                                WinnerIds.Add(pc.PlayerId);
+                            }
+                            break;
                         case CustomRoles.Specter when pc.GetPlayerTaskState().IsTaskFinished && !pc.IsAlive() && Specter.SnatchesWin.GetBool():
                             reason = GameOverReason.ImpostorsByKill;
                             if (!CheckForConvertedWinner(pc.PlayerId))
@@ -306,16 +322,18 @@ class GameEndCheckerForNormal
 
                 if (CustomRoles.Lovers.RoleExist() && !reason.Equals(GameOverReason.CrewmatesByTask))
                 {
-                    if (!(!Main.LoversPlayers.ToArray().All(p => p.IsAlive()) && Options.LoverSuicide.GetBool()))
-                    {
-                        if (WinnerTeam is CustomWinner.Crewmate or CustomWinner.Impostor or CustomWinner.Jackal or CustomWinner.Pelican)
-                        {
-                            ResetAndSetWinner(CustomWinner.Lovers);
-                            Main.AllPlayerControls
-                                .Where(p => p.Is(CustomRoles.Lovers))
-                                .Do(p => WinnerIds.Add(p.PlayerId));
-                        }
-                    }
+                    Lovers.CheckWin();
+                    // // if not (not all lovers alive and lovers suicide)
+                    // if (!(!Main.LoversPlayers.ToArray().All(p => p.IsAlive()) && Options.LoverSuicide.GetBool()))
+                    // {
+                    //     if (WinnerTeam is CustomWinner.Crewmate or CustomWinner.Impostor or CustomWinner.Jackal or CustomWinner.Pelican or CustomWinner.Coven)
+                    //     {
+                    //         ResetAndSetWinner(CustomWinner.Lovers);
+                    //         Main.AllPlayerControls
+                    //             .Where(p => p.Is(CustomRoles.Lovers))
+                    //             .Do(p => WinnerIds.Add(p.PlayerId));
+                    //     }
+                    // }
                 }
 
 
@@ -399,6 +417,10 @@ class GameEndCheckerForNormal
                             case CustomRoles.Opportunist when pc.IsAlive():
                                 WinnerIds.Add(pc.PlayerId);
                                 AdditionalWinnerTeams.Add(AdditionalWinners.Opportunist);
+                                break;
+                            case CustomRoles.Tunny when pc.IsAlive():
+                                WinnerIds.Add(pc.PlayerId);
+                                AdditionalWinnerTeams.Add(AdditionalWinners.Tunny);
                                 break;
                             case CustomRoles.Pixie when !CheckForConvertedWinner(pc.PlayerId):
                                 Pixie.PixieWinCondition(pc);
@@ -485,24 +507,27 @@ class GameEndCheckerForNormal
                     //Lovers follow winner
                     if (WinnerTeam is not CustomWinner.Lovers)
                     {
-                        var loverArray = Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Lovers)).ToArray();
+                        Lovers.CheckAdditionalWin();
+                        // var loverArray = Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Lovers)).ToArray();
 
-                        foreach (var lover in loverArray)
-                        {
-                            if (WinnerIds.Any(x => Utils.GetPlayerById(x).Is(CustomRoles.Lovers)) && !WinnerIds.Contains(lover.PlayerId))
-                            {
-                                WinnerIds.Add(lover.PlayerId);
-                                AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
-                            }
-                        }
+                        // foreach (var lover in loverArray)
+                        // {
+                        //     if (WinnerIds.Any(x => Utils.GetPlayerById(x).Is(CustomRoles.Lovers)) && !WinnerIds.Contains(lover.PlayerId))
+                        //     {
+                        //         WinnerIds.Add(lover.PlayerId);
+                        //         AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
+                        //     }
+                        // }
                     }
 
-                    if (WinnerTeam == CustomWinner.Lovers || AdditionalWinnerTeams.Contains(AdditionalWinners.Lovers))
-                    {
-                        Main.AllPlayerControls
-                            .Where(p => p.Is(CustomRoles.Lovers) && !WinnerIds.Contains(p.PlayerId))
-                            .Do(p => WinnerIds.Add(p.PlayerId));
-                    }
+                    Cupid.CheckAdditionalWin();
+
+                    // if (WinnerTeam == CustomWinner.Lovers || AdditionalWinnerTeams.Contains(AdditionalWinners.Lovers))
+                    // {
+                    //     Main.AllPlayerControls
+                    //         .Where(p => p.Is(CustomRoles.Lovers) && !WinnerIds.Contains(p.PlayerId))
+                    //         .Do(p => WinnerIds.Add(p.PlayerId));
+                    // }
 
                     /*Keep Schrodinger cat win condition at last*/
                     //Main.AllPlayerControls.Where(pc => pc.Is(CustomRoles.SchrodingersCat)).ToList().ForEach(SchrodingersCat.SchrodingerWinCondition);
@@ -611,6 +636,7 @@ class GameEndCheckerForNormal
     public static void SetPredicateToNormal() => predicate = new NormalGameEndPredicate();
     public static void SetPredicateToFFA() => predicate = new FFAGameEndPredicate();
     public static void SetPredicateToSpeedRun() => predicate = new SpeedRunGameEndPredicate();
+    public static void SetPredicateToTagMode() => predicate = new TagModeGameEndPredicate();
 
 
     // ===== Check Game End =====
@@ -676,13 +702,19 @@ class GameEndCheckerForNormal
                 return true;
             }
 
-            else if (Main.AllAlivePlayerControls.Length > 0 && Main.AllAlivePlayerControls.All(p => p.Is(CustomRoles.Lovers))) // if lover is alive lover wins
+            else if (Main.AllAlivePlayerControls.Length == 2 && Lovers.AreLovers(Main.AllAlivePlayerControls[0], Main.AllAlivePlayerControls[1])) // if lover is alive lover wins
             {
                 reason = GameOverReason.ImpostorsByKill;
                 ResetAndSetWinner(CustomWinner.Lovers);
                 return true;
             }
 
+            else if (Main.AllAlivePlayerControls.Length == 3 && Cupid.IsPolycule(Main.AllAlivePlayerControls)) // Cupid & Lovers win
+            {
+                reason = GameOverReason.ImpostorsByKill;
+                ResetAndSetWinner(CustomWinner.Lovers);
+                return true;
+            }
 
             else if (totalNKAlive == 0 && covenCount == 0) // total number of nks alive 0
             {

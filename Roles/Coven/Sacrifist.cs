@@ -15,7 +15,7 @@ internal class Sacrifist : CovenManager
     public override CustomRoles Role => CustomRoles.Sacrifist;
     private const int Id = 30600;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
     //==================================================================\\
 
@@ -85,7 +85,10 @@ internal class Sacrifist : CovenManager
         DebuffID = reader.ReadByte();
     }
     public override bool CanUseImpostorVentButton(PlayerControl pc) => true;
-
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.PhantomCooldown = 1f;
+    }
     // Sacrifist shouldn't be able to kill at all but if there's solo Sacrifist the game is unwinnable so they can kill when solo
     public override bool CanUseKillButton(PlayerControl pc) => Main.AllAlivePlayerControls.Where(pc => pc.Is(Custom_Team.Coven)).Count() == 1;
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
@@ -98,7 +101,7 @@ internal class Sacrifist : CovenManager
         killer.Notify(GetString("CovenDontKillOtherCoven"));
         return false;
     }
-    public override void UnShapeShiftButton(PlayerControl pc)
+    public override bool OnCheckVanish(PlayerControl pc, float killCooldown)
     {
         var rand = IRandom.Instance;
         DebuffID = (byte)rand.Next(0, 9);
@@ -122,7 +125,7 @@ internal class Sacrifist : CovenManager
                 {
                     Main.AllPlayerKillCooldown[cov.PlayerId] -= Main.AllPlayerKillCooldown[cov.PlayerId] * (NecroReducedCooldown.GetFloat() / 100);
                 }
-                return;
+                return false;
             }
             switch (DebuffID)
             {
@@ -251,6 +254,7 @@ internal class Sacrifist : CovenManager
             SendRPC(pc);
             debuffTimer = 0;
         }
+        return false;
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {

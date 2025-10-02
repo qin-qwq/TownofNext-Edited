@@ -72,6 +72,7 @@ internal class Chameleon : RoleBase
     {
         hud.AbilityButton.OverrideText(GetString("ChameleonDisguise"));
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
+        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("invisible");
 }

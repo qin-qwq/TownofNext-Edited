@@ -458,27 +458,6 @@ static class ExtendedPlayerControl
 
         killer.RpcMurderPlayer(target, true);
     }
-    public static bool IsInsideMap(this PlayerControl player)
-    {
-        if (player == null) return false;
-
-        var results = new Collider2D[10];
-        int overlapPointNonAlloc = Physics2D.OverlapPointNonAlloc(player.transform.position, results, Constants.ShipOnlyMask);
-        PlainShipRoom room = player.GetPlainShipRoom();
-        Vector2 pos = player.GetCustomPosition();
-
-        return Main.CurrentMap switch
-        {
-            MapNames.Fungle when overlapPointNonAlloc >= 2 => true,
-            MapNames.MiraHQ when overlapPointNonAlloc >= 1 => true,
-            MapNames.MiraHQ when room != null && room.RoomId is SystemTypes.MedBay or SystemTypes.Comms => true,
-            MapNames.Airship when overlapPointNonAlloc >= 1 => true,
-            MapNames.Skeld or MapNames.Dleks when room != null => true,
-            MapNames.Polus when overlapPointNonAlloc >= 1 => true,
-            MapNames.Polus when pos.y is >= -26.11f and <= -6.41f && pos.x is >= 3.56f and <= 32.68f => true,
-            _ => false
-        };
-    }
     public static void RpcGuardAndKill(this PlayerControl killer, PlayerControl target = null, bool forObserver = false, bool fromSetKCD = false)
     {
         if (!AmongUsClient.Instance.AmHost)
@@ -528,6 +507,7 @@ static class ExtendedPlayerControl
         }
 
         player.SetKillTimer(CD: time);
+        player.SyncSettings();
         if (target == null) target = player;
 
         Logger.Info($"SetKillCooldown for [{player.PlayerId}]{player.GetRealName()} => [{target.PlayerId}]{target.GetRealName()}, forceAnime: {forceAnime}", "SetKillCooldown");
@@ -589,6 +569,7 @@ static class ExtendedPlayerControl
     {
         if (player == null) return;
         if (!player.CanUseKillButton()) return;
+        player.SyncSettings();
         player.SetKillTimer(CD: time);
         if (time >= 0f) Main.AllPlayerKillCooldown[player.PlayerId] = time * 2;
         else Main.AllPlayerKillCooldown[player.PlayerId] *= 2;
@@ -599,6 +580,7 @@ static class ExtendedPlayerControl
     {
         if (player == null) return;
         if (!player.CanUseKillButton()) return;
+        player.SyncSettings();
         player.SetKillTimer(CD: time);
         if (target == null) target = player;
         if (time >= 0f) Main.AllPlayerKillCooldown[player.PlayerId] = time * 2;
@@ -1051,7 +1033,7 @@ static class ExtendedPlayerControl
     }
 
     public static float GetKillDistances(bool ovverideValue = false, int newValue = 2)
-        => NormalGameOptionsV09.KillDistances[Mathf.Clamp(ovverideValue ? newValue : Main.NormalOptions.KillDistance, 0, 2)];
+        => NormalGameOptionsV10.KillDistances[Mathf.Clamp(ovverideValue ? newValue : Main.NormalOptions.KillDistance, 0, 2)];
 
     public static void MarkDirtySettings(this PlayerControl player)
     {
@@ -1194,7 +1176,7 @@ static class ExtendedPlayerControl
     }
     public static bool CanUseKillButton(this PlayerControl pc)
     {
-        if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId)) return false;
+        if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId) || TimeMaster.Rewinding) return false;
         if (MeetingStates.FirstMeeting && !Options.ShieldedCanUseKillButton.GetBool() && pc.CheckFirstDied()) return false;
         if (pc.Is(CustomRoles.Killer) || Mastermind.PlayerIsManipulated(pc)) return true;
         if (pc.Is(CustomRoles.Narc) && !NarcManager.NarcCanUseKillButton(pc)) return false;
@@ -1289,6 +1271,8 @@ static class ExtendedPlayerControl
         {
             Main.AllPlayerKillCooldown[player.PlayerId] = 0.3f;
         }
+
+        Logger.Info($"Set {player.name} cooldown to {Main.AllPlayerKillCooldown[player.PlayerId]}", "ResetKillCooldown");
     }
     public static bool IsNonCrewSheriff(this PlayerControl sheriff)
     {
@@ -1416,7 +1400,8 @@ static class ExtendedPlayerControl
         else if (Options.SeeEjectedRolesInMeeting.GetBool() && Main.PlayerStates[target.PlayerId].deathReason == PlayerState.DeathReason.Vote) return true;
         else if (Altruist.HasEnabled && seer.IsMurderedThisRound()) return false;
         else if (seer.GetCustomRole() == target.GetCustomRole() && seer.GetCustomRole().IsNK()) return true;
-        else if (Options.LoverKnowRoles.GetBool() && seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers)) return true;
+        else if (Lovers.LoverKnowRoles.GetBool() && seer.IsLoverWith(target)) return true;
+        else if (Cupid.LoversKnowCupid.GetBool() && Cupid.IsCupidLover(target, seer)) return true;
         else if (Options.ImpsCanSeeEachOthersRoles.GetBool() && seer.CheckImpCanSeeAllies(CheckAsSeer: true) && target.CheckImpCanSeeAllies(CheckAsTarget: true)) return true;
         else if (Madmate.MadmateKnowWhosImp.GetBool() && seer.Is(CustomRoles.Madmate) && target.CheckImpCanSeeAllies(CheckAsTarget: true)) return true;
         else if (Madmate.ImpKnowWhosMadmate.GetBool() && target.Is(CustomRoles.Madmate) && seer.CheckImpCanSeeAllies(CheckAsSeer: true)) return true;
@@ -1637,6 +1622,11 @@ static class ExtendedPlayerControl
     {
         Main.PlayerStates[targetId].deathReason = reason;
     }
+    public static PlayerState.DeathReason GetDeathReason(this PlayerControl target) => target.PlayerId.GetDeathReason();
+    public static PlayerState.DeathReason GetDeathReason(this byte targetId)
+    {
+        return Main.PlayerStates[targetId].deathReason;
+    }
 
     public static bool Is(this PlayerControl target, CustomRoles role) =>
         role > CustomRoles.NotAssigned ? target.GetCustomSubRoles().Contains(role) : target.GetCustomRole() == role;
@@ -1846,5 +1836,97 @@ static class ExtendedPlayerControl
     public static string ColoredPlayerName(this byte id)
     {
         return Utils.ColorString(Main.PlayerColors.GetValueOrDefault(id, Color.white), Main.AllPlayerNames.GetValueOrDefault(id, Utils.GetPlayerById(id)?.GetRealName() ?? $"Someone (ID {id})"));
+    }
+    public static void SetChatVisible(this PlayerControl player, bool visible)
+    {
+        if (player.AmOwner)
+        {
+            HudManager.Instance.Chat.SetVisible(visible);
+            HudManager.Instance.Chat.HideBanButton();
+            return;
+        }
+        bool isDead = player.Data.IsDead;
+        MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+        writer.StartMessage(6);
+        writer.Write(AmongUsClient.Instance.GameId);
+        writer.WritePacked(player.GetClientId());
+        writer.StartMessage(4);
+        writer.WritePacked(HudManager.Instance.MeetingPrefab.SpawnId);
+        writer.WritePacked(-2);
+        writer.Write((byte)SpawnFlags.None);
+        writer.WritePacked(1);
+        uint netIdCnt = AmongUsClient.Instance.NetIdCnt;
+        AmongUsClient.Instance.NetIdCnt = netIdCnt + 1U;
+        writer.WritePacked(netIdCnt);
+        writer.StartMessage(1);
+        writer.WritePacked(0);
+        writer.EndMessage();
+        writer.EndMessage();
+        player.Data.IsDead = visible;
+        writer.StartMessage(1);
+        writer.WritePacked(player.Data.NetId);
+        player.Data.Serialize(writer, true);
+        writer.EndMessage();
+        writer.StartMessage(2);
+        writer.WritePacked(netIdCnt);
+        writer.Write((byte)RpcCalls.CloseMeeting);
+        writer.EndMessage();
+        player.Data.IsDead = isDead;
+        writer.StartMessage(1);
+        writer.WritePacked(player.Data.NetId);
+        player.Data.Serialize(writer, true);
+        writer.EndMessage();
+        writer.StartMessage(5);
+        writer.WritePacked(netIdCnt);
+        writer.EndMessage();
+        writer.EndMessage();
+        AmongUsClient.Instance.SendOrDisconnect(writer);
+        writer.Recycle();
+    }
+
+    // If you use vanilla RpcSetRole, it will block further SetRole calls until the next game starts.
+    public static void RpcSetRoleGlobal(this PlayerControl player, RoleTypes roleTypes)
+    {
+        if (AmongUsClient.Instance.AmClient) player.StartCoroutine(player.CoSetRole(roleTypes, true));
+        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetRole, SendOption.Reliable);
+        writer.Write((ushort)roleTypes);
+        writer.Write(true);
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
+    }
+
+    public static bool UsesMeetingShapeshift(this PlayerControl player)
+    {
+        CustomRoles role = player.GetCustomRole();
+        if (player.IsHost() && role is CustomRoles.Balancer) return false;
+        if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper) return false;
+        return role.IsMeetingShapeshifterRole();
+    }
+    
+    public static void RpcTeleportRandomSpawn(this PlayerControl player)
+    {
+        RandomSpawn.SpawnMap map;
+        switch (Main.NormalOptions.MapId)
+        {
+            case 0:
+                map = new RandomSpawn.SkeldSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 1:
+                map = new RandomSpawn.MiraHQSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 2:
+                map = new RandomSpawn.PolusSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 4:
+                map = new RandomSpawn.AirshipSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 5:
+                map = new RandomSpawn.FungleSpawnMap();
+                map.RandomTeleport(player);
+                break;
+        }
     }
 }

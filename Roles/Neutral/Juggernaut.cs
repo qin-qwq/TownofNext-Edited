@@ -1,5 +1,7 @@
 using AmongUs.GameOptions;
+using Hazel;
 using System;
+using TOHE.Modules.Rpc;
 using static TOHE.Options;
 
 namespace TOHE.Roles.Neutral;
@@ -46,6 +48,7 @@ internal class Juggernaut : RoleBase
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         NowCooldown[killer.PlayerId] = Math.Clamp(NowCooldown[killer.PlayerId] - ReduceKillCooldown.GetFloat(), MinKillCooldown.GetFloat(), DefaultKillCooldown.GetFloat());
+        SendRPC(killer);
         killer.ResetKillCooldown();
         killer.SyncSettings();
         return true;
@@ -53,4 +56,19 @@ internal class Juggernaut : RoleBase
     public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
     public override bool CanUseKillButton(PlayerControl pc) => true;
     public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(HasImpostorVision.GetBool());
+    public override string GetProgressText(byte playerId, bool comms)
+    {
+        var reduce = Math.Round(DefaultKillCooldown.GetFloat() - NowCooldown[playerId], 1);
+        return NowCooldown[playerId] != DefaultKillCooldown.GetFloat() ? Utils.ColorString(Palette.ImpostorRed.ShadeColor(0.5f), $" -{reduce}s") : string.Empty;
+    }
+    public void SendRPC(PlayerControl pc)
+    {
+        var writer = MessageWriter.Get(SendOption.Reliable);
+        writer.Write(NowCooldown[pc.PlayerId]);
+        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+    }
+    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
+    {
+        NowCooldown[pc.PlayerId] = reader.ReadSingle();
+    }
 }

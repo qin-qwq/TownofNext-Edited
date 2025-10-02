@@ -1,6 +1,7 @@
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Coven;
+using TOHE.Roles.Neutral;
 using static TOHE.Options;
 using static TOHE.Translator;
 using static TOHE.Utils;
@@ -13,6 +14,7 @@ internal class Oracle : RoleBase
     public override CustomRoles Role => CustomRoles.Oracle;
     private const int Id = 9100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Oracle);
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
@@ -42,6 +44,10 @@ internal class Oracle : RoleBase
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(CheckLimitOpt.GetFloat());
+    }
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckVote(pc, target);
     }
     public override bool CheckVote(PlayerControl player, PlayerControl target)
     {
@@ -81,7 +87,8 @@ internal class Oracle : RoleBase
                 string text = "Crewmate";
                 if (ChangeRecruitTeam.GetBool())
                 {
-                    if (target.Is(CustomRoles.Admired) || target.Is(CustomRoles.Narc)) text = "Crewmate";
+                    if (Lich.IsCursed(target)) text = "Neutral";
+                    else if (target.Is(CustomRoles.Admired) || target.Is(CustomRoles.Narc)) text = "Crewmate";
                     else if (Illusionist.IsCovIllusioned(target.PlayerId)) text = "Crewmate";
                     else if (Illusionist.IsNonCovIllusioned(target.PlayerId)) text = "Coven";
                     else if (target.GetCustomRole().IsImpostorTeamV2() || target.GetCustomSubRoles().Any(role => role.IsImpostorTeamV2())) text = "Impostor";
@@ -91,7 +98,8 @@ internal class Oracle : RoleBase
                 }
                 else
                 {
-                    if (Illusionist.IsCovIllusioned(target.PlayerId)) text = "Crewmate";
+                    if (Lich.IsCursed(target)) text = "Neutral";
+                    else if (Illusionist.IsCovIllusioned(target.PlayerId)) text = "Crewmate";
                     else if (Illusionist.IsNonCovIllusioned(target.PlayerId)) text = "Coven";
                     else if (target.Is(CustomRoles.Narc)) text = "Crewmate";
                     else if (target.Is(Custom_Team.Impostor) && !target.Is(CustomRoles.Trickster)) text = "Impostor";

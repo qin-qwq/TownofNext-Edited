@@ -32,6 +32,7 @@ internal class Innocent : RoleBase
         TargetIsKilled = false;
     }
     public override bool CanUseKillButton(PlayerControl pc) => true;
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = DefaultKillCooldown;
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         TargetIsKilled = true;

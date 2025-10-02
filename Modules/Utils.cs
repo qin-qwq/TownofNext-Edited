@@ -311,8 +311,8 @@ public static class Utils
             return string.Empty;
 
         string mode = GetChance(role.GetMode());
-        if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
-        else if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
+        // if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
+        if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
         {
             mode = GetChance(Options.CustomAdtRoleSpawnRate[role].GetFloat());
 
@@ -480,6 +480,11 @@ public static class Utils
             }
         }
 
+        if (GetPlayerById(targetId) != null && GetPlayerById(seerId) != null && Lich.IsCursed(GetPlayerById(targetId)) && Lich.IsDeceived(GetPlayerById(seerId), GetPlayerById(targetId)))
+        {
+            targetMainRole = CustomRoles.Lich;
+        }
+
         RoleText.Clear().Append(GetRoleName(targetMainRole));
         RoleColor = GetRoleColor(targetMainRole);
 
@@ -638,7 +643,7 @@ public static class Utils
                 break;
             default:
                 // player based on an impostor not should have tasks
-                if (States.RoleClass.ThisRoleBase is CustomRoles.Impostor or CustomRoles.Shapeshifter or CustomRoles.Phantom)
+                if (States.RoleClass.ThisRoleBase is CustomRoles.Impostor or CustomRoles.Shapeshifter or CustomRoles.Phantom or CustomRoles.Viper)
                     hasTasks = false;
                 break;
         }
@@ -751,6 +756,13 @@ public static class Utils
             var info = GetPlayerInfoById(playerId);
             var TaskCompleteColor = HasTasks(info) ? Color.green : GetRoleColor(Main.PlayerStates[playerId].MainRole).ShadeColor(0.5f);
             var NonCompleteColor = HasTasks(info) ? Color.yellow : Color.white;
+            if (Options.BetterTaskCountColor.GetBool())
+            {
+                Color nonCompleteColorStart = new Color32(203, 61, 64, 255);
+                Color nonCompleteColorEnd = TaskCompleteColor = new Color32(15, 249, 137, 255);
+                float progress = (float)taskState.CompletedTasksCount / taskState.AllTasksCount;
+                NonCompleteColor = Color.Lerp(nonCompleteColorStart, nonCompleteColorEnd, progress);
+            }
 
             if (Workhorse.IsThisRole(playerId))
                 NonCompleteColor = Workhorse.RoleColor;
@@ -895,8 +907,8 @@ public static class Utils
             string mode = GetChance(role.GetMode());
             if (role.IsEnable())
             {
-                if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
-                else if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
+                // if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
+                if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))
                 {
                     mode = GetChance(Options.CustomAdtRoleSpawnRate[role].GetFloat());
 
@@ -962,11 +974,12 @@ public static class Utils
 
         sb.Append($"<#ffffff>{GetString("RoleSummaryText")}</color>");
 
-        List<byte> cloneRoles = new(Main.PlayerStates.Keys);
+        List<byte> cloneRoles = [.. Main.PlayerStates.Keys];
         foreach (byte id in Main.winnerList.ToArray())
         {
-            if (EndGamePatch.SummaryText[id].Contains("<INVALID:NotAssigned>")) continue;
-            sb.Append($"\n<#c4aa02>★</color> ").Append(EndGamePatch.SummaryText[id]/*.RemoveHtmlTags()*/);
+            if (!EndGamePatch.SummaryText.TryGetValue(id, out string winner)) continue;
+            if (winner.Contains("<INVALID:NotAssigned>")) continue;
+            sb.Append($"\n<#c4aa02>★</color> ").Append(winner/*.RemoveHtmlTags()*/);
             cloneRoles.Remove(id);
         }
         switch (Options.CurrentGameMode)
@@ -980,7 +993,8 @@ public static class Utils
                 listFFA.Sort();
                 foreach ((int, byte) id in listFFA.ToArray())
                 {
-                    sb.Append($"\n　 ").Append(EndGamePatch.SummaryText[id.Item2]);
+                    if (EndGamePatch.SummaryText.TryGetValue(id.Item2, out string winner))
+                        sb.Append($"\n　 ").Append(winner);
                 }
                 break;
             case CustomGameMode.SpeedRun:
@@ -990,9 +1004,9 @@ public static class Utils
             default: // Normal game
                 foreach (byte id in cloneRoles.ToArray())
                 {
-                    if (EndGamePatch.SummaryText[id].Contains("<INVALID:NotAssigned>"))
-                        continue;
-                    sb.Append($"\n　 ").Append(EndGamePatch.SummaryText[id]);
+                    if (!EndGamePatch.SummaryText.TryGetValue(id, out string loser)) continue;
+                    if (loser.Contains("<INVALID:NotAssigned>")) continue;
+                    sb.Append($"\n　 ").Append(loser);
 
                 }
                 break;
@@ -1334,7 +1348,7 @@ public static class Utils
     public static void SendMessage(string text, byte sendTo = byte.MaxValue, string title = "", bool logforChatManager = false, bool noReplay = false, bool ShouldSplit = false)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        if (title == "") title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
+        if (title.IsNullOrWhiteSpace()) title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
         if (title.Count(x => x == '\u2605') == 2 && !title.Contains('\n'))
         {
             if (title.Contains('<') && title.Contains('>') && title.Contains('#'))
@@ -1372,14 +1386,22 @@ public static class Utils
     public static bool IsPlayerModerator(string friendCode)
     {
         if (friendCode == "") return false;
-        var friendCodesFilePath = @$"{Main.TONE_Initial_Path}/Moderators.txt";
+#if ANDROID
+        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
+#else
+        var friendCodesFilePath = @"./TONE-DATA/Moderators.txt";
+#endif
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
     public static bool IsPlayerVIP(string friendCode)
     {
         if (friendCode == "") return false;
-        var friendCodesFilePath = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
+#if ANDROID
+        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
+#else
+        var friendCodesFilePath = @"./TONE-DATA/VIP-List.txt";
+#endif
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
@@ -1487,13 +1509,44 @@ public static class Utils
         {
             if (GameStates.IsOnlineGame || GameStates.IsLocalGame)
             {
-                name = Options.HideHostText.GetBool() ? $"<color={GetString("NameColor")}>{name}</color>"
-                                                      : $"<color={GetString("HostColor")}>{GetString("HostText")}</color><color={GetString("IconColor")}>{GetString("Icon")}</color><color={GetString("NameColor")}>{name}</color>";
+                if (!Options.GradientTagsOpt.GetBool())
+                {
+                    string hostColor = GetString("HostColor").Trim().Split(" ")[0];
+                    string nameColor = GetString("NameColor").Trim().Split(" ")[0];
+
+                    name = Options.HideHostText.GetBool() ? $"<color={nameColor}>{name}</color>"
+                                                      : $"<color={hostColor}>{GetString("HostText")}</color><color={GetString("IconColor")}>{GetString("Icon")}</color><color={nameColor}>{name}</color>";
+                }
+                else
+                {
+                    string[] hostColor = GetString("HostColor").Trim().Split(" ");
+                    string[] nameColor = GetString("NameColor").Trim().Split(" ");
+
+                    string coloredHost = $"<color={hostColor[0]}>{GetString("HostText")}</color>";
+                    string coloredName = $"<color={nameColor[0]}>{name}</color>";
+
+                    if (CheckGradientCode(GetString("HostColor").Trim()))
+                    {
+                        coloredHost = GradientColorText(hostColor[0], hostColor[1], GetString("HostText"));
+                    }
+
+                    if (CheckGradientCode(GetString("NameColor").Trim()))
+                    {
+                        coloredName = GradientColorText(nameColor[0], nameColor[1], name);
+                    }
+
+                    name = Options.HideHostText.GetBool() ? coloredName
+                                                      : $"{coloredHost}<color={GetString("IconColor")}>{GetString("Icon")}</color>{coloredName}";
+                }
+
+
             }
             if (Options.CurrentGameMode == CustomGameMode.FFA)
                 name = $"<color=#00ffff><size=1.7>{GetString("ModeFFA")}</size></color>\r\n" + name;
             if (Options.CurrentGameMode == CustomGameMode.SpeedRun)
                 name = $"<color=#fffb00><size=1.7>{GetString("ModeSpeedRun")}</size></color>\r\n" + name;
+            if (Options.CurrentGameMode == CustomGameMode.TagMode)
+                name = $"<color=#2ccc00><size=1.7>{GetString("ModeTagMode")}</size></color>\r\n" + name;
         }
 
 
@@ -1502,7 +1555,11 @@ public static class Utils
         {
             if (IsPlayerVIP(player.FriendCode))
             {
-                string colorFilePath = @$"{Main.TONE_Initial_Path}/Tags/VIP_TAGS/{player.FriendCode}.txt";
+#if ANDROID
+                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS", $"{player.FriendCode}.txt");
+#else
+                string colorFilePath = @$"./TONE-DATA/Tags/VIP_TAGS/{player.FriendCode}.txt";
+#endif
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -1546,7 +1603,11 @@ public static class Utils
         {
             if (IsPlayerModerator(player.FriendCode))
             {
-                string colorFilePath = @$"{Main.TONE_Initial_Path}/Tags/MOD_TAGS/{player.FriendCode}.txt";
+#if ANDROID
+                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS", $"{player.FriendCode}.txt");
+#else
+                string colorFilePath = @$"./TONE-DATA/Tags/MOD_TAGS/{player.FriendCode}.txt";
+#endif
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -1588,9 +1649,7 @@ public static class Utils
         }
         if (player.FriendCode != PlayerControl.LocalPlayer.FriendCode && TagManager.CheckFriendCode(player.FriendCode, false))
         {
-            if ((TagManager.ReadTagColor(player.FriendCode) == " " || TagManager.ReadTagColor(player.FriendCode) == "") && (TagManager.ReadTagName(player.FriendCode) != "" && TagManager.ReadTagName(player.FriendCode) != " ")) modtag = $"{TagManager.ReadTagName(player.FriendCode)}";
-            else if (TagManager.ReadTagName(player.FriendCode) == " " || TagManager.ReadTagName(player.FriendCode) == "") modtag = "";
-            else modtag = $"<color=#{TagManager.ReadTagColor(player.FriendCode)}>{TagManager.ReadTagName(player.FriendCode)}</color>";
+            modtag = TagManager.ReadColoredTag(player.FriendCode);
         }
 
         if (player.AmOwner)
@@ -2017,20 +2076,22 @@ public static class Utils
 
                         if ((seer.IsPlayerCoven() && target.IsPlayerCoven()) && (CovenManager.HasNecronomicon(target)))
                         {
-                            TargetMark.Append(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), "♣"));
+                            TargetMark.Append(ColorString(GetRoleColor(CustomRoles.Coven), "♣"));
                         }
 
                         if (target.Is(CustomRoles.Cyber) && Cyber.CyberKnown.GetBool())
                             TargetMark.Append(ColorString(GetRoleColor(CustomRoles.Cyber), "★"));
 
-                        if (seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
-                        {
-                            TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
-                        }
-                        else if (seer.Data.IsDead && !seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
-                        {
-                            TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
-                        }
+
+                        TargetMark.Append(Lovers.GetMarkOthers(seer, target));
+                        // if (seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
+                        // {
+                        //     TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                        // }
+                        // else if (seer.Data.IsDead && !seer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers))
+                        // {
+                        //     TargetMark.Append($"<color={GetRoleColorCode(CustomRoles.Lovers)}>♥</color>");
+                        // }
 
                         // ====== Seer know target role ======
 
@@ -2057,12 +2118,22 @@ public static class Utils
                         if (seer.IsAlive() && Overseer.IsRevealedPlayer(seer, target) && Illusionist.IsNonCovIllusioned(target.PlayerId))
                         {
                             var randomRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement();
-                            BlankRT = ColorString(GetRoleColor(randomRole), GetString(randomRole.ToString()));
+                            BlankRT = ColorString(GetRoleColor(randomRole), GetString(randomRole.GetActualRoleName()));
                             if (randomRole is CustomRoles.CovenLeader or CustomRoles.Jinx or CustomRoles.Illusionist or CustomRoles.VoodooMaster) // Roles with Ability Uses
                             {
                                 BlankRT += randomRole.GetStaticRoleClass().GetProgressText(target.PlayerId, false);
                             }
                             TargetRoleText = $"<size={fontSize}>{BlankRT}</size>\r\n";
+                        }
+
+
+                        if (seer.IsAlive() && Lich.IsCursed(target) && Lich.IsDeceived(seer, target))
+                        {
+                            BlankRT = ColorString(GetRoleColor(CustomRoles.Lich), GetString(CustomRoles.Lich.GetActualRoleName()));
+                            TargetRoleText = $"<size={fontSize}>{BlankRT}</size>\r\n";
+
+                            if (!Overseer.IsRevealedPlayer(seer, target))
+                                TargetRoleText = KnowRoleTarget ? TargetRoleText : "";
                         }
 
                         // ====== Target player name ======
@@ -2296,6 +2367,7 @@ public static class Utils
             PlayerState.DeathReason.Electrocuted => CustomRoles.Shocker.IsEnable(),
             PlayerState.DeathReason.Scavenged => CustomRoles.Scavenger.IsEnable(),
             PlayerState.DeathReason.BlastedOff => CustomRoles.MoonDancer.IsEnable(),
+            PlayerState.DeathReason.Suffocate => CustomRoles.Tunny.IsEnable(),
             PlayerState.DeathReason.Kill => true,
             _ => true,
         };
@@ -2377,6 +2449,17 @@ public static class Utils
             ventilationSystem.PlayersInsideVents.Clear();
             ventilationSystem.IsDirty = true;
             // Will be synced by ShipStatus patch, SetAllVentInteractions
+        }
+
+        if (Lovers.PrivateChat.GetBool())
+        {
+            foreach (var target in Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Lovers)))
+            if (target.IsAlive())
+            {
+                target.SetChatVisible(true);
+                target.SetName(target.GetRealName(isMeeting: true));
+                ChatUpdatePatch.DoBlockChat = false;
+            }
         }
     }
     public static string ToColoredString(this CustomRoles role) => ColorString(GetRoleColor(role), GetString(role.ToString()));

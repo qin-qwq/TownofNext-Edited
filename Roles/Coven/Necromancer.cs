@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core;
 using TOHE.Roles.Crewmate;
@@ -14,7 +15,7 @@ internal class Necromancer : CovenManager
     public override CustomRoles Role => CustomRoles.Necromancer;
     private const int Id = 17100;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
     //==================================================================\\
 
@@ -24,7 +25,7 @@ internal class Necromancer : CovenManager
     private static OptionItem RevengeTime;
     private static OptionItem AbilityDuration;
     private static OptionItem AbilityCooldown;
-
+    public static OptionItem PreventKillerButtoning;
 
     public static PlayerControl Killer = null;
     private static bool IsRevenge = false;
@@ -44,6 +45,7 @@ internal class Necromancer : CovenManager
             .SetValueFormat(OptionFormat.Seconds);
         RevengeTime = IntegerOptionItem.Create(Id + 11, "NecromancerRevengeTime", new(0, 60, 1), 30, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer])
             .SetValueFormat(OptionFormat.Seconds);
+        PreventKillerButtoning = BooleanOptionItem.Create(Id + 16, "Necromancer.PreventKillerButtoning", true, TabGroup.CovenRoles, false).SetParent(RevengeTime);
         //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer]);
         //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer]);
         AbilityDuration = FloatOptionItem.Create(Id + 14, GeneralOption.AbilityDuration, new(0f, 300f, 2.5f), 60f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer])
@@ -68,7 +70,10 @@ internal class Necromancer : CovenManager
         UsedRoles[playerId] = [];
         OldAddons[playerId] = [];
     }
-    //public override void ApplyGameOptions(IGameOptions opt, byte id) => opt.SetVision(HasImpostorVision.GetBool());
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
+    {
+        AURoleOptions.PhantomCooldown = 1f;
+    }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc) => HasNecronomicon(pc) || IsRevenge;
     //public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
@@ -120,18 +125,18 @@ internal class Necromancer : CovenManager
     {
         return string.Format(GetString(GeneralOption.AbilityCooldown.ToString()) + ": {0:F0}s / {1:F0}s", AbilityTimer, AbilityCooldown.GetFloat());
     }
-    public override void UnShapeShiftButton(PlayerControl nm)
+    public override bool OnCheckVanish(PlayerControl nm, float killCooldown)
     {
-        if (nm == null) return;
+        if (nm == null) return false;
         if (!canUseAbility)
         {
             nm.Notify(GetString("NecromancerCooldownNotDone"));
-            return;
+            return false;
         }
         if (IsRevenge)
         {
             nm.Notify(GetString("NecromancerRevengeInProgress"));
-            return;
+            return false;
         }
         var deadPlayers = Main.AllPlayerControls.Where(x => !x.IsAlive());
         List<CustomRoles> deadRoles = [];
@@ -144,7 +149,7 @@ internal class Necromancer : CovenManager
         if (deadRoles.Count < 1)
         {
             nm.Notify(GetString("NecromancerNoUsableRoles"));
-            return;
+            return false;
         }
         var role = deadRoles.RandomElement();
         nm.RpcChangeRoleBasis(role);
@@ -174,6 +179,7 @@ internal class Necromancer : CovenManager
             if (!GameStates.IsMeeting)
                 RevertRole(nm, role);
         }, AbilityDuration.GetFloat(), "Necromancer Revert Role");
+        return false;
     }
     private static void RevertRole(PlayerControl nm, CustomRoles role)
     {

@@ -1,7 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using System;
+using TOHE.Modules;
 using TOHE.Roles.Core;
+using TOHE.Roles.Crewmate;
+using TOHE.Roles.Impostor;
 using UnityEngine;
 
 namespace TOHE.Patches;
@@ -52,35 +56,9 @@ public static class PhantomRolePatch
 
         var phantom = __instance;
         Logger.Info($"Player: {phantom.GetRealName()}", "CheckVanish");
-        var role = phantom.GetRoleClass();
 
-        if (role?.CheckVanish(phantom) == false)
-        {
-            if (phantom.AmOwner)
-            {
-                DestroyableSingleton<HudManager>.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
-                phantom.Data.Role.SetCooldown();
-                return false;
-            }
-
-            var sender = CustomRpcSender.Create($"Cancel vanish for {phantom.GetRealName()}", SendOption.Reliable);
-            sender.StartMessage(phantom.OwnerId);
-
-            sender.StartRpc(phantom.NetId, RpcCalls.SetRole)
-                .Write((ushort)RoleTypes.Phantom)
-                .Write(true)
-                .EndRpc();
-
-            sender.StartRpc(phantom.NetId, RpcCalls.ProtectPlayer)
-                .WriteNetObject(phantom)
-                .Write(0)
-                .EndRpc();
-
-            sender.EndMessage();
-            sender.SendMessage();
-
+        if (!CheckTrigger(phantom))
             return false;
-        }
 
         foreach (var target in Main.AllPlayerControls)
         {
@@ -107,6 +85,47 @@ public static class PhantomRolePatch
         InvisibilityList.Add(phantom);
         return true;
     }
+
+    public static bool CheckTrigger(PlayerControl phantom)
+    {
+        var role = phantom.GetRoleClass();
+        float killCooldown = phantom.GetKillTimer();
+        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom, killCooldown) == false)
+        {
+            if (phantom.AmOwner)
+            {
+                DestroyableSingleton<HudManager>.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
+                phantom.Data.Role.SetCooldown();
+                return false;
+            }
+
+            var sender = CustomRpcSender.Create($"Cancel vanish for {phantom.GetRealName()}", SendOption.Reliable);
+            sender.StartMessage(phantom.OwnerId);
+
+            sender.StartRpc(phantom.NetId, RpcCalls.SetRole)
+                .Write((ushort)RoleTypes.Phantom)
+                .Write(true)
+                .EndRpc();
+
+            sender.StartRpc(phantom.NetId, RpcCalls.ProtectPlayer)
+                .WriteNetObject(phantom)
+                .Write(0)
+                .EndRpc();
+
+            sender.EndMessage();
+            sender.SendMessage();
+
+            _ = new LateTask(() =>
+            {
+                phantom.SetKillCooldown(Math.Max(killCooldown, 0.001f));
+            }, 0.2f, $"Phantom Check");
+
+            return false;
+        }
+
+        return true;
+    }
+
     // Called when Phantom press appear button when is invisible
     [HarmonyPatch(nameof(PlayerControl.CheckAppear)), HarmonyPrefix]
     private static void CheckAppear_Prefix(PlayerControl __instance, bool shouldAnimate)
@@ -243,7 +262,7 @@ public static class PhantomRoleUseAbilityPatch
                 }
                 DestroyableSingleton<HudManager>.Instance.AbilityButton.SetSecondImage(__instance.Ability);
                 DestroyableSingleton<HudManager>.Instance.AbilityButton.OverrideText(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.PhantomAbilityUndo, new Il2CppReferenceArray<Il2CppSystem.Object>(0)));
-                __instance.Player.CmdCheckVanish(GameManager.Instance.LogicOptions.GetPhantomDuration());
+                __instance.Player.CmdCheckVanish(GameManager.Instance.LogicOptions.GetRoleFloat(FloatOptionNames.PhantomDuration));
                 return false;
             }
         }

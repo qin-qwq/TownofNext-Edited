@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -73,12 +74,22 @@ public class ModUpdater
         }
     }
 
+#if ANDROID
+    static string RegionConfigPath = Path.Combine(UnityEngine.Application.persistentDataPath, "BepInEx", "config", "at.duikbo.regioninstall.cfg");
+    static string MiniRegionInstallPath = Path.Combine(UnityEngine.Application.persistentDataPath, "BepInEx", "plugins", "Mini.RegionInstall.dll");
+#else
     const string RegionConfigPath = "./BepInEx/config/at.duikbo.regioninstall.cfg";
     const string MiniRegionInstallPath = "./BepInEx/plugins/Mini.RegionInstall.dll";
+#endif
+
     const string RegionConfigResource = "TOHE.Resources.at.duikbo.regioninstall.cfg";
     const string MiniRegionInstallResource = "TOHE.Resources.Mini.RegionInstall.dll";
     private static void CheckCustomRegions()
     {
+#if ANDROID
+        Logger.Info($"Skip check on Android platform", "CheckCustomRegions");
+        return;
+#endif
         var regions = ServerManager.Instance.AvailableRegions;
         var hasCustomRegions = false;
         var forceUpdate = false;
@@ -146,7 +157,7 @@ public class ModUpdater
     }
     public static void ResetUpdateButton()
     {
-        /*if (updateButton == null)
+        if (updateButton == null)
         {
             updateButton = MainMenuManagerPatch.CreateButton(
                 "updateButton",
@@ -157,7 +168,7 @@ public class ModUpdater
                 GetString("update"));
             updateButton.transform.localScale = Vector3.one;
         }
-        updateButton.gameObject.SetActive(hasUpdate);*/
+        updateButton.gameObject.SetActive(hasUpdate);
     }
     public static void ShowAvailableUpdate()
     {
@@ -222,6 +233,15 @@ public class ModUpdater
         }
         else
         {
+            string[] tag = data["tag_name"]?.ToString()[1..].Split(".");
+            Logger.Info($"{tag[0]}.{tag[1]}.{tag[2]}", "PluginVersion");
+            Logger.Info($"{Main.PluginVersion.Substring(10, 1)}.{Main.PluginVersion.Substring(11, 1)}.{Main.PluginVersion.Substring(12, 1)}.{Main.PluginVersion.Substring(14, 3)}", "PluginVersion");
+
+            var pluginNum = int.Parse(Main.PluginVersion.Substring(10, 1)) * 10000000 + int.Parse(Main.PluginVersion.Substring(11, 1)) * 1000000 + int.Parse(Main.PluginVersion.Substring(12, 1)) * 100000 + int.Parse(Main.PluginVersion.Substring(14, 3), CultureInfo.InvariantCulture) * 100;
+            var versionNum = int.Parse(tag[0]) * 10000000 + int.Parse(tag[1]) * 1000000 + int.Parse($"{tag[2][0]}") * 100000 + (tag[2][1] == 'b' ? int.Parse(tag[2][2..]) : 999) * 100;
+
+            hasUpdate = versionNum > pluginNum;
+
             string publishedAt = data["published_at"]?.ToString();
             latestVersion = DateTime.TryParse(publishedAt, out DateTime parsedDate) ? parsedDate : DateTime.MinValue;
             latestTitle = $"Day: {latestVersion?.Day} Month: {latestVersion?.Month} Year: {latestVersion?.Year}";
@@ -230,18 +250,12 @@ public class ModUpdater
             for (int i = 0; i < assets.Count; i++)
             {
                 string assetName = assets[i]["name"].ToString();
-                if (assetName.ToLower() == "tohe.dll")
+                if (assetName.ToLower() == "tone.dll")
                 {
                     downloadUrl = assets[i]["browser_download_url"].ToString();
                     Logger.Info($"Github downloadUrl is set to {downloadUrl}", "CheckRelease");
                 }
             }
-
-            DateTime pluginTimestamp = DateTime.ParseExact(Main.PluginVersion.Substring(5, 4), "MMdd", System.Globalization.CultureInfo.InvariantCulture);
-            int year = int.Parse(Main.PluginVersion.Substring(0, 4));
-            pluginTimestamp = pluginTimestamp.AddYears(year - pluginTimestamp.Year);
-            Logger.Info($"Day: {pluginTimestamp.Day} Month: {pluginTimestamp.Month} Year: {pluginTimestamp.Year}", "PluginVersion");
-            hasUpdate = latestVersion?.Date > pluginTimestamp.Date;
         }
 
         Logger.Info("hasupdate: " + hasUpdate, "Github");
@@ -267,20 +281,33 @@ public class ModUpdater
     }
     public static void StartUpdate(string url)
     {
-        ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
-        Task.Run(() => DownloadDLLAsync(url));
+#if ANDROID
+        ShowPopup(GetString("AndroidUpdateNotSupported"), StringNames.Close, true, InfoPopup.Close);
+        Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
         return;
+#else
+    ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
+    Task.Run(() => DownloadDLLAsync(url));
+    return;
+#endif
     }
     public static bool NewVersionCheck()
     {
         try
         {
             var fileName = Assembly.GetExecutingAssembly().Location;
-            if (Directory.Exists(Main.TONE_DATA_FOLDER_NAME) && File.Exists(@$"{Main.TONE_Initial_Path}/BanWords.txt"))
+#if ANDROID
+            if (Directory.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA")) &&
+                File.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "BanWords.txt")))
             {
-                DirectoryInfo di = new(Main.TONE_DATA_FOLDER_NAME);
+                DirectoryInfo di = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA"));
+#else
+        if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
+        {
+            DirectoryInfo di = new("TOH_DATA");
+#endif
                 di.Delete(true);
-                Logger.Warn($"Deleting old data '╝{Main.TONE_DATA_FOLDER_NAME}'", "NewVersionCheck");
+                Logger.Warn("Deleting old data：TOH_DATA", "NewVersionCheck");
             }
         }
         catch (Exception ex)
@@ -312,7 +339,7 @@ public class ModUpdater
     public static void DeleteOldFiles()
     {
         string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string searchPattern = "TOHE.dll*";
+        string searchPattern = "TONE.dll*";
         string[] files = Directory.GetFiles(path, searchPattern);
         try
         {
@@ -335,7 +362,7 @@ public class ModUpdater
 
     private static async Task DownloadDLLAsync(string url)
     {
-        var savePath = "BepInEx/plugins/TOHE.dll.temp";
+        var savePath = "BepInEx/plugins/TONE.dll.temp";
 
         // Delete the temporary file if it exists
         DeleteOldFiles();

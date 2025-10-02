@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Neutral;
 using UnityEngine;
@@ -12,7 +13,7 @@ internal class Pitfall : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Pitfall;
     private const int Id = 5600;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
 
@@ -64,6 +65,7 @@ internal class Pitfall : RoleBase
     {
         DefaultSpeed = Main.AllPlayerSpeed[playerId];
 
+        playerId.SetAbilityUseLimit(MaxTrapCount.GetFloat());
         TrapMaxPlayerCount = TrapMaxPlayerCountOpt.GetFloat();
         TrapDuration = TrapDurationOpt.GetFloat();
 
@@ -75,13 +77,17 @@ internal class Pitfall : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = ShapeshiftCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = ShapeshiftCooldown.GetFloat();
     }
 
-    public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(Translator.GetString("PitfallButtonText"));
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.AbilityButton.OverrideText(GetString("PitfallButtonText"));
+        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+    }
     // public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Set Trap");
 
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         //if (!CheckUnshapeshift) return;
         Logger.Info($"Triggered Pitfall Ability!!!", "Pitfall");
@@ -92,7 +98,7 @@ internal class Pitfall : RoleBase
 
         Vector2 position = shapeshifter.transform.position;
         var playerTraps = Traps.Where(a => a.PitfallPlayerId == shapeshifter.PlayerId).ToArray();
-        if (playerTraps.Length >= MaxTrapCount.GetInt())
+        if (shapeshifter.GetAbilityUseLimit() <= 0)
         {
             var trap = playerTraps.First();
             trap.Location = position;
@@ -101,6 +107,7 @@ internal class Pitfall : RoleBase
         }
         else
         {
+            shapeshifter.RpcRemoveAbilityUse();
             Traps.Add(new PitfallTrap
             {
                 PitfallPlayerId = shapeshifter.PlayerId,
@@ -111,6 +118,7 @@ internal class Pitfall : RoleBase
         }
 
         shapeshifter.Notify(GetString("RejectShapeshift.AbilityWasUsed"), time: 2f);
+        return false;
     }
 
     private void OnFixedUpdateOthers(PlayerControl player, bool lowLoad, long nowTime)

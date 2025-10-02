@@ -24,7 +24,7 @@ internal class Fireworker : RoleBase
     [Obfuscation(Exclude = true)]
     private const int Id = 3200;
 
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //==================================================================\\
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => nowFireworkerCount[player.PlayerId] == 0 ? CustomButton.Get("FireworkD") : CustomButton.Get("FireworkP");
@@ -76,7 +76,7 @@ internal class Fireworker : RoleBase
 
     private static void SendRPC(byte playerId)
     {
-        Logger.Info($"Player{playerId}:SendRPC", "Fireworker");
+        Logger.Info($"Player{playerId}:SendRPC nowFireworkerCount:{nowFireworkerCount[playerId]} state:{state[playerId]}", "Fireworker");
         var msg = new RpcSendFireworkerState(PlayerControl.LocalPlayer.NetId, playerId, nowFireworkerCount[playerId], (int)state[playerId]);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }
@@ -91,7 +91,7 @@ internal class Fireworker : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = PlaceCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = PlaceCooldown.GetFloat();
     }
 
     public override bool CanUseKillButton(PlayerControl pc)
@@ -110,7 +110,7 @@ internal class Fireworker : RoleBase
         return canUse;
     }
 
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         Logger.Info($"Fireworker ShapeShift", "Fireworker");
 
@@ -171,6 +171,7 @@ internal class Fireworker : RoleBase
         }
         SendRPC(shapeshifterId);
         Utils.NotifyRoles(ForceLoop: true);
+        return false;
     }
 
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)

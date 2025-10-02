@@ -134,6 +134,11 @@ internal class Summoner : CovenManager
         }
         return true;
     }
+
+    public override void OnVoteKick(PlayerControl pc, PlayerControl target)
+    {
+        SummonerCheckMsg(pc, $"/sm {target.PlayerId}", true);
+    }
     public static bool SummonerCheckMsg(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false; // Skip if system message or not host
@@ -264,7 +269,7 @@ internal class Summoner : CovenManager
         return true; // Suppress the command message
     }
 
-    private static void HideSummonCommand()
+    public static void HideSummonCommand()
     {
         ChatUpdatePatch.DoBlockChat = true;
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)

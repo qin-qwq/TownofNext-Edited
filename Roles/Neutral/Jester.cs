@@ -57,6 +57,7 @@ internal class Jester : RoleBase
     }
     public override bool HideVote(PlayerVoteArea votedPlayer) => HideJesterVote.GetBool();
     public override bool OnCheckStartMeeting(PlayerControl reporter) => CanUseMeetingButton.GetBool();
+    public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => false;
 
     public override void CheckExile(NetworkedPlayerInfo exiled, ref bool DecidedWinner, bool isMeetingHud, ref string name)
     {

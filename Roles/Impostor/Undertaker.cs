@@ -10,7 +10,7 @@ internal class Undertaker : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Undertaker;
     private const int Id = 4900;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -27,7 +27,7 @@ internal class Undertaker : RoleBase
         Options.SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Undertaker);
         KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Undertaker])
             .SetValueFormat(OptionFormat.Seconds);
-        SSCooldown = FloatOptionItem.Create(Id + 11, GeneralOption.ShapeshifterBase_ShapeshiftCooldown, new(0f, 180f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Undertaker])
+        SSCooldown = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Undertaker])
             .SetValueFormat(OptionFormat.Seconds);
         FreezeTime = FloatOptionItem.Create(Id + 13, "UndertakerFreezeDuration", new(1f, 5f, 1f), 5, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Undertaker])
             .SetValueFormat(OptionFormat.Seconds);
@@ -47,8 +47,7 @@ internal class Undertaker : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = SSCooldown.GetFloat();
-        AURoleOptions.ShapeshifterDuration = 1f;
+        AURoleOptions.PhantomCooldown = SSCooldown.GetFloat();
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
@@ -71,13 +70,14 @@ internal class Undertaker : RoleBase
         else
             MarkedLocation.Add(PlayerId, ExtendedPlayerControl.GetBlackRoomPosition());
     }
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         var shapeshifterId = shapeshifter.PlayerId;
         MarkedLocation[shapeshifterId] = shapeshifter.GetCustomPosition();
         SendRPC(shapeshifterId);
 
         shapeshifter.Notify(Translator.GetString("RejectShapeshift.AbilityWasUsed"), time: 2f);
+        return false;
     }
 
     private static void FreezeUndertaker(PlayerControl player)

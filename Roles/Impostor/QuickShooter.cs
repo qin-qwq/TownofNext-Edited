@@ -13,7 +13,7 @@ internal class QuickShooter : RoleBase
     public override CustomRoles Role => CustomRoles.QuickShooter;
     private const int Id = 2200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.QuickShooter);
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -31,7 +31,7 @@ internal class QuickShooter : RoleBase
         KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 35f, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.QuickShooter])
             .SetValueFormat(OptionFormat.Seconds);
         LimitBySSCoolDown = BooleanOptionItem.Create(Id + 11, "QucikShooterLimitBySS", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.QuickShooter]);
-        SSCoolDown = FloatOptionItem.Create(Id + 12, GeneralOption.ShapeshifterBase_ShapeshiftCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.ImpostorRoles, false).SetParent(LimitBySSCoolDown)
+        SSCoolDown = FloatOptionItem.Create(Id + 12, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.ImpostorRoles, false).SetParent(LimitBySSCoolDown)
             .SetValueFormat(OptionFormat.Seconds);
         MeetingReserved = IntegerOptionItem.Create(Id + 14, "MeetingReserved", new(0, 15, 1), 2, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.QuickShooter])
             .SetValueFormat(OptionFormat.Pieces);
@@ -44,7 +44,7 @@ internal class QuickShooter : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = LimitBySSCoolDown.GetBool() ? SSCoolDown.GetFloat() : 0.01f;
+        AURoleOptions.PhantomCooldown = LimitBySSCoolDown.GetBool() ? SSCoolDown.GetFloat() : 0.01f;
     }
 
     public override void SetKillCooldown(byte id)
@@ -77,7 +77,7 @@ internal class QuickShooter : RoleBase
             DestroyableSingleton<HudManager>.Instance.AbilityButton.SetCoolDown(timer, 0.01f);
     }
 
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         var killTimer = shapeshifter.GetKillTimer();
         Logger.Info($"Kill Timer: {killTimer}", "QuickShooter");
@@ -97,6 +97,7 @@ internal class QuickShooter : RoleBase
             shapeshifter.Notify(Translator.GetString("QuickShooterFailed"));
             SendRPC(true);
         }
+        return false;
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {

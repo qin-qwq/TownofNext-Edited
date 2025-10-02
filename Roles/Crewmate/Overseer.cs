@@ -49,7 +49,7 @@ internal class Overseer : RoleBase
         CustomRoles.Bastion,
         CustomRoles.Dictator,
         CustomRoles.Doctor,
-        CustomRoles.Detective,
+        CustomRoles.Forensic,
         CustomRoles.Lookout,
         CustomRoles.Telecommunication,
         CustomRoles.NiceGuesser,
@@ -248,7 +248,7 @@ internal class Overseer : RoleBase
         var randomRole = randomRolesForTrickster.RandomElement();
 
         //string roleName = GetRoleName(randomRole);
-        string RoleText = ColorString(GetRoleColor(randomRole), GetString(randomRole.ToString()));
+        string RoleText = ColorString(GetRoleColor(randomRole), GetString(randomRole.GetActualRoleName()));
 
         return RoleText;
     }

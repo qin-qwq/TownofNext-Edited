@@ -248,7 +248,8 @@ class VentButtonDoClickPatch
 
         var pc = PlayerControl.LocalPlayer;
         {
-            if (!pc.Is(CustomRoles.Swooper) || !pc.Is(CustomRoles.Wraith) || !pc.Is(CustomRoles.Chameleon) || pc.inVent || __instance.currentTarget == null || !pc.CanMove || !__instance.isActiveAndEnabled) return true;
+            if (pc.inVent || __instance.currentTarget == null || !pc.CanMove || !__instance.isActiveAndEnabled) return true;
+            if (!pc.Is(CustomRoles.Swooper) && !pc.Is(CustomRoles.Wraith) && !pc.Is(CustomRoles.Chameleon)) return true;
             pc?.MyPhysics?.RpcEnterVent(__instance.currentTarget.Id);
             return false;
         }
@@ -303,7 +304,7 @@ class TaskPanelBehaviourPatch
 
             switch (Options.CurrentGameMode)
             {
-                case CustomGameMode.Standard:
+                case CustomGameMode.Standard or CustomGameMode.TagMode:
 
                     var lines = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
                     StringBuilder sb = new();
@@ -322,7 +323,7 @@ class TaskPanelBehaviourPatch
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
 
-                    if (MeetingStates.FirstMeeting)
+                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode == CustomGameMode.Standard)
                     {
                         AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
                         /*if (Main.PlayerStates.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var ps) && ps.SubRoles.Count >= 1)

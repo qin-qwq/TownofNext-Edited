@@ -8,7 +8,9 @@ using System.Text.RegularExpressions;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Patches;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core.AssignManager;
+using TOHE.Roles.Core.DraftAssign;
 using TOHE.Roles.Crewmate;
 using static TOHE.Translator;
 
@@ -58,6 +60,7 @@ class OnGameJoinedPatch
 
             GameStartManagerPatch.GameStartManagerUpdatePatch.exitTimer = -1;
             Main.DoBlockNameChange = false;
+            DraftAssign.Reset();
             RoleAssign.SetRoles = [];
             GhostRoleAssign.forceRole = [];
             EAC.DeNum = new();
@@ -94,11 +97,11 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun in H&S game, set HideNSeekTOHE
+                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTOHE
                     if (Options.CurrentGameMode != CustomGameMode.HidenSeekTOHE)
                     {
                         // Select HideNSeekTOHE
-                        Options.GameMode.SetValue(2);
+                        Options.GameMode.SetValue(4);
                     }
                     break;
 
@@ -382,12 +385,13 @@ class OnPlayerLeftPatch
             {
                 if (data.Character.Is(CustomRoles.Lovers) && !data.Character.Data.IsDead)
                 {
-                    foreach (var lovers in Main.LoversPlayers.ToArray())
-                    {
-                        Main.isLoversDead = true;
-                        Main.LoversPlayers.Remove(lovers);
-                        Main.PlayerStates[lovers.PlayerId].RemoveSubRole(CustomRoles.Lovers);
-                    }
+                    Lovers.OnPartnerLeft(data.Character.PlayerId);
+                    // foreach (var lovers in Main.LoversPlayers.ToArray())
+                    // {
+                    //     Main.isLoversDead = true;
+                    //     Main.LoversPlayers.Remove(lovers);
+                    //     Main.PlayerStates[lovers.PlayerId].RemoveSubRole(CustomRoles.Lovers);
+                    // }
                 }
 
                 Spiritualist.RemoveTarget(data.Character.PlayerId);

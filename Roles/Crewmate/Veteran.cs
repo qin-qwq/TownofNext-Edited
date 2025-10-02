@@ -71,12 +71,6 @@ internal class Veteran : RoleBase
                     Logger.Info($"{killer.GetRealName()} kill {target.GetRealName()} because killer Pestilence or War", "Veteran");
                     return false;
                 }
-                else if (killer.Is(CustomRoles.Jinx))
-                {
-                    target.RpcCheckAndMurder(killer);
-                    Logger.Info($"{killer.GetRealName()} is Jinx try kill {target.GetRealName()} but it is canceled", "Veteran");
-                    return false;
-                }
                 else
                 {
                     target.RpcMurderPlayer(killer);
@@ -134,6 +128,7 @@ internal class Veteran : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.AbilityButton.buttonLabelText.text = GetString("VeteranVentButtonText");
+        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Veteran");
 }

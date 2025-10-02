@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
 using TOHE.Roles.Core;
+using TOHE.Roles.Neutral;
 using UnityEngine;
 
 namespace TOHE;
@@ -17,6 +18,7 @@ public abstract class RoleBase
 
     public virtual bool IsEnable { get; set; } = false;
     public bool HasVoted = false;
+    public virtual bool IsMsr => false;
     public virtual bool IsExperimental => false;
     public virtual bool IsDesyncRole => false;
     public virtual bool IsSideKick => false;
@@ -264,7 +266,11 @@ public abstract class RoleBase
     /// </summary>
     public virtual void OnShapeshift(PlayerControl shapeshifter, PlayerControl target, bool IsAnimate, bool shapeshifting)
     { }
-    public virtual bool CheckVanish(PlayerControl phantom) => true;
+    public virtual void OnVoteKick(PlayerControl pc, PlayerControl target)
+    { }
+    public virtual void OnMeetingShapeshift(PlayerControl shapeshifter, PlayerControl target)
+    { }
+    public virtual bool OnCheckVanish(PlayerControl phantom, float killCooldown) => true;
 
     // NOTE: when using UnShapeshift button, it will not be possible to revert to normal state because of complications
     // So OnCheckShapeShift and OnShapeshift are pointless when using it
@@ -512,5 +518,7 @@ public abstract class RoleBase
         TrackerBase_TrackingCooldown,
         TrackerBase_TrackingDuration,
         TrackerBase_TrackingDelay,
+        DetectiveBase_DetectiveSuspectLimit,
+        ViperBase_ViperDissolveTime
     }
 }

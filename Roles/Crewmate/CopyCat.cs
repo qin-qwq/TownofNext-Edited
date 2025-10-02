@@ -21,6 +21,7 @@ internal class CopyCat : RoleBase
     private static OptionItem KillCooldown;
     private static OptionItem CopyCrewVar;
     private static OptionItem CopyTeamChangingAddon;
+    private static OptionItem CopyOnlyEnabledRoles;
 
     private static float CurrentKillCooldown = new();
     private static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
@@ -32,6 +33,7 @@ internal class CopyCat : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CopyCrewVar = BooleanOptionItem.Create(Id + 13, "CopyCrewVar", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
         CopyTeamChangingAddon = BooleanOptionItem.Create(Id + 14, "CopyTeamChangingAddon", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
+        CopyOnlyEnabledRoles = BooleanOptionItem.Create(Id + 15, "CopyOnlyEnabledRoles", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
     }
 
     public override void Init()
@@ -101,7 +103,7 @@ internal class CopyCat : RoleBase
             CustomRoles.Doomsayer or // CopyCat cannot guessed roles because he can be know others roles players
             CustomRoles.EvilGuesser or
             CustomRoles.NiceGuesser or
-            CustomRoles.Baker or CustomRoles.Famine;
+            CustomRoles.Famine;
     }
 
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
@@ -118,57 +120,63 @@ internal class CopyCat : RoleBase
         {
             role = role switch
             {
-                CustomRoles.Stealth or CustomRoles.Medusa => CustomRoles.Grenadier,
-                CustomRoles.TimeThief => CustomRoles.TimeManager,
-                CustomRoles.Consigliere => CustomRoles.Overseer,
-                CustomRoles.Mercenary => CustomRoles.Addict,
-                CustomRoles.Miner => CustomRoles.Mole,
-                CustomRoles.Godfather => CustomRoles.ChiefOfPolice,
-                CustomRoles.Twister => CustomRoles.TimeMaster,
-                CustomRoles.Disperser => CustomRoles.Transporter,
-                CustomRoles.Eraser => CustomRoles.Cleanser,
-                CustomRoles.Visionary => CustomRoles.Oracle,
-                CustomRoles.Workaholic => CustomRoles.Snitch,
-                CustomRoles.Sunnyboy => CustomRoles.Doctor,
-                CustomRoles.Councillor => CustomRoles.Judge,
-                CustomRoles.Taskinator => CustomRoles.Benefactor,
-                CustomRoles.EvilTracker => CustomRoles.TrackerTOHE,
-                CustomRoles.AntiAdminer => CustomRoles.Telecommunication,
-                CustomRoles.Pursuer => CustomRoles.Deceiver,
-                CustomRoles.CursedWolf => CustomRoles.Veteran,
-                CustomRoles.Swooper or CustomRoles.Wraith => CustomRoles.Chameleon,
-                CustomRoles.Vindicator or CustomRoles.Pickpocket => CustomRoles.Mayor,
-                CustomRoles.Opportunist or CustomRoles.BloodKnight or CustomRoles.Wildling => CustomRoles.Guardian,
-                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster => CustomRoles.Admirer,
-                CustomRoles.Arrogance or CustomRoles.Juggernaut or CustomRoles.Berserker => CustomRoles.Reverie,
-                CustomRoles.Baker when Baker.CurrentBread() is 0 => CustomRoles.Overseer,
-                CustomRoles.Baker when Baker.CurrentBread() is 1 => CustomRoles.Deputy,
-                CustomRoles.Baker when Baker.CurrentBread() is 2 => CustomRoles.Medic,
-                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 0 => CustomRoles.Overseer,
-                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 1 => CustomRoles.Medic,
-                CustomRoles.Sacrifist => CustomRoles.Alchemist,
-                CustomRoles.MoonDancer => CustomRoles.Merchant,
-                CustomRoles.Ritualist => CustomRoles.Admirer,
-                CustomRoles.Jinx => CustomRoles.Crusader,
-                CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(),
-                CustomRoles.Instigator => CustomRoles.Requiter,
+                CustomRoles.Stealth or CustomRoles.Medusa or CustomRoles.Pitfall => CustomRoles.Grenadier, // 隐形者，美杜莎 => 掷雷兵
+                CustomRoles.TimeThief => CustomRoles.TimeManager, // 蚀时者 => 时间操控者
+                CustomRoles.Consigliere => CustomRoles.Overseer, // 军师 => 预言家
+                CustomRoles.Mercenary => CustomRoles.Addict, // 嗜血杀手 => 瘾君子
+                CustomRoles.Miner => CustomRoles.Mole, // 矿工 => 鼹鼠
+                CustomRoles.Godfather => CustomRoles.ChiefOfPolice, // 教父 => 警察局长
+                CustomRoles.Twister => CustomRoles.TimeMaster, // 龙卷风 => 时间之主
+                CustomRoles.Disperser => CustomRoles.Transporter, // 分散者 => 传送师
+                CustomRoles.Eraser => CustomRoles.Cleanser, // 抹除者 => 清洗者
+                CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
+                CustomRoles.Workaholic => CustomRoles.Snitch, // 工作狂 => 告密者
+                CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
+                CustomRoles.Councillor => CustomRoles.Judge, // 邪恶法官 => 法官
+                CustomRoles.Taskinator => CustomRoles.Benefactor, // 任务执行者 => 恩人
+                CustomRoles.EvilTracker => CustomRoles.TrackerTOHE, // 邪恶追踪者 => 侦查员
+                CustomRoles.AntiAdminer => CustomRoles.Telecommunication, // 监管者 => 通信员
+                CustomRoles.Pursuer => CustomRoles.Deceiver, // 起诉人 => 赝品商
+                CustomRoles.CursedWolf => CustomRoles.Veteran, // 呪狼 => 老兵
+                CustomRoles.Swooper or CustomRoles.Wraith => CustomRoles.Chameleon, // 隐匿者，魅影 => 变色龙
+                CustomRoles.Vindicator or CustomRoles.Pickpocket => CustomRoles.Mayor, // 卫道士，小偷 => 市长
+                CustomRoles.Opportunist or CustomRoles.BloodKnight or CustomRoles.Wildling => CustomRoles.Guardian, // 投机者，嗜血骑士，野人 => 守护者
+                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist => CustomRoles.Admirer, // 魅魔，病毒，歹徒，大祭司 => 仰慕者
+                CustomRoles.Arrogance or CustomRoles.Juggernaut or CustomRoles.Berserker => CustomRoles.Reverie, // 狂妄杀手，天启，狂战士 => 遐想者
+                CustomRoles.Baker when Baker.CurrentBread() is 0 => CustomRoles.Overseer, // 面包师 0 => 预言家
+                CustomRoles.Baker when Baker.CurrentBread() is 1 => CustomRoles.Deputy, // 面包师 1 => 捕快
+                CustomRoles.Baker when Baker.CurrentBread() is 2 => CustomRoles.Medic, // 面包师 2 => 医生
+                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 0 => CustomRoles.Overseer, // 药剂师 0 => 预言家
+                CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 1 => CustomRoles.Medic, // 药剂师 1 => 医生
+                CustomRoles.Sacrifist => CustomRoles.Alchemist, // 献祭者 => 炼金术士
+                CustomRoles.MoonDancer or CustomRoles.Harvester or CustomRoles.Bandit => CustomRoles.Merchant, // 月光舞者，收割者，强盗 => 商人
+                CustomRoles.Jinx => CustomRoles.Crusader, // 扫把星 => 十字军
+                CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(), // 骗术师，幻术师 => 随机
+                CustomRoles.Instigator => CustomRoles.Requiter, // 教唆者 => 清算者
+                CustomRoles.Jackal => CustomRoles.ChiefOfPolice, // 豺狼 => 警察局长
+                CustomRoles.Sidekick => CustomRoles.Sheriff, // 跟班 => 警长
                 _ => role
             };
         }
-        if (role.IsCrewmate())
+        if (Lich.IsCursed(target)) role = CustomRoles.Lich;
+        if (role.IsCrewmate() && (role.IsEnable() || !CopyOnlyEnabledRoles.GetBool()))
         {
             if (role != CustomRoles.CopyCat)
             {
-                killer.RpcChangeRoleBasis(role);
-                killer.RpcSetCustomRole(role, false, false);
-                killer.GetRoleClass()?.OnAdd(killer.PlayerId);
-                killer.SyncSettings();
-                Dictionary<byte, List<CustomRoles>> CurrentAddons = new();
-                CurrentAddons[killer.PlayerId] = [];
+                Dictionary<byte, List<CustomRoles>> CurrentAddons = new()
+                {
+                    [killer.PlayerId] = []
+                };
                 foreach (var addon in killer.GetCustomSubRoles())
                 {
                     CurrentAddons[killer.PlayerId].Add(addon);
                 }
+
+                killer.RpcChangeRoleBasis(role);
+                killer.RpcSetCustomRole(role, false, false);
+                killer.GetRoleClass()?.OnAdd(killer.PlayerId);
+                killer.SyncSettings();
+
                 foreach (var addon in CurrentAddons[killer.PlayerId])
                 {
                     if (!CustomRolesHelper.CheckAddonConfilct(addon, killer))

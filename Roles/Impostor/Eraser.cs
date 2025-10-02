@@ -41,7 +41,7 @@ internal class Eraser : RoleBase
     }
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (killer.GetAbilityUseLimit() > 0 && !PlayerToErase.Contains(target.PlayerId))
+        if (killer.GetAbilityUseLimit() > 0 && !PlayerToErase.Contains(target.PlayerId) && !target.Is(CustomRoles.Stubborn))
         {
             return killer.CheckDoubleTrigger(target, () =>
             {

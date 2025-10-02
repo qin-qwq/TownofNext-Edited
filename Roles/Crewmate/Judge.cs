@@ -17,6 +17,7 @@ internal class Judge : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Judge;
     private const int Id = 10700;
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\
@@ -37,6 +38,7 @@ internal class Judge : RoleBase
     private static OptionItem CanTrialNeutralC;
     private static OptionItem CanTrialNeutralA;
     private static OptionItem CanTrialCoven;
+    private static OptionItem CanTrialAdmired;
 
     private static readonly Dictionary<byte, int> TrialLimitMeeting = [];
     private static readonly Dictionary<byte, int> TrialLimitGame = [];
@@ -61,6 +63,7 @@ internal class Judge : RoleBase
         CanTrialNeutralK = BooleanOptionItem.Create(Id + 15, "JudgeCanTrialNeutralK", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialNeutralA = BooleanOptionItem.Create(Id + 22, "JudgeCanTrialNeutralA", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         CanTrialCoven = BooleanOptionItem.Create(Id + 23, "JudgeCanTrialCoven", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
+        CanTrialAdmired = BooleanOptionItem.Create(Id + 26, "JudgeCanTrialAdmired", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge]);
         TryHideMsg = BooleanOptionItem.Create(Id + 11, "JudgeTryHideMsg", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Judge])
             .SetColor(Color.green);
     }
@@ -99,6 +102,10 @@ internal class Judge : RoleBase
     {
         if (!_Player) return;
         _Player.SetAbilityUseLimit(TrialLimitGame[_Player.PlayerId]);
+    }
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        TrialMsg(pc, $"/tl {target.PlayerId}", true);
     }
     public static bool TrialMsg(PlayerControl pc, string msg, bool isUI = false)
     {
@@ -198,8 +205,8 @@ internal class Judge : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("GuessSolsticer"));
                     return true;
                 }
+                else if (target.Is(CustomRoles.Admired) && !CanTrialAdmired.GetBool()) judgeSuicide = true;
                 else if (target.IsTransformedNeutralApocalypse()) judgeSuicide = true;
-                else if (target.Is(CustomRoles.Trickster)) judgeSuicide = true;
                 else if (Medic.IsProtected(target.PlayerId) && !Medic.GuesserIgnoreShield.GetBool())
                 {
                     pc.ShowInfoMessage(isUI, GetString("GuessShielded"));
@@ -211,6 +218,7 @@ internal class Judge : RoleBase
                     return true;
                 }
                 else if (pc.IsAnySubRole(x => x.IsConverted())) judgeSuicide = false;
+                else if (target.Is(CustomRoles.Trickster)) judgeSuicide = true;
                 else if (target.Is(CustomRoles.Rascal)) judgeSuicide = false;
                 else if (target.Is(CustomRoles.Narc)) judgeSuicide = true;
                 else if ((target.Is(CustomRoles.Sidekick) || target.Is(CustomRoles.Recruit)) && CanTrialSidekick.GetBool()) judgeSuicide = false;

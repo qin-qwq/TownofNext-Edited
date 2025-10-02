@@ -57,7 +57,7 @@ internal class Wildling : RoleBase
         AURoleOptions.ShapeshifterDuration = ShapeshiftDur.GetFloat();
     }
 
-    public override bool CanUseImpostorVentButton(PlayerControl pc) => false;
+    public override bool CanUseImpostorVentButton(PlayerControl pc) => true;
     private bool InProtect() => TimeStamp > Utils.GetTimeStamp(DateTime.Now);
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)

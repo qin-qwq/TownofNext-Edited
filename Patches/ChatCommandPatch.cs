@@ -10,6 +10,7 @@ using TOHE.Modules.ChatManager;
 using TOHE.Modules.Rpc;
 using TOHE.Roles.Core;
 using TOHE.Roles.Core.AssignManager;
+using TOHE.Roles.Core.DraftAssign;
 using TOHE.Roles.Coven;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Impostor;
@@ -23,12 +24,21 @@ namespace TOHE;
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
 internal class ChatCommands
 {
-    private static readonly string modLogFiles = @$"{Main.TONE_Initial_Path}/ModLogs.txt";
-    private static readonly string modTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/MOD_TAGS";
-    private static readonly string sponsorTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/SPONSOR_TAGS";
-    private static readonly string vipTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/VIP_TAGS";
-    private static readonly string modFiles = @$"{Main.TONE_Initial_Path}/Moderators.txt";
-    private static readonly string vipFiles = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
+#if ANDROID
+    private static readonly string modLogFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "ModLogs.txt");
+    private static readonly string modTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS");
+    private static readonly string sponsorTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "SPONSOR_TAGS");
+    private static readonly string vipTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS");
+    private static readonly string modFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
+    private static readonly string vipFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
+#else
+    private static readonly string modLogFiles = @"./TONE-DATA/ModLogs.txt";
+    private static readonly string modTagsFiles = @"./TONE-DATA/Tags/MOD_TAGS";
+    private static readonly string sponsorTagsFiles = @"./TONE-DATA/Tags/SPONSOR_TAGS";
+    private static readonly string vipTagsFiles = @"./TONE-DATA/Tags/VIP_TAGS";
+    private static readonly string modFiles = @"./TONE-DATA/Moderators.txt";
+    private static readonly string vipFiles = @"./TONE-DATA/VIP-List.txt";
+#endif
 
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
@@ -516,6 +526,10 @@ internal class ChatCommands
 
                         case CustomGameMode.SpeedRun:
                             SpeedRun.AppendSpeedRunKcount(sub);
+                            break;
+
+                        case CustomGameMode.TagMode:
+                            TagMode.AppendTagModeKcount(sub);
                             break;
                     }
 
@@ -1777,6 +1791,91 @@ internal class ChatCommands
                     Utils.SendMessage(string.Format(GetString("StartCommandStarted"), PlayerControl.LocalPlayer.name));
                     Logger.Info("Game Starting", "ChatCommand");
                     break;
+                case "/draft":
+                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft)
+                    {
+                        break;
+                    }
+                    canceled = true;
+                    if (!GameStates.IsLobby)
+                    {
+                        Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    if (args.Length < 2 || args[1] == "start")
+                    {
+                        var startResult = DraftAssign.StartDraft();
+
+                        if (startResult == DraftAssign.DraftCmdResult.NoCurrentDraft)
+                        {
+                            Utils.SendMessage(GetString("StartDraftWrongGameMode"), PlayerControl.LocalPlayer.PlayerId);
+                        }
+                        else
+                        {
+                            foreach (var pc in Main.AllPlayerControls)
+                            {
+                                Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), pc.GetFormattedDraftPool()), pc.PlayerId);
+                            }
+                        }
+                    }
+                    else if (args[1] == "add")
+                    {
+                        var addResult = DraftAssign.AddPlayersToDraft();
+
+                        if (addResult == DraftAssign.DraftCmdResult.NoCurrentDraft)
+                        {
+                            Utils.SendMessage(GetString("NoCurrentDraft"), PlayerControl.LocalPlayer.PlayerId);
+                        }
+                        else
+                        {
+                            foreach (var pc in Main.AllPlayerControls)
+                            {
+                                Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), pc.GetFormattedDraftPool()), pc.PlayerId);
+                            }
+                        }
+                    }
+                    else if (args[1] == "reset")
+                    {
+                        DraftAssign.Reset();
+                    }
+                    else if (args[1] == "enable" && PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
+                    {
+                        Options.devEnableDraft = true;
+                        Options.DraftHeader.SetHidden(false);
+                        Options.DraftMode.SetHidden(false);
+                        Utils.SendMessage($"{PlayerControl.LocalPlayer.GetRealName()}启用了轮抽选角", PlayerControl.LocalPlayer.PlayerId);
+                    }
+                    else
+                    {
+                        CustomRoles draftedRole;
+                        DraftAssign.DraftCmdResult cmdResult;
+                        if (int.TryParse(args[1], out int index))
+                        {
+                            (cmdResult, draftedRole) = PlayerControl.LocalPlayer.DraftRole(index);
+                        }
+                        else
+                        {
+                            Utils.SendMessage(GetString("InvalidDraftSelection"), PlayerControl.LocalPlayer.PlayerId);
+                            break;
+                        }
+
+                        if (cmdResult == DraftAssign.DraftCmdResult.NoCurrentDraft)
+                        {
+                            Utils.SendMessage(GetString("NoCurrentDraft"), PlayerControl.LocalPlayer.PlayerId);
+                            break;
+                        }
+                        else if (cmdResult == DraftAssign.DraftCmdResult.DraftRemoved)
+                        {
+                            Utils.SendMessage(GetString("DraftSelectionCleared"), PlayerControl.LocalPlayer.PlayerId);
+                            break;
+                        }
+                        else
+                        {
+                            Utils.SendMessage(string.Format(GetString("DraftSelection"), draftedRole.ToColoredString()), PlayerControl.LocalPlayer.PlayerId);
+                        }
+                    }
+                    break;
                 case "/spam":
                     canceled = true;
                     ChatManager.SendQuickChatSpam();
@@ -2193,35 +2292,8 @@ internal class ChatCommands
         }
         return false;
     }
-    public static void SendRolesInfo(string role, byte playerId, bool isDev = false, bool isUp = false)
+    public static CustomRoles ParseRole(string role)
     {
-        switch (Options.CurrentGameMode)
-        {
-            case CustomGameMode.FFA:
-                {
-                    Utils.SendMessage(GetString("ModeDescribe.FFA"), playerId);
-                    return;
-                }
-            case CustomGameMode.SpeedRun:
-                {
-                    Utils.SendMessage(GetString("ModeDescribe.SpeedRun"), playerId);
-                    return;
-                }
-        }
-        role = role.Trim().ToLower();
-        if (role.StartsWith("/r")) _ = role.Replace("/r", string.Empty);
-        if (role.StartsWith("/up")) _ = role.Replace("/up", string.Empty);
-        if (role.EndsWith("\r\n")) _ = role.Replace("\r\n", string.Empty);
-        if (role.EndsWith("\n")) _ = role.Replace("\n", string.Empty);
-        if (role.StartsWith("/bt")) _ = role.Replace("/bt", string.Empty);
-        if (role.StartsWith("/rt")) _ = role.Replace("/rt", string.Empty);
-
-        if (role == "" || role == string.Empty)
-        {
-            Utils.ShowActiveRoles(playerId);
-            return;
-        }
-
         role = FixRoleNameInput(role).ToLower().Trim().Replace(" ", string.Empty);
         var result = CustomRoles.NotAssigned;
 
@@ -2254,6 +2326,45 @@ internal class ChatCommands
                 }
             }
         }
+
+        return result;
+    }
+
+    public static void SendRolesInfo(string role, byte playerId, bool isDev = false, bool isUp = false)
+    {
+        switch (Options.CurrentGameMode)
+        {
+            case CustomGameMode.FFA:
+                {
+                    Utils.SendMessage(GetString("ModeDescribe.FFA"), playerId);
+                    return;
+                }
+            case CustomGameMode.SpeedRun:
+                {
+                    Utils.SendMessage(GetString("ModeDescribe.SpeedRun"), playerId);
+                    return;
+                }
+            case CustomGameMode.TagMode:
+                {
+                    Utils.SendMessage(GetString("ModeDescribe.TagMode"), playerId);
+                    return;
+                }
+        }
+        role = role.Trim().ToLower();
+        if (role.StartsWith("/r")) _ = role.Replace("/r", string.Empty);
+        if (role.StartsWith("/up")) _ = role.Replace("/up", string.Empty);
+        if (role.EndsWith("\r\n")) _ = role.Replace("\r\n", string.Empty);
+        if (role.EndsWith("\n")) _ = role.Replace("\n", string.Empty);
+        if (role.StartsWith("/bt")) _ = role.Replace("/bt", string.Empty);
+        if (role.StartsWith("/rt")) _ = role.Replace("/rt", string.Empty);
+
+        if (role == "" || role == string.Empty)
+        {
+            Utils.ShowActiveRoles(playerId);
+            return;
+        }
+
+        var result = ParseRole(role);
 
         if (result == CustomRoles.NotAssigned)
         {
@@ -2713,6 +2824,10 @@ internal class ChatCommands
                     case CustomGameMode.SpeedRun:
                         SpeedRun.AppendSpeedRunKcount(sub);
                         break;
+
+                    case CustomGameMode.TagMode:
+                        TagMode.AppendTagModeKcount(sub);
+                        break;
                 }
 
                 Utils.SendMessage(sub.ToString(), player.PlayerId);
@@ -2831,8 +2946,7 @@ internal class ChatCommands
             case "/айди":
             case "/编号":
             case "/玩家编号":
-                if (TagManager.ReadPermission(player.FriendCode) < 2) break;
-                else if (TagManager.ReadPermission(player.FriendCode) < 2 && (Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode))
+                if (TagManager.ReadPermission(player.FriendCode) < 2 && (Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode))
                     && !Options.EnableVoteCommand.GetBool()) break;
 
                 string msgText = GetString("PlayerIdList");
@@ -2886,7 +3000,7 @@ internal class ChatCommands
                 }
 
                 // Check if the player has the necessary privileges to use the command
-                if (!tagCanBan && !Utils.IsPlayerModerator(player.FriendCode))
+                if (!tagCanBan && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
                 {
                     Utils.SendMessage(GetString("BanCommandNoAccess"), player.PlayerId);
                     break;
@@ -2964,7 +3078,7 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("WarnCommandDisabled"), player.PlayerId);
                     break;
                 }
-                if (!tagCanWarn && !Utils.IsPlayerModerator(player.FriendCode))
+                if (!tagCanWarn && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
                 {
                     Utils.SendMessage(GetString("WarnCommandNoAccess"), player.PlayerId);
                     break;
@@ -3035,7 +3149,7 @@ internal class ChatCommands
                 }
 
                 // Check if the player has the necessary privileges to use the command
-                if (!tagCanKick && !Utils.IsPlayerModerator(player.FriendCode))
+                if (!tagCanKick && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
                 {
                     Utils.SendMessage(GetString("KickCommandNoAccess"), player.PlayerId);
                     break;
@@ -3614,7 +3728,7 @@ internal class ChatCommands
                 else
                 {
                     var tagCanMe = TagManager.ReadPermission(player.FriendCode) >= 2;
-                    if ((Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode)) && !tagCanMe)
+                    if ((Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode)) && !tagCanMe && !player.FriendCode.GetDevUser().DeBug)
                     {
                         Utils.SendMessage(GetString("Message.MeCommandNoPermission"), player.PlayerId);
                         break;
@@ -3704,6 +3818,109 @@ internal class ChatCommands
                 Utils.SendMessage(string.Format(GetString("EndCommandEnded"), player.name));
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Draw);
                 GameManager.Instance.LogicFlow.CheckEndCriteria();
+                break;
+            case "/draft":
+                if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft && !player.FriendCode.GetDevUser().IsDev)
+                {
+                    break;
+                }
+                if (!GameStates.IsLobby)
+                {
+                    Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
+                    break;
+                }
+
+                var tagCanStartDraft = TagManager.ReadPermission(player.FriendCode) >= 3;
+                if (args.Length < 2 || args[1] == "start")
+                {
+                    if (!tagCanStartDraft && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev)
+                    {
+                        Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
+                        break;
+                    }
+
+                    var startResult = DraftAssign.StartDraft();
+
+                    if (startResult == DraftAssign.DraftCmdResult.NoCurrentDraft)
+                    {
+                        Utils.SendMessage(GetString("StartDraftWrongGameMode"), player.PlayerId);
+                    }
+                    else
+                    {
+                        foreach (var pc in Main.AllPlayerControls)
+                        {
+                            Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), pc.GetFormattedDraftPool()), pc.PlayerId);
+                        }
+                    }
+                }
+                else if (args[1] == "add")
+                {
+                    if (!tagCanStartDraft && !Utils.IsPlayerModerator(player.FriendCode))
+                    {
+                        Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
+                        break;
+                    }
+                    var addResult = DraftAssign.AddPlayersToDraft();
+
+                    if (addResult == DraftAssign.DraftCmdResult.NoCurrentDraft)
+                    {
+                        Utils.SendMessage(GetString("NoCurrentDraft"), player.PlayerId);
+                    }
+                    else
+                    {
+                        foreach (var pc in Main.AllPlayerControls)
+                        {
+                            Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), pc.GetFormattedDraftPool()), pc.PlayerId);
+                        }
+                    }
+                }
+                else if (args[1] == "reset")
+                {
+                    if (!tagCanStartDraft && !Utils.IsPlayerModerator(player.FriendCode))
+                    {
+                        Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
+                        break;
+                    }
+                    DraftAssign.Reset();
+                }
+                else if (args[1] == "enable" && player.FriendCode.GetDevUser().IsDev)
+                {
+                    Options.devEnableDraft = true;
+                    Options.DraftHeader.SetHidden(false);
+                    Options.DraftMode.SetHidden(false);
+                    foreach (var pc in Main.AllPlayerControls)
+                        Utils.SendMessage($"开发者{player.GetRealName()}启用了轮抽选角", pc.PlayerId);
+                }
+                else
+                {
+                    CustomRoles draftedRole;
+                    DraftAssign.DraftCmdResult cmdResult;
+                    if (int.TryParse(args[1], out int index))
+                    {
+                        (cmdResult, draftedRole) = player.DraftRole(index);
+                    }
+                    else
+                    {
+                        Utils.SendMessage(GetString("InvalidDraftSelection"), player.PlayerId);
+                        break;
+                    }
+
+                    if (cmdResult == DraftAssign.DraftCmdResult.NoCurrentDraft)
+                    {
+                        Utils.SendMessage(GetString("NoCurrentDraft"), player.PlayerId);
+                        break;
+                    }
+                    else if (cmdResult == DraftAssign.DraftCmdResult.DraftRemoved)
+                    {
+                        Utils.SendMessage(GetString("DraftSelectionCleared"), player.PlayerId);
+                        break;
+                    }
+                    else
+                    {
+                        Utils.SendMessage(string.Format(GetString("DraftSelection"), draftedRole.ToColoredString()), player.PlayerId);
+                        SendRolesInfo(draftedRole.ToString(), player.PlayerId, isDev: player.FriendCode.GetDevUser().DeBug);
+                    }
+                }
                 break;
             case "/exe":
             case "/уничтожить":

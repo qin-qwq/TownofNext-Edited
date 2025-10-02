@@ -116,6 +116,7 @@ internal partial class Pyrophoric : RoleBase
     }
     public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
+        if (inMeeting) return;
         if (target.IsDisconnected()) return;
         if (!PyrophoricCanKill.GetBool()) return;
         if (!InPyrophoric) return;

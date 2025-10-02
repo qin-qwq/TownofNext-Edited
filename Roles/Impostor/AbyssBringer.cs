@@ -14,7 +14,7 @@ internal class AbyssBringer : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Abyssbringer;
     const int Id = 31300;
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -25,6 +25,7 @@ internal class AbyssBringer : RoleBase
     private static OptionItem BlackHoleMovesTowardsNearestPlayer;
     private static OptionItem BlackHoleMoveSpeed;
     private static OptionItem BlackHoleRadius;
+    public static OptionItem BlackHoleSkin;
     private static OptionItem CanKillImpostors;
     private static OptionItem CanKillTNA;
 
@@ -52,14 +53,15 @@ internal class AbyssBringer : RoleBase
         BlackHoleRadius = FloatOptionItem.Create(Id + 15, "BlackHoleRadius", new(0.1f, 5f, 0.1f), 1.2f, tab, false)
             .SetParent(CustomRoleSpawnChances[role])
             .SetValueFormat(OptionFormat.Multiplier);
+        BlackHoleSkin = BooleanOptionItem.Create(Id + 17, "BlackHoleSkin", false, tab, false)
+            .SetParent(CustomRoleSpawnChances[role]);
         CanKillImpostors = BooleanOptionItem.Create(Id + 19, "CanKillImpostors", false, tab, false).SetParent(CustomRoleSpawnChances[role]);
         CanKillTNA = BooleanOptionItem.Create(Id + 20, "CanKillTNA", false, tab, false).SetParent(CustomRoleSpawnChances[role]);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = BlackHolePlaceCooldown.GetInt();
-        AURoleOptions.ShapeshifterDuration = 1f;
+        AURoleOptions.PhantomCooldown = BlackHolePlaceCooldown.GetInt();
     }
 
     public override void Init()
@@ -96,17 +98,17 @@ internal class AbyssBringer : RoleBase
         throw new InvalidOperationException("No available BlackHole ID.");
     }
 
-    public override void UnShapeShiftButton(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         if (!Main.AllAlivePlayerControls.Where(x => x.PlayerId != shapeshifter.PlayerId).Any())
         {
-            return;
+            return false;
         }
         // When no player exists, Instantly spawm and despawn networked object will cause error spam
 
         if (BlackHoles.Count >= BlackHoleCountLimit.GetInt())
         {
-            return;
+            return false;
         }
 
         var pos = shapeshifter.GetCustomPosition();
@@ -115,8 +117,15 @@ internal class AbyssBringer : RoleBase
         var blackHoleId = GetNextBlackHoleId();
         BlackHoles.Add(blackHoleId, new(new(pos, _state.PlayerId), Utils.TimeStamp, pos, roomName, 0));
         Utils.SendRPC(CustomRPC.SyncRoleSkill, _Player, 1, blackHoleId, pos, roomName);
+        shapeshifter.ResetKillCooldown();
+        shapeshifter.SetKillCooldown(forceAnime: true);
+        return false;
     }
-    public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.AbilityButton.OverrideText(Translator.GetString("AbyssbringerButtonText"));
+        hud.AbilityButton.SetUsesRemaining(BlackHoleCountLimit.GetInt() - BlackHoles.Count);
+    }
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
     {
         var abyssbringer = _Player;

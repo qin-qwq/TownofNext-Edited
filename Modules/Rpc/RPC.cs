@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Patches;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
 using TOHE.Roles.Coven;
@@ -18,7 +19,7 @@ namespace TOHE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 175/255 USED
+public enum CustomRPC : byte // 180/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -77,7 +78,8 @@ public enum CustomRPC : byte // 175/255 USED
     DoSpell,
     DoHex,
     SniperSync,
-    SetLoversPlayers,
+    //SetLoversPlayers,
+    SetLoverPairs,
     SendFireworkerState,
     SetCurrentDousingTarget,
     SetEvilTrackerTarget,
@@ -97,6 +99,7 @@ public enum CustomRPC : byte // 175/255 USED
     LightningSetGhostPlayer,
     SetConsigliere,
     SetGreedy,
+    SetInquisitor,
     BenefactorRPC,
     SetSwapperVotes,
     SetMarkedPlayer,
@@ -125,6 +128,9 @@ public enum Sounds
     TaskComplete,
     TaskUpdateSound,
     ImpTransform,
+    HnSShort,
+    HnSLong,
+    HnSRanch,
     SabotageSound,
 
     Test,
@@ -216,10 +222,17 @@ internal class RPCHandlerPatch
     }
     public static void Postfix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
+        switch (callId)
+        {
+            case 62 when GameStates.IsInTask && Main.IntroDestroyed && !ExileController.Instance && !AntiBlackout.SkipTasks:
+                PhantomRolePatch.CheckTrigger(__instance);
+                break;
+        }
         // Process nothing but CustomRPC
         if (callId < (byte)CustomRPC.VersionCheck) return;
 
         var rpcType = (CustomRPC)callId;
+        //int seerId = -1;
         switch (rpcType)
         {
             case CustomRPC.AntiBlackout:
@@ -362,6 +375,8 @@ internal class RPCHandlerPatch
                 RPC.PlaySound(playerID, sound);
                 break;
             case CustomRPC.ShowPopUp:
+                //seerId = reader.ReadPackedInt32();
+                //if (seerId != PlayerControl.LocalPlayer.PlayerId) break;
                 string message = reader.ReadString();
                 string title = reader.ReadString();
 
@@ -447,11 +462,14 @@ internal class RPCHandlerPatch
             case CustomRPC.UndertakerLocationSync:
                 Undertaker.ReceiveRPC(reader);
                 break;
-            case CustomRPC.SetLoversPlayers:
-                Main.LoversPlayers.Clear();
-                int count = reader.ReadInt32();
-                for (int i = 0; i < count; i++)
-                    Main.LoversPlayers.Add(Utils.GetPlayerById(reader.ReadByte()));
+            // case CustomRPC.SetLoversPlayers:
+            //     Main.LoversPlayers.Clear();
+            //     int count = reader.ReadInt32();
+            //     for (int i = 0; i < count; i++)
+            //         Main.LoversPlayers.Add(Utils.GetPlayerById(reader.ReadByte()));
+            //     break;
+            case CustomRPC.SetLoverPairs:
+                Lovers.ReceiveRPC(reader);
                 break;
             case CustomRPC.BetterCheck: // Better Among Us RPC
                 {
@@ -631,10 +649,15 @@ internal class RPCHandlerPatch
             case CustomRPC.SetConsigliere:
                 Consigliere.ReceiveRPC(reader);
                 break;
+            case CustomRPC.SetInquisitor:
+                Inquisitor.ReceiveRPC(reader);
+                break;
             case CustomRPC.SetInvestgatorLimit:
                 Investigator.ReceiveRPC(reader);
                 break;
             case CustomRPC.KillFlash:
+                //seerId = reader.ReadPackedInt32();
+                //if (seerId != PlayerControl.LocalPlayer.PlayerId) break;
                 Utils.FlashColor(new(1f, 0f, 0f, 0.3f));
                 var playKillSound = reader.ReadBoolean();
                 if (Constants.ShouldPlaySfx()) RPC.PlaySound(PlayerControl.LocalPlayer.PlayerId, playKillSound ? Sounds.KillSound : Sounds.SabotageSound);
@@ -686,8 +709,16 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.Invisibility:
                 {
-                    if (reader.ReadBoolean()) __instance.MakeInvisible();
-                    else __instance.MakeVisible();
+                    if (reader.ReadBoolean())
+                    {
+                        __instance.MakeInvisible();
+                        Main.Invisible.Add(__instance.PlayerId);
+                    }
+                    else
+                    {
+                        __instance.MakeVisible();
+                        Main.Invisible.Remove(__instance.PlayerId);
+                    }
                     break;
                 }
         }
@@ -833,7 +864,7 @@ internal static class RPC
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        var msg = new RpcShowPopUp(PlayerControl.LocalPlayer.NetId, message, title);
+        var msg = new RpcShowPopUp(PlayerControl.LocalPlayer.NetId, pc.PlayerId, message, title);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }
     */
@@ -942,6 +973,15 @@ internal static class RPC
                 case Sounds.ImpTransform:
                     SoundManager.Instance.PlaySound(DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherImpostorTransformSfx, false, 0.8f);
                     break;
+                case Sounds.HnSShort:
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorShortMusic, true);
+                    break;
+                case Sounds.HnSLong:
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorLongMusic, true);
+                    break;
+                case Sounds.HnSRanch:
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorRanchMusic, true);
+                    break;
                 case Sounds.SabotageSound:
                     SoundManager.Instance.PlaySound(ShipStatus.Instance.SabotageSound, false, 0.8f);
                     break;
@@ -991,13 +1031,13 @@ internal static class RPC
             Logger.Error($" Error RPC:{error}", "SyncRoleSkillReader");
         }
     }
-    public static void SyncLoversPlayers()
-    {
-        if (!AmongUsClient.Instance.AmHost) return;
+    // public static void SyncLoversPlayers()
+    // {
+    //     if (!AmongUsClient.Instance.AmHost) return;
 
-        var msg = new RpcSetLoversPlayers(PlayerControl.LocalPlayer.NetId, Main.LoversPlayers.Count, Main.LoversPlayers);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
+    //     var msg = new RpcSetLoversPlayers(PlayerControl.LocalPlayer.NetId, Main.LoversPlayers.Count, Main.LoversPlayers);
+    //     RpcUtils.LateBroadcastReliableMessage(msg);
+    // }
     public static void SyncDeadPassedMeetingList()
     {
         if (!AmongUsClient.Instance.AmHost) return;

@@ -117,6 +117,7 @@ internal partial class Mayor : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.AbilityButton.buttonLabelText.text = GetString("MayorVentButtonText");
+        hud.AbilityButton.SetUsesRemaining(MayorNumOfUseButton.GetInt() - MayorUsedButtonCount[id]);
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("EmergencyButton");
 }

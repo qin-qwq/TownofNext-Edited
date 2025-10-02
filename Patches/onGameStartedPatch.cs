@@ -11,6 +11,7 @@ using TOHE.Modules.Rpc;
 using TOHE.Patches;
 using TOHE.Roles.Core;
 using TOHE.Roles.Core.AssignManager;
+using TOHE.Roles.Core.DraftAssign;
 using UnityEngine;
 using static TOHE.Translator;
 
@@ -97,6 +98,7 @@ internal class ChangeRoleSettings
             GameStartManagerPatch.GameStartManagerUpdatePatch.AlredyBegin = false;
             OnPlayerLeftPatch.LeftPlayerId = byte.MaxValue;
             FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
+            Main.Invisible.Clear();
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
@@ -233,6 +235,10 @@ internal class ChangeRoleSettings
             //Speed Run
             SpeedRun.Init();
 
+            //Tag Mode
+            if (Options.CurrentGameMode == CustomGameMode.TagMode)
+                TagMode.Init();
+
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
             AntiBlackout.Reset();
@@ -265,7 +271,7 @@ internal class StartGameHostPatch
 {
     private static AmongUsClient thiz;
 
-    private static RoleOptionsCollectionV09 RoleOpt => Main.NormalOptions.roleOptions;
+    private static RoleOptionsCollectionV10 RoleOpt => Main.NormalOptions.roleOptions;
     private static Dictionary<RoleTypes, int> RoleTypeNums = [];
     public static void UpdateRoleTypeNums()
     {
@@ -276,7 +282,9 @@ internal class StartGameHostPatch
             { RoleTypes.Shapeshifter, RoleAssign.AddShapeshifterNum },
             { RoleTypes.Noisemaker, RoleAssign.AddNoisemakerNum },
             { RoleTypes.Phantom, RoleAssign.AddPhantomNum },
-            { RoleTypes.Tracker, RoleAssign.AddTrackerNum }
+            { RoleTypes.Tracker, RoleAssign.AddTrackerNum },
+            { RoleTypes.Detective, RoleAssign.AddDetectiveNum },
+            { RoleTypes.Viper, RoleAssign.AddViperNum },
         };
     }
 
@@ -383,7 +391,11 @@ internal class StartGameHostPatch
 
             // Select custom Roles/Add-ons
             EAC.OriginalRoles = [];
-            RoleAssign.StartSelect();
+
+            if (Options.DraftMode.GetBool() && Options.devEnableDraft)
+                DraftAssign.StartSelect();
+            else
+                RoleAssign.StartSelect();
             AddonAssign.StartSelect();
 
             // Set count Vanilla Roles
@@ -439,10 +451,12 @@ internal class StartGameHostPatch
                     RoleTypes.Noisemaker => CustomRoles.Noisemaker,
                     RoleTypes.Phantom => CustomRoles.Phantom,
                     RoleTypes.Tracker => CustomRoles.Tracker,
+                    RoleTypes.Detective => CustomRoles.Detective,
+                    RoleTypes.Viper => CustomRoles.Viper,
                     _ => CustomRoles.NotAssigned
                 };
                 if (role == CustomRoles.NotAssigned) Logger.SendInGame(string.Format(GetString("Error.InvalidRoleAssignment"), pc?.Data?.PlayerName));
-                Main.PlayerStates[pc.PlayerId].SetMainRole(role);
+                Main.PlayerStates[pc.PlayerId].SetMainRole(role, false);
             }
 
             if (Options.CurrentGameMode is CustomGameMode.FFA)
@@ -467,7 +481,7 @@ internal class StartGameHostPatch
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
-                    AddonAssign.InitAndStartAssignLovers();
+                    //AddonAssign.InitAndStartAssignLovers();
                     AddonAssign.StartSortAndAssign();
                 }
             }
@@ -531,6 +545,9 @@ internal class StartGameHostPatch
                     break;
                 case CustomGameMode.SpeedRun:
                     GameEndCheckerForNormal.SetPredicateToSpeedRun();
+                    break;
+                case CustomGameMode.TagMode:
+                    GameEndCheckerForNormal.SetPredicateToTagMode();
                     break;
             }
 
@@ -609,7 +626,7 @@ internal class StartGameHostPatch
     private static void AssignCustomRole(CustomRoles role, PlayerControl player)
     {
         if (player == null) return;
-        Main.PlayerStates[player.PlayerId].SetMainRole(role);
+        Main.PlayerStates[player.PlayerId].SetMainRole(role, false);
     }
 }
 [HarmonyPatch(typeof(RoleManager), nameof(RoleManager.SelectRoles))]
@@ -692,7 +709,7 @@ public static class RpcSetRoleReplacer
 
             if (player == null) continue;
 
-            Main.PlayerStates[playerId].SetMainRole(role);
+            Main.PlayerStates[playerId].SetMainRole(role, false);
 
             if (role.IsDesyncRole())
             {

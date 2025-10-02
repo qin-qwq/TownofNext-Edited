@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using Hazel;
 using TOHE.Modules.Rpc;
+using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core;
 using static TOHE.Options;
 using static TOHE.Translator;
@@ -49,6 +50,7 @@ internal class Lawyer : RoleBase
         CustomRoles.Follower,
         CustomRoles.TrackerTOHE,
         CustomRoles.Mechanic,
+        CustomRoles.Pursuer,
         CustomRoles.Refugee,
         CustomRoles.Sheriff,
         CustomRoles.Medic,
@@ -97,7 +99,7 @@ internal class Lawyer : RoleBase
                 else if (!CanTargetJester.GetBool() && target.Is(CustomRoles.Jester)) continue;
                 else if (target.Is(Custom_Team.Neutral) && !target.IsNeutralKiller() && !target.Is(CustomRoles.Jester) && !target.IsNeutralApocalypse()) continue;
                 if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.NiceMini or CustomRoles.EvilMini) continue;
-                if (lawyer.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers)) continue;
+                if (Lovers.AreLovers(lawyer, target)) continue;
 
                 targetList.Add(target);
             }
@@ -158,7 +160,7 @@ internal class Lawyer : RoleBase
         }
     }
 
-    private bool IsTarget(byte playerId) => TargetId == playerId;
+    public bool IsTarget(byte playerId) => TargetId == playerId;
     public byte GetTargetId() => TargetId;
 
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute)
