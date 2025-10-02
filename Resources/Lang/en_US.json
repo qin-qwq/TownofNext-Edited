@@ -5,19 +5,15 @@
   "IconColor": "#4bf4ff",
   "Icon": "♥",
   "NameColor": "#ffc0cb",
-
   "HideHostText": "Hide 'Host♥' Text",
   "HideAllTagsAndText": "Hide All Tags (for «AutoMuteUs»)",
-
   "SupportUs": "Support Us",
   "update": "Update",
   "GitHub": "GitHub",
   "Discord": "Discord",
   "Website": "Website",
-
   "HostIconInMeeting": "HOST: {0}",
   "ModdedClient": "Modded Client",
-
   "SubText.GM": "Spectate the chaos!",
   "SubText.Crewmate": "Find and exile the <color=#ff1919>Impostors</color>",
   "SubText.Impostor": "Sabotage and kill everyone",
@@ -27,14 +23,12 @@
   "SubText.Madmate": "Help the <color=#ff1919>Impostors</color>",
   "SubText.Lovers": "Stay alive and win together",
   "SubText.Egoist": "Win on your own",
-
   "TypeImpostor": "Impostors",
   "TypeCrewmate": "Crewmates",
   "TypeNeutral": "Neutrals",
   "TypeCoven": "Coven",
   "TypeAddon": "Add-ons",
   "GuesserMode": "Guesser Mode",
-
   "TeamImpostor": "Impostor",
   "TeamNeutral": "Neutral",
   "TeamCrewmate": "Crewmate",
@@ -43,17 +37,14 @@
   "TeamLovers": "Lovers",
   "TeamEgoist": "Egoist",
   "TeamApocalypse": "Apocalypse",
-
   "Role_NoChange": "Don't change the role",
   "Role_Random": "Random role from list",
-
   "CrewmatesCanGuess": "<color=#8cffff>Crewmates</color> can guess",
   "ImpostorsCanGuess": "<color=#ff1919>Impostors</color> can guess",
   "NeutralKillersCanGuess": "<color=#7f8c8d>Neutral Killers</color> can guess",
   "NeutralApocalypseCanGuess": "<color=#7f8c8d>Neutral</color> <color=#ff174f>Apocalypse</color> can guess",
   "CovenCanGuess": "<color=#ac42f2>Coven</color> can guess",
   "PassiveNeutralsCanGuess": "Passive <color=#7f8c8d>Neutrals</color> can guess",
-
   "CanGuessAddons": "Can Guess Add-ons",
   "ShowOnlyEnabledRolesInGuesserUI": "Show Only Enabled Roles in Guesser UI",
   "CanOnlyGuessEnabled": "Guessers Can Only Guess Enabled Roles/Add-ons",
@@ -62,7 +53,6 @@
   "ApocCanGuessApoc": "<color=#7f8c8d>Neutral</color> <color=#ff174f>Apocalypse</color> can Guess <color=#7f8c8d>Neutral</color> <color=#ff174f>Apocalypse</color> Roles",
   "CovenCanGuessCoven": "<color=#ac42f2>Coven</color> Can Guess <color=#ac42f2>Coven</color> Roles",
   "GuessImmune": "Sorry, but that role is immune to being guessed!",
-
   "GM": "Game Master",
   "Sunnyboy": "Sunnyboy",
   "Bard": "Bard",
@@ -84,7 +74,6 @@
   "ShapeshifterTOHE": "Shapeshifter",
   "Phantom": "Phantom",
   "PhantomTOHE": "Phantom",
-
   "BountyHunter": "Bounty Hunter",
   "Fireworker": "Fireworker",
   "Mercenary": "Mercenary",
@@ -1071,16 +1060,13 @@
   "AbilityUseLimit": "Initial Ability Use Limit",
   "AbilityInUse": "Ability in use",
   "AbilityExpired": "Ability expired, {0} uses remain",
-
   "RevenantTargeted": "Your role has changed to <b>{0}</b>",
   "RevenantCanCopyAddons": "Can Steal Add-ons",
-
   "ShowArrows": "Has Arrows pointing toward bodies",
   "ArrowDelayMin": "Minimum Arrow show-up delay",
   "ArrowDelayMax": "Maximum Arrow show-up delay",
   "SMUsesUsedWhenFixingReactorOrO2": "Uses it takes to fix Reactor/O2",
   "SMUsesUsedWhenFixingLightsOrComms": "Uses it takes to fix Lights/Comms",
-
   "ShowSpecificRole": "Know specific roles on Task Completion",
   "SwooperVentNormallyOnCooldown": "<color=#ff1919>Swooper</color> Vents normally when Swooping is on Cooldown",
   "WraithVentNormallyOnCooldown": "<color=#4b0082>Wraith</color> Vents normally when Invisibility is on Cooldown",
@@ -1238,15 +1224,12 @@
   "ForceOwnLanguageRoleName": "Force role names in your language if possible",
   "VersionCheat": "Bypass version synchronization check",
   "GodMode": "God Mode",
-
   "AutoDisplayKillLog": "Display Kill-log",
   "AutoDisplayLastRoles": "Display Last Roles",
   "AutoDisplayLastResult": "Auto Display Last Result",
   "RevertOldKillLog": "Revert to old kill-log",
-
   "HideExileChat": "Hide exile (lava) chat",
   "ExileSpamMsg": "Someone is trying to be a smart ass by lava chatting",
-
   "EnableYTPlan": "Enable Youtuber Plan",
   "InvalidPermissionCMD": "<color=#ff1919><size=125%><b>INVALID PERMISSION</b></size></color>\n\n<color=#ff1919>Sorry, you do not have the permission to use this command, check /me for all permissions</color>",
   "KickLowLevelPlayer": "Kick players whose level is lower than",
@@ -1377,7 +1360,6 @@
   "NeutralRoleWinTogether": "<color=#7f8c8d>Neutrals</color> win together",
   "NeutralWinTogether": "All <color=#7f8c8d>Neutrals</color> win together",
   "SpawnOneRandomKillingFraction": "<size=140%>Spawn One Random Killing Fraction</size>\n<size=80%>(<color=#7f8c8d>Neutral</color> <color=#ff0000>Killers</color>/<color=#ff174f>Apocalypse</color>, <color=#ac42f2>Coven</color>)</size>",
-
   "MenuTitle.Disable": "★ Disable ★",
   "MenuTitle.MapsSettings": "★ Maps ★",
   "MenuTitle.Sabotage": "★ Sabotage ★",
@@ -1388,14 +1370,12 @@
   "MenuTitle.Settings": "★ Settings ★",
   "MenuTitle.TaskSettings": "★ Task Management ★",
   "MenuTitle.Guessers": "★ Guesser Mode ★",
-
   "ShieldPersonDiedFirst": "Shield player who dead first in the last game",
   "ShowShieldedPlayerToAll": "Reveal shielded player to all",
   "RemoveShieldOnFirstDead": "Remove shield on first death",
   "ShieldedCanUseKillButton": "Shielded player can use ability/Kill button",
   "PlayerIsShieldedByGame": "Player is protected by the game!",
   "PreventFirstDeadShapeShift": "Prevent Shielded player from using Shapeshift ability",
-
   "UseLegacyVersion": "Use Legacy Version",
   "ArsonistKeepsGameGoing": "<color=#ff6633>Arsonist</color> keeps the game going",
   "ArsonistCanIgniteAnytime": "Can Ignite Anytime",
@@ -1406,7 +1386,6 @@
   "DollMasterPossessionDuration": "Possession Duration",
   "DollMasterCanKillAsMainBody": "Can kill as the main body",
   "DollMasterTargetDiesAfterPossession": "Target dies after possession",
-
   "DoubleAgentCanDiffuseBombs": "Double Agent can diffuse bombs from other roles",
   "DoubleAgentClearBombOnMeetingCall": "Diffuse active bomb on meeting call",
   "DoubleAgentCanUseAbilityInCalledMeeting": "If diffused can use ability in called meeting",
@@ -1418,7 +1397,6 @@
   "DoubleAgent_BombExploded": "Bomb has exploded!",
   "DoubleAgentChangeRoleTo": "Change role on last <color=#ff1919>Impostor</color>",
   "DoubleAgentRoleChange": "You have become a: ",
-
   "MastermindCD": "Manipulate Cooldown",
   "MastermindTimeLimit": "Time limit to kill someone",
   "MastermindDelay": "Manipulation notification delay",
@@ -1438,10 +1416,8 @@
   "GlitchVent": "Vent",
   "ShowFPS": "Show FPS",
   "FPSGame": "FPS: ",
-
   "ControlCooldown": "Control Cooldown",
   "WardenNotifyLimit": "Maximum number of alerts",
-
   "BombCooldown": "Bomb Cooldown",
   "Warlock_CanKillSelf": "Can Kill Themselves",
   "CrewpostorKnowsAllies": "Knows <color=#ff1919>Impostors</color>",
@@ -1449,7 +1425,6 @@
   "CrewpostorLungeKill": "Crewpostor lunges on kill",
   "CrewpostorKillAfterTask": "Number of tasks completed to make one kill",
   "CrewpostorKillsPerRound": "Number of kills Crewpostor can make per round",
-
   "NonNeutralKillingRolesMinPlayer": "<color=#00ffff>Minimum</color> amount of <color=#ffff00>Non-Killing</color> <color=#7f8c8d>Neutrals</color>",
   "NonNeutralKillingRolesMaxPlayer": "<color=#00a5ff>Maximum</color> amount of <color=#ffff00>Non-Killing</color> <color=#7f8c8d>Neutrals</color>",
   "NeutralKillingRolesMinPlayer": "<color=#00ffff>Minimum</color> amount of <color=#7f8c8d>Neutral</color> <color=#ff0000>Killers</color>",
@@ -1492,7 +1467,6 @@
   "Vampire_OnlyBites": "Only Bites",
   "Youtuber_KillerWinsWithYouTuber": "The Killer Wins With <color=#fb749b>YouTuber</color>",
   "Maverick_MinKillsToWin": "Minimum number of kills to win",
-
   "Cooldown": "Cooldown",
   "AbilityCooldown": "Ability Cooldown",
   "AbilityDuration": "Ability Duration",
@@ -1511,7 +1485,6 @@
   "CanUseMeetingButton": "Can Call Emergency Meetings",
   "ModeSwitchAction": "Switch Action via",
   "ShowShapeshiftAnimations": "Show <color=#ff1919>Shapeshift</color> animations",
-
   "ShapeshifterBase_ShapeshiftCooldown": "<color=#ff1919>Shapeshift</color> Cooldown",
   "ShapeshifterBase_ShapeshiftDuration": "<color=#ff1919>Shapeshift</color> Duration",
   "ShapeshifterBase_LeaveShapeshiftingEvidence": "Leave Shapeshifting Evidence",
@@ -1529,7 +1502,6 @@
   "TrackerBase_TrackingCooldown": "Tracking Cooldown",
   "TrackerBase_TrackingDuration": "Tracking Duration",
   "TrackerBase_TrackingDelay": "Tracking Delay",
-
   "MareAddSpeedInLightsOut": "Additional Speed During Lights Out",
   "MareKillCooldownInLightsOut": "Kill Cooldown During Lights Out",
   "MechanicFixesDoors": "Can open all doors in the same building",
@@ -1537,7 +1509,6 @@
   "MechanicFixesOxygens": "Can Fix Both O2 Alone",
   "MechanicFixesCommunications": "Can Fix Both Comms Alone In MIRA HQ",
   "MechanicFixesElectrical": "Can Fix Lights With One Switch",
-
   "SheriffShowShotLimit": "Display Shot Limit next to Role Name",
   "SheriffCanKill%role%": "Can Kill %role%",
   "SheriffCanKillNeutrals": "Can Kill <color=#7f8c8d>Neutrals</color>",
@@ -1573,7 +1544,6 @@
   "SheriffCanKillCoven": "Can Kill <color=#ac42f2>Coven</color>",
   "SheriffMadCanKillImp": "Can Kill <color=#ff1919>Impostors</color>",
   "SheriffMadCanKillCrew": "Can Kill <color=#8cffff>Crewmates</color>",
-
   "GuessSheriff": "Sorry. Narc can't guess Sheriff",
   "GuessCoP": "Sorry. Narc can't guess Chief of Police",
   "GuessNarc": "Sorry. Sheriff and Chief of Police can't guess Narc",
@@ -1581,20 +1551,16 @@
   "NarcHasCrewVision": "Narc Has <color=#8cffff>Crewmate</color> Vision",
   "MadmateCanBeNarc": "<color=#ff1919>Madmate</color> Roles Can Be Narc",
   "ImpsCanKillEachOther": "<color=#ff1919>Impostors</color> Can Kill Each Other",
-
   "RebirthUses": "Amount of Rebirths",
   "RebirthCountVotes": "Only rebirth to players who voted for them",
   "RebirthFailed": "Ahh, how unfortunate, you did not find any viable souls to swap bodies with",
-
   "ReverieIncreaseKillCooldown": "Increase Kill Cooldown",
   "ReverieMisfireSuicide": "Misfire on reaching maximum Kill Cooldown",
   "ReverieResetCooldownMeeting": "Reset Kill Cooldown after meeting",
   "ConvertedReverieKillAll": "Converted Reverie can kill anyone without repercussions",
-
   "ConvertedVigilanteCanVent": "Converted Vigilante can Vent",
   "CanSabotageAsRecruit": "Can Sabotage as <color=#00b4eb>Recruit</color>",
   "VigilanteNotify": "You have become the very thing you swore to destroy",
-
   "DictatorChangeCommandToExpel": "<color=#df9b00>Dictator</color> use Command to expell instead of vote",
   "DictatorExpelSelf": "WAIT WAIT WAIT WAT THE HELLLLLL Bro really just want to expel himself",
   "DoctorTaskCompletedBatteryCharge": "Battery Duration",
@@ -1629,7 +1595,6 @@
   "LawyerChangeRolesAfterTargetKilled": "When Target Dies, <color=#008080>Lawyer</color> becomes",
   "LaywerShouldChangeRoleAfterTargetKilled": "Should Lawyer Change Role when Target Dies",
   "LawyerTargetDeadInMeeting": "Your target was killed while meeting.\nYour role may change depending on the settings.",
-
   "ArsonistDouseTime": "Douse Duration",
   "CanTerroristSuicideWin": "Can Win By Suicide",
   "FireworkerMaxCount": "Fireworker Count",
@@ -1639,10 +1604,8 @@
   "SniperPrecisionShooting": "Precise Shooting",
   "SniperAimAssist": "Aim Assist",
   "SniperAimAssistOneshot": "One shot Assist",
-
   "PyroDouseCooldown": "Douse Cooldown",
   "PyroBurnCooldown": "Kill Cooldown after killing a doused player",
-
   "Prohibited_OverrideBlockedVentsAfterMeeting": "Override Blocked Vents After Meeting",
   "Prohibited_CountBlockedVentsInSkeld": "Count Blocked Vents In <color=#66a186>The Skeld</color>",
   "Prohibited_CountBlockedVentsInMira": "Count Blocked Vents In <color=#e84b56>MIRA HQ</color>",
@@ -1650,9 +1613,7 @@
   "Prohibited_CountBlockedVentsInDleks": "Count Blocked Vents In <color=#66a186>Dleks</color>",
   "Prohibited_CountBlockedVentsInAirship": "Count Blocked Vents In <color=#ed0007>Airship</color>",
   "Prohibited_CountBlockedVentsInFungle": "Count Blocked Vents In <color=#ffa646>The Fungle</color>",
-
   "UndertakerFreezeDuration": "Freeze Duration",
-
   "NameDisplayAddons": "Display Add-Ons next to the role name",
   "BracketAddons": "Add Brackets To Add-ons",
   "ShowShortNamesForAddOns": "Show Short Names For Add-Ons",
@@ -1660,7 +1621,6 @@
   "ShortAddOnNamesMode_Always": "Always",
   "ShortAddOnNamesMode_OnlyInMeeting": "Only In Meeting",
   "ShortAddOnNamesMode_OnlyInGame": "Only In Game",
-
   "YourAddon": "Your Add-ons:",
   "NoLimitAddonsNumMax": "Maximum Add-ons Per Player",
   "RemoveIncompatibleAddOnsMidGame": "Remove Incompatible Addons for role assigned mid game",
@@ -1686,9 +1646,7 @@
   "EvilTrackerTargetMode.OnceInGame": "Once in-game",
   "EvilTrackerTargetMode.EveryMeeting": "Every Meeting",
   "EvilTrackerTargetMode.Always": "Any time",
-
   "ScavengerHasCustomDeathReason": "Enable Custom Death Reason",
-
   "EvilHackerCanSeeDeadMark": "Can See The Location of Dead-bodies",
   "EvilHackerCanSeeImpostorMark": "Can See The Location of Other Impostors",
   "EvilHackerCanSeeKillFlash": "Can See Kill-Flash",
@@ -1696,7 +1654,6 @@
   "EvilHackerMurderNotify": "Murder In",
   "EvilHackerLastAdminInfoTitle": "Last-minute admin information",
   "EvilHackerDeadbody": "DEAD",
-
   "Ventguard": "Ventguard",
   "VentguardInfo": "Block Vents by entering them",
   "VentguardInfoLong": "(Crewmates):\nAs the Ventguard, you can enter Vents to block them. No one can enter blocked Vents, except Crewmates, if the setting is on. Blocked Vents can be resets every meeting.",
@@ -1706,7 +1663,6 @@
   "Ventguard_BlockDoesNotAffectCrew": "<color=#8cffff>Crewmates</color> can use blocked Vents",
   "Ventguard_BlocksResetOnMeeting": "Reset Blocked Vents Every Meeting",
   "VentIsBlocked": "This Vent is Now Blocked!",
-
   "TraitorKnowMadmate": "Traitor Knows Madmates",
   "Psychic_NBareRed": "<color=#7f8c8d>Neutral</color> <color=#046300>Benign</color> can be red",
   "Psychic_NEareRed": "<color=#7f8c8d>Neutral</color> <color=#912900>Evil</color> can be red",
@@ -1800,7 +1756,6 @@
   "MadmateCountMode.None": "Nothing",
   "MadmateCountMode.Imp": "<color=#ff1919>Impostors</color>",
   "MadmateCountMode.Original": "Original Team",
-
   "Altruist_RevivedDeadBodyCannotBeReported_Option": "Revived Dead Body cannot be Reported",
   "Altruist_ImpostorsCanGetsAlert": "<color=#ff1919>Impostors</color> can get Alert",
   "Altruist_ImpostorsCanGetsArrow": "<color=#ff1919>Impostors</color> can get Arrow",
@@ -1814,7 +1769,6 @@
   "Altruist_YouTriedReportRevivedDeadBody": "You Tried Report Revived Dead Body",
   "Altruist_DeadPlayerHasBeenRevived": "A Dead Player has been Revived!",
   "AltruistAbilityButton": "Change Mode",
-
   "SnatchesWin": "Snatches victory",
   "DemonKillCooldown": "Attack Cooldown",
   "DemonHealthMax": "Player maximum health",
@@ -1901,7 +1855,6 @@
   "InfectiousKnowTargetRole": "Know <color=#7B8968>infected</color> player's role",
   "InfectiousTargetKnowOtherTarget": "<color=#7B8968>Infected</color> players know each other",
   "DoubleClickKill": "Double click to kill the target",
-
   "VirusInfectMax": "Maximum Number Of <color=#2E8B57>Spreads</color>",
   "VirusKnowTargetRole": "Know <color=#2E8B57>Contagious</color> Player's Role",
   "VirusTargetKnowOtherTarget": "<color=#2E8B57>Contagious</color> players know each other",
@@ -1911,12 +1864,10 @@
   "VirusNoticeTitle": "[ Infected Corpse! ]",
   "VirusNoticeMessage": "The body you reported was infected by the Virus! You are now part of Team Virus. Help the Virus win the game.",
   "VirusNoticeMessage2": "The body you reported was infected by the Virus! Vote the Virus out during this meeting, or you will die.",
-
   "Cultist_CharmedCountMode": "<color=#cf6acd>Charmed</color> players count as",
   "CountMode_None": "Nothing",
   "Cultist_CharmedCountMode_Cultist": "<color=#cf6acd>Cultist</color>",
   "CountMode_Original": "Original Team",
-
   "JackalCanWinBySabotageWhenNoImpAlive": "When all <color=#ff1919>Impostors</color> are dead, the <color=#00b4eb>Jackal</color> wins by Sabotage instead",
   "JackalResetKillCooldownWhenPlayerGetKilled": "Reset Kill Cooldown if someone gets killed by another player",
   "JackalResetKillCooldownOn": "Kill Cooldown on Reset",
@@ -1943,11 +1894,9 @@
   "JackalCanRecruitNeutral": "Jackal can recruit/sidekick Neutrals",
   "JackalCanRecruitCoven": "Jackal can recruit/sidekick Coven",
   "JackalCanRecruitImpostor": "Jackal can recruit/sidekick Impostors",
-
   "CoronerArrowsPointingToDeadBody": "Arrows pointing to dead bodies",
   "CoronerLeaveDeadBodyUnreportable": "Bodies the <color=#8B0000>Coroner</color> uses can't be reported",
   "CoronerInformKillerBeingTracked": "Inform the Killer that he gets tracked",
-
   "PresidentCanBeGuessedAfterRevealing": "<color=#00ffac>President</color> can be guessed after revealing",
   "HidePresidentEndCommand": "Hide <color=#00ffac>President</color>'s commands",
   "NeutralsSeePresident": "<color=#7f8c8d>Neutrals</color> can see revealed <color=#00ffac>President</color>",
@@ -1960,7 +1909,6 @@
   "PresidentRevealed": "[{0}] has chosen to reveal themselves as President!",
   "GuessPresident": "President has revealed themselves. You can't guess them.",
   "PresidentRevealTitle": "PRESIDENT REVEAL",
-
   "Troller_TrollsPerRound": "Trolls Per Round",
   "Troller_CanHaveStartMeetingEvent": "Can Start Meeting By Event",
   "Troller_ChangesSpeed": "Troller changed everyone speed!",
@@ -1972,7 +1920,6 @@
   "Troller_RemoveYourAddon": "Troller removed your random Add-on",
   "Troller_YouCausedSabotage": "You caused Sabotage",
   "Troller_YouFixedSabotage": "You fixed Sabotage",
-
   "CovenRolesMinPlayer": "<color=#00a5ff>Minimum</color> amount of <color=#ac42f2>Coven</color>",
   "CovenRolesMaxPlayer": "<color=#00a5ff>Maximum</color> amount of <color=#ac42f2>Coven</color>",
   "%role%CanVent": "%role% Can Vent",
@@ -1986,7 +1933,6 @@
   "NecronomiconNotification": "You have recieved the Necronomicon!<br>Your powers are now enhanced!",
   "NecronomiconVote": "You have voted for {0} to receive the Necronomicon next round. You may now vote normally.",
   "CovenDontKillOtherCoven": "Don't try to kill your fellow Coven!",
-
   "CovenLeaderMaxRetrains": "Maximum Retrains",
   "CovenLeaderRetrainCooldown": "Retrain Cooldown",
   "CovenLeaderRetrain": "Retrain offered",
@@ -1998,11 +1944,9 @@
   "RetrainNotification": "The <b>{0}</b> has requested to retrain you into a <b>{1}</b>.<br>Vote yourself to accept the offer, vote someone else to decline.",
   "RetrainAcceptOffer": "You have accepted the <b>{0}</b>'s retraining and you are now a <b>{1}</b>!",
   "RetrainDeclineOffer": "You declined the <b>{0}</b>'s retraining and your role has not been changed...",
-
   "CovenLeaderKillButton": "Retrain",
   "CovenLeaderRetrainInGame": "{0} has been retrained into a {1}!",
   "CovenLeaderRetrainInGameNotif": "You have been retrained by the {0} into a {1}!",
-
   "RitualistMaxRitsPerRound": "Maximum Blood Rituals per Round",
   "RitualistTryHideMsg": "Try to hide Ritualist's commands",
   "RitualistRitualSuccess": "You preformed a successful Blood Ritual on {0} and they are now part of the Coven!",
@@ -2016,7 +1960,6 @@
   "RitualistGuessAddon": "Did you seriously think it would be that easy? You can't do a Ritual solely based on Add-ons.",
   "RitualistSuccessfullyRecruited": "You successfully recruited a player",
   "BeRecruitedByRitualist": "The Ritualist has recruited you",
-
   "ConjurerCooldown": "Conjure Cooldown",
   "ConjurerRadius": "Blast Radius",
   "ConjurerNecroRadius": "Necronomicon Blast Radius",
@@ -2026,20 +1969,17 @@
   "ConjurerMeteor": "Meteor summoned",
   "ConjurerNecroMark": "Player marked",
   "ConjurerConjureShapeshift": "Conjure",
-
   "IllusionCooldown": "Illusion Cooldown",
   "IllusionistMaxIllusions": "Maximum Illusions",
   "IllusionistSnitchAffected": "<color=#b8fb4f>Snitch</color> is Affected by Illusions",
   "IllusionistResetIllusionsPerRound": "Reset Illusions After Meeting",
   "IllusionistClearIllusionsWhenDead": "Remove Illusions When Illusionist Dies",
-
   "MedusaStoneCooldown": "Stone Cooldown",
   "MedusaStoneDuration": "Stone Duration",
   "MedusaStoneVision": "Stoned Vision",
   "MedusaStonedPlayer": "{0} has been Stoned",
   "MedusaStoningStart": "Stoning in progress",
   "MedusaStoningEnd": "Stoning has ended",
-
   "MoonDancerBatonPassCooldown": "Baton Pass Cooldown",
   "MoonDancerBlastOffChance": "Chance to Blast Off",
   "MoonDancerPassEnabledAddons": "Can only Baton Pass enabled Add-ons",
@@ -2050,7 +1990,6 @@
   "MoonDancerNoAddons": "No Add-ons to Baton Pass to {0}",
   "MoonDancerKillButtonText": "Baton Pass",
   "MoonDancerNecroKillButtonText": "Blast Off",
-
   "SacrifistDebuffCooldown": "Debuff Cooldown",
   "SacrifistDeathsAfterVote": "Players Killed After Sacrifist is Exiled",
   "SacrifistNecroReducedCooldown": "Coven Decreased Cooldown After Ultimate Sacrifice",
@@ -2073,7 +2012,6 @@
   "SacrifistSpeedRevert": "Speed Reverted",
   "SacrifistShapeshiftButton": "Debuff",
   "SacrifistNecroShapeshiftButton": "Ultimate Sacrifice",
-
   "VoodooMasterPerRound": "Voodoo Dolls per Round",
   "VoodooMasterCanDollCoven": "Voodoo Master can Voodoo <color=#ac42f2>Coven</color>",
   "VoodooMasterNecroCanKillCov": "Necronomicon Ability can Kill <color=#ac42f2>Coven</color>",
@@ -2081,7 +2019,6 @@
   "VoodooMasterTargetInMeeting": "Someone tried to target you with their role during this meeting, but it was deflected to one of your dolls, {0}, instead!",
   "VoodooMasterNoDollsLeft": "You can't voodoo anyone else this round!",
   "VoodooMasterDolledSomeone": "{0} has been turned into a Voodoo Doll",
-
   "PotionMasterMaxReveals": "Maximum Reveals",
   "PotionMasterMaxBarriers": "Maximum Barriers",
   "PotionMasterCovenCanSeeReveals": "<#ac42f2>Coven</color> can see Reveals",
@@ -2092,23 +2029,19 @@
   "PotionMasterReveal": "Reveal",
   "PotionMasterBarrier": "Barrier",
   "PotionMasterKillButtonText": "Use Potion",
-
   "HexMasterHexCooldown": "Hex Cooldown",
   "HexMasterCovenCanGetMovingHex": "<color=#ac42f2>Coven</color> Can Get Moving Hex",
   "HexMasterMovingHexCooldown": "Moving Hex Pass Cooldown",
   "HexesLookLikeSpells": "<color=#ff00ff>Hexes</color> appear as <color=#ff1919>Spells</color>",
   "HexButtonText": "Hex",
   "HexMasterPassNotify": "Hex successfully passed",
-
   "JinxSpellTimes": "Amount of Jinx Spells",
   "JinxCooldown": "Jinx Cooldown",
   "JinxCovenCanDieToJinx": "<color=#ac42f2>Coven</color> Can Die To Jinx",
-
   "PoisonCooldown": "Poison Cooldown",
   "PoisonerKillDelay": "Poison Kill Delay",
   "PoisonerTargetDead": "Target died",
   "PoisonerPoisonButtonText": "Poison",
-
   "NecromancerRevengeTime": "Necronomicon Ability time",
   "NecromancerRevenge": "You have {0}s to kill <color=#ff1919>{1}</color>",
   "NecromancerSuccess": "Necromancy complete! You live to see another day.",
@@ -2116,7 +2049,6 @@
   "NecromancerCooldownNotDone": "Ability is still on Cooldown!",
   "NecromancerNoUsableRoles": "No usable roles",
   "NecromancerRevengeInProgress": "You have to finish your revenge before you can change roles!",
-
   "HarvesterSettings.SwapCooldown": "Swap Cooldown",
   "HarvesterSettings.AmountStolen": "Add-ons stolen every steal",
   "HarvesterSettings.MaxAddonsCoven": "Maximum Add-ons <color=#ac42f2>Coven</color> can have",
@@ -2124,7 +2056,6 @@
   "Harvester.SwapListFull": "Your swap list is full!",
   "Harvester.PlayerAdded": "{0} added to swap list",
   "Harvester.ShapeshiftButton": "Swap Add-Ons",
-
   "DreamweaverSettings.CanDreamweaveNeutrals": "Neutrals can be Dreamwoven",
   "DreamweaverSettings.CanDreamweaveImpostors": "Impostors can be Dreamwoven",
   "Dreamweaver.InsomniaNotification": "You have been driven to insomnia!",
@@ -2134,9 +2065,7 @@
   "Dreamweaver.DreamweaveSuccess": "You have successfully Dreamwoven {0}!",
   "Dreamweaver.AlreadyDreamwoven": "You have already Dreamwoven this player!",
   "Dreamweaver.DreamwovenWarning": "You have been Dreamwoven by the Dreamweaver! If the Dreamweaver does not die after this meeting, you will be <b>unable to use your abilities</b> and your <b>vote will not count</b> until they die!",
-
   "RequiterIgnoresShields": "Requiter Ignores Shields(Excluding Mini and Solsticer)",
-
   "LuckyProbability": "Probability of surviving a kill",
   "ImpCanBeDoubleShot": "<color=#ff1919>Impostors</color> can have <color=#19fa8d>Double Shot</color>",
   "CrewCanBeDoubleShot": "<color=#8cffff>Crewmates</color> can have <color=#19fa8d>Double Shot</color>",
@@ -2193,7 +2122,6 @@
   "EndCommandNoAccess": "You do not have access to the end command.",
   "EndCommandEnded": "The game has been ended by {0}!",
   "ExecuteCommandNoAccess": "You do not have access to the execute command.",
-
   "WarnCommandWarnMod": "You are not permitted to warn other Moderators.",
   "WarnCommandWarned": "has been warned. There will be no more warnings given and appropriate action will be taken \n ",
   "WarnExample": "Use /warn [id] [reason] in future. \nExample :-\n /warn 5 lava chatting",
@@ -2254,7 +2182,6 @@
   "Alive": "Alive",
   "Disconnected": "Disconnected",
   "Win": " Wins!",
-
   "Last-": "Last ",
   "Madmate-": "Madmate ",
   "Recruit-": "Recruit ",
@@ -2265,7 +2192,6 @@
   "Admired-": "Admired ",
   "Enchanted-": "Enchanted ",
   "Narc-": "Narc ",
-
   "DeputyHandcuffCooldown": "Handcuff Cooldown",
   "DeputyHandcuffMax": "Maximum Handcuffs",
   "DeputyHandcuffedPlayer": "Handcuffed target",
@@ -2274,19 +2200,14 @@
   "HandcuffBrokenAfterMeeting": "Remove all handcuffs after meeting",
   "DeputyHandcuffText": "Handcuff",
   "DeputyHandcuffCDForTarget": "Next Kill Cooldown for handcuffed player",
-
   "RejectShapeshift.AbilityWasUsed": "Ability was used",
-
   "EscapisMtarkedPosition": "You marked self-position",
-
   "InvestigateCooldown": "Investigate Cooldown",
   "InvestigateMax": "Maximum Investigations",
   "InvestigateRoundMax": "Maximum Investigations in one round",
-
   "InvestigatorInvestigatedPlayer": "Player Investigated",
   "InvestigatorInvalidTarget": "Can not investigate",
   "InvestigatorButtonText": "Check",
-
   "SabotageCooldownControl": "Sabotage Cooldown Control",
   "SabotageCooldown": "Sabotage Cooldown",
   "SabotageTimeControl": "Sabotage Duration Control",
@@ -2321,7 +2242,6 @@
   "Command.death": "→ Display info on how you died",
   "Command.icons": "<size=60%><br><color=#ff1919>╳</color> - The player was marked by the <color=#ff1919>Blackmailer</color> and can't talk during the meeting<br><color=#4682b4>☆</color> - Used by <color=#4682b4>Captain</color> to display themselves. Only Crewmates can see the <color=#4682b4>Captain</color>'s star<br><color=#ff00ff>乂</color> - This player was hexed by the <color=#ff00ff>Hex Master</color> and will die if the <color=#ff00ff>Hex Master</color> isn't killed or ejected by the end of the meeting.<br>♦ - Used by <color=#008080>Lawyer</color> or <color=#c0c0c0>Executioner</color> or <color=#ff9409>Follower</color>.<br><color=#ff9ace>♥</color> - Used by <color=#ff9ace>Lovers</color> or <color=#ff1493>Romantic</color>.<br><color=#00ff97>✚</color> - Used by <color=#00ff97>Medic</color> to mark their target.<br><color=#edc240>⦿</color> - This player is in a duel with the <color=#edc240>Pirate</color>.<br><color=#8666bd>!?</color> - This player was marked by the <color=#8666bd>Quizmaster</color> and must answer the question correctly to survive.<br><color=#404040>☜</color> - Used by <color=#404040>Schrödinger's cat</color> to mark their teammate.<br><color=#6697ff>◈</color> - This player marked by the <color=#6697ff>Shroud</color> and will die if the <color=#6697ff>Shroud</color> is not killed or ejected by the end of the meeting.<br><color=#b8fb4f>⚠</color> - This player is a <color=#b8fb4f>Snitch</color> or <color=#dee13d>Solsticer</color> who has finished their tasks.<br>★ - Used by <color=#f6f657>Super Star</color> or <color=#f46f4e>Cyber</color> or <color=#5573aa>Marshall</color>.<br><color=#ff1919>†</color> - This player was spelled and will die if the <color=#ff1919>Witch</color> is not killed by the end of the Meeting.<br><color=#ff1919>∇</color> - Used by <color=#ff1919>Kamikaze</color> to mark their targets.<br><color=#ff1919>■</color> - Used by <color=#ff1919>Lightning</color> to mark their Quantum Ghosts.<br><color=#aa900d>⊠</color> - Used by <color=#aa900d>Jailer</color> to mark their prisoner.<br><color=#bf9f7a>●</color> - Used by <color=#bf9f7a>Baker</color> to mark who has Bread.<br><color=#A675A1>♠</color> - Used by <color=#A675A1>Soul Collector</color> to mark who's death they're predicting.<br><color=#e5f6b4>⦿</color> - Used by <color=#e5f6b4>Plaguebearer</color> to mark who they have plagued.<br><color=#ac42f2>♣</color> - Shown on the <color=#ac42f2>Coven</color> member with the Necronomicon. This is only shown to <color=#ac42f2>Coven</color>.<br><color=#ac42f2>⌘</color> - This player is Jinxed. This is only shown to <color=#ac42f2>Coven</color>.<br><color=#ac42f2>ø</color> - This player is Illusioned. This is only shown to <color=#ac42f2>Coven</color>.<br><color=#ac42f2>♻</color> - This player is Stoned. This is only shown to <color=#ac42f2>Coven</color>.<br><color=#ac42f2>✂</color> - This player is a Voodoo Doll. This is only shown to <color=#ac42f2>Coven</color>.",
   "Command.start": "[Seconds] → Start the game",
-
   "Command.iconinfo": "→ Display info on in-meeting icons",
   "Command.iconhelp": "→ Display info on in-meeting icons to everyone",
   "Command.Poll": "→ Start a poll with up-to 5 choices",
@@ -2338,7 +2258,6 @@
   "SeeEjectedRolesInMeeting": "See ejected roles in meetings",
   "ThankYouForUsingTOHE": "Thank you for using TONE!",
   "ShowBetrayalAddonsOnEject": "Show Betrayal Add-ons of ejected players",
-
   "SkillUsedLeft": "You have activated your skill to call a meeting. \nRemaining amount of uses left:",
   "NemesisDeadMsg": "The death of the Nemesis means the beginning of the revenge. \nPlease use /rv + [player ID] to kill the specified player \nYou can see player ID's in front of their names. \nOr type /rv to get a list of player ID's",
   "NemesisAliveKill": "Revenge for the Nemesis can only begin after their death.",
@@ -2346,7 +2265,6 @@
   "NemesisKillSucceed": "[{0}] was killed by the Nemesis!",
   "NemesisKillDisable": "Sorry, but according to Host's settings, Nemesis revenge is prohibited in this game",
   "NemesisKillMax": "You've reached the maximum amount of kills, you can't kill anymore!",
-
   "CelebrityDead": "Shock! Celebrity [{0}], has unfortunately been mercilessly killed in the recent period!",
   "CyberDead": "Oh no! It appears the Cyber, <b>{0}</b>, has died recently.",
   "DetectiveNoticeVictim": "According to your investigation,\nthe victim ([{0}]) had the role [{1}]",
@@ -2391,7 +2309,6 @@
   "FortuneTellerAlreadyCheckedMsg": "You've already checked the player",
   "MorticianGetNoInfo": "According to your inspection, <b>{0}</b> did not seem to have contact with anyone during their lifetime.",
   "MorticianGetInfo": "According to your inspection, the last person <b>{0}</b> came into contact with during their lifetime was <b>{1}</b>.",
-
   "MediumOnlyReceiveMsgFromCrew": "Receive messages only from <color=#8cffff>Crewmates</color> (including <color=#ff1919>Madmates</color> and <color=#cf6acd>Charmed</color> Players)",
   "MediumHelp": "<b>/ms yes</b> to agree\n<b>/ms no</b> to disagree",
   "MediumYes": "You thought you heard a quiet voice from another world affirming the answer to your question.",
@@ -2399,13 +2316,11 @@
   "MediumDone": "You successfully responded to the Medium.",
   "MediumNotifyTarget": "<b>{0}</b>, the Medium, has established contact with you. Before the end of this meeting, you have a chance to respond to their question. Type one of the following commands to answer:\nConfirm: /ms yes\nDeny: /ms no",
   "MediumNotifySelf": "You established contact with <b>{0}</b>. Please ask them questions and wait for them to respond.\n\nRemaining ability uses: {1}",
-
   "SpurtMinSpeed": "Minimum Speed",
   "SpurtMaxSpeed": "Maximum Speed",
   "SpurtModule": "Speed Modulator",
   "EnableSpurtCharge": "Display The Charge",
   "SpurtSuffix": "\n« <color=#c9e8f5>Spurt</color>: {0}% »",
-
   "TargetIsAlreadyDead": "Target is Already Dead",
   "ByBard": "by <color=#ff1919>Bard</color>",
   "ByBardGetFailed": "Oops, I seem to be out of inspiration.",
@@ -2505,7 +2420,6 @@
   "MerchantTargetCrew": "Can sell to <color=#8cffff>Crewmates</color>",
   "MerchantTargetImpostor": "Can sell to <color=#ff1919>Impostors</color>",
   "MerchantTargetCoven": "Can sell to <color=#ac42f2>Coven</color>",
-
   "MerchantTargetNeutral": "Can sell to <color=#7f8c8d>Neutrals</color>",
   "MerchantSellHelpful": "Can sell <color=#8cffff>Helpful</color> Add-ons",
   "MerchantSellHarmful": "Can sell <color=#ff1919>Harmful</color> Add-ons",
@@ -2514,7 +2428,6 @@
   "MerchantSellHarmfulToEvil": "Can sell <color=#ff1919>Harmful</color> Add-ons only to <color=#ff1919>Evil</color>",
   "MerchantSellHelpfulToCrew": "Can sell <color=#8cffff>Helpful</color> Add-ons only to <color=#8cffff>Crewmates</color>",
   "MerchantSellOnlyEnabledAddons": "Can sell only enabled Add-ons",
-
   "SpiritcallerSpiritMax": "Maximum number of <color=#003366>Evil Spirits</color>",
   "SpiritcallerSpiritAbilityCooldown": "<color=#003366>Evil Spirit</color> Ability Cooldown",
   "SpiritcallerFreezeTime": "<color=#003366>Evil Spirit</color> ability freeze time",
@@ -2581,38 +2494,30 @@
   "Message.MeCommandNoPermission": "You are not allowed to use /me command for others",
   "FactionSettingsTitle": "FACTION SETTINGS:",
   "NumberOfImpostors": "Number of <color=#ff1919>Impostors</color>",
-
   "PollTitle": "〖 Poll 〗",
   "PollResultTitle": "Poll Results",
   "Poll.Result": "And... The winner was {0} with {1} votes!\n\n<size=75%>Runner ups:",
   "Poll.Tied": "Uh oh, The vote was tied between {0}, all having {1} votes.",
   "Poll.MissingPlayers": "You can't start a poll with yourself dummy ;3",
-
   "Poll.Begin": "You may vote using /pv {answer}, ps: a number also works.",
   "Poll.TimeInfo": "The results will be final in 2 minutes",
   "Poll.OnlyInLobby": "<#ab4f75>Sorry, this command may only be used in lobby</color>",
-
   "Poll.Inactive": "There isn't any active poll currently.",
   "Poll.AlreadyVoted": "You already cast your vote, so it won't be counted.",
-
   "Poll.VotingInfo": "Use /pv {answer} to vote, answer can be a character or a number.",
   "Poll.YouVoted": "You have voted for {0}, which has now {1} votes.",
   "PollUsage": "To create a poll type \n<b>/poll {Question}? <size=55%>{Answer A} {Answer B} \n{Answer C (Optional)} {Answer D (Optional)} {Answer E (Optional)}</size></b>\n<size=50%>It is important you end the question with a ? </size>\n\n<size=75%>Use <b>/poll Replay</b> to replay the latest poll</size>",
   "Replay": "Replay",
-
   "EnableGadientTags": "Enable Gradient Tags <color=#ff0000>(can cause disconnect issues)</color>",
   "Warning.GradientTags": "<color=#ff0000><size=150%>Warning:</size></color>\n\nHost has enabled gradient tags. This feature is not recommended to use because it can cause <b>disconnect issues</b>",
   "WarningTitle": "Warning!",
   "Warning.BrokenVentsInDleksSendInGame": "Warning! The Vents on this map are broken",
   "Warning.BrokenVentsInDleksMessage": "<b>On the «dlekS ehT» map, the Vents are broken</b>, they cannot be fixed in Host-Only Mods, this is a vanilla bug, <b>so any roles using a Vent as an ability will not spawns on this map</b>",
-
   "Warning.NoGameEndIsEnabled": "Warning: <b>{0}</b> is enabled!",
-
   "AntiBlackoutProtectionTitle": "Anti Blackout",
   "Warning.AntiBlackoutProtectionMsg": "<size=110%>Warning:</size>\n\r<b>Black screen protection has been activated,</b> due to the low number of alive <color=#ff1919>Impostors</color>, <color=#8cffff>Crewmates</color> and <color=#7f8c8d>Neutral Killers</color>\n<b>The voting screen will show as a tied vote (only affects the visual, not the results voting)</b>\n<size=70%>Modded players will see voting screen normally</size>",
   "Warning.ShowAntiBlackExiledPlayer": "<b>Last meeting triggered Black Screen Prevention!\nFollowing is the information of the player exiled in the last meeting.</b>\n",
   "DisableAntiBlackoutProtects": "Disable AntiBlackout Protects (Recommended for testing)",
-
   "Warning.InvalidRpc": "Kicked <b>{0}</b> because an invalid RPC was received.\nPlease check that no Mods other than TONE are installed.",
   "Warning.NoModHost": "TONE is not installed on the Host",
   "Warning.MismatchedVersion": "<b>{0}</b> has a different version of <b>{1}</b>",
@@ -2838,29 +2743,23 @@
   "KickBecauseLowLevel": "<b>{0}</b> was kicked because their level was too low",
   "TempBannedBecauseLowLevel": "<b>{0}</b> was temporarily banned because their level was too low",
   "KickBecauseDiffrentVersionOrMod": "<b>{0}</b> was kicked because they had a different version of the mod",
-
   "FFADisplayScore": "Ranking: {0} Score: {1}",
   "FFATimeRemain": "<color=#00ffa5>Time Remaining:</color> <b>{0}</b>s",
-
   "GameOver": "Game Over",
   "TOHEOptions": "TONE Options",
   "Cancel": "Cancel",
   "Back": "Back",
   "Yes": "Yes",
   "No": "No",
-
   "AntiBlackOutLoggerSendInGame": "Because of an unknown error, the game will end to prevent a black screen.",
   "AntiBlackOutNotifyInLobby": "An error occurred to prevent a black screen. Do a «/dump» and send the logs to the Discord server TONE in «bug-reports» and we will try to fix it.",
-
   "EndWhenPlayerBug": "End the game when a Modded player gets a critical error (While loading)",
   "AntiBlackOutRequestHostToForceEnd": "You were the reason for the black screen. The game will end",
   "AntiBlackOutHostRejectForceEnd": "You were the reason for the black screen, and the Host is not going to end the game\nYou will be disconnected soon",
-
   "RpcAntiBlackOutNotifyInLobby": "Because of <b>{0}</b>, an unknown error occurred. To prevent a black screen, turn off [{1}] in settings.",
   "RpcAntiBlackOutEndGame": "Because of <b>{0}</b>, an unknown error occurred, the game will end to prevent a black screen.",
   "RpcAntiBlackOutIgnored": "Because of <b>{0}</b>, an unknown error occurred, but the game will continue without that player due to Host settings.",
   "RpcAntiBlackOutKicked": "<b>{0}</b> was kicked due to having a blackout error on its side.",
-
   "NextPage": "Next Page",
   "PreviousPage": "Previous Page",
   "PressF1ShowMainRoleDes": "Press F1: Show Role Description",
@@ -2931,24 +2830,19 @@
   "DeathCmd.Misfired": "You <b>misfired</b>.",
   "DeathCmd.Shrouded": "You were <b>shrouded</b> by a <b><color=#6697FF>Shroud</color></b> and didn't make a kill, so you suicided.",
   "DeathCmd.Lovers": "Your <color=#ff9ace>lover</color> had died.",
-
   "RpsCommandInfo": "<b>This command can only be used when in the lobby or after you die.</b>\n\ntype <b>/rps X</b> to play Rock Paper Scissors with the system. X can be 0 (rock), 1 (paper) or 2 (scissors). \n\nExample :- /rps 0",
   "RpsDraw": "I choose <b>{0}</b>\n\nWow, what an intense battle of wits we just had! It's almost as if we're equally matched in this game of sheer luck and randomness.",
   "RpsLose": "I choose <b>{0}</b>\n\nWell, well, well, looks like I've managed to outsmart a human again in this highly complex game of Rock, Paper, Scissors. I guess my unbeatable powers strike again! ",
   "RpsWin": "I choose <b>{0}</b>\n\nOh, congratulations! You must have a Crystal Ball hidden behind that screen to beat me at Rock, Paper, Scissors. Or maybe I have the world's worst luck algorithm.",
-
   "CoinFlipCommandInfo": "<b>This command can only be used when in the lobby or after you die.</b>",
   "CoinFlipResult": "Drumroll, please... After an intense battle of gravity and randomness, the coin has decided to grace us with its presence! And the majestic winner is... (wait for it) ... the one and only... <b>{0}</b>! Who could have seen that coming?! Clearly, a momentous occasion in the history of coin flips.",
-
   "GNoCommandInfo": "<b>This command can only be used when in the lobby or after you die.</b>\n\ntype <b>/gno X</b> to play guess a number. X can be a number between 0 and 99 (both included). \n\nYou get maximum of <color=#ff0000>7 tries</color> to guess the number.\n\n Example:- <b>/gno 10</b>",
   "GNoLost": "Oh, you were so close! Just one more guess: you might have deciphered the Da Vinci code! By the way, <color=#ff0000>the secret number was... {0}!</color> But hey, you were only off by a few billion possibilities. Better luck next time, Sherlock! ",
   "GNoLow": "Oh, you're really nailing this! It's so low. I almost need a shovel to dig it up!\nYou have <color=#ff0000>{0} guesses</color> left!",
   "GNoHigh": "Oh, absolutely! You're getting warmer. In fact, it's so high that I need a telescope to see it from here! \nYou have <color=#ff0000>{0} guesses</color> left!",
   "GNoWon": "Oh, how did you ever figure that out? It's almost like you're a mind reader! Congratulations, you're a genius! You found the secret number with <color=#00ff00>{0} guesses</color> left!",
-
   "RandCommandInfo": "<b>This command can only be used when in the lobby or after you die.</b>\n\ntype <b>/rand X Y</b> to get a number between X and Y, inclusive. \nX and Y can be any number between 0 and 2147483647, including both numbers.\nX must be less than Y.\n\nExample:- <b>/rand 0 99</b>",
   "RandResult": "Congratulations, your random number is {0}! Wasn't that fun?",
-
   "8BallTitle": "The Magic 8 Ball Reveals...",
   "8BallMaybe": "Maybe",
   "8BallTryAgainLater": "Ask again later",
@@ -2964,9 +2858,7 @@
   "8BallCantPredict": "Cannot predict now",
   "8BallWithoutDoubt": "Without a doubt",
   "8BallWithDoubt": "Very doubtful",
-
   "ChanceToMiss": "Chance to miss a kill",
-
   "SoulCollectorPointsToWin": "Required number of Souls",
   "SoulCollectorTarget": "You have predicted the death of <b>{0}</b>",
   "SoulCollectorToDeath": "You have become Death!!!",
@@ -2980,7 +2872,6 @@
   "SoulCollectorMeetingDeath": "Your target has died during the meeting. You have gained a Soul.",
   "SoulCollectorKillButtonText": "Predict",
   "SoulCollectorHasImpostorVision": "<color=#A675A1>Soul Collector</color> has <color=#ff1919>Impostor</color> Vision",
-
   "ApocalypseIsNigh": "[ The Apocalypse Is Nigh! ]",
   "ApocalypseImmune": "This role is immune!",
   "BakerToFamine": "You have become Famine!!!",
@@ -3008,17 +2899,14 @@
   "FamineCantStarveApoc": "You cannot starve other Apocalypse members!",
   "FamineAlreadyStarved": "That player has already been starved!",
   "FamineStarved": "Player starved",
-
   "ChronomancerKillCooldown": "Ability Charge Time",
   "ChronomancerDecreaseTime": "Slaughter Decrease Time (lower is faster)",
   "ChronomancerStartMassacre": "SLAUGHTER: ACTIVATED",
   "ChronomancerVisionMassacre": "Vision When in Slaughter",
-
   "ShamanButtonText": "Voodoo",
   "ShamanTargetAlreadySelected": "You have already selected a Voodoo Doll in this round",
   "Shaman_KillerCannotMurderChosenTarget": "The killer cannot murder chosen target",
   "VoodooCooldown": "Voodoo Cooldown",
-
   "AdminWarning": "Admin Table in use!",
   "VitalsWarning": "Vitals in use!",
   "DoorlogWarning": "DoorLogs in use!",
@@ -3080,7 +2968,6 @@
   "BerserkerTransform": "<align=\"center\"><size=150%>The <color=#FF0055><b>Berserker</b></color> has transformed into <color=#2B0804><b>War</b></color>, Horseman of the Apocalypse! Cry 'Havoc!', and let slip the dogs of war.</size></align>",
   "WarKillCooldown": "War Kill Cooldown",
   "BerserkerCanKillTeamate": "Can kill other Neutral Apocalypse",
-
   "BlackmailerSkillCooldown": "Blackmail Cooldown",
   "BlackmailerMax": "Maximum times blackmailed players may speak",
   "BlackmailerDead": "Warning! <b>{0}</b> has been blackmailed by a <color=#ff1919>Blackmailer</color>!",
@@ -3138,23 +3025,18 @@
   "JailorKillButtonText": "Jail",
   "AgitaterKillButtonText": "Pass",
   "HasSerialKillerBuddy": "Has Serial Killer buddy",
-
   "DiseasedCDOpt": "Increase the Cooldown by",
   "CDReset": "Cooldown returns to normal after a meeting",
-
   "AntidoteCDOpt": "Decrease the Cooldown by",
-
   "GlowRadius": "Glow Radius",
   "GlowVisionOthers": "Vision Boost for nearby Players",
   "GlowVisionSelf": "Vision Boost for Glow",
-
   "SleuthCanKnowKillerRole": "Can find the role of the killer",
   "SleuthNoticeKiller": "\nThe killer's role is <b>{0}</b>.",
   "SleuthNoticeVictim": "{0}'s role is <b>{1}</b>.",
   "SleuthNoticeKillerNotFound": "\nThe killer could not be identified, this was possibly a <b>suicide</b>.",
   "BomberDiesInExplosion": "<color=#ff1919>Bomber</color> dies in their explosion",
   "ImpostorsSurviveBombs": "<color=#ff1919>Impostors</color> survive bombs",
-
   "PunchingBagKillMax": "Amount of attacks needed to win",
   "GuessPunchingBag": "You just tried to guess a Punching Bag!\nThey're now one step closer to winning!",
   "GuessPunchingBagAgain": "You just tried to guess a Punching Bag again!\n\nIt no longer counts your attacks by guessing",
@@ -3162,7 +3044,6 @@
   "SelfGuessPunchingBag": "You can't self-guess as a Punching Bag, you cheater!",
   "GuessPunchingBagBlocked": "Punching Bag cannot guess due to self-guessing.",
   "EradicatePunchingBag": "You just tried to terminate Punching Bag, that is not allowed.",
-
   "RememberCooldown": "Imitate Cooldown",
   "RefugeeKillCD": "<color=#ff1919>Refugee</color>'s Kill Cooldown",
   "RememberedNeutralKiller": "You remembered you were a Neutral killer!",
@@ -3176,7 +3057,6 @@
   "IncompatibleNeutralMode": "If Neutral is incompatible, turn into",
   "RememberedYourRole": "An Amnesiac remembered your role!",
   "YouRememberedRole": "You remembered who you were!",
-
   "BanditStealMode": "Steal Mode",
   "BanditStealMode_OnMeeting": "On Meeting",
   "BanditStealMode_Instantly": "Instantly",
@@ -3185,10 +3065,8 @@
   "BanditCanStealImpOnlyAddon": "Can Steal <color=#ff1919>Impostor</color> Only Add-ons",
   "Bandit_NoStealableAddons": "Could not steal Add-on from the player",
   "BanditStealCooldown": "Steal Cooldown",
-
   "DoppelMaxSteals": "Maximum Steals",
   "DoppelCurrentVictimCanSeeRolesAsDead": "Last victim can see Role and Add-on info of alive players as a ghost",
-
   "RetributionistDeadMsg": "The death of the Retributionist means the beginning of retribution. \nPlease use /ret + [player ID] to kill the specified player \nYou can see player ID's in front of their names. \nOr type /ret to get a list of player ID's",
   "RetributionistAliveKill": "Retribution for the Retributionist may only begin after their death.",
   "RetributionistKillMax": "You've reached the maximum amount of kills. You can't kill anymore!",
@@ -3201,12 +3079,10 @@
   "MinimumPlayersAliveToRetri": "Minimum players alive to retribute",
   "MinimumNoKillerEjectsToKill": "Minimum meetings passed with no killer ejects to kill",
   "ImmuneToAttacksWhenTasksDone": "Immune to attacks on task completion",
-
   "TwisterCooldown": "Twist Cooldown",
   "TwisterButtonText": "Twist",
   "TwisterHideTwistedPlayerNames": "Hide who the players swap places with",
   "InstigatorKillsPerAbilityUse": "Kills per Ability use",
-
   "CrewCanFindCaptain": "Crewmates can find Captain",
   "MadmateCanFindCaptain": "Madmates can find Captain",
   "ReducedSpeed": "Reduced speed",
@@ -3220,7 +3096,6 @@
   "CaptainSpeedReduced": "Captain reduced your speed",
   "CaptainRevealTaskRequired": "Number of tasks completed after which Captain is revealed",
   "CaptainSlowTaskRequired": "Number of tasks completed after which target speed is reduced",
-
   "InspectorTryHideMsg": "Hide <color=#0D57AF>Inspector</color>'s commands",
   "MaxInspectCheckLimit": "Maximum inspections per game",
   "InspectCheckLimitPerMeeting": "Maximum inspections per meeting",
@@ -3239,10 +3114,8 @@
   "InspectCheckBaitCountMode": "<color=#00f7ff>Bait</color> counts as revealing role if <color=#00f7ff>Bait</color> reveal on first meeting is on",
   "InspectCheckRevealTarget": "When tasks are done, the target knows the team of the other target",
   "InspectorTargetReveal": " Looks like <b>{0}</b> is aligned with team <b>{1}</b>",
-
   "EgoistCountMode.Original": "Original",
   "EgoistCountMode.Neutral": "Neutral",
-
   "JailerJailCooldown": "Jail Cooldown",
   "JailerMaxExecution": "Maximum executions",
   "JailerNBCanBeExe": "Can execute <color=#7f8c8d>Neutral</color> <color=#046300>Benign</color>",
@@ -3259,25 +3132,21 @@
   "CanNotTrialJailed": "You can not trial the target.",
   "notifyJailedOnMeeting": "Notify jailed player when a meeting starts",
   "JailedNotifyMsg": "The Jailer has jailed you. No one can guess or judge you. You can only guess The Jailer.\n\nIf Jailer votes you, you will be executed after the meeting ends.",
-
   "CopyCatCopyCooldown": "Copy Cooldown",
   "CopyCatRoleChange": "Your role has been changed to <b>{0}</b>",
   "CopyCatCanNotCopy": "You can not copy the target's role",
   "CopyButtonText": "Copy",
   "CopyCrewVar": "Can copy evil variants of Crewmate roles",
   "CopyTeamChangingAddon": "Can copy team changing Add-on",
-
   "MaxCleanserUses": "Maximum Cleanses",
   "CleansedCanGetAddon": "Cleansed player can get Add-on",
   "CleanserRemoveSelf": "You can not cleanse yourself",
   "CleanserCantRemove": "Oops! the player can not be Cleansed.",
   "CleanserRemovedRole": "<b>{0}</b> has been cleansed. All their Add-ons will be removed after the meeting.\n\nYour vote has been returned and you can vote for someone.",
   "LostAddonByCleanser": "The Cleanser removed all your Add-ons",
-
   "MaxProtections": "Maximum Protections",
   "KeeperHideVote": "Hide Keeper's vote",
   "KeeperProtect": "You chose to protect <b>{0}</b>, your vote has been returned",
-
   "MaulRadius": "Maul Radius",
   "ImpKnowCyberDead": "<color=#ff1919>Impostors</color> know if Cyber died",
   "CrewKnowCyberDead": "<color=#8cffff>Crewmates</color> know if Cyber died",
@@ -3311,7 +3180,6 @@
   "GanOverseerCanBeMadmate": "<color=#BA55D3>Overseer</color> can be converted",
   "GanCovenCanBeMadmate": "<color=#ac42f2>Coven</color> can be converted",
   "RascalAppearAsMadmate": "Appear as <color=#ff1919>Madmate</color> on Ejection",
-
   "CouncillorDead": "Sorry, you can't murder from the dead.",
   "CouncillorMurderMaxMeeting": "Sorry, you've reached the maximum amount of murders for the meeting.",
   "CouncillorMurderMaxGame": "Sorry, you've reached the maximum amount of murders for the game.",
@@ -3330,21 +3198,17 @@
   "CouncillorSuicideOnJudgeImpTeam": "Suicide when judge <color=#ff1919>Impostors</color> Team Wrongly",
   "CouncillorCanMurderTaskDoneSnitch": "Can Murder <color=#b8fb4f>Snitch</color> with All Tasks Done",
   "CouncillorTryHideMsg": "Try to hide Councillor's commands",
-
   "DazzlerDazzled": "You were dazzled by the Dazzler!",
   "DazzlerCauseVision": "Reduced vision",
   "DazzlerDazzleLimit": "Maximum number of players affected by reduced vision",
   "DazzlerResetDazzledVisionOnDeath": "Reset vision of dazzled players on death/eject",
   "DazzleCooldown": "Dazzle Cooldown",
   "DazzleButtonText": "Dazzle",
-
   "MoleVentButtonText": "Dig",
   "MoleVentCooldown": "Dig Cooldown",
-
   "AddictVentButtonText": "Get Fix",
   "AddictInvulnerbilityTimeAfterVent": "<color=#008000>Invulnerability</color> Time",
   "AddictSpeedWhileInvulnerble": "Movement speed while <color=#008000>Invulnerable</color>",
-
   "AddictFreezeTimeAfterInvulnerbility": "Time the <color=#008000>Addict</color> gets frozen in place after <color=#008000>Invulnerability</color>",
   "AlchemistShieldDur": "Resistance Potion Duration",
   "AlchemistInvisDur": "Invisibility Potion Duration",
@@ -3362,7 +3226,6 @@
   "AlchemistGotBloodthirstPotion": "Potion of Harming: Kill the next player you touch",
   "AlchemistGotInvisibility": "Potion of Invisibility: Become Invisible",
   "NoPotion": "You have no Potions",
-
   "StoreShield": "<color=#00ff97>Potion of Resistance</color>",
   "StoreSuicide": "<color=#478800>Potion of Poison</color>",
   "StoreTP": "<color=#42d1ff>Potion of Warping</color>",
@@ -3374,7 +3237,6 @@
   "StoreNull": "<color=#888888>None</color>",
   "PotionStore": "<color=#00ffa5>Potion in store: </color>",
   "WaitQFPotion": "\n<color=#3333ff>Potion of Fixing</color> waiting for use",
-
   "AlchemistShielded": "Potion of Resistance started",
   "AlchemistHasVision": "Potion of Night Vision started",
   "AlchemistShieldOut": "Potion of Resistance ended",
@@ -3382,7 +3244,6 @@
   "AlchemistPotionBloodthirst": "You gained Bloodthirst",
   "AlchemistHasSpeed": "Potion Of Speed started",
   "AlchemistSpeedOut": "Potion Of Speed ended",
-
   "DeathpactDuration": "<color=#ff1919>Deathpact</color> Duration",
   "DeathPactCooldown": "<color=#ff1919>Deathpact</color> Assign Cooldown",
   "DeathpactNumberOfPlayersInPact": "Number of players in <color=#ff1919>Deathpact</color>",
@@ -3450,7 +3311,6 @@
   "KillCooldownAfterStoneGazing": "Kill Cooldown On Stone Gaze",
   "MedusaStoneBody": "Body stoned",
   "MedusaReportButtonText": "Stone",
-
   "CursedSoulCurseCooldown": "Soul Snatch Cooldown",
   "CursedSoulCurseCooldownIncrese": "Soul Snatch Cooldown Increase",
   "CursedSoulCurseMax": "Maximum Soul Snatches",
@@ -3461,7 +3321,6 @@
   "SoullessByCursedSoul": "A Cursed Soul snatched your Soul",
   "CursedSoulSoullessPlayer": "Soul snatched",
   "CursedSoulInvalidTarget": "No Soul found",
-
   "AdmireCooldown": "Admire Cooldown",
   "AdmirerKnowTargetRole": "Know the roles of <color=#ee43c3>Admired</color> players",
   "AdmirerSkillLimit": "Skill Limit",
@@ -3469,7 +3328,6 @@
   "AdmirerAdmired": "The Admirer admired you!",
   "AdmiredPlayer": "Player admired",
   "AdmirerInvalidTarget": "Target cannot be admired",
-
   "TaskManager_OptionCanCompleteTaskAfterDeath": "Can Complete Random Tasks For Players After His Death",
   "TaskManager_LimitGetsAddOns": "Limit Gets Add-ons",
   "TaskManager_OptionCanGetHelpfulAddons": "Can Get <color=#8cffff>Helpful</color> Add-ons",
@@ -3487,7 +3345,6 @@
   "ActivatingShields": "<b>Activating Shields</b>",
   "ShootingAtAsteroids": "<b>Shooting At Asteroids</b>",
   "MedbayScan": "<b>Medbay Scan</b>",
-
   "SpiritualistNoticeMessage": "The Spiritualist has an arrow pointing to you!\nYou can use them to a killer or frame a Crewmate",
   "SpiritualistShowGhostArrowForSeconds": "Ghost arrow duration",
   "SpiritualistShowGhostArrowEverySeconds": "Ghost arrow interval",
@@ -3544,19 +3401,16 @@
   "EnigmaClueRoleTitle": "Enigma Role Clue!",
   "EnigmaClueLevelTitle": "Enigma Level Clue!",
   "EnigmaClueFriendCodeTitle": "Enigma Friend Code Clue!",
-
   "SocialiteResetParties": "Reset Parties After Meetings",
   "SocialiteBlockNotification": "Your target is partying and cannot be interacted with!",
   "SocialiteGuestListMsg": "The following players are on the guest list:\n",
   "SocialiteVoteMsg": "You have added <b>{0}</b> to the guest list.\nThey will be able to attend the party and use their ability.\nYou may now vote normally!",
   "SocialitePartyMsg": "You are now partying with <b>{0}</b>!",
   "SocialiteAlreadyGuest": "This player is already on the guest list!",
-
   "ImpCanBeRole": "<color=#ff1919>Impostors</color> can become {role}",
   "CrewCanBeRole": "<color=#8cffff>Crewmates</color> can become {role}",
   "NeutralCanBeRole": "<color=#7f8c8d>Neutrals</color> can become {role}",
   "CovenCanBeRole": "<color=#ac42f2>Coven</color> can become {role}",
-
   "VotesPerKill": "Votes gained for each kill",
   "PickpocketGetVote": "You've got {0} votes",
   "VultureArrowsPointingToDeadBody": "Arrows pointing to dead bodies",
@@ -3566,7 +3420,6 @@
   "VultureReportCooldown": "Eat Cooldown",
   "VultureMaxEatenInOneRound": "Maximum eaten bodies possible per round",
   "VultureCooldownUp": "Eat Cooldown finished",
-
   "GhastlyPossessCD": "Possess Cooldown",
   "GhastlyMaxPossessions": "Maximum Possessions",
   "GhastlyPossessionDuration": "Possession Duration",
@@ -3579,15 +3432,12 @@
   "GhastlyYouvePosses": "You've Been Possessed!",
   "GhastlyPossessedUser": "You have possessed: {0}",
   "GhastlyExpired": "{0} is no longer possessed",
-
   "TasksMarkPerRound": "Number of tasks that can be marked in one round",
   "TaskinatorBombPlanted": "Bomb has been planted",
-
   "ShieldDuration": "Shield Duration",
   "ShieldIsOneTimeUse": "Shield breaks after one kill attempt",
   "BenefactorTaskMarked": "Task marked successfully",
   "BenefactorTargetGotShield": "You got a shield by Benefactor",
-
   "PirateTryHideMsg": "Hide <color=#EDC240>Pirate</color>'s commands",
   "SuccessfulDuelsToWin": "Number of successful duels needed to win",
   "PirateMeetingMsg": "Duel with your target.\n\nDuel command:\n⦿ /duel 0\n⦿ /duel 1\n⦿ /duel 2\n\nYou win the Duel if you choose the same option as the target",
@@ -3613,20 +3463,17 @@
   "AgitaterTargetNotify": "YOU HAVE THE BOMB!! Pass it to someone else",
   "AgitaterCanGetBombed": "<color=#F4A460>Agitator</color> can get bomb",
   "AgitaterAutoReportBait": "<color=#F4A460>Agitator</color> can Auto Report Bait",
-
   "SeekerPointsToWin": "Number of points required to win",
   "SeekerTagCooldown": "Tag Cooldown",
   "SeekerNotify": "Your target is <b>{0}</b>",
   "SeekerTargetNotify": "You are Seekers target!! Hide before they tag you",
   "SeekerKillButtonText": "Tag",
-
   "PixiePointsToWin": "Number of points required to win",
   "MaxTargets": "Maximum number of targets per round",
   "MarkCooldown": "Mark Cooldown",
   "PixieSuicide": "Pixie suicides if the target is not voted out",
   "PixieMaxTargetReached": "You have already selected all the targets this round",
   "PixieTargetAlreadySelected": "Target is already selected",
-
   "PlagueBearerCooldown": "Plague Cooldown",
   "PestilenceCooldown": "<color=#343136>Pestilence</color> Kill Cooldown",
   "PestilenceCanVent": "<color=#343136>Pestilence</color> Can Vent",
@@ -3653,10 +3500,8 @@
   "RomanticPartnerButtonText": "Pick Partner",
   "RomanticProtectButtonText": "Protect",
   "VengefulRomanticButtonText": "Avenge",
-
   "GuessMasterMisguess": "<b>{0}</b> misguessed",
   "GuessMasterTargetRole": "Someone tried to guess <b>{0}</b>",
-
   "DoomsayerAmountOfGuessesToWin": "Amount of Guesses to win",
   "DCanGuessImpostors": "Can Guess <color=#ff1919>Impostors</color>",
   "DCanGuessCrewmates": "Can Guess <color=#8cffff>Crewmates</color>",
@@ -3674,7 +3519,6 @@
   "DoomsayerNotCorrectlyGuessRole": "You didn't correctly guess the Role!\nBut you didn't die because the Host's settings don't allow you to die",
   "DoomsayerGuessCountMsg": "You correctly guessed <b>{0}</b> Roles",
   "DoomsayerGuessSameRoleAgainMsg": "You tried to guess the same Role or Add-on that you guessed before",
-
   "EveryoneCanKnowMini": "Everyone can see the Mini",
   "CanBeEvil": "Mini can be an <color=#ff1919>Impostor</color>",
   "EvilMiniSpawnChances": "Probability of Mini being an <color=#ff1919>Impostor</color>",
@@ -3858,7 +3702,6 @@
   "HaterCanKillEnchanted": "Can kill Enchanted",
   "HorseMode": "Enable to become a horse",
   "LongMode": "Enable to have a long neck",
-
   "FFA": "Free For All",
   "ModeFFA": "Gamemode: FFA",
   "ModeDescribe.FFA": "In the FFA (Free For All) Gamemode, everyone is a killer, and everyone can kill anyone. The last player alive wins!\n\nSome random events make this even more fun in the meantime!",
@@ -3891,11 +3734,9 @@
   "FFA_ShieldBroken": "<color=#ffff00>Someone tried to kill you, your shield is now broken!</color>",
   "Killer": "FREE FOR ALL",
   "KillerInfo": "Kill Everyone to Win",
-
   "Hide&SeekTOHE": "Hide & Seek",
   "MenuTitle.Hide&Seek": "Hide & Seek Settings",
   "NumImpostorsHnS": "Num Impostors",
-
   "EveryOneKnowSolsticer": "Every One Know who is Solsticer",
   "SolsticerKnowItsKiller": "Solsticer knows the role of whom used the Kill button on it",
   "SolsticerSpeed": "Movement speed of Solsticer",
@@ -3910,20 +3751,15 @@
   "SolsticerTasksReset": "Your tasks get reset!",
   "SolsticerMisGuessed": "You just misguessed! You are no longer allowed to guess.",
   "SolsticerGuessMax": "Because you already misguessed, you are no longer allowed to guess.",
-
   "VoteDead": "The player you voted for was exiled before the meeting concluded. Your vote was rescinded.",
-
   "LastMessageReplay": "Last System Message Replay",
   "Contributor": "Contributor",
-
   "dbConnect.InitFailure": "Error while connecting to TONE API, please check your network connection and retry login!",
   "dbConnect.InitFailurePublic": "Error while connecting to TONE API, this could be caused by your internet connection. And so Sponsor+ perks are not available, you may continue to play as usual without these.",
-
   "Quizmaster": "Quizmaster",
   "QuizmasterInfo": "Quiz people to kill them in meetings",
   "QuizmasterInfoLong": "(Neutrals):\nAs the Quizmaster, you can mark a player using your Kill button. In the next meeting, the marked player will have \"?!\" next to their name. The player will die if they answer the question wrong or doesn't answer. The player will live if the Quizmaster is killed/ejected in the same meeting.\nThe Quizmaster cannot mark multiple people in the same round.\nIf the Quizmaster can kill after tagging, they are considered a Neutral Killer. If not, they are considered Neutral Chaos and will steal the win if they're still alive at the end of the game.",
   "QuizmasterKillButtonText": "Quiz",
-
   "QuizmasterChat.MarkedBy": "You've been marked by the <color={QMCOLOR}><b>Quizmaster</b></color>\nTo survive you have to answer correct to this question:\n\n{QMQUESTION}",
   "QuizmasterChat.MarkedPublic": "<b>{QMTARGET}</b> has been marked by the <color={QMCOLOR}><b>Quizmaster</b></color>\nTo survive {QMTARGET} have to answer correct to their question!",
   "QuizmasterChat.Answers": "<size=150%><b>Answers</b></size>\nA: {QMA}\nB: {QMB}\nC: {QMC}\n\nTo answer just type /answer [answer letter]\n\nIf you need to recheck the answer and questions just do /qmquiz",
@@ -3938,16 +3774,13 @@
   "QuizmasterChat.CantAnswer": "As the Quizmaster, you can't answer questions",
   "QuizmasterChat.AnswerNotValid": "Your answer must be A, B, or C",
   "QuizmasterChat.SyntaxNotValid": "<b>Usage:</b>\n/answer [A/B/C]",
-
   "QuizmasterSettings.MinQuestionDifficulty": "Minimum Question Difficulty",
   "QuizmasterSettings.MaxQuestionDifficulty": "Maximum Question Difficulty",
   "QuizmasterSettings.CanVentAfterMark": "Can Vent After Marking Somebody for Quiz",
   "QuizmasterSettings.CanKillAfterMark": "Can Kill After Marking Somebody for Quiz",
   "QuizmasterSettings.NumOfKillAfterMark": "How Many Kills per Round",
   "QuizmasterSettings.CanGiveQuestionsAboutPastGames": "Can Give Questions About Past Games",
-
   "Quizmaster.None": "None",
-
   "QuizmasterSabotages.Lights": "Lights",
   "QuizmasterSabotages.Reactor": "Reactor",
   "QuizmasterSabotages.Communications": "Communications",
@@ -3981,7 +3814,6 @@
   "QuizmasterAnswers.Scientist": "Scientist",
   "QuizmasterAnswers.Engineer": "Engineer",
   "QuizmasterAnswers.GuardianAngel": "GuardianAngel",
-
   "QuizmasterQuestions.LastSabotage": "What was the Sabotage was called last?",
   "QuizmasterQuestions.FirstRoundSabotage": "What was the first Sabotage called this round?",
   "QuizmasterQuestions.LastEjectedPlayerColor": "What was the color of the player that was last ejected?",
@@ -4007,21 +3839,16 @@
   "QuizmasterQuestions.HowManyCats": "How many Cat related roles are in the Mod?",
   "QuizmasterQuestions.GuessingCommand": "What does /bt actually mean?",
   "QuizmasterQuestions.NotFromTOS2": "Which of these roles are NOT from Town of Salem 2?",
-
   "DeathReason.WrongAnswer": "Wrong Quiz Answer",
-
   "TPCooldown": "Teleport Cooldown",
   "RiftsTooClose": "Location too close to the first Rift",
   "RiftCreated": "Rift made successfully",
   "RiftsDestroyed": "All Rifts destroyed",
   "RiftRadius": "Rift Radius",
-
   "TiredVision": "Vision When Tired",
   "TiredSpeed": "Speed When Tired",
   "TiredDur": "Tired Duration",
-
   "TiredNotify": "Zzz..",
-
   "PlagueDoctorInfectLimit": "Infect Limit",
   "PlagueDoctorInfectWhenKilled": "Infect Killer When Killed",
   "PlagueDoctorInfectTime": "Infect Time",
@@ -4030,17 +3857,12 @@
   "PlagueDoctorCanInfectSelf": "Can Infect Self",
   "PlagueDoctorCanInfectVent": "Can Infect While In Vent",
   "WinnerRoleText.PlagueDoctor": "Plague Scientist Wins!",
-
   "StatueSlow": "Statue Slowness",
   "StatuePeopleToSlow": "People Needed To Slow",
-
   "WardenIncreaseSpeed": "Increase Speed By",
   "WardenWarn": "DANGER! RUN!",
-
   "Minion_Blind": "blinded",
-
   "Evader_ChanceNotExiled": "Chance to not be exiled",
-
   "ShockerAbilityPerRound": "Abilities Per Round",
   "ShockerShockInVents": "Shock people in Vents",
   "ShockerAbilityResetAfterMeeting": "Reset marked rooms after meeting",
@@ -4051,10 +3873,8 @@
   "ShockerAbilityDeactivate": "Ability Deactivated",
   "ShockerVentButtonText": "Shock",
   "ShockerRoomMarked": "Marked Room",
-
   "EavesdropperMsgTitle": "You found a secret",
   "EavesdropPercentChance": "Chance to eavesdrop",
-
   "ExorcistKill": "{0} was Exorcised",
   "ExorcistNotify": "Exorcism is being activated in <b>{0}</b> seconds",
   "ExorcistEnd": "Exorcism has ended",
@@ -4069,9 +3889,7 @@
   "ExorcismLimitMeeting": "Max exorcises per meeting",
   "ExorcismEndOnKill": "End exorcism on kill",
   "ExorcistTryHideMsg": "Try to hide exorcist's commands",
-
   "PreventSeeRolesBeforeSkillUsedUp": "Prevent seeing others roles before skill used up",
-
   "UseQuickChatSpamCheat": "Use Quick Chat Spam for commands",
   "QuickChatSpam_Disabled": "Disabled",
   "QuickChatSpam_How2PlayNormal": "How2Play Normal",
@@ -4080,13 +3898,10 @@
   "QuickChatSpam_EzHacked": "Ducked Ezly",
   "QuickChatSpam_Empty": "Empty String",
   "CrossLanguageGetRole": "Get role names from different languages for commands",
-
   "BypassRateLimitAC": "Bypass RateLimit Anticheat (Only needed on Officials)",
   "MaxSpiltReliablePacketsPerTick": "Max Reliable calls to send per tick",
   "MaxSpiltNonePacketsPerTick": "Max None calls to send per tick (useless)",
-
   "AntiBlackNotEnoughPlayersWarning": "At least 4 players is needed to bypass blackout!\nYour game does not have enough players and will casue a blackout for vanilla players.",
-
   "Runner": "Runner",
   "ModeSpeedRun": "Gamemode: Speedrun",
   "ModeDescribe.SpeedRun": "In the Speedrun Gamemode, everything is about speed. Everyone has to complete all tasks as fast as possible, then kill everyone else as fast as possible!\n\nWhen someone completes all their tasks, they become a Killer and can kill everyone else. The last player alive wins!\n\nThis Gamemode is a hybrid of the Free For All Gamemode.",
@@ -4116,7 +3931,6 @@
   "SpeedRun_LeaderBoard": "★ Cool Runners! ★",
   "MenuTitle.SpeedRun": "★ Speedrun ★",
   "SpeedRun_ShowChatInGame": "Show Chat in Game",
-
   "MenuTitle.FreeForAll": "★ Free For All ★",
   "Remaining.FFAKiller": "There are <b>{0}</b> FFA Killer in game!",
   "Remaining.FFASpectator": "<b>{0}</b> dead killers are spectating...",
@@ -4124,7 +3938,6 @@
   "Remaining.SpeedRunAliveRunner": "<b>{0}</b> Runner are rushing for a chance of life.",
   "Remaining.SpeedRunDeadKiller": "<b>{0}</b> task-finished Runner were killed in the merciless war...",
   "Remaining.SpeedRunDeadRunner": "<b>{0}</b> Runner died with uncompleted goal...",
-
   "ChiefOfPoliceSkillCooldown": "Cooldown for recruiting <color=#ffb347>Sheriffs</color>",
   "PolicCanImpostor": "Can recruit <color=#ff1919>Impostor</color>",
   "PolicCanNeutral": "Can recruit <color=#7f8c8d>Neutral</color>",
@@ -4137,7 +3950,6 @@
   "PolicPreventRecruitNonKiller": "Prevent recruit players without Kill button",
   "PolicSuidiceWhenTargetNotKiller": "Suicides when recruit a non-Killer or non-<color=#8cffff>Crewmate</color>",
   "PolicPassConverted": "Can pass Converted Add-on to <color=#ffb347>Sheriff</color>",
-
   "OnPlayerJoinMsgTitle": "【 ★ {0} Welcome！★ 】",
   "Pyrophoric": "Pyrophoric",
   "PyrophoricInfo": "Burn yourself and improve your vision",
