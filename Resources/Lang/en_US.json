@@ -4302,7 +4302,7 @@
   "CopyOnlyEnabledRoles": "Copy Only Enabled Roles",
   "BetterTaskCountColor": "任务颜色随进度更改",
   "AndroidUpdateNotSupported": "ModUpdater is unavailable on StarLight.\nPlease update via StarLight manage page.",
-  "Blaster": "爆破手",
+  "Blaster": "Blaster",
   "BlasterInfo": "放置爆炸物并杀死附近的船员",
   "BlasterInfoLong": "(内鬼阵营):\n爆破手可以使用消失按钮放置一个炸弹，炸弹会在一段时间后爆炸",
   "BlasterMark": "炸弹已安放，在{0}秒后爆炸！",
