@@ -3540,7 +3540,7 @@
   "CantRecruit": "You can't recruit a Mini that hasn't grown up.",
   "CantDuel": "You can't duel a Mini that hasn't grown up.",
   "CantMark": "You can't mark a Mini that hasn't grown up.",
-  "CantBlood": "You can't blood a Mini that hasn't grown up.",
+  "CantBlood": "你不能让这名船员流血",
   "CantPosses": "You can't possess a Mini that hasn't grown up.",
   "ExiledNiceMini": "You ejected a <color=#8cffff>Nice Mini</color> before they grew up.\n<color=#ff1919>You all lose</color>",
   "MiniUp": "You're a year older!",
