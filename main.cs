@@ -53,17 +53,17 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.4.0"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.4.0";
+    public const string PluginVersion = "1.4.1"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.5.0 Alpha 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 17.0.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.4.0 Alpha 6
+    public static readonly bool devRelease = true; // Latest: V1.5.0 Alpha 1
     public static readonly bool canaryRelease = false; // Latest: V1.4.0 Beta 3
-    public static readonly bool fullRelease = true; // Latest: V1.4.0
+    public static readonly bool fullRelease = false; // Latest: V1.4.0
 
     public static bool hasAccess = true;
 
