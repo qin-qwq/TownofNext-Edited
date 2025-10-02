@@ -13,8 +13,8 @@ internal class ControllerManagerUpdatePatch
     private static readonly (int, int)[] resolutions = [(480, 270), (640, 360), (800, 450), (1280, 720), (1600, 900), (1920, 1080)];
     private static int resolutionIndex = 0;
 
-    private static int addonInfoIndex = -1;
-    private static int addonSettingsIndex = -1;
+    //private static int addonInfoIndex = -1;
+    //private static int addonSettingsIndex = -1;
 
     public static void Postfix(/*ControllerManager __instance*/)
     {

@@ -21,6 +21,7 @@ internal class CopyCat : RoleBase
     private static OptionItem KillCooldown;
     private static OptionItem CopyCrewVar;
     private static OptionItem CopyTeamChangingAddon;
+    private static OptionItem CopyOnlyEnabledRoles;
 
     private static float CurrentKillCooldown = new();
     private static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
@@ -32,6 +33,7 @@ internal class CopyCat : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CopyCrewVar = BooleanOptionItem.Create(Id + 13, "CopyCrewVar", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
         CopyTeamChangingAddon = BooleanOptionItem.Create(Id + 14, "CopyTeamChangingAddon", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
+        CopyOnlyEnabledRoles = BooleanOptionItem.Create(Id + 15, "CopyOnlyEnabledRoles", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
     }
 
     public override void Init()
@@ -147,28 +149,34 @@ internal class CopyCat : RoleBase
                 CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 0 => CustomRoles.Overseer, // 药剂师 0 => 预言家
                 CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 1 => CustomRoles.Medic, // 药剂师 1 => 医生
                 CustomRoles.Sacrifist => CustomRoles.Alchemist, // 献祭者 => 炼金术士
-                CustomRoles.MoonDancer => CustomRoles.Merchant, // 月光舞者 => 商人
+                CustomRoles.MoonDancer or CustomRoles.Harvester or CustomRoles.Bandit => CustomRoles.Merchant, // 月光舞者，收割者，强盗 => 商人
                 CustomRoles.Jinx => CustomRoles.Crusader, // 扫把星 => 十字军
                 CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(), // 骗术师，幻术师 => 随机
                 CustomRoles.Instigator => CustomRoles.Requiter, // 教唆者 => 清算者
+                CustomRoles.Jackal => CustomRoles.ChiefOfPolice, // 豺狼 => 警察局长
+                CustomRoles.Sidekick => CustomRoles.Sheriff, // 跟班 => 警长
                 _ => role
             };
         }
         if (Lich.IsCursed(target)) role = CustomRoles.Lich;
-        if (role.IsCrewmate())
+        if (role.IsCrewmate() && (role.IsEnable() || !CopyOnlyEnabledRoles.GetBool()))
         {
             if (role != CustomRoles.CopyCat)
             {
-                killer.RpcChangeRoleBasis(role);
-                killer.RpcSetCustomRole(role, false, false);
-                killer.GetRoleClass()?.OnAdd(killer.PlayerId);
-                killer.SyncSettings();
-                Dictionary<byte, List<CustomRoles>> CurrentAddons = new();
-                CurrentAddons[killer.PlayerId] = [];
+                Dictionary<byte, List<CustomRoles>> CurrentAddons = new()
+                {
+                    [killer.PlayerId] = []
+                };
                 foreach (var addon in killer.GetCustomSubRoles())
                 {
                     CurrentAddons[killer.PlayerId].Add(addon);
                 }
+
+                killer.RpcChangeRoleBasis(role);
+                killer.RpcSetCustomRole(role, false, false);
+                killer.GetRoleClass()?.OnAdd(killer.PlayerId);
+                killer.SyncSettings();
+
                 foreach (var addon in CurrentAddons[killer.PlayerId])
                 {
                     if (!CustomRolesHelper.CheckAddonConfilct(addon, killer))

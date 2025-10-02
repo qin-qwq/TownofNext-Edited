@@ -188,10 +188,10 @@ internal class Jackal : RoleBase
             Logger.Info("Jackal run out of recruits or Recruit disabled?", "Jackal");
             return true;
         }
-        bool TargetCanBeSidekick = (CanRecruitCoven.GetBool() && target.IsPlayerCovenTeam())
+        bool TargetCanBeSidekick = ((CanRecruitCoven.GetBool() && target.IsPlayerCovenTeam())
         || (CanRecruitNeutral.GetBool() && target.IsPlayerNeutralTeam() && !target.GetCustomRole().IsNA())
         || (CanRecruitImpostor.GetBool() && target.IsPlayerImpostorTeam())
-        || target.IsPlayerCrewmateTeam();
+        || target.IsPlayerCrewmateTeam()) && !target.Is(CustomRoles.Loyal);
 
         switch (SidekickAssignMode.GetInt())
         {

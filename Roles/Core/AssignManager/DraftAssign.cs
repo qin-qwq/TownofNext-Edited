@@ -34,6 +34,8 @@ public static class DraftAssign
     {
         if (Options.CurrentGameMode != CustomGameMode.Standard) return DraftCmdResult.NoCurrentDraft;
 
+        Reset();
+
         var rd = IRandom.Instance;
         int playerCount = Main.AllAlivePlayerControls.Length;
 
@@ -678,5 +680,10 @@ public static class DraftAssign
         {
             return (DraftCmdResult.NoCurrentDraft, CustomRoles.NotAssigned);
         }
+    }
+
+    public static void SendDraftDescription(this PlayerControl player, int index)
+    {
+        // TODO
     }
 }

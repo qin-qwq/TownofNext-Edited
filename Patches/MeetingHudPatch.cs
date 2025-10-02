@@ -352,11 +352,34 @@ class CheckForEndVotingPatch
 
             if (Balancer.Choose && tie)
             {
-                var exileIds = VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).Select(kvp => kvp.Key).ToArray();
-                foreach (var playerId in exileIds)
-                GetPlayerById(playerId).SetRealKiller(null);
-                TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);
-                exiledPlayer = null;
+                byte targetId = byte.MaxValue;
+                foreach (var data in VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).ToArray())
+                {
+                    if (Tiebreaker.VoteFor.Contains(data.Key))
+                    {
+                        if (targetId != byte.MaxValue)
+                        {
+                            targetId = byte.MaxValue;
+                            break;
+                        }
+                        targetId = data.Key;
+                    }
+                }
+                if (targetId != byte.MaxValue)
+                {
+                    Logger.Info("Flat breakers cover expulsion of players", "Tiebreaker Vote");
+                    exiledPlayer = GetPlayerInfoById(targetId);
+                    tie = false;
+                    braked = true;
+                }
+                else
+                {
+                    var exileIds = VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).Select(kvp => kvp.Key).ToArray();
+                    foreach (var playerId in exileIds)
+                        GetPlayerById(playerId).SetRealKiller(null);
+                    TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);
+                    exiledPlayer = null;
+                }
             }
             if (Options.VoteMode.GetBool() && Options.WhenTie.GetBool() && tie)
             {
@@ -418,7 +441,7 @@ class CheckForEndVotingPatch
             {
                 if (exiledPlayer != null)
                 {
-                    ConfirmEjections(exiledPlayer);
+                    ConfirmEjections(exiledPlayer, Tiebreaker: braked);
                 }
 
                 __instance.RpcVotingComplete(states, exiledPlayer, tie); // Normal processing
@@ -436,7 +459,7 @@ class CheckForEndVotingPatch
     }
 
     // Credit：https://github.com/music-discussion/TownOfHost-TheOtherRoles
-    public static void ConfirmEjections(NetworkedPlayerInfo exiledPlayer, bool AntiBlackoutStore = false)
+    public static void ConfirmEjections(NetworkedPlayerInfo exiledPlayer, bool AntiBlackoutStore = false, bool Tiebreaker = false)
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (exiledPlayer == null) return;
@@ -560,6 +583,7 @@ class CheckForEndVotingPatch
 
         CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiledPlayer, ref DecidedWinner, isMeetingHud: true, name: ref name));
 
+        if (Tiebreaker) name += $"({Utils.ColorString(Utils.GetRoleColor(CustomRoles.Tiebreaker), GetString("Tiebreaker"))})";
         if (DecidedWinner) name += "<size=0>";
         if (Options.ShowImpRemainOnEject.GetBool() && !DecidedWinner)
         {
@@ -1310,6 +1334,24 @@ class MeetingHudStartPatch
                 }
                 ChatUpdatePatch.DoBlockChat = false;
             }, 3f, "SetName To Chat");
+
+            if (Options.UseMeetingShapeshift.GetBool())
+            {
+                _ = new LateTask(() =>
+                {
+                    if (!MeetingHud.Instance || MeetingHud.Instance.state is MeetingHud.VoteStates.Results or MeetingHud.VoteStates.Proceeding) return;
+
+                    foreach (var pc in Main.AllAlivePlayerControls)
+                    {
+                        if (pc.UsesMeetingShapeshift())
+                        {
+                            pc.RpcSetRoleDesync(RoleTypes.Shapeshifter, pc.GetClientId());
+                            if (pc.GetCustomRole().IsImpostor())
+                                pc.RpcSetRoleDesync(RoleTypes.Crewmate, pc.GetClientId());
+                        }
+                    }
+                }, 8f, "Set Shapeshifter Role For Meeting Use");
+            }
         }
 
         foreach (var pva in __instance.playerStates)
@@ -1516,6 +1558,12 @@ class MeetingHudOnDestroyPatch
             AntiBlackout.SetIsDead();
 
             Main.LastVotedPlayerInfo = null;
+            if (Options.UseMeetingShapeshift.GetBool() && !AntiBlackout.SkipTasks)
+            {
+                var pc = Main.AllAlivePlayerControls;
+                pc.DoIf(x => x.UsesMeetingShapeshift(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
+                pc.DoIf(x => x.GetCustomRole().IsImpostor(), x => x.RpcSetRoleGlobal(x.GetCustomRole().GetRoleTypes()));
+            }
             EAC.ReportTimes = [];
         }
     }

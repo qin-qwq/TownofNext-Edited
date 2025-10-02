@@ -232,7 +232,7 @@ internal class RPCHandlerPatch
         if (callId < (byte)CustomRPC.VersionCheck) return;
 
         var rpcType = (CustomRPC)callId;
-        int seerId = -1;
+        //int seerId = -1;
         switch (rpcType)
         {
             case CustomRPC.AntiBlackout:
@@ -375,8 +375,8 @@ internal class RPCHandlerPatch
                 RPC.PlaySound(playerID, sound);
                 break;
             case CustomRPC.ShowPopUp:
-                seerId = reader.ReadPackedInt32();
-                if (seerId != PlayerControl.LocalPlayer.PlayerId) break;
+                //seerId = reader.ReadPackedInt32();
+                //if (seerId != PlayerControl.LocalPlayer.PlayerId) break;
                 string message = reader.ReadString();
                 string title = reader.ReadString();
 
@@ -656,8 +656,8 @@ internal class RPCHandlerPatch
                 Investigator.ReceiveRPC(reader);
                 break;
             case CustomRPC.KillFlash:
-                seerId = reader.ReadPackedInt32();
-                if (seerId != PlayerControl.LocalPlayer.PlayerId) break;
+                //seerId = reader.ReadPackedInt32();
+                //if (seerId != PlayerControl.LocalPlayer.PlayerId) break;
                 Utils.FlashColor(new(1f, 0f, 0f, 0.3f));
                 var playKillSound = reader.ReadBoolean();
                 if (Constants.ShouldPlaySfx()) RPC.PlaySound(PlayerControl.LocalPlayer.PlayerId, playKillSound ? Sounds.KillSound : Sounds.SabotageSound);
@@ -860,13 +860,14 @@ internal static class RPC
         var message = new RpcSyncAllPlayerNames(PlayerControl.LocalPlayer.NetId);
         RpcUtils.LateBroadcastReliableMessage(message);
     }
+    /*
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
         var msg = new RpcShowPopUp(PlayerControl.LocalPlayer.NetId, pc.PlayerId, message, title);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }
-    /*
+    */
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -875,7 +876,6 @@ internal static class RPC
         writer.Write(title);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
-    */
     public static void RpcSetFriendCode(string fc)
     {
         var msg = new RpcSetFriendCode(PlayerControl.LocalPlayer.NetId, fc);

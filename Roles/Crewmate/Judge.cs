@@ -17,6 +17,7 @@ internal class Judge : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Judge;
     private const int Id = 10700;
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\
@@ -101,6 +102,10 @@ internal class Judge : RoleBase
     {
         if (!_Player) return;
         _Player.SetAbilityUseLimit(TrialLimitGame[_Player.PlayerId]);
+    }
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        TrialMsg(pc, $"/tl {target.PlayerId}", true);
     }
     public static bool TrialMsg(PlayerControl pc, string msg, bool isUI = false)
     {

@@ -253,8 +253,9 @@ public static class Utils
         }
         else if (player.IsNonHostModdedClient())
         {
-            var msg = new RpcKillFlash(PlayerControl.LocalPlayer.NetId, player.PlayerId, playKillSound);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.KillFlash, SendOption.Reliable, player.GetClientId());
+            writer.Write(playKillSound);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
         else if (!ReactorCheck) player.ReactorFlash(0f); //Reactor flash for vanilla
         player.MarkDirtySettings();
@@ -755,6 +756,13 @@ public static class Utils
             var info = GetPlayerInfoById(playerId);
             var TaskCompleteColor = HasTasks(info) ? Color.green : GetRoleColor(Main.PlayerStates[playerId].MainRole).ShadeColor(0.5f);
             var NonCompleteColor = HasTasks(info) ? Color.yellow : Color.white;
+            if (Options.BetterTaskCountColor.GetBool())
+            {
+                Color nonCompleteColorStart = new Color32(203, 61, 64, 255);
+                Color nonCompleteColorEnd = TaskCompleteColor = new Color32(15, 249, 137, 255);
+                float progress = (float)taskState.CompletedTasksCount / taskState.AllTasksCount;
+                NonCompleteColor = Color.Lerp(nonCompleteColorStart, nonCompleteColorEnd, progress);
+            }
 
             if (Workhorse.IsThisRole(playerId))
                 NonCompleteColor = Workhorse.RoleColor;
@@ -1378,14 +1386,22 @@ public static class Utils
     public static bool IsPlayerModerator(string friendCode)
     {
         if (friendCode == "") return false;
-        var friendCodesFilePath = @$"{Main.TONE_Initial_Path}/Moderators.txt";
+#if ANDROID
+        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
+#else
+        var friendCodesFilePath = @"./TONE-DATA/Moderators.txt";
+#endif
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
     public static bool IsPlayerVIP(string friendCode)
     {
         if (friendCode == "") return false;
-        var friendCodesFilePath = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
+#if ANDROID
+        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
+#else
+        var friendCodesFilePath = @"./TONE-DATA/VIP-List.txt";
+#endif
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
@@ -1539,7 +1555,11 @@ public static class Utils
         {
             if (IsPlayerVIP(player.FriendCode))
             {
-                string colorFilePath = @$"{Main.TONE_Initial_Path}/Tags/VIP_TAGS/{player.FriendCode}.txt";
+#if ANDROID
+                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS", $"{player.FriendCode}.txt");
+#else
+                string colorFilePath = @$"./TONE-DATA/Tags/VIP_TAGS/{player.FriendCode}.txt";
+#endif
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -1583,7 +1603,11 @@ public static class Utils
         {
             if (IsPlayerModerator(player.FriendCode))
             {
-                string colorFilePath = @$"{Main.TONE_Initial_Path}/Tags/MOD_TAGS/{player.FriendCode}.txt";
+#if ANDROID
+                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS", $"{player.FriendCode}.txt");
+#else
+                string colorFilePath = @$"./TONE-DATA/Tags/MOD_TAGS/{player.FriendCode}.txt";
+#endif
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {

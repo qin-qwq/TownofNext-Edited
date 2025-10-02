@@ -19,6 +19,7 @@ internal class Swapper : RoleBase
     public override CustomRoles Role => CustomRoles.Swapper;
     private const int Id = 12400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swapper);
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\
@@ -57,6 +58,11 @@ internal class Swapper : RoleBase
 
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
         => IsForMeeting && seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Swapper), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
+
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        SwapMsg(pc, $"/sw {target.PlayerId}", true);
+    }
 
     public bool SwapMsg(PlayerControl pc, string msg, bool isUI = false)
     {

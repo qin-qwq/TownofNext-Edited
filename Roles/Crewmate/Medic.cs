@@ -220,6 +220,7 @@ internal class Medic : RoleBase
         {
             medic.RpcSetRoleDesync(RoleTypes.Scientist, medicClientId);
         }
+        Main.DesyncPlayerList.Remove(medic.PlayerId);
         medic.RpcResetTasks();
     }
     public override void AfterMeetingTasks()

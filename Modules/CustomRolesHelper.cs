@@ -235,6 +235,10 @@ public static class CustomRolesHelper
         // Based on Imp but counted as crewmate
         return role.HasImpBasis() && role.IsCrewmate();
     }
+    public static bool IsMeetingShapeshifterRole(this CustomRoles role)
+    {
+        return role.GetStaticRoleClass().IsMsr;
+    }
     public static bool IsTaskBasedCrewmate(this CustomRoles role)
     {
         return role is
@@ -320,7 +324,8 @@ public static class CustomRolesHelper
         return role is
             CustomRoles.Impostor or
             CustomRoles.Shapeshifter or
-            CustomRoles.Phantom;
+            CustomRoles.Phantom or
+            CustomRoles.Viper;
     }
     public static bool IsCoven(this CustomRoles role)
     {
@@ -381,7 +386,8 @@ public static class CustomRolesHelper
             CustomRoles.Glitch or
             CustomRoles.Pickpocket or
             CustomRoles.Stubborn or
-            CustomRoles.Stealer;
+            CustomRoles.Stealer or
+            CustomRoles.Archaeologist;
     }
     public static bool IsSpeedRole(this CustomRoles role)
     {
@@ -519,7 +525,7 @@ public static class CustomRolesHelper
             CustomRoles.Infected => Infectious.CanBeBitten(target),
             CustomRoles.Contagious => target.CanBeInfected(),
             CustomRoles.Soulless => CursedSoul.CanBeSoulless(target),//Cursed Soul recruits players to Soulless by default
-            _ => true
+            _ => false
         };
     }
 
@@ -695,7 +701,6 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.SuperStar)
                     || Doctor.VisibleToEveryone(pc)
                     || (pc.Is(CustomRoles.Bait) && Bait.BaitNotification.GetBool())
-                    || pc.Is(CustomRoles.LastImpostor)
                     || pc.Is(CustomRoles.NiceMini)
                     || pc.Is(CustomRoles.Mare)
                     || pc.Is(CustomRoles.Solsticer)
@@ -709,7 +714,6 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.SuperStar)
                     || Doctor.VisibleToEveryone(pc)
                     || (pc.Is(CustomRoles.Bait) && Bait.BaitNotification.GetBool())
-                    || pc.Is(CustomRoles.LastImpostor)
                     || pc.Is(CustomRoles.NiceMini)
                     || pc.Is(CustomRoles.Mare)
                     || pc.Is(CustomRoles.Solsticer)
@@ -1111,8 +1115,6 @@ public static class CustomRolesHelper
             case CustomRoles.Circumvent:
                 if (pc.GetCustomRole() is CustomRoles.Vampire && !Vampire.CheckCanUseVent()
                     || pc.Is(CustomRoles.Witch) && Witch.ModeSwitchActionOpt.GetValue() == 1
-                    || pc.Is(CustomRoles.Swooper)
-                    || pc.Is(CustomRoles.Wildling)
                     || pc.Is(CustomRoles.KillingMachine)
                     || pc.Is(CustomRoles.Lurker)
                     || pc.Is(CustomRoles.Miner)
@@ -1347,6 +1349,10 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Cupid)
                 )
                     return false;
+                break;
+
+            case CustomRoles.Rat:
+                if (pc.Is(CustomRoles.God)) return false;
                 break;
         }
 

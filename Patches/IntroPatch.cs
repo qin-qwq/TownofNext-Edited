@@ -77,12 +77,20 @@ class CoBeginPatch
     }
 }
 
+#if !ANDROID
 [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
+#else
+[HarmonyPatch(typeof(IntroCutscene._ShowRole_d__40), nameof(IntroCutscene._ShowRole_d__40.MoveNext))]
+#endif
 class SetUpRoleTextPatch
 {
     public static bool IsInIntro = false;
 
+#if !ANDROID
     public static void Postfix(IntroCutscene._ShowRole_d__41 __instance, ref bool __result)
+#else
+    public static void Postfix(IntroCutscene._ShowRole_d__40 __instance, ref bool __result)
+#endif
     {
         if (__instance.__1__state == 1 && __result) // while wait for 2.5s
         {
@@ -853,7 +861,7 @@ class BeginImpostorPatch
     }
 }
 // Android not have "IntroCutscene.OnDestroy" so need use "HudManager.OnGameStart"
-#if DEBUGANDROID || BETAANDROID || RELEASEANDROID
+#if ANDROID
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.OnGameStart))]
 #else
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]

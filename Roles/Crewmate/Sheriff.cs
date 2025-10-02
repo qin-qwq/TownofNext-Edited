@@ -21,7 +21,7 @@ internal class Sheriff : RoleBase
     private static OptionItem MisfireKillsTarget;
     public static OptionItem ShotLimitOpt;
     public static OptionItem ShowShotLimit;
-    private static OptionItem CanKillAllAlive;
+    private static OptionItem CanKillBeforeFirstMeeting;
     private static OptionItem CanKillCoven;
     private static OptionItem MisfireOnAdmired;
     private static OptionItem CanKillNeutrals;
@@ -61,7 +61,7 @@ internal class Sheriff : RoleBase
         ShotLimitOpt = IntegerOptionItem.Create(Id + 12, "SheriffShotLimit", new(1, 15, 1), 6, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff])
             .SetValueFormat(OptionFormat.Times);
         ShowShotLimit = BooleanOptionItem.Create(Id + 13, "SheriffShowShotLimit", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
-        CanKillAllAlive = BooleanOptionItem.Create(Id + 15, "SheriffCanKillAllAlive", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
+        CanKillBeforeFirstMeeting = BooleanOptionItem.Create(Id + 15, "CanKillBeforeFirstMeeting", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
         CanKillMadmate = BooleanOptionItem.Create(Id + 17, "SheriffCanKillMadmate", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
         CanKillCharmed = BooleanOptionItem.Create(Id + 22, "SheriffCanKillCharmed", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
         CanKillLovers = BooleanOptionItem.Create(Id + 24, "SheriffCanKillLovers", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sheriff]);
@@ -108,7 +108,7 @@ internal class Sheriff : RoleBase
 
     public override bool CanUseKillButton(PlayerControl pc) => IsUseKillButton(pc);
     public static bool IsUseKillButton(PlayerControl pc)
-        => (CanKillAllAlive.GetBool() || GameStates.AlreadyDied) && pc.GetAbilityUseLimit() > 0;
+        => (CanKillBeforeFirstMeeting.GetBool() || !MeetingStates.FirstMeeting) && pc.GetAbilityUseLimit() > 0;
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {

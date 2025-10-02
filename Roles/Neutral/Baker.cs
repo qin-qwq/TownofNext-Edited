@@ -82,7 +82,7 @@ internal class Baker : RoleBase
     private static (int, int) BreadedPlayerCount(byte playerId)
     {
         int breaded = 0, all = BreadNeededToTransform.GetInt();
-        if (all == 0 || Main.AllAlivePlayerControls.Length == 0) return (0, 100);
+        if (all == 0 || Main.AllAlivePlayerControls.Length == 0) return (-1, 100);
         foreach (var pc in Main.AllAlivePlayerControls)
         {
             if (pc.PlayerId == playerId) continue;
@@ -209,7 +209,7 @@ internal class Baker : RoleBase
             }
         }
     }
-    public override bool OnCheckVanish(PlayerControl pc)
+    public override bool OnCheckVanish(PlayerControl pc, float killCooldown)
     {
         if (BTOS2Baker.GetBool())
         {
@@ -343,6 +343,8 @@ internal class Baker : RoleBase
 
         if (AllHasBread(player) || (TransformNoMoreBread.GetBool() && BreadedPlayerCount(player.PlayerId).Item1 >= Main.AllAlivePlayerControls.Where(x => !x.IsNeutralApocalypse() && !Main.PlayerStates[x.PlayerId].IsNecromancer).Count()))
         {
+            var bread = BreadedPlayerCount(player.PlayerId);
+            Logger.Info($"{player.GetRealName()} transformed to Famine with {bread.Item1}/{bread.Item2} bread", "Baker");
             player.RpcChangeRoleBasis(CustomRoles.Famine);
             player.RpcSetCustomRole(CustomRoles.Famine);
             player.GetRoleClass()?.OnAdd(_Player.PlayerId);

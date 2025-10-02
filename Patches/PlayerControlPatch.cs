@@ -607,6 +607,12 @@ public static class CheckShapeshiftPatch
         logger.Info($"Self:{shapeshifter.PlayerId == target.PlayerId} - Is animate:{shouldAnimate} - In Meeting:{GameStates.IsMeeting}");
 
         var shapeshifterRoleClass = shapeshifter.GetRoleClass();
+        if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
+        {
+            shapeshifterRoleClass?.OnMeetingShapeshift(shapeshifter, target);
+            shapeshifter.RpcRejectShapeshift();
+            return false;
+        }
         if (shapeshifterRoleClass?.OnCheckShapeshift(shapeshifter, target, ref resetCooldown, ref shouldAnimate) == false)
         {
             // role need specific reject shapeshift if player use desync shapeshift
@@ -657,7 +663,7 @@ public static class CheckShapeshiftPatch
             logger.Info("Shapeshifting canceled because mushroom mixup is active");
             return false;
         }
-        if (MeetingHud.Instance && animate)
+        if (MeetingHud.Instance && animate && !instance.UsesMeetingShapeshift())
         {
             logger.Info("Cancel shapeshifting in meeting");
             return false;
@@ -1044,7 +1050,6 @@ class FixedUpdateInNormalGamePatch
         }
         catch (Exception ex)
         {
-            if (string.IsNullOrEmpty(__instance.GetNameWithRole().Trim())) return;
             Utils.ThrowException(ex);
             Logger.Error($"Error for {__instance.GetNameWithRole().RemoveHtmlTags()}: Error: {ex}", "FixedUpdateInNormalGamePatch");
         }
@@ -1059,6 +1064,11 @@ class FixedUpdateInNormalGamePatch
         var localPlayer = PlayerControl.LocalPlayer;
         byte localPlayerId = localPlayer.PlayerId;
         var player = __instance;
+        if (player == null)
+        {
+            Logger.Warn("player was null", "FixedUpdateInNormalGamePatch");
+            return;
+        }
         byte playerId = player.PlayerId;
 
         var playerData = player.Data;
@@ -1380,13 +1390,6 @@ class FixedUpdateInNormalGamePatch
                 // }
                 roleText.text = result.ToString();
             }
-
-            // if (localPlayer.IsAlive() && Lich.IsCursed(player) && Lich.IsDeceived(localPlayer, player))
-            // {
-            //     StringBuilder blankRT = new(CustomRoles.Lich.ToColoredString());
-            //     blankRT.Append(CustomRoles.Lich.GetStaticRoleClass().GetProgressText(localPlayerId, false));
-            //     roleText.text = $"<size=1.3>{blankRT}</size>";
-            // }
 
             if (!amongUsClient.IsGameStarted && amongUsClient.NetworkMode != NetworkModes.FreePlay)
             {

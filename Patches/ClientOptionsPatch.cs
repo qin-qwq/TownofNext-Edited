@@ -22,7 +22,7 @@ public static class OptionsMenuBehaviourStartPatch
     private static ClientOptionItem EnableCustomDecorations;
     private static ClientOptionItem SwitchVanilla;
 
-#if DEBUGWINDOWS || DEBUGANDROID
+#if DEBUG
     private static ClientOptionItem VersionCheat;
     private static ClientOptionItem GodMode;
     private static ClientOptionItem AutoRehost;
@@ -147,7 +147,7 @@ public static class OptionsMenuBehaviourStartPatch
             }
         }
 
-#if DEBUGWINDOWS || DEBUGANDROID
+#if DEBUG
         if (EOSManager.Instance.friendCode.GetDevUser().DeBug)
         {
             if ((VersionCheat == null || VersionCheat.ToggleButton == null) && DebugModeManager.AmDebugger)

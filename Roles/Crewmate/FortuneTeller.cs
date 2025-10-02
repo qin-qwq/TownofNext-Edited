@@ -15,6 +15,7 @@ internal class FortuneTeller : RoleBase
     public override CustomRoles Role => CustomRoles.FortuneTeller;
     private const int Id = 8000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.FortuneTeller);
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
@@ -46,6 +47,10 @@ internal class FortuneTeller : RoleBase
     private static string GetTargetRoleList(CustomRoles[] roles)
     {
         return roles != null ? string.Join("\n", roles.Select(role => $"    ★ {GetRoleName(role)}")) : "";
+    }
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckVote(pc, target);
     }
     public override bool CheckVote(PlayerControl player, PlayerControl target)
     {
@@ -104,7 +109,7 @@ internal class FortuneTeller : RoleBase
 
             if (Lich.IsCursed(target))
                 msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRoles.Lich.GetActualRoleName()));
-    
+
         }
         else if (RandomActiveRoles.GetBool())
         {

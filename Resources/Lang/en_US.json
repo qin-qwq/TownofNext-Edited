@@ -4281,7 +4281,7 @@
   "Arq": "Master Key",
   "TimeAssassin": "Time Assassin",
   "TimeAssassinInfo": "Stop time, killing becomes poetry!",
-  "TimeAssassinInfoLong": "(Impostors):\nThe Time Assassin can use deformation to pause time.When time stops,except Time Assassin All players cannot move",
+  "TimeAssassinInfoLong": "(Impostors)\nThe Time Assassin can use the Vanish Button to freeze time when no sabotage is active. While time is frozen, only the Time Assassin can move — all other players are paralyzed",
   "TimeAssassinShapeShifterButtonText": "Time stops",
   "TimeStopStart": "Time stops and starts",
   "TimeStopEnd": "Time resumes",
@@ -4331,7 +4331,7 @@
   "GodfatherCloseMeeting": "The Godfather stopped the meeting",
   "Tunny": "Tunny",
   "TunnyInfo": "Keep moving to stay alive",
-  "TunnyInfoLong": "(中立阵营):\n金枪鱼需要一直移动才能存活，活到最后就能胜利\n提示：第一轮会议前不移动也可以存活",
+  "TunnyInfoLong": "(Neutral)\nTunny must keep moving to stay alive. Survive to the end to follow the victory.\nNote： staying still is allowed before the first meeting",
   "DeathReason.Suffocate": "Choke",
   "CanWaitTime": "Can stay time",
   "CanWaitTimeAfterMeeting": "Meeting after can stay time",
@@ -4421,7 +4421,7 @@
   "NoCurrentDraft": "No Current Draft",
   "InvalidDraftSelection": "Invalid Draft Selection",
 
-  "DraftPoolMessage": "Your Draft Pool:\n{0}\n\nTo draft a role, do /draft [number]\n/draft -1 to clear your draft pick",
+  "DraftPoolMessage": "Your Draft Pool:\n{0}\n\nTo draft a role, do /draft [number]\n/draft 11 to clear your draft pick",
   "DraftSelectionCleared": "Draft Selection Cleared",
   "DraftSelection": "Role: {0} selected",
 
@@ -4470,5 +4470,22 @@
   "BakerRevealsPersist": "<color=#ff174f>Apocalypse</color> can see Reveals after Baker dies",
   "ConsigliereRevealsPersist": "<color=#ff1919>Impostors</color> can see Reveals after Consigliere dies",
   "JudgeCanTrialAdmired": "Can trial <color=#ee43c3>Admired</color> players",
-  "Necromancer.PreventKillerButtoning": "Prevent killer from callling meeting while hunted"
+  "Necromancer.PreventKillerButtoning": "Prevent killer from callling meeting while hunted",
+
+  "CompatibilityMode": "Compatibility Mode",
+  "UseMeetingShapeshift": "Shapeshift in meetings to use commands",
+  "CanAdmireImp": "Can be admired<color=#ff1919>impostors</color>",
+  "CanAdmireCrew": "Can be admired<color=#8cffff>Crewmates</color>",
+  "CanAdmireNeutral": "Can be admired<color=#7f8c8d>Neutral</color>",
+  "CanAdmireCoven": "Can be admired<color=#ac42f2>Coven</color>",
+  "MisfireAdmireTarget": "Admire Misfires on Target",
+  "CopyOnlyEnabledRoles": "Copy Only Enabled Roles",
+  "BetterTaskCountColor": "任务颜色随进度更改",
+  "AndroidUpdateNotSupported": "ModUpdater is unavailable on StarLight.\nPlease update via StarLight manage page.",
+  "Blaster": "爆破手",
+  "BlasterInfo": "放置爆炸物并杀死附近的船员",
+  "BlasterInfoLong": "(内鬼阵营):\n爆破手可以使用消失按钮放置一个炸弹，炸弹会在一段时间后爆炸",
+  "BlasterMark": "炸弹已安放，在{0}秒后爆炸！",
+  "BombDelayTime": "延迟爆炸时间",
+  "BlasterPhantomText": "放置"
 }

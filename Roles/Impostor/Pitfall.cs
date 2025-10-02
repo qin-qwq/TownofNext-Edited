@@ -87,7 +87,7 @@ internal class Pitfall : RoleBase
     }
     // public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Set Trap");
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         //if (!CheckUnshapeshift) return;
         Logger.Info($"Triggered Pitfall Ability!!!", "Pitfall");

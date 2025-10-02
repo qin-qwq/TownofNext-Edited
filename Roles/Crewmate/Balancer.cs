@@ -11,6 +11,7 @@ internal class Balancer : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Balancer;
     private const int Id = 32700;
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\
@@ -40,8 +41,14 @@ internal class Balancer : RoleBase
         Target2 = 253;
     }
 
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckVote(pc, target);
+    }
+
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
+        if (Choose) return true;
         if (voter.GetAbilityUseLimit() < 1) return true;
         if (voter == null || target == null) return true;
         if (voter.IsHost()) return true;
@@ -94,17 +101,19 @@ internal class Balancer : RoleBase
 
         if (Target1 == deadid)
         {
-            TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target2);
+            //TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target2);
             List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
+            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target2.GetPlayer().Data, false);
+            ConfirmEjections(Target2.GetPlayer().Data);
+            //MeetingHud.Instance.RpcClose();
         }
         if (Target2 == deadid)
         {
-            TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target1);
+            //TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target1);
             List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
+            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target1.GetPlayer().Data, false);
+            ConfirmEjections(Target1.GetPlayer().Data);
+            //MeetingHud.Instance.RpcClose();
         }
     }
     public static void BalancerAfterMeetingTasks()

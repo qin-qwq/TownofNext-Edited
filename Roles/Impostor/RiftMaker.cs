@@ -123,7 +123,7 @@ internal class RiftMaker : RoleBase
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         var shapeshifterId = shapeshifter.PlayerId;
 

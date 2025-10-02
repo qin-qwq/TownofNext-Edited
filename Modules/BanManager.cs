@@ -10,11 +10,19 @@ namespace TOHE;
 
 public static class BanManager
 {
-    private static readonly string DenyNameListPath = @$"{Main.TONE_Initial_Path}/DenyName.txt";
-    private static readonly string BanListPath = @$"{Main.TONE_Initial_Path}/BanList.txt";
-    private static readonly string ModeratorListPath = @$"{Main.TONE_Initial_Path}/Moderators.txt";
-    private static readonly string VIPListPath = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
-    private static readonly string WhiteListListPath = @$"{Main.TONE_Initial_Path}/WhiteList.txt";
+#if ANDROID
+    private static string DenyNameListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "DenyName.txt");
+    private static string BanListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "BanList.txt");
+    private static string ModeratorListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
+    private static string VIPListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
+    private static string WhiteListListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "WhiteList.txt");
+#else
+    private static string DenyNameListPath = "./TONE-DATA/DenyName.txt";
+    private static string BanListPath = "./TONE-DATA/BanList.txt";
+    private static string ModeratorListPath = "./TONE-DATA/Moderators.txt";
+    private static string VIPListPath = "./TONE-DATA/VIP-List.txt";
+    private static string WhiteListListPath = "./TONE-DATA/WhiteList.txt";
+#endif
     //private static List<string> EACList = []; // Don't make it read-only
     public static List<string> TempBanWhiteList = []; //To prevent writing to ban list
     public static List<Dictionary<string, System.Text.Json.JsonElement>> EACDict = [];
@@ -22,7 +30,11 @@ public static class BanManager
     {
         try
         {
-            Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
+#if ANDROID
+            Directory.CreateDirectory(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA"));
+#else
+            Directory.CreateDirectory("TONE-DATA");
+#endif
 
             if (!File.Exists(BanListPath))
             {
@@ -115,27 +127,17 @@ public static class BanManager
 
         try
         {
-            Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
+#if ANDROID
+            Directory.CreateDirectory(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA"));
+#else
+            Directory.CreateDirectory("TONE-DATA");
+#endif
             if (!File.Exists(DenyNameListPath)) File.Create(DenyNameListPath).Close();
             using StreamReader sr = new(DenyNameListPath);
             string line;
             while ((line = sr.ReadLine()) != null)
             {
                 if (line == "") continue;
-                if (line.Contains("Amogus"))
-                {
-                    AmongUsClient.Instance.KickPlayer(player.OwnerId, false);
-                    Logger.SendInGame(string.Format(GetString("Message.KickedByDenyName"), name, line));
-                    Logger.Info($"{name}は名前が「{line}」に一致したためキックされました。", "Kick");
-                    return true;
-                }
-                if (line.Contains("Amogus V"))
-                {
-                    AmongUsClient.Instance.KickPlayer(player.OwnerId, false);
-                    Logger.SendInGame(string.Format(GetString("Message.KickedByDenyName"), name, line));
-                    Logger.Info($"{name}は名前が「{line}」に一致したためキックされました。", "Kick");
-                    return true;
-                }
 
                 if (Regex.IsMatch(name, line))
                 {
@@ -198,7 +200,11 @@ public static class BanManager
 
         try
         {
-            Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
+#if ANDROID
+            Directory.CreateDirectory(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA"));
+#else
+            Directory.CreateDirectory("TONE-DATA");
+#endif
             if (!File.Exists(BanListPath)) File.Create(BanListPath).Close();
             using StreamReader sr = new(BanListPath);
             string line;

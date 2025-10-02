@@ -75,7 +75,7 @@ public static class Options
     public static OptionItem DraftMode;
     public static OptionItem CompatibilityMode;
     public static OptionItem DraftableCount;
-    public static OptionItem BucketCount;
+    //public static OptionItem BucketCount;
     public static bool devEnableDraft = false;
     public static readonly string[] roleBuckets =
     [
@@ -439,6 +439,7 @@ public static class Options
     public static OptionItem WhenNonVote;
     public static OptionItem WhenTie;
     public static OptionItem ShowMeetingReason;
+    public static OptionItem UseMeetingShapeshift;
 
     // Other
     public static OptionItem LadderDeath;
@@ -457,6 +458,7 @@ public static class Options
     public static OptionItem KillFlashDuration;
     public static OptionItem NonCrewRandomCommonTasks;
     public static OptionItem UniqueNeutralRevealScreen;
+    public static OptionItem BetterTaskCountColor;
 
     // Ghost
     public static OptionItem GhostIgnoreTasks;
@@ -1414,13 +1416,13 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode);
 
-        BucketCount = IntegerOptionItem.Create(61003, "BucketCount", new(5, 225, 1), 15, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetParent(DraftMode)
-            .RegisterUpdateValueEvent((obj, args) => BucketCountChanged(args));
+        // BucketCount = IntegerOptionItem.Create(61002, "BucketCount", new(5, 225, 1), 15, TabGroup.ModSettings, false)
+        //     .SetGameMode(CustomGameMode.Standard)
+        //     .SetParent(DraftMode)
+        //     .RegisterUpdateValueEvent((obj, args) => BucketCountChanged(args));
 
-        DraftBuckets = MultipleStringOptionItem.Create(61004, 225, BucketCount.GetInt() + 5, "RoleBucket", roleBuckets, 0, TabGroup.ModSettings, false, useGetString: false)
-            .SetParent(BucketCount)
+        DraftBuckets = MultipleStringOptionItem.Create(61004, 225, 15, "RoleBucket", roleBuckets, 0, TabGroup.ModSettings, false, useGetString: false)
+            .SetParent(DraftableCount)
             .SetGameMode(CustomGameMode.Standard);
 
         Logger.Info("Draft Bucket Options set up", "OptionsHolder.CoLoadOptions");
@@ -2089,7 +2091,10 @@ public static class Options
         ShouldVoteCmdsSpamChat = BooleanOptionItem.Create(60747, "ShouldVoteSpam", false, TabGroup.ModSettings, false)
             .SetParent(EnableVoteCommand)
             .SetGameMode(CustomGameMode.Standard);
-        ShowMeetingReason = BooleanOptionItem.Create(60750, "ShowMeetingReason", false, TabGroup.ModSettings, false)
+        ShowMeetingReason = BooleanOptionItem.Create(60748, "ShowMeetingReason", false, TabGroup.ModSettings, false)
+            .SetColor(new Color32(147, 241, 240, byte.MaxValue))
+            .SetGameMode(CustomGameMode.Standard);
+        UseMeetingShapeshift = BooleanOptionItem.Create(60749, "UseMeetingShapeshift", false, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
         // 其它设定
@@ -2152,6 +2157,9 @@ public static class Options
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
 
         UniqueNeutralRevealScreen = BooleanOptionItem.Create(60792, "UniqueNeutralRevealScreen", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(193, 255, 209, byte.MaxValue));
+        BetterTaskCountColor = BooleanOptionItem.Create(60793, "BetterTaskCountColor", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
         // 幽灵相关设定

@@ -6,7 +6,11 @@ namespace TOHE;
 
 public static class TagManager
 {
-    private static readonly string TAGS_FILE_PATH = @$"{Main.TONE_Initial_Path}/Tags";
+#if ANDROID
+    private static readonly string TAGS_FILE_PATH = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags");
+#else
+    private static readonly string TAGS_FILE_PATH = "./TONE-DATA/Tags";
+#endif
 
     public static void Init()
     {
@@ -17,13 +21,21 @@ public static class TagManager
     {
         try
         {
-            if (!Directory.Exists(TAGS_FILE_PATH)) Directory.CreateDirectory(TAGS_FILE_PATH);
+#if ANDROID
+            string dataDirectory = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags");
+            string templateFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "Tag_Template.txt");
+#else
+            string dataDirectory = @"TONE-DATA/Tags";
+            string templateFilePath = @"./TONE-DATA/Tags/Tag_Template.txt";
+#endif
+
+            if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
             var defaultTagMsg = GetResourcesTxt($"TOHE.Resources.Config.TagTemplate.txt");
-            if (!File.Exists(@$"{TAGS_FILE_PATH}/Tag_Template.txt")) // Default tag
+            if (!File.Exists(templateFilePath)) // Default tag
             {
-                using FileStream fs = File.Create(@$"{TAGS_FILE_PATH}/Tag_Template.txt");
+                using FileStream fs = File.Create(templateFilePath);
             }
-            File.WriteAllText(@$"{TAGS_FILE_PATH}/Tag_Template.txt", defaultTagMsg); // Overwriting default template
+            File.WriteAllText(templateFilePath, defaultTagMsg); // Overwriting default template
         }
         catch (Exception ex)
         {

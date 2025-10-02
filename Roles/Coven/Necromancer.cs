@@ -125,7 +125,7 @@ internal class Necromancer : CovenManager
     {
         return string.Format(GetString(GeneralOption.AbilityCooldown.ToString()) + ": {0:F0}s / {1:F0}s", AbilityTimer, AbilityCooldown.GetFloat());
     }
-    public override bool OnCheckVanish(PlayerControl nm)
+    public override bool OnCheckVanish(PlayerControl nm, float killCooldown)
     {
         if (nm == null) return false;
         if (!canUseAbility)

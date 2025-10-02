@@ -14,6 +14,7 @@ internal class Oracle : RoleBase
     public override CustomRoles Role => CustomRoles.Oracle;
     private const int Id = 9100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Oracle);
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
@@ -43,6 +44,10 @@ internal class Oracle : RoleBase
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(CheckLimitOpt.GetFloat());
+    }
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckVote(pc, target);
     }
     public override bool CheckVote(PlayerControl player, PlayerControl target)
     {

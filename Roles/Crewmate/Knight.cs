@@ -21,6 +21,7 @@ internal class Knight : RoleBase
 
     public static OptionItem KillCooldown;
     public static OptionItem CanKnowTargetRole;
+    public static OptionItem CanKillBeforeFirstMeeting;
     public static OptionItem RequiterChance;
     public static OptionItem RequiterIgnoresShields;
 
@@ -34,10 +35,12 @@ internal class Knight : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CanKnowTargetRole = BooleanOptionItem.Create(Id + 12, "CanKnowTargetRole", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Knight]);
-        RequiterChance = IntegerOptionItem.Create(Id + 13, "RequiterChance", new(0, 100, 5), 0, TabGroup.CrewmateRoles, false)
+        CanKillBeforeFirstMeeting = BooleanOptionItem.Create(Id + 13, "CanKillBeforeFirstMeeting", true, TabGroup.CrewmateRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Knight]);
+        RequiterChance = IntegerOptionItem.Create(Id + 14, "RequiterChance", new(0, 100, 5), 0, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Knight])
             .SetValueFormat(OptionFormat.Percent);
-        RequiterIgnoresShields = BooleanOptionItem.Create(Id + 14, "RequiterIgnoresShields", false, TabGroup.CrewmateRoles, false)
+        RequiterIgnoresShields = BooleanOptionItem.Create(Id + 15, "RequiterIgnoresShields", false, TabGroup.CrewmateRoles, false)
             .SetParent(RequiterChance);
     }
     public override void Init()
@@ -51,11 +54,10 @@ internal class Knight : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(false);
 
-    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = IsKilled(id) ? 300f : KillCooldown.GetFloat();
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = id.GetAbilityUseLimit() <= 0 ? 300f : KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc)
-        => !IsKilled(pc.PlayerId);
+        => (CanKillBeforeFirstMeeting.GetBool() || !MeetingStates.FirstMeeting) && pc.GetAbilityUseLimit() > 0;
 
-    private static bool IsKilled(byte playerId) => playerId.GetAbilityUseLimit() <= 0;
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl banana)
     {
         if (CanKnowTargetRole.GetBool())
@@ -66,8 +68,8 @@ internal class Knight : RoleBase
         killer.RpcRemoveAbilityUse();
         Logger.Info($"{killer.GetNameWithRole()} : " + "Kill chance used", "Knight");
         GiveTasks = true;
-        var knightClientId = killer.GetClientId();
-        killer.RpcSetRoleDesync(RoleTypes.Crewmate, knightClientId);
+        killer.RpcSetRoleDesync(RoleTypes.Crewmate, killer.GetClientId());
+        Main.DesyncPlayerList.Remove(killer.PlayerId);
         killer.RpcResetTasks();
         return true;
     }

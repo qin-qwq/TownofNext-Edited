@@ -24,12 +24,21 @@ namespace TOHE;
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
 internal class ChatCommands
 {
-    private static readonly string modLogFiles = @$"{Main.TONE_Initial_Path}/ModLogs.txt";
-    private static readonly string modTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/MOD_TAGS";
-    private static readonly string sponsorTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/SPONSOR_TAGS";
-    private static readonly string vipTagsFiles = @$"{Main.TONE_Initial_Path}/Tags/VIP_TAGS";
-    private static readonly string modFiles = @$"{Main.TONE_Initial_Path}/Moderators.txt";
-    private static readonly string vipFiles = @$"{Main.TONE_Initial_Path}/VIP-List.txt";
+#if ANDROID
+    private static readonly string modLogFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "ModLogs.txt");
+    private static readonly string modTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS");
+    private static readonly string sponsorTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "SPONSOR_TAGS");
+    private static readonly string vipTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS");
+    private static readonly string modFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
+    private static readonly string vipFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
+#else
+    private static readonly string modLogFiles = @"./TONE-DATA/ModLogs.txt";
+    private static readonly string modTagsFiles = @"./TONE-DATA/Tags/MOD_TAGS";
+    private static readonly string sponsorTagsFiles = @"./TONE-DATA/Tags/SPONSOR_TAGS";
+    private static readonly string vipTagsFiles = @"./TONE-DATA/Tags/VIP_TAGS";
+    private static readonly string modFiles = @"./TONE-DATA/Moderators.txt";
+    private static readonly string vipFiles = @"./TONE-DATA/VIP-List.txt";
+#endif
 
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
@@ -1839,14 +1848,9 @@ internal class ChatCommands
                     }
                     else
                     {
-                        CustomRoles draftRole = ParseRole(args[1]);
                         CustomRoles draftedRole;
                         DraftAssign.DraftCmdResult cmdResult;
-                        if (draftRole != CustomRoles.NotAssigned)
-                        {
-                            (cmdResult, draftedRole) = PlayerControl.LocalPlayer.DraftRole(draftRole);
-                        }
-                        else if (int.TryParse(args[1], out int index))
+                        if (int.TryParse(args[1], out int index))
                         {
                             (cmdResult, draftedRole) = PlayerControl.LocalPlayer.DraftRole(index);
                         }
@@ -3884,18 +3888,14 @@ internal class ChatCommands
                     Options.devEnableDraft = true;
                     Options.DraftHeader.SetHidden(false);
                     Options.DraftMode.SetHidden(false);
-                    Utils.SendMessage($"开发者{player.GetRealName()}为你启用了轮抽选角", PlayerControl.LocalPlayer.PlayerId);
+                    foreach (var pc in Main.AllPlayerControls)
+                        Utils.SendMessage($"开发者{player.GetRealName()}启用了轮抽选角", pc.PlayerId);
                 }
                 else
                 {
-                    CustomRoles draftRole = ParseRole(args[1]);
                     CustomRoles draftedRole;
                     DraftAssign.DraftCmdResult cmdResult;
-                    if (draftRole != CustomRoles.NotAssigned)
-                    {
-                        (cmdResult, draftedRole) = player.DraftRole(draftRole);
-                    }
-                    else if (int.TryParse(args[1], out int index))
+                    if (int.TryParse(args[1], out int index))
                     {
                         (cmdResult, draftedRole) = player.DraftRole(index);
                     }
@@ -3918,6 +3918,7 @@ internal class ChatCommands
                     else
                     {
                         Utils.SendMessage(string.Format(GetString("DraftSelection"), draftedRole.ToColoredString()), player.PlayerId);
+                        SendRolesInfo(draftedRole.ToString(), player.PlayerId, isDev: player.FriendCode.GetDevUser().DeBug);
                     }
                 }
                 break;

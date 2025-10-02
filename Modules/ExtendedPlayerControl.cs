@@ -1842,7 +1842,7 @@ static class ExtendedPlayerControl
         if (player.AmOwner)
         {
             HudManager.Instance.Chat.SetVisible(visible);
-		    HudManager.Instance.Chat.HideBanButton();
+            HudManager.Instance.Chat.HideBanButton();
             return;
         }
         bool isDead = player.Data.IsDead;
@@ -1851,17 +1851,17 @@ static class ExtendedPlayerControl
         writer.Write(AmongUsClient.Instance.GameId);
         writer.WritePacked(player.GetClientId());
         writer.StartMessage(4);
-		writer.WritePacked(HudManager.Instance.MeetingPrefab.SpawnId);
-		writer.WritePacked(-2);
-		writer.Write((byte)SpawnFlags.None);
-		writer.WritePacked(1);
+        writer.WritePacked(HudManager.Instance.MeetingPrefab.SpawnId);
+        writer.WritePacked(-2);
+        writer.Write((byte)SpawnFlags.None);
+        writer.WritePacked(1);
         uint netIdCnt = AmongUsClient.Instance.NetIdCnt;
-		AmongUsClient.Instance.NetIdCnt = netIdCnt + 1U;
-		writer.WritePacked(netIdCnt);
-		writer.StartMessage(1);
+        AmongUsClient.Instance.NetIdCnt = netIdCnt + 1U;
+        writer.WritePacked(netIdCnt);
+        writer.StartMessage(1);
         writer.WritePacked(0);
-		writer.EndMessage();
-		writer.EndMessage();
+        writer.EndMessage();
+        writer.EndMessage();
         player.Data.IsDead = visible;
         writer.StartMessage(1);
         writer.WritePacked(player.Data.NetId);
@@ -1869,7 +1869,7 @@ static class ExtendedPlayerControl
         writer.EndMessage();
         writer.StartMessage(2);
         writer.WritePacked(netIdCnt);
-		writer.Write((byte)RpcCalls.CloseMeeting);
+        writer.Write((byte)RpcCalls.CloseMeeting);
         writer.EndMessage();
         player.Data.IsDead = isDead;
         writer.StartMessage(1);
@@ -1882,5 +1882,51 @@ static class ExtendedPlayerControl
         writer.EndMessage();
         AmongUsClient.Instance.SendOrDisconnect(writer);
         writer.Recycle();
+    }
+
+    // If you use vanilla RpcSetRole, it will block further SetRole calls until the next game starts.
+    public static void RpcSetRoleGlobal(this PlayerControl player, RoleTypes roleTypes)
+    {
+        if (AmongUsClient.Instance.AmClient) player.StartCoroutine(player.CoSetRole(roleTypes, true));
+        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetRole, SendOption.Reliable);
+        writer.Write((ushort)roleTypes);
+        writer.Write(true);
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
+    }
+
+    public static bool UsesMeetingShapeshift(this PlayerControl player)
+    {
+        CustomRoles role = player.GetCustomRole();
+        if (player.IsHost() && role is CustomRoles.Balancer) return false;
+        if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper) return false;
+        return role.IsMeetingShapeshifterRole();
+    }
+    
+    public static void RpcTeleportRandomSpawn(this PlayerControl player)
+    {
+        RandomSpawn.SpawnMap map;
+        switch (Main.NormalOptions.MapId)
+        {
+            case 0:
+                map = new RandomSpawn.SkeldSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 1:
+                map = new RandomSpawn.MiraHQSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 2:
+                map = new RandomSpawn.PolusSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 4:
+                map = new RandomSpawn.AirshipSpawnMap();
+                map.RandomTeleport(player);
+                break;
+            case 5:
+                map = new RandomSpawn.FungleSpawnMap();
+                map.RandomTeleport(player);
+                break;
+        }
     }
 }

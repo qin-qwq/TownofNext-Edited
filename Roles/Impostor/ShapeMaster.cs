@@ -27,4 +27,10 @@ internal class ShapeMaster : RoleBase // Should be deleted tbh, because it's lit
         AURoleOptions.ShapeshifterLeaveSkin = false;
         AURoleOptions.ShapeshifterDuration = ShapeMasterShapeshiftDuration.GetFloat();
     }
+
+    public override bool OnCheckShapeshift(PlayerControl shapeshifter, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
+    {
+        shouldAnimate = false;
+        return true;
+    }
 }

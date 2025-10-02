@@ -55,14 +55,15 @@ internal class Bomber : RoleBase
     {
         AURoleOptions.PhantomCooldown = BombCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         var playerRole = shapeshifter.GetCustomRole();
 
         Logger.Info("The bomb went off", playerRole.ToString());
         CustomSoundsManager.RPCPlayCustomSoundAll("Boom");
 
-        _ = new Explosion(5f, 0.5f, shapeshifter.GetCustomPosition());
+        if (AmongUsClient.Instance.AmHost)
+            _ = new Explosion(5f, 0.5f, shapeshifter.GetCustomPosition());
 
         foreach (var target in Main.AllPlayerControls)
         {

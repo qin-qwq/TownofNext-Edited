@@ -39,8 +39,9 @@ internal class Cleaner : RoleBase
 
             reporter.Notify(Translator.GetString("CleanerCleanBody"));
             reporter.SetKillCooldownV3(KillCooldownAfterCleaning.GetFloat(), forceAnime: true);
+            reporter.SyncSettings();
 
-            Logger.Info($"Cleaner: {reporter.GetRealName()} clear body: {deadBody.PlayerName}，qshyylx", "Cleaner");
+            Logger.Info($"Cleaner: {reporter.GetRealName()} clear body: {deadBody.PlayerName}", "Cleaner");
             return false;
         }
 

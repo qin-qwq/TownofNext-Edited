@@ -12,6 +12,7 @@ internal class Socialite : RoleBase
     public override CustomRoles Role => CustomRoles.Socialite;
     private const int Id = 31800;
     public override bool IsDesyncRole => true;
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
@@ -66,7 +67,7 @@ internal class Socialite : RoleBase
         if (PartiedPlayers.Contains(target.PlayerId)) return false;
         PartiedPlayers.Add(target.PlayerId);
         SendRPC(killer, target);
-        killer.Notify(string.Format(GetString(("SocialitePartyMsg")), target.GetRealName()));
+        killer.Notify(string.Format(GetString("SocialitePartyMsg"), target.GetRealName()));
         killer.RpcRemoveAbilityUse();
         killer.SetKillCooldown();
         killer.ResetKillCooldown();
@@ -99,6 +100,10 @@ internal class Socialite : RoleBase
             message += PreGuestList.Contains(playerId) ? $"<i>{GetPlayerById(playerId).GetRealName()}</i>\n" : $"{GetPlayerById(playerId).GetRealName()}\n";
         }
         SendMessage(message, pc.PlayerId, title: CustomRoles.Socialite.ToColoredString().ToUpper());
+    }
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckVote(pc, target);
     }
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {

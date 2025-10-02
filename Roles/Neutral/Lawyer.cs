@@ -50,6 +50,7 @@ internal class Lawyer : RoleBase
         CustomRoles.Follower,
         CustomRoles.TrackerTOHE,
         CustomRoles.Mechanic,
+        CustomRoles.Pursuer,
         CustomRoles.Refugee,
         CustomRoles.Sheriff,
         CustomRoles.Medic,

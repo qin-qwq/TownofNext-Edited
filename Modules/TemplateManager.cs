@@ -10,7 +10,12 @@ namespace TOHE;
 
 public static class TemplateManager
 {
-    private static readonly string TEMPLATE_FILE_PATH = @$"{Main.TONE_Initial_Path}/template.txt";
+#if ANDROID
+    private static readonly string TEMPLATE_FILE_PATH = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "template.txt");
+#else
+    private static readonly string TEMPLATE_FILE_PATH = "./TONE-DATA/template.txt";
+#endif
+
     private static readonly Dictionary<string, Func<string>> _replaceDictionaryNormalOptions = new()
     {
         ["RoomCode"] = () => InnerNet.GameCode.IntToGameName(AmongUsClient.Instance.GameId),
@@ -105,14 +110,25 @@ public static class TemplateManager
                     _ => "English"
                 };
             else fileName = "English";
-            if (!Directory.Exists(Main.TONE_DATA_FOLDER_NAME)) Directory.CreateDirectory(Main.TONE_DATA_FOLDER_NAME);
+
+#if ANDROID
+            string dataDirectory = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA");
+            string defaultTemplatePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Default_Teamplate.txt");
+#else
+        string dataDirectory = @"TONE-DATA";
+        string defaultTemplatePath = @"./TONE-DATA/Default_Teamplate.txt";
+#endif
+
+            if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
             var defaultTemplateMsg = GetResourcesTxt($"TOHE.Resources.Config.template.{fileName}.txt");
-            if (!File.Exists(@$"{Main.TONE_Initial_Path}/Default_Teamplate.txt")) //default template
+
+            if (!File.Exists(defaultTemplatePath))
             {
                 Logger.Warn("Creating Default_Template.txt", "TemplateManager");
-                using FileStream fs = File.Create(@$"{Main.TONE_Initial_Path}/Default_Teamplate.txt");
+                using FileStream fs = File.Create(defaultTemplatePath);
             }
-            File.WriteAllText(@$"{Main.TONE_Initial_Path}/Default_Teamplate.txt", defaultTemplateMsg); //overwriting default template
+            File.WriteAllText(defaultTemplatePath, defaultTemplateMsg);
+
             if (!File.Exists(TEMPLATE_FILE_PATH))
             {
                 if (File.Exists(@"./template.txt")) File.Move(@"./template.txt", TEMPLATE_FILE_PATH);

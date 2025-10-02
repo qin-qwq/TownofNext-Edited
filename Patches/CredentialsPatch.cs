@@ -134,18 +134,18 @@ class VersionShowerStartPatch
         Main.credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
         var buildtype = "";
 
-#if RELEASEWINDOWS || RELEASEANDROID
+#if RELEASE
             //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
             buildtype = "Release";
 #endif
 
-#if BETAWINDOWS || BETAANDROID
+#if BETA
         Main.credentialsText += $"\r\n<color=#ffc0cb>Beta:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
         //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
         buildtype = "Beta";
 #endif
 
-#if DEBUGWINDOWS || DEBUGANDROID
+#if DEBUG
         Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
         //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
         buildtype = "Debug";

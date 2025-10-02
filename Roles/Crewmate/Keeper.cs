@@ -15,7 +15,7 @@ internal class Keeper : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Keeper;
     private const int Id = 26500;
-
+    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
@@ -89,6 +89,10 @@ internal class Keeper : RoleBase
         }
     }
 
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckVote(pc, target);
+    }
 
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {

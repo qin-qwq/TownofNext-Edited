@@ -8,7 +8,7 @@ public class Rat : IAddon
 {
     public CustomRoles Role => CustomRoles.Rat;
     private const int Id = 33100;
-    public AddonTypes Type => AddonTypes.Experimental;
+    public AddonTypes Type => AddonTypes.Helpful;
     private static readonly HashSet<byte> playerList = [];
     public static bool IsEnable = false;
     public static OptionItem ratRoleCount;
@@ -48,7 +48,7 @@ public class Rat : IAddon
 
         int n = ratRoleCount.GetInt();
         int i = 0;
-        List<CustomRoles> listOfRoles = [.. CustomRolesHelper.AllRoles.Where(role => !role.IsGhostRole() && role.IsEnable() && !role.RoleExist(countDead: true) && ((role.IsCrewmate()&&canFindCrew.GetBool())||(role.IsImpostor()&&canFindImp.GetBool())||(role.IsNeutral()&&canFindNeutral.GetBool())||(role.IsCoven()&&canFindCoven.GetBool()))).Shuffle()];
+        List<CustomRoles> listOfRoles = [.. CustomRolesHelper.AllRoles.Where(role => !role.IsAdditionRole() && !role.IsGhostRole() && role.IsEnable() && !role.RoleExist(countDead: true) && ((role.IsCrewmate()&&canFindCrew.GetBool())||(role.IsImpostor()&&canFindImp.GetBool())||(role.IsNeutral()&&canFindNeutral.GetBool())||(role.IsCoven()&&canFindCoven.GetBool()))).Shuffle()];
         string separator = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.English or SupportedLangs.Russian ? "], [" : "】, 【";
         if (n > listOfRoles.Count) n = listOfRoles.Count;
 

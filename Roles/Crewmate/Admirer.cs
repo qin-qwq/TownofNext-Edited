@@ -22,17 +22,27 @@ internal class Admirer : RoleBase
     private static OptionItem AdmireCooldown;
     private static OptionItem KnowTargetRole;
     private static OptionItem SkillLimit;
+    private static OptionItem CanAdmireImp;
+    private static OptionItem CanAdmireCrew;
+    private static OptionItem CanAdmireNeutral;
+    private static OptionItem CanAdmireCoven;
+    private static OptionItem MisfireAdmireTarget;
 
     public static readonly Dictionary<byte, HashSet<byte>> AdmiredList = [];
 
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Admirer);
-        AdmireCooldown = FloatOptionItem.Create(Id + 10, "AdmireCooldown", new(1f, 180f, 1f), 5f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer])
+        AdmireCooldown = FloatOptionItem.Create(Id + 10, "AdmireCooldown", new(1f, 180f, 1f), 25f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer])
             .SetValueFormat(OptionFormat.Seconds);
         KnowTargetRole = BooleanOptionItem.Create(Id + 11, "AdmirerKnowTargetRole", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
         SkillLimit = IntegerOptionItem.Create(Id + 12, "AdmirerSkillLimit", new(0, 100, 1), 1, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer])
             .SetValueFormat(OptionFormat.Times);
+        CanAdmireImp = BooleanOptionItem.Create(Id + 13, "CanAdmireImp", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
+        CanAdmireCrew = BooleanOptionItem.Create(Id + 14, "CanAdmireCrew", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
+        CanAdmireNeutral = BooleanOptionItem.Create(Id + 15, "CanAdmireNeutral", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
+        CanAdmireCoven = BooleanOptionItem.Create(Id + 16, "CanAdmireCoven", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
+        MisfireAdmireTarget = BooleanOptionItem.Create(Id + 17, "MisfireAdmireTarget", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
     }
     public override void Init()
     {
@@ -114,6 +124,14 @@ internal class Admirer : RoleBase
     AdmirerFailed:
 
         killer.Notify(Utils.ColorString(Utils.GetRoleColor(addon), GetString("AdmirerInvalidTarget")));
+        if (MisfireAdmireTarget.GetBool())
+        {
+            killer.SetDeathReason(PlayerState.DeathReason.Misfire);
+            killer.RpcMurderPlayer(killer);
+            return false;
+        }
+        killer.ResetKillCooldown();
+        killer.SetKillCooldown();
         return false;
     }
 
@@ -137,6 +155,9 @@ internal class Admirer : RoleBase
 
     public static bool CanBeAdmired(PlayerControl pc, PlayerControl admirer)
     {
+        if ((admirer.IsPlayerImpostorTeam() && !CanAdmireImp.GetBool()) || (admirer.IsPlayerCrewmateTeam() && !CanAdmireCrew.GetBool())
+            || (admirer.IsPlayerNeutralTeam() && !CanAdmireNeutral.GetBool()) || (admirer.IsPlayerCovenTeam() && !CanAdmireCoven.GetBool()))
+            return false;
         if (AdmiredList.ContainsKey(admirer.PlayerId))
         {
             if (AdmiredList[admirer.PlayerId].Contains(pc.PlayerId))

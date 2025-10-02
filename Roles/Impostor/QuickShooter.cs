@@ -77,7 +77,7 @@ internal class QuickShooter : RoleBase
             DestroyableSingleton<HudManager>.Instance.AbilityButton.SetCoolDown(timer, 0.01f);
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
     {
         var killTimer = shapeshifter.GetKillTimer();
         Logger.Info($"Kill Timer: {killTimer}", "QuickShooter");

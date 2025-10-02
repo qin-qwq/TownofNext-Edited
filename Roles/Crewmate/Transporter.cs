@@ -21,7 +21,7 @@ internal class Transporter : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Transporter);
-        TransporterTeleportMax = IntegerOptionItem.Create(7402, "TransporterTeleportMax", new(1, 100, 1), 10, TabGroup.CrewmateRoles, false)
+        TransporterTeleportMax = IntegerOptionItem.Create(7402, "TransporterTeleportMax", new(1, 100, 1), 6, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Transporter])
             .SetValueFormat(OptionFormat.Times);
         TransporterTeleportCooldown = FloatOptionItem.Create(Id + 10, "TransporterTeleportCooldown", new(0f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false)

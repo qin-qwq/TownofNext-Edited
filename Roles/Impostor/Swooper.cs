@@ -34,7 +34,7 @@ internal class Swooper : RoleBase
     {
         AURoleOptions.PhantomCooldown = SwooperCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl player)
+    public override bool OnCheckVanish(PlayerControl player, float killCooldown)
     {
         player.RpcMakeInvisible();
         _ = new LateTask(() =>
@@ -55,7 +55,6 @@ internal class Swooper : RoleBase
     }
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (target.Is(CustomRoles.Bait)) return true;
         if (Main.Invisible.Contains(killer.PlayerId))
         {
             target.RpcMurderPlayer(target);
