@@ -195,6 +195,7 @@ public class RoleAssign
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
                 case CustomRoles.PhantomTOHE when NarcManager.IsNarcAssigned():
+                case CustomRoles.Cupid:
                     continue;
             }
 

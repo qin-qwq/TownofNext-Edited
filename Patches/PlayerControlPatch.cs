@@ -1233,7 +1233,6 @@ class FixedUpdateInNormalGamePatch
 
                 if (!lowLoad)
                 {
-                    Camouflage.OnFixedUpdate(player);
                     if (Main.RefixCooldownDelay <= 0)
                     {
                         if (player.Is(CustomRoles.Vampire) || player.Is(CustomRoles.Warlock) || player.Is(CustomRoles.Ninja))
