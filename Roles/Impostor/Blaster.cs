@@ -25,6 +25,7 @@ internal class Blaster : RoleBase
     public static OptionItem ImpostorsSurviveBombs;
 
     private static readonly Dictionary<byte, List<Vector3>> BombPosition = [];
+    private static readonly HashSet<byte> WaitBomb = [];
 
     public override void SetupCustomOption()
     {
@@ -50,6 +51,7 @@ internal class Blaster : RoleBase
     public override void Init()
     {
         BombPosition.Clear();
+        WaitBomb.Clear();
     }
     public override void Add(byte playerId)
     {
@@ -70,9 +72,11 @@ internal class Blaster : RoleBase
     }
     public override bool OnCheckVanish(PlayerControl pc, float killCooldown)
     {
+        if (WaitBomb.Contains(pc.PlayerId)) return false;
         var BombPlace = pc.GetCustomPosition();
         BombPosition[pc.PlayerId].Add(pc.transform.position);
         pc.Notify(string.Format(GetString("BlasterMark"), BombDelayTime.GetFloat()));
+        WaitBomb.Add(pc.PlayerId);
         _ = new LateTask(() =>
         {
             if (!GameStates.IsInTask) return;
@@ -95,10 +99,14 @@ internal class Blaster : RoleBase
             }
             pc.RpcResetAbilityCooldown();
             BombPosition[pc.PlayerId].Clear();
+            WaitBomb.Remove(pc.PlayerId);
         }, BombDelayTime.GetFloat(), "Blaster Boom");
         return false;
     }
-
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        WaitBomb.Clear();
+    }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.AbilityButton.OverrideText(GetString("BlasterPhantomText"));

@@ -17,6 +17,8 @@ internal class TimeAssassin : RoleBase
     private static OptionItem TimeAssassinSkillCooldown;
     private static OptionItem TimeAssassinSkillDuration;
 
+    public static bool TimeStop;
+
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.TimeAssassin);
@@ -24,6 +26,11 @@ internal class TimeAssassin : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         TimeAssassinSkillDuration = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityDuration, new(1f, 60f, 1f), 6f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeAssassin])
             .SetValueFormat(OptionFormat.Seconds);
+    }
+
+    public override void Init()
+    {
+        TimeStop = false;
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -34,9 +41,11 @@ internal class TimeAssassin : RoleBase
     public override bool OnCheckVanish(PlayerControl player, float killCooldown)
     {
         if (AnySabotageIsActive()) return false;
+        if (TimeStop) return false;
         foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin) && !x.Is(CustomRoles.GM)))
         {
             player.Notify(GetString("TimeStopStart"));
+            TimeStop = true;
             Main.PlayerStates[target.PlayerId].IsBlackOut = true;
             var tmpSpeed = Main.AllPlayerSpeed[target.PlayerId];
             Main.AllPlayerSpeed[target.PlayerId] = Main.MinSpeed;
@@ -45,6 +54,7 @@ internal class TimeAssassin : RoleBase
             _ = new LateTask(() =>
             {
                 player.Notify(GetString("TimeStopEnd"));
+                TimeStop = false;
                 player.RpcResetAbilityCooldown();
                 Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + tmpSpeed;
                 Main.PlayerStates[target.PlayerId].IsBlackOut = false;
@@ -54,6 +64,10 @@ internal class TimeAssassin : RoleBase
             }, TimeAssassinSkillDuration.GetFloat(), "TimeAssassin Stop Time");
         }
         return false;
+    }
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        if (TimeStop) TimeStop = false;
     }
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {

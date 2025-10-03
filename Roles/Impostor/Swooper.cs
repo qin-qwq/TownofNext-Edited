@@ -36,6 +36,7 @@ internal class Swooper : RoleBase
     }
     public override bool OnCheckVanish(PlayerControl player, float killCooldown)
     {
+        if (Main.Invisible.Contains(player.PlayerId)) return false;
         player.RpcMakeInvisible();
         _ = new LateTask(() =>
         {

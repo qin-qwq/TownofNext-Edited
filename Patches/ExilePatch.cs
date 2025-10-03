@@ -185,6 +185,9 @@ class ExileControllerWrapUpPatch
                     state.SetDead();
                     player?.RpcExileV2();
 
+                    // Just to be sure
+                    _ = new LateTask(() => player?.RpcExileV2(), 0.5f, "Extra Exile to be Sure");
+
                     if (x.Value == PlayerState.DeathReason.Suicide)
                         player?.SetRealKiller(player, true);
 

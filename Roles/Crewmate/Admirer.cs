@@ -153,19 +153,19 @@ internal class Admirer : RoleBase
         else return false;
     }
 
-    public static bool CanBeAdmired(PlayerControl pc, PlayerControl admirer)
+    public static bool CanBeAdmired(PlayerControl target, PlayerControl pc)
     {
-        if ((admirer.IsPlayerImpostorTeam() && !CanAdmireImp.GetBool()) || (admirer.IsPlayerCrewmateTeam() && !CanAdmireCrew.GetBool())
-            || (admirer.IsPlayerNeutralTeam() && !CanAdmireNeutral.GetBool()) || (admirer.IsPlayerCovenTeam() && !CanAdmireCoven.GetBool()))
+        if ((target.IsPlayerImpostorTeam() && !CanAdmireImp.GetBool()) || (target.IsPlayerCrewmateTeam() && !CanAdmireCrew.GetBool())
+            || (target.IsPlayerNeutralTeam() && !CanAdmireNeutral.GetBool()) || (target.IsPlayerCovenTeam() && !CanAdmireCoven.GetBool()))
             return false;
-        if (AdmiredList.ContainsKey(admirer.PlayerId))
+        if (AdmiredList.ContainsKey(pc.PlayerId))
         {
-            if (AdmiredList[admirer.PlayerId].Contains(pc.PlayerId))
+            if (AdmiredList[pc.PlayerId].Contains(target.PlayerId))
                 return false;
         }
-        else AdmiredList.Add(admirer.PlayerId, []);
+        else AdmiredList.Add(pc.PlayerId, []);
 
-        return pc != null && !pc.Is(CustomRoles.Narc);
+        return target != null && !target.Is(CustomRoles.Narc);
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)

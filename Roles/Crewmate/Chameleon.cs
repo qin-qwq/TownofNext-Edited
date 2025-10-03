@@ -51,6 +51,7 @@ internal class Chameleon : RoleBase
     public override void OnEnterVent(PlayerControl player, Vent vent)
     {
         if (player.GetAbilityUseLimit() < 1) return;
+        if (Main.Invisible.Contains(player.PlayerId)) return;
         player.RpcRemoveAbilityUse();
         player.RpcMakeInvisible();
         _ = new LateTask(() =>

@@ -236,8 +236,7 @@ internal class ChangeRoleSettings
             SpeedRun.Init();
 
             //Tag Mode
-            if (Options.CurrentGameMode == CustomGameMode.TagMode)
-                TagMode.Init();
+            TagMode.Init();
 
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
