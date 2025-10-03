@@ -70,7 +70,7 @@ internal class Blaster : RoleBase
     {
         AURoleOptions.PhantomCooldown = BombCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl pc, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl pc)
     {
         if (WaitBomb.Contains(pc.PlayerId)) return false;
         var BombPlace = pc.GetCustomPosition();

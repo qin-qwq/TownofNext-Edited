@@ -119,7 +119,7 @@ internal class Medusa : CovenManager
         killer.SetKillCooldown();
         killer.Notify(string.Format(GetString("MedusaStonedPlayer"), target.GetRealName()));
     }
-    public override bool OnCheckVanish(PlayerControl dusa, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl dusa)
     {
         foreach (var player in StonedPlayers[dusa.PlayerId])
         {

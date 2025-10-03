@@ -101,7 +101,7 @@ internal class Sacrifist : CovenManager
         killer.Notify(GetString("CovenDontKillOtherCoven"));
         return false;
     }
-    public override bool OnCheckVanish(PlayerControl pc, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl pc)
     {
         var rand = IRandom.Instance;
         DebuffID = (byte)rand.Next(0, 9);

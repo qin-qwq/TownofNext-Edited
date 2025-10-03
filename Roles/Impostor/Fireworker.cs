@@ -110,7 +110,7 @@ internal class Fireworker : RoleBase
         return canUse;
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         Logger.Info($"Fireworker ShapeShift", "Fireworker");
 

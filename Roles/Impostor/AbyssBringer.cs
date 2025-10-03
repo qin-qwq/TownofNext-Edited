@@ -98,7 +98,7 @@ internal class AbyssBringer : RoleBase
         throw new InvalidOperationException("No available BlackHole ID.");
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         if (!Main.AllAlivePlayerControls.Where(x => x.PlayerId != shapeshifter.PlayerId).Any())
         {

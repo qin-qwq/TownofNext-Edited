@@ -209,7 +209,7 @@ internal class Baker : RoleBase
             }
         }
     }
-    public override bool OnCheckVanish(PlayerControl pc, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl pc)
     {
         if (BTOS2Baker.GetBool())
         {

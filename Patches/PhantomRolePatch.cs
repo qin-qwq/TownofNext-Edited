@@ -89,8 +89,7 @@ public static class PhantomRolePatch
     public static bool CheckTrigger(PlayerControl phantom)
     {
         var role = phantom.GetRoleClass();
-        float killCooldown = phantom.GetKillTimer();
-        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom, killCooldown) == false)
+        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false)
         {
             if (phantom.AmOwner)
             {
@@ -117,7 +116,8 @@ public static class PhantomRolePatch
 
             _ = new LateTask(() =>
             {
-                phantom.SetKillCooldown(Math.Max(killCooldown, 0.001f));
+                if (phantom.GetCustomRole() is CustomRoles.Fury or CustomRoles.QuickShooter) return;
+                phantom.SetKillCooldown(Math.Max(phantom.GetKillTimer(), 0.001f));
             }, 0.2f, $"Phantom Check");
 
             return false;
