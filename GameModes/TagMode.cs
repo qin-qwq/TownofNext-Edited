@@ -108,13 +108,13 @@ public static class TagMode
 
     public static void Init()
     {
+        if (Options.CurrentGameMode != CustomGameMode.TagMode) return;
+
         Dark = true;
         Zap = false;
         _ = new LateTask(() =>
         {
             Dark = false;
-            foreach (var target in Main.AllPlayerControls)
-                if (GameStates.IsInTask) RPC.PlaySoundRPC(Sounds.ImpTransform, target.PlayerId);
             foreach (var tac in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
                 tac.MarkDirtySettings();
         }, 25f, "Zombie Can Move");
@@ -141,6 +141,20 @@ public static class TagMode
                 Main.AllPlayerControls.Where(x => x.IsHost()).Do(x => RPC.PlaySoundRPC(Sounds.HnSLong, x.PlayerId));
             else Main.AllPlayerControls.Where(x => x.IsModded()).Do(x => RPC.PlaySoundRPC(Sounds.HnSLong, x.PlayerId));
         }
+    }
+
+    public static void SendTaskRPC()
+    {
+        var writer = MessageWriter.Get(SendOption.Reliable);
+        writer.Write(TaskCount.Item1);
+        writer.Write(TaskCount.Item2);
+        var sender = new RpcSyncTagModeTaskStates(PlayerControl.LocalPlayer.NetId, TaskCount.Item1, TaskCount.Item2);
+        RpcUtils.LateBroadcastReliableMessage(sender);
+    }
+
+    public static void HandleSyncTagModeTaskStates(MessageReader reader)
+    {
+        TaskCount = (reader.ReadInt32(), reader.ReadInt32());
     }
 
     public static void AppendTagModeKcount(StringBuilder builder)
@@ -350,8 +364,6 @@ public class TCrewmate : RoleBase
         writer.Write(InvisibleState.Item2);
         writer.Write(DetectState.Item1);
         writer.Write(DetectState.Item2);
-        writer.Write(TagMode.TaskCount.Item1);
-        writer.Write(TagMode.TaskCount.Item2);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
 
@@ -361,7 +373,6 @@ public class TCrewmate : RoleBase
         ProtectState = (reader.ReadBoolean(), reader.ReadSingle());
         InvisibleState = (reader.ReadBoolean(), reader.ReadSingle());
         DetectState = (reader.ReadBoolean(), reader.ReadByte());
-        TagMode.TaskCount = (reader.ReadInt32(), reader.ReadInt32());
     }
 
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
@@ -417,6 +428,7 @@ public class TCrewmate : RoleBase
         TaskInt++;
 
         SendRPC();
+        TagMode.SendTaskRPC();
         return true;
     }
 

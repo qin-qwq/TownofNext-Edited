@@ -50,7 +50,26 @@ namespace TOHE.Modules.Rpc
             writer.Recycle();
             // There are chances that the writer can't be recycled. May cause memory leak.
         }
-        
+
         private readonly MessageWriter writer;
+    }
+    class RpcSyncTagModeTaskStates : BaseModdedRpc
+    {
+        public override byte RpcType => (byte)CustomRPC.SyncTagModeTaskStates;
+
+        public RpcSyncTagModeTaskStates(uint rpcObjectNetId, int taskcount1, int taskcount2) : base(rpcObjectNetId)
+        {
+            this.taskcount1 = taskcount1;
+            this.taskcount2 = taskcount2;
+        }
+
+        public override void SerializeRpcValues(MessageWriter msg)
+        {
+            msg.Write(taskcount1);
+            msg.Write(taskcount2);
+        }
+
+        private readonly int taskcount1;
+        private readonly int taskcount2;
     }
 }

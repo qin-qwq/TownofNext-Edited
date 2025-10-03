@@ -607,9 +607,10 @@ public static class CheckShapeshiftPatch
         logger.Info($"Self:{shapeshifter.PlayerId == target.PlayerId} - Is animate:{shouldAnimate} - In Meeting:{GameStates.IsMeeting}");
 
         var shapeshifterRoleClass = shapeshifter.GetRoleClass();
-        if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
+        if (Options.UseMeetingShapeshift.GetBool() && GameStates.IsMeeting)
         {
-            shapeshifterRoleClass?.OnMeetingShapeshift(shapeshifter, target);
+            if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
+                shapeshifterRoleClass?.OnMeetingShapeshift(shapeshifter, target);
             shapeshifter.RpcRejectShapeshift();
             return false;
         }

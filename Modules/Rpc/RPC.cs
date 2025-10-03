@@ -19,7 +19,7 @@ namespace TOHE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 180/255 USED
+public enum CustomRPC : byte // 181/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -120,6 +120,8 @@ public enum CustomRPC : byte // 180/255 USED
     SyncFFANameNotify,
     //Speed run
     SyncSpeedRunStates,
+    //Tag Mode
+    SyncTagModeTaskStates,
 }
 [Obfuscation(Exclude = true)]
 public enum Sounds
@@ -596,6 +598,9 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.SyncSpeedRunStates:
                 SpeedRun.HandleSyncSpeedRunStates(reader);
+                break;
+            case CustomRPC.SyncTagModeTaskStates:
+                TagMode.HandleSyncTagModeTaskStates(reader);
                 break;
             case CustomRPC.SyncAllPlayerNames:
                 Main.AllPlayerNames.Clear();

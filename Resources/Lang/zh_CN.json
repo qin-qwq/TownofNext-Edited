@@ -4200,6 +4200,7 @@
   "RatCanFindImp": "可以了解<color=#ff1919>内鬼阵营</color>职业",
   "RatCanFindNeutral": "可以了解<color=#7f8c8d>中立阵营</color>职业",
   "RatCanFindCoven": "可以了解<color=#ac42f2>巫师阵营</color>职业",
+  "RatCanFindAddons" : "可以了解<color=#ff9ace>附加</color>职业",
   "RatMsgTitle": "探知的职业",
   "RatRoleList": "你探知到没有人是<b>{0}</b>",
   "InquisitorHereticCount": "异端数量",
