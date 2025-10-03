@@ -768,7 +768,6 @@ public enum CustomRoles
     Godfather,
     Greedy,
     Hangman,
-    Inhibitor,
     Instigator,
     Kamikaze,
     KillingMachine,
