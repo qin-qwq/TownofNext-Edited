@@ -1047,7 +1047,6 @@ public static class CustomRolesHelper
             case CustomRoles.Mare:
                 if (pc.Is(CustomRoles.Underdog)
                     || pc.Is(CustomRoles.Berserker)
-                    || pc.Is(CustomRoles.Inhibitor)
                     || pc.Is(CustomRoles.Saboteur)
                     || pc.Is(CustomRoles.Swift)
                     || pc.Is(CustomRoles.Nemesis)

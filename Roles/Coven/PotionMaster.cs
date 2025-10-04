@@ -175,7 +175,7 @@ internal class PotionMaster : CovenManager
                 break;
         }
     }
-    public override bool OnCheckVanish(PlayerControl pm, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl pm)
     {
         switch (PotionMode)
         {

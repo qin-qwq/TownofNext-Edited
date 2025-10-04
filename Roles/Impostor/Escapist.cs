@@ -37,7 +37,7 @@ internal class Escapist : RoleBase
         AURoleOptions.PhantomCooldown = EscapeLocation.ContainsKey(playerId) ? ShapeshiftCooldown.GetFloat() : 1f;
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         if (EscapeLocation.TryGetValue(shapeshifter.PlayerId, out var position))
         {
