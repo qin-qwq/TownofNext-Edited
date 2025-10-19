@@ -53,16 +53,16 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.4.11"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.5.0 Alpha 1";
+    public const string PluginVersion = "1.4.2"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.5.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 9, 9, 0) // 2025.9.9 & 17.0.0
+            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 17.0.0 & 17.0.1
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = true; // Latest: V1.5.0 Alpha 1
-    public static readonly bool canaryRelease = false; // Latest: V1.4.0 Beta 3
+    public static readonly bool devRelease = false; // Latest: V1.5.0 Alpha 1, Discontinued, use Beta instead
+    public static readonly bool canaryRelease = true; // Latest: V1.5.0 Beta 1
     public static readonly bool fullRelease = false; // Latest: V1.4.1
 
     public static bool hasAccess = true;
@@ -147,6 +147,14 @@ public class Main : BasePlugin
     public static readonly Dictionary<byte, Color32> PlayerColors = [];
     public static readonly Dictionary<byte, PlayerState.DeathReason> AfterMeetingDeathPlayers = [];
     public static readonly Dictionary<CustomRoles, string> roleColors = [];
+    public static Dictionary<CustomGameMode, Color> GameModeColors = new()
+    {
+        [CustomGameMode.Standard] = Color.white,
+        [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
+        [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
+        [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
+        [CustomGameMode.HidenSeekTOHE] = new Color32(255, 25, 25, byte.MaxValue),
+    };
 
 #if ANDROID
     public static readonly string LANGUAGE_FOLDER_NAME = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Language");
@@ -651,7 +659,7 @@ public class Main : BasePlugin
         TemplateManager.Init();
         TagManager.Init();
         //SpamManager.Init();
-        DevManager.Init();
+        Utils.Init();
         Cloud.Init();
 
         IRandom.SetInstance(new NetRandomWrapper());
@@ -686,7 +694,9 @@ public class Main : BasePlugin
         Harmony.PatchAll();
 
         // ConsoleManager.DetachConsole();
+#if !ANDROID
         if (DebugModeManager.AmDebugger) ConsoleManager.CreateConsole();
+#endif
 
         // InitializeFileHash();
         FileHash = "Support_2025_09_09";
