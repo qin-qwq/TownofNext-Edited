@@ -143,7 +143,8 @@ internal class Camouflager : RoleBase
     private void ClearCamouflage()
     {
         AbilityActivated = false;
-        SendRPC();
+        if (_Player != null && PlayerControl.LocalPlayer != null)
+            SendRPC();
         Camouflage.CheckCamouflage();
     }
 }

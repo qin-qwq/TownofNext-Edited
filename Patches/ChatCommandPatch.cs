@@ -1052,6 +1052,29 @@ internal class ChatCommands
                     }
                     break;
 
+                case "/re":
+                case "/Revive":
+                case "/复活":
+                    canceled = true;
+                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
+                    {
+                        Utils.SendMessage($"{GetString("InvalidPermissionCMD")}", PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (GameStates.IsLobby)
+                    {
+                        Utils.SendMessage(GetString("Message.CanNotUseInLobby"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (args.Length < 2 || !int.TryParse(args[1], out int id3)) break;
+                    var target1 = Utils.GetPlayerById(id3);
+                    if (target1 != null)
+                    {
+                        target1.RpcRevive();
+                        Utils.SendMessage(string.Format(GetString("Message.Revive"), target1.Data.PlayerName), PlayerControl.LocalPlayer.PlayerId);
+                    }
+                    break;
+
                 case "/addmod":
                     canceled = true;
                     subArgs = args.Length < 2 ? "" : args[1];
@@ -1791,6 +1814,21 @@ internal class ChatCommands
                     Utils.SendMessage(string.Format(GetString("StartCommandStarted"), PlayerControl.LocalPlayer.name));
                     Logger.Info("Game Starting", "ChatCommand");
                     break;
+                case "/deck":
+                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft)
+                    {
+                        break;
+                    }
+                    canceled = true;
+                    if (!GameStates.IsLobby)
+                    {
+                        Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+
+                    //PlayerControl.LocalPlayer.SendDeckList();
+
+                    break;
                 case "/draft":
                     if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft)
                     {
@@ -1818,6 +1856,11 @@ internal class ChatCommands
                                 Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), pc.GetFormattedDraftPool()), pc.PlayerId);
                             }
                         }
+                    }
+                    else if (args[1] == "desc" || args[1] == "description")
+                    {
+                        if (args.Length > 2) args[1] = args[2];
+                        goto case "/dd";
                     }
                     else if (args[1] == "add")
                     {
@@ -1853,6 +1896,7 @@ internal class ChatCommands
                         if (int.TryParse(args[1], out int index))
                         {
                             (cmdResult, draftedRole) = PlayerControl.LocalPlayer.DraftRole(index);
+                            PlayerControl.LocalPlayer.SendDraftDescription(index);
                         }
                         else
                         {
@@ -1874,6 +1918,18 @@ internal class ChatCommands
                         {
                             Utils.SendMessage(string.Format(GetString("DraftSelection"), draftedRole.ToColoredString()), PlayerControl.LocalPlayer.PlayerId);
                         }
+                    }
+                    break;
+                case "/dd":
+                case "/draftdescription":
+                    if (int.TryParse(args[1], out int index2))
+                    {
+                        PlayerControl.LocalPlayer.SendDraftDescription(index2);
+                    }
+                    else
+                    {
+                        Utils.SendMessage(GetString("InvalidDraftSelection"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
                     }
                     break;
                 case "/spam":
@@ -3000,7 +3056,7 @@ internal class ChatCommands
                 }
 
                 // Check if the player has the necessary privileges to use the command
-                if (!tagCanBan && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
+                if (!tagCanBan && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev)
                 {
                     Utils.SendMessage(GetString("BanCommandNoAccess"), player.PlayerId);
                     break;
@@ -3078,7 +3134,7 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("WarnCommandDisabled"), player.PlayerId);
                     break;
                 }
-                if (!tagCanWarn && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
+                if (!tagCanWarn && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev)
                 {
                     Utils.SendMessage(GetString("WarnCommandNoAccess"), player.PlayerId);
                     break;
@@ -3149,7 +3205,7 @@ internal class ChatCommands
                 }
 
                 // Check if the player has the necessary privileges to use the command
-                if (!tagCanKick && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().DeBug)
+                if (!tagCanKick && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev)
                 {
                     Utils.SendMessage(GetString("KickCommandNoAccess"), player.PlayerId);
                     break;
@@ -3728,7 +3784,7 @@ internal class ChatCommands
                 else
                 {
                     var tagCanMe = TagManager.ReadPermission(player.FriendCode) >= 2;
-                    if ((Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode)) && !tagCanMe && !player.FriendCode.GetDevUser().DeBug)
+                    if ((Options.ApplyModeratorList.GetValue() == 0 || !Utils.IsPlayerModerator(player.FriendCode)) && !tagCanMe && !player.FriendCode.GetDevUser().IsDev)
                     {
                         Utils.SendMessage(GetString("Message.MeCommandNoPermission"), player.PlayerId);
                         break;
@@ -3819,6 +3875,20 @@ internal class ChatCommands
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Draw);
                 GameManager.Instance.LogicFlow.CheckEndCriteria();
                 break;
+            case "/deck":
+                if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft && !player.FriendCode.GetDevUser().IsDev)
+                {
+                    break;
+                }
+                if (!GameStates.IsLobby)
+                {
+                    Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
+                    break;
+                }
+
+                //player.SendDeckList();
+
+                break;
             case "/draft":
                 if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft && !player.FriendCode.GetDevUser().IsDev)
                 {
@@ -3903,6 +3973,7 @@ internal class ChatCommands
                     if (int.TryParse(args[1], out int index))
                     {
                         (cmdResult, draftedRole) = player.DraftRole(index);
+                        player.SendDraftDescription(index);
                     }
                     else
                     {
@@ -3929,6 +4000,15 @@ internal class ChatCommands
                 break;
             case "/dd":
             case "/draftdescription":
+                if (int.TryParse(args[1], out int index2))
+                {
+                    player.SendDraftDescription(index2);
+                }
+                else
+                {
+                    Utils.SendMessage(GetString("InvalidDraftSelection"), player.PlayerId);
+                    break;
+                }
                 break;
             case "/exe":
             case "/уничтожить":

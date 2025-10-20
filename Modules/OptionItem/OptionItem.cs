@@ -35,6 +35,7 @@ public abstract class OptionItem
     public bool IsHeader { get; protected set; }
     public bool IsHidden { get; protected set; }
     public bool IsText { get; protected set; }
+    public TextOptionItem Header { get; set; } = null;
     public bool IsVanillaText { get; protected set; }
     public Dictionary<string, string> ReplacementDictionary
     {
@@ -197,6 +198,7 @@ public abstract class OptionItem
             || (HideOptionInHnS != CustomGameMode.All && HideOptionInHnS == mode)
             || (HideOptionInSpeedRun != CustomGameMode.All && HideOptionInSpeedRun == mode)
             || (HideOptionInTagMode != CustomGameMode.All && HideOptionInTagMode == mode)
+            || (Header is { CollapsesSection: true })
             || (GameMode != CustomGameMode.All && GameMode != mode);
     }
     public string ApplyFormat(string value)

@@ -507,7 +507,6 @@ static class ExtendedPlayerControl
         }
 
         player.SetKillTimer(CD: time);
-        player.SyncSettings();
         if (target == null) target = player;
 
         Logger.Info($"SetKillCooldown for [{player.PlayerId}]{player.GetRealName()} => [{target.PlayerId}]{target.GetRealName()}, forceAnime: {forceAnime}", "SetKillCooldown");

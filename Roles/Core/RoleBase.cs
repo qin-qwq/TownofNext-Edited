@@ -270,7 +270,7 @@ public abstract class RoleBase
     { }
     public virtual void OnMeetingShapeshift(PlayerControl shapeshifter, PlayerControl target)
     { }
-    public virtual bool OnCheckVanish(PlayerControl phantom, float killCooldown) => true;
+    public virtual bool OnCheckVanish(PlayerControl phantom) => true;
 
     // NOTE: when using UnShapeshift button, it will not be possible to revert to normal state because of complications
     // So OnCheckShapeShift and OnShapeshift are pointless when using it

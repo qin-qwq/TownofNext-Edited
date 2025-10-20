@@ -1096,11 +1096,11 @@ class MeetingHudStartPatch
                 Main.AllAlivePlayerControls.Where(x => x.GetRealKiller()?.PlayerId == pc.PlayerId).Do(x => MimicMsg += $"\n{x.GetNameWithRole(true)}");
         }
 
-        if (Eavesdropper.IsEnable)
-            Eavesdropper.GetMessage();
-
         if (Rat.IsEnable)
             Rat.GetMessage();
+
+        if (Eavesdropper.IsEnable)
+            Eavesdropper.GetMessage();
 
         // Add Mimic msg
         if (MimicMsg != "")
@@ -1461,7 +1461,7 @@ class MeetingHudUpdatePatch
     {
         if (__instance == null || !GameStates.IsInGame) return;
 
-        //Meeting Skip with vote counting on keystroke (m + delete)
+        //Meeting Skip with vote counting on keystroke (F6)
         if (AmongUsClient.Instance.AmHost && Input.GetKeyDown(KeyCode.F6))
         {
             __instance.CheckForEndVoting();

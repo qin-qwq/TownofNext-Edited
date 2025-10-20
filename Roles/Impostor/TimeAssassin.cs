@@ -38,7 +38,7 @@ internal class TimeAssassin : RoleBase
         AURoleOptions.PhantomCooldown = TimeAssassinSkillCooldown.GetFloat();
     }
 
-    public override bool OnCheckVanish(PlayerControl player, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl player)
     {
         if (AnySabotageIsActive()) return false;
         if (TimeStop) return false;

@@ -20,6 +20,7 @@ internal class Eraser : RoleBase
     private static OptionItem CanGuessErasedPlayer;
 
     private static readonly HashSet<byte> PlayerToErase = [];
+    public static readonly Dictionary<byte, CustomRoles> ErasedRoleStorage = [];
 
     public override void SetupCustomOption()
     {
@@ -31,6 +32,7 @@ internal class Eraser : RoleBase
     public override void Init()
     {
         PlayerToErase.Clear();
+        ErasedRoleStorage.Clear();
     }
     public override void Add(byte playerId)
     {
@@ -81,6 +83,17 @@ internal class Eraser : RoleBase
             var player = Utils.GetPlayerById(pc);
             if (player == null) continue;
             if (!player.IsAlive()) continue;
+
+            if (!ErasedRoleStorage.ContainsKey(player.PlayerId))
+            {
+                ErasedRoleStorage.Add(player.PlayerId, player.GetCustomRole());
+                Logger.Info($"Added {player.GetNameWithRole()} to ErasedRoleStorage", "Eraser");
+            }
+            else
+            {
+                Logger.Info($"Canceled {player.GetNameWithRole()} Eraser bcz already erased.", "Eraser");
+                return;
+            }
 
             if (player.HasGhostRole())
             {

@@ -134,7 +134,7 @@ internal class Balancer : RoleBase
         _ = new LateTask(() =>
         {
             Tar1?.NoCheckStartMeeting(null);
-        }, 2.5f);
+        }, 1f);
     }
     public override void AfterMeetingTasks()
     {

@@ -110,8 +110,7 @@ public class Randomizer : IAddon
         {
             Logger.Info($"{killer.GetNameWithRole()} 击杀了萧暮触发凶手CD变成600 => {target.GetNameWithRole()}", "Randomizer");
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Randomizer), GetString("YouKillRandomizer3")));
-            Main.AllPlayerKillCooldown[killer.PlayerId] = 600f;
-            killer.SyncSettings();
+            killer.SetKillCooldown(600f, forceAnime: true);
         }
         else if (Randomizer == 4)
         {

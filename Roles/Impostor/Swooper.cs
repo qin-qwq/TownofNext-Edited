@@ -34,7 +34,7 @@ internal class Swooper : RoleBase
     {
         AURoleOptions.PhantomCooldown = SwooperCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl player, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl player)
     {
         if (Main.Invisible.Contains(player.PlayerId)) return false;
         player.RpcMakeInvisible();

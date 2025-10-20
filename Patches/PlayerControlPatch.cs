@@ -1216,7 +1216,7 @@ class FixedUpdateInNormalGamePatch
                         FallFromLadder.FixedUpdate(player);
 
                     if (CustomNetObject.AllObjects.Count > 0)
-                        CustomNetObject.FixedUpdate(lowLoad, timerLowLoad);
+                    CustomNetObject.FixedUpdate();
 
                     if (!lowLoad)
                     {

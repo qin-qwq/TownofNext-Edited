@@ -69,7 +69,8 @@ internal class Crusader : RoleBase
         if (killerRole is CustomRoles.Taskinator
             or CustomRoles.Bodyguard
             or CustomRoles.Deputy
-            or CustomRoles.Crusader)
+            or CustomRoles.Crusader
+            or CustomRoles.Jinx)
             return false;
 
         if (crusader.CheckForInvalidMurdering(killer) && crusader.RpcCheckAndMurder(killer, true))

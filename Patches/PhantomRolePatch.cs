@@ -53,6 +53,12 @@ public static class PhantomRolePatch
     private static bool CheckVanish_Prefix(PlayerControl __instance)
     {
         if (!AmongUsClient.Instance.AmHost) return true;
+        Logger.Info($" {__instance.GetNameWithRole()}", "CheckVanish");
+        return __instance.AmOwner && CheckTrigger(__instance); // This is assuming that all non-host vanish requests are for ability triggers and should be cancelled
+    }
+    /*private static bool CheckVanish_Prefix(PlayerControl __instance)
+    {
+        if (!AmongUsClient.Instance.AmHost) return true;
 
         var phantom = __instance;
         Logger.Info($"Player: {phantom.GetRealName()}", "CheckVanish");
@@ -84,13 +90,12 @@ public static class PhantomRolePatch
         }
         InvisibilityList.Add(phantom);
         return true;
-    }
+    }*/
 
     public static bool CheckTrigger(PlayerControl phantom)
     {
         var role = phantom.GetRoleClass();
-        float killCooldown = phantom.GetKillTimer();
-        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom, killCooldown) == false)
+        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false)
         {
             if (phantom.AmOwner)
             {
@@ -117,7 +122,8 @@ public static class PhantomRolePatch
 
             _ = new LateTask(() =>
             {
-                phantom.SetKillCooldown(Math.Max(killCooldown, 0.001f));
+                if (phantom.GetCustomRole() is CustomRoles.Fury or CustomRoles.QuickShooter) return;
+                phantom.SetKillCooldown(Math.Max(phantom.GetKillTimer(), 0.001f));
             }, 0.2f, $"Phantom Check");
 
             return false;

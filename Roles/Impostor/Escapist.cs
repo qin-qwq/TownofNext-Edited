@@ -14,6 +14,14 @@ internal class Escapist : RoleBase
     public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
+
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        if (!EscapeLocation.TryGetValue(id, out Vector2 loc))
+            hud.AbilityButton.buttonLabelText.text = GetString("EscapistMarkButtonText");
+        else
+            hud.AbilityButton.buttonLabelText.text = GetString("EscapistTeleportButtonText");
+    }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("abscond");
 
     private static OptionItem ShapeshiftCooldown;
@@ -37,7 +45,7 @@ internal class Escapist : RoleBase
         AURoleOptions.PhantomCooldown = EscapeLocation.ContainsKey(playerId) ? ShapeshiftCooldown.GetFloat() : 1f;
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         if (EscapeLocation.TryGetValue(shapeshifter.PlayerId, out var position))
         {
