@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Crewmate;
@@ -20,7 +21,7 @@ public class Oiiai : IAddon
     private static OptionItem ShouldChangeRoleOnNeutral;
     private static OptionItem ChangeNeutralRole;
 
-    public static readonly List<string> ChangeRoles = new List<string>();
+    public static readonly List<string> ChangeRoles = [];
 
     public static readonly CustomRoles[] NRoleChangeRoles =
     [
@@ -80,7 +81,7 @@ public class Oiiai : IAddon
             Logger.Info(killer.GetNameWithRole() + " gets Oiiai addon by " + target.GetNameWithRole(), "Oiiai");
         }
 
-        /*if (!Eraser.ErasedRoleStorage.ContainsKey(killer.PlayerId))
+        if (!Eraser.ErasedRoleStorage.ContainsKey(killer.PlayerId))
         {
             Eraser.ErasedRoleStorage.Add(killer.PlayerId, killer.GetCustomRole());
             Logger.Info($"Added {killer.GetNameWithRole()} to ErasedRoleStorage", "Oiiai");
@@ -89,12 +90,12 @@ public class Oiiai : IAddon
         {
             Logger.Info($"Canceled {killer.GetNameWithRole()} Oiiai bcz already erased.", "Oiiai");
             return;
-        }*/
+        }
 
         var killerRole = killer.GetCustomRole();
         if (killer.HasGhostRole() || CopyCat.playerIdList.Contains(killer.PlayerId) || killer.Is(CustomRoles.Stubborn))
         {
-            Logger.Info($"Oiiai {killer.GetNameWithRole().RemoveHtmlTags()} cannot eraser crew imp-based role", "Oiiai");
+            Logger.Info($"Oiiai {killer.GetNameWithRole().RemoveHtmlTags()} cannot eraser ghost/copycat/stubborn role", "Oiiai");
             return;
         }
         else if (killerRole.IsCoven() && !CovenManager.HasNecronomicon(killer))
@@ -134,11 +135,11 @@ public class Oiiai : IAddon
         }
         else if (!killerRole.IsNeutral())
         {
-            //var readyrole = Eraser.GetErasedRole(killer.GetCustomRole().GetRoleTypes(), killer.GetCustomRole());
+            var readyrole = GetErasedRole(killer.GetCustomRole().GetRoleTypes(), killer.GetCustomRole());
             //Use eraser here LOL
             killer.GetRoleClass()?.OnRemove(killer.PlayerId);
-            //killer.RpcChangeRoleBasis(readyrole);
-            //killer.RpcSetCustomRole(readyrole);
+            killer.RpcChangeRoleBasis(readyrole);
+            killer.RpcSetCustomRole(readyrole);
             Main.DesyncPlayerList.Remove(killer.PlayerId);
             killer.GetRoleClass()?.OnAdd(killer.PlayerId);
             Logger.Info($"Oiiai {killer.GetNameWithRole().RemoveHtmlTags()} with eraser assign.", "Oiiai");
@@ -177,5 +178,25 @@ public class Oiiai : IAddon
         if ((player.Is(CustomRoles.Loyal) && player.GetCustomRole().IsNeutral()) || player.Is(CustomRoles.Stubborn)) return false;
 
         return true;
+    }
+
+    // Erased RoleType - Impostor, Shapeshifter, Crewmate, Engineer, Scientist (Not Neutrals)
+    public static CustomRoles GetErasedRole(RoleTypes roleType, CustomRoles role)
+    {
+        return role.IsVanilla()
+            ? role
+            : roleType switch
+            {
+                RoleTypes.Crewmate => CustomRoles.CrewmateTOHE,
+                RoleTypes.Scientist => CustomRoles.ScientistTOHE,
+                RoleTypes.Tracker => CustomRoles.TrackerTOHE,
+                RoleTypes.Noisemaker => CustomRoles.NoisemakerTOHE,
+                RoleTypes.Engineer => CustomRoles.EngineerTOHE,
+                RoleTypes.Impostor when role.IsCrewmate() => CustomRoles.CrewmateTOHE,
+                RoleTypes.Impostor => CustomRoles.ImpostorTOHE,
+                RoleTypes.Shapeshifter => CustomRoles.ShapeshifterTOHE,
+                RoleTypes.Phantom => CustomRoles.PhantomTOHE,
+                _ => role,
+            };
     }
 }

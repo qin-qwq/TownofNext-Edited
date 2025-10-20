@@ -190,6 +190,8 @@ public class Lovers : IAddon
 
             if (p1.IsAlive() && pair.Item1 != deathId && p2.IsAlive() && pair.Item2 != deathId) continue;
 
+            if (!p1.IsAlive() && !p2.IsAlive()) return;
+
             if (Cupid.IsCupidLoverPair(p1, p2)) continue;
 
             hasHeartbreak[pair] = true;

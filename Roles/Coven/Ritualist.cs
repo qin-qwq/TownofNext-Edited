@@ -283,6 +283,6 @@ internal class Ritualist : CovenManager
     }
     public static bool CanBeConverted(PlayerControl pc)
     {
-        return pc != null && (!pc.GetCustomRole().IsCovenTeam() && !pc.IsTransformedNeutralApocalypse());
+        return pc != null && !(pc.GetCustomRole().IsCovenTeam() || pc.GetBetrayalAddon().IsCovenTeam()) && !pc.IsTransformedNeutralApocalypse();
     }
 }

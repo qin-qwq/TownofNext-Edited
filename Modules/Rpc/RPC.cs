@@ -68,6 +68,7 @@ public enum CustomRPC : byte // 181/255 USED
     SyncDeadPassedMeetingList,
     SyncAbilityUseLimit,
     PlayGuardAndKill,
+    FixBlackscreen,
 
     //Roles 
     SyncRoleSkill,
@@ -171,7 +172,8 @@ internal class RPCHandlerPatch
         or CustomRPC.DumpLog
         or CustomRPC.SetFriendCode
         or CustomRPC.BetterCheck
-        or CustomRPC.DictatorRPC;
+        or CustomRPC.DictatorRPC
+        or CustomRPC.FixBlackscreen;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
         var rpcType = (RpcCalls)callId;
@@ -635,6 +637,11 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.Guess:
                 GuessManager.ReceiveRPC(reader, __instance);
+                break;
+            case CustomRPC.FixBlackscreen:
+                Logger.Info("Attempted to fix Black Screen", "KeyCommand");
+                AntiBlackout.SetIsDead();
+                Logger.SendInGame("尝试修复黑屏");
                 break;
             case CustomRPC.NemesisRevenge:
                 Nemesis.ReceiveRPC_Custom(reader, __instance);

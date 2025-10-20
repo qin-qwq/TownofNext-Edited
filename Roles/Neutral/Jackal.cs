@@ -232,7 +232,7 @@ internal class Jackal : RoleBase
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
 
                 ConvertedPlayerId = target.PlayerId;
                 break;
@@ -260,7 +260,7 @@ internal class Jackal : RoleBase
                 Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
 
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
 
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
@@ -310,7 +310,7 @@ internal class Jackal : RoleBase
                 Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
 
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
 
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);

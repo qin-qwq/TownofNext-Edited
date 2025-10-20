@@ -4,6 +4,7 @@ using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Crewmate;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
+using TOHE.Roles.Core.DraftAssign;
 using TOHE.Roles.Coven;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Double;
@@ -398,7 +399,8 @@ public static class CustomRolesHelper
             CustomRoles.Alchemist or
             CustomRoles.Tired or
             CustomRoles.Sloth or
-            CustomRoles.Fury;
+            CustomRoles.Fury or
+            CustomRoles.TimeAssassin;
     }
     public static bool IsRevealingRole(this CustomRoles role, PlayerControl target)
     {
@@ -1646,6 +1648,16 @@ public static class CustomRolesHelper
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
 
+    public static bool IsInRoleSlot(this CustomRoles role, RoleSlot slot)
+    {
+        if (slot.Roles.Contains(role)) return true;
+
+        foreach (var bucket in slot.Buckets)
+        {
+            if (role.IsInRoleBucket(bucket)) return true;
+        }
+        return false;
+    }
 
     /// <summary>
     /// Whether the role is in the given role bucket

@@ -137,9 +137,7 @@ public static class TagMode
         TaskCount = (0, TaskNum);
         if (PlaySound.GetBool())
         {
-            if (GameStates.IsVanillaServer && !GameStates.IsLocalGame)
-                Main.AllPlayerControls.Where(x => x.IsHost()).Do(x => RPC.PlaySoundRPC(Sounds.HnSLong, x.PlayerId));
-            else Main.AllPlayerControls.Where(x => x.IsModded()).Do(x => RPC.PlaySoundRPC(Sounds.HnSLong, x.PlayerId));
+            Main.AllPlayerControls.Where(x => x.IsHost()).Do(x => RPC.PlaySound(x.PlayerId, Sounds.HnSLong));
         }
     }
 
