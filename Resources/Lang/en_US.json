@@ -4301,7 +4301,7 @@
   "AndroidUpdateNotSupported": "ModUpdater is unavailable on StarLight.\nPlease update via StarLight manage page.",
   "Blaster": "Blaster",
   "BlasterInfo": "Put explosive and kill nearby crewmate",
-  "BlasterInfoLong": "(内鬼阵营):\n爆破手可以使用消失按钮放置一个炸弹，炸弹会在一段时间后爆炸",
+  "BlasterInfoLong": "(impostors):\nDemoman can use the Vanish Button to plant a bomb. The bomb will detonate after a short delay",
   "BlasterMark": "Bomb has been placed, in{0}second explosion!",
   "BombDelayTime": "Explosion delay time",
   "BlasterPhantomText": "Put",
