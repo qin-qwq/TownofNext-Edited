@@ -2448,7 +2448,7 @@ public static class Utils
             AirshipElectricalDoors.Initialize();
 
         DoorsReset.ResetDoors();
-        //CustomNetObject.AfterMeetingTasks();
+        CustomNetObject.AfterMeetingTasks();
 
         // Empty Deden bug support Empty vent after meeting
         var ventilationSystem = ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Ventilation, out var systemType) ? systemType.CastFast<VentilationSystem>() : null;

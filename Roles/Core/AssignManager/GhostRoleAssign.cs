@@ -68,7 +68,8 @@ public static class GhostRoleAssign
             or CustomRoles.Virus
             or CustomRoles.Jackal
             or CustomRoles.Sidekick
-            or CustomRoles.PlagueDoctor) return;
+            or CustomRoles.PlagueDoctor
+            or CustomRoles.Wraith) return;
 
         var IsNeutralAllowed = !player.IsAnySubRole(x => x.IsConverted()) || Options.ConvertedCanBecomeGhost.GetBool();
         var CheckNeutral = player.GetCustomRole().IsNeutral() && Options.NeutralCanBecomeGhost.GetBool();

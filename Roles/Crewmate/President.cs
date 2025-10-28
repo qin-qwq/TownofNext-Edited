@@ -25,7 +25,7 @@ internal class President : RoleBase
     private static OptionItem CovenSeePresident;
 
     private static readonly Dictionary<byte, int> RevealLimit = [];
-    private static readonly Dictionary<byte, bool> CheckPresidentReveal = [];
+    public static readonly Dictionary<byte, bool> CheckPresidentReveal = [];
 
     public override void SetupCustomOption()
     {

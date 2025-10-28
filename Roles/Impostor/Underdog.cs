@@ -1,3 +1,5 @@
+using System;
+
 namespace TOHE.Roles.Impostor;
 
 internal class Underdog : RoleBase
@@ -9,21 +11,31 @@ internal class Underdog : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
-    private static OptionItem UnderdogMaximumPlayersNeededToKill;
     private static OptionItem UnderdogKillCooldown;
+    private static OptionItem ReduceKillCooldown;
+    private static OptionItem MinKillCooldown;
 
     public override void SetupCustomOption()
     {
         Options.SetupRoleOptions(2700, TabGroup.ImpostorRoles, CustomRoles.Underdog);
-        UnderdogMaximumPlayersNeededToKill = IntegerOptionItem.Create(Id + 2, "UnderdogMaximumPlayersNeededToKill", new(1, 15, 1), 5, TabGroup.ImpostorRoles, false)
+        UnderdogKillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.DefaultKillCooldown, new(0f, 180f, 2.5f), 45f, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Underdog])
-            .SetValueFormat(OptionFormat.Players);
-        UnderdogKillCooldown = FloatOptionItem.Create(Id + 3, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 12.5f, TabGroup.ImpostorRoles, false)
+            .SetValueFormat(OptionFormat.Seconds);
+        ReduceKillCooldown = FloatOptionItem.Create(Id + 11, "Underdog.ReduceKillCooldown", new(0f, 180f, 1f), 5f, TabGroup.ImpostorRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Underdog])
+            .SetValueFormat(OptionFormat.Seconds);
+        MinKillCooldown = FloatOptionItem.Create(Id + 12, GeneralOption.MinKillCooldown, new(0f, 180f, 2.5f), 15f, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Underdog])
             .SetValueFormat(OptionFormat.Seconds);
     }
 
-    public override bool CanUseKillButton(PlayerControl pc) => Main.AllAlivePlayerControls.Length <= UnderdogMaximumPlayersNeededToKill.GetInt();
+    public override bool CanUseKillButton(PlayerControl pc) => true;
 
-    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = UnderdogKillCooldown.GetFloat();
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = Math.Clamp(UnderdogKillCooldown.GetFloat() - (Main.AllPlayerControls.Count(x => !x.IsAlive()) * ReduceKillCooldown.GetFloat()), MinKillCooldown.GetFloat(), UnderdogKillCooldown.GetFloat());
+
+    public override void OnMurderPlayerAsKiller(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    {
+        killer?.ResetKillCooldown();
+        killer?.SyncSettings();
+    }
 }

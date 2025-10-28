@@ -11,7 +11,7 @@
 		<Platforms>Windows;Android</Platforms>
 		<AmongUs>D:\Program Files (x86)\Steam\steamapps\common\Among Us</AmongUs>
 		<!--<AmongUs>C:\Program Files\Epic Games\AmongUs</AmongUs>-->
-		<Configurations>Debug;Release;Canary</Configurations>
+		<Configurations>Debug;Release;Beta</Configurations>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Optimize>True</Optimize>
 		<CodePage>65001</CodePage>

@@ -53,8 +53,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.4.2"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.5.0 Beta 1";
+    public const string PluginVersion = "1.4.3"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.5.0 Beta 2";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 17.0.0 & 17.0.1
@@ -62,7 +62,7 @@ public class Main : BasePlugin
 
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V1.5.0 Alpha 1, Discontinued, use Beta instead
-    public static readonly bool canaryRelease = true; // Latest: V1.5.0 Beta 1
+    public static readonly bool canaryRelease = true; // Latest: V1.5.0 Beta 2
     public static readonly bool fullRelease = false; // Latest: V1.4.1
 
     public static bool hasAccess = true;
@@ -740,6 +740,7 @@ public enum CustomRoles
     Bloodmoon,
     Minion,
     Possessor,
+    Wraithh,
 
     //Impostor
     Abyssbringer,
@@ -818,6 +819,7 @@ public enum CustomRoles
     Warlock,
     Wildling,
     Witch,
+    Wraith,
     Zombie,
 
     //Crewmate Ghost
@@ -980,7 +982,6 @@ public enum CustomRoles
     War,
     Werewolf,
     Workaholic,
-    Wraith,
 
     //Coven
     Coven,
@@ -1143,7 +1144,6 @@ public enum CustomWinner
     HexMaster = CustomRoles.HexMaster,
     Quizmaster = CustomRoles.Quizmaster,
     Cultist = CustomRoles.Cultist,
-    Wraith = CustomRoles.Wraith,
     Bandit = CustomRoles.Bandit,
     Pirate = CustomRoles.Pirate,
     SerialKiller = CustomRoles.SerialKiller,

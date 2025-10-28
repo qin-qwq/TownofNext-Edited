@@ -1009,7 +1009,15 @@ static class ExtendedPlayerControl
             Logger.Warn($"{callerClassName}.{callerMethodName} tried to get CustomSubRole, but the target was null", "GetCustomRole");
             return [CustomRoles.NotAssigned];
         }
-        return Main.PlayerStates.TryGetValue(player.PlayerId, out var State) ? State.SubRoles : [CustomRoles.NotAssigned];
+
+        if (Main.PlayerStates.TryGetValue(player.PlayerId, out var State))
+        {
+            if (CopyCat.playerIdList.Contains(player.PlayerId)) return [.. State.SubRoles, .. CopyCat.OldAddons[player.PlayerId]];
+
+            return State.SubRoles;
+        }
+
+        return  [CustomRoles.NotAssigned];
     }
     public static CountTypes GetCountTypes(this PlayerControl player)
     {
@@ -1429,6 +1437,7 @@ static class ExtendedPlayerControl
         {
             if (Nemesis.PreventKnowRole(seer)) return false;
             if (Retributionist.PreventKnowRole(seer)) return false;
+            if (Wraithh.PreventKnowRole(seer)) return false;
 
             if (!Options.GhostCanSeeOtherRoles.GetBool())
                 return false;
@@ -1469,6 +1478,7 @@ static class ExtendedPlayerControl
         {
             if (Nemesis.PreventKnowRole(seer)) return false;
             if (Retributionist.PreventKnowRole(seer)) return false;
+            if (Wraithh.PreventKnowRole(seer)) return false;
 
             if (!Options.GhostCanSeeOtherRoles.GetBool())
                 return false;

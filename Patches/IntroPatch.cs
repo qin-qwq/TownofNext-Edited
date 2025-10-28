@@ -519,6 +519,7 @@ class BeginCrewmatePatch
             case CustomRoles.SoulCatcher:
             case CustomRoles.Specter:
             case CustomRoles.Stalker:
+            case CustomRoles.Wraith:
             case CustomRoles.PhantomTOHE:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Phantom);
                 break;
@@ -625,7 +626,6 @@ class BeginCrewmatePatch
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = PlayerControl.LocalPlayer.KillSfx;
                 break;
             case CustomRoles.Swooper:
-            case CustomRoles.Wraith:
             case CustomRoles.Chameleon:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = PlayerControl.LocalPlayer.MyPhysics.ImpostorDiscoveredSound;
                 break;

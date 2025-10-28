@@ -135,10 +135,11 @@ public class Lovers : IAddon
     public static byte GetLoverId(PlayerControl player) => GetLoverId(player.PlayerId);
     public static byte GetLoverId(byte playerId)
     {
-        if (loverless == playerId) return byte.MaxValue;
+        //if (loverless == playerId) return byte.MaxValue;
 
         foreach (var pair in loverPairs)
         {
+            if (loverless == pair.Item1 || loverless == pair.Item2) Logger.Warn("Lover is also loverless?", "Lovers");
             if (pair.Item1 == playerId) return pair.Item2;
             if (pair.Item2 == playerId) return pair.Item1;
         }
@@ -193,6 +194,8 @@ public class Lovers : IAddon
             if (!p1.IsAlive() && !p2.IsAlive()) return;
 
             if (Cupid.IsCupidLoverPair(p1, p2)) continue;
+
+            if (hasHeartbreak[pair]) continue;
 
             hasHeartbreak[pair] = true;
 

@@ -56,6 +56,7 @@ internal class Swooper : RoleBase
     }
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
+        if (!killer.RpcCheckAndMurder(target, true)) return false;
         if (Main.Invisible.Contains(killer.PlayerId))
         {
             target.RpcMurderPlayer(target);

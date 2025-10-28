@@ -139,7 +139,7 @@ internal class TimeMaster : RoleBase
         long now = TimeStamp;
         if (BackTrack.ContainsKey(now)) return;
 
-        BackTrack[now] = Main.AllAlivePlayerControls.ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
+        BackTrack[now] = Main.AllAlivePlayerControls.Where(x => !x.inVent && !x.onLadder && !x.inMovingPlat).ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
 
         if (!lowLoad && TimeMasterInProtect.TryGetValue(player.PlayerId, out var vtime) && vtime + TimeMasterSkillDuration.GetInt() < nowTime)
         {

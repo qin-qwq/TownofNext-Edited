@@ -1,24 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22 d17.14
+VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TOHE", "TOHE.csproj", "{5662C988-912C-3D07-8454-0C0AC7960BFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Canary|Android = Canary|Android
-		Canary|Windows = Canary|Windows
+		Beta|Android = Beta|Android
+		Beta|Windows = Beta|Windows
 		Debug|Android = Debug|Android
 		Debug|Windows = Debug|Windows
 		Release|Android = Release|Android
 		Release|Windows = Release|Windows
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Canary|Android.ActiveCfg = Canary|Android
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Canary|Android.Build.0 = Canary|Android
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Canary|Windows.ActiveCfg = Canary|Windows
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Canary|Windows.Build.0 = Canary|Windows
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Android.ActiveCfg = Beta|Android
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Android.Build.0 = Beta|Android
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Windows.ActiveCfg = Beta|Windows
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Windows.Build.0 = Beta|Windows
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Android.ActiveCfg = Debug|Android
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Android.Build.0 = Debug|Android
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Windows.ActiveCfg = Debug|Windows

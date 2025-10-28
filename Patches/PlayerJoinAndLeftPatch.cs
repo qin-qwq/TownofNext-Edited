@@ -42,6 +42,7 @@ class OnGameJoinedPatch
         EAC.Init();
         Main.AllClientRealNames.Clear();
         FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
+        Utils.GetRegionName(ServerManager.Instance.CurrentRegion ?? null);
 
         if (AmongUsClient.Instance.AmHost) // Execute the following only on the Host
         {

@@ -4,6 +4,7 @@ using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Crewmate;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
+using TOHE.Roles.Core.AssignManager;
 using TOHE.Roles.Core.DraftAssign;
 using TOHE.Roles.Coven;
 using TOHE.Roles.Crewmate;
@@ -214,7 +215,6 @@ public static class CustomRolesHelper
             CustomRoles.Sidekick or
             CustomRoles.Infectious or
             CustomRoles.Pyromaniac or
-            CustomRoles.Wraith or
             CustomRoles.Shroud or
             CustomRoles.Pelican or
             CustomRoles.Refugee or
@@ -1221,7 +1221,6 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.DollMaster)
                     || pc.Is(CustomRoles.Sloth)
                     || pc.Is(CustomRoles.Zombie)
-                    || pc.Is(CustomRoles.Wraith)
                     || pc.Is(CustomRoles.Spurt)
                     || pc.Is(CustomRoles.Chameleon)
                     || pc.Is(CustomRoles.Alchemist)
@@ -1279,8 +1278,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.DollMaster)
                     || pc.Is(CustomRoles.Chameleon)
                     || pc.Is(CustomRoles.Swooper)
-                    || pc.Is(CustomRoles.Alchemist)
-                    || pc.Is(CustomRoles.Wraith))
+                    || pc.Is(CustomRoles.Alchemist))
                     return false;
                 break;
 
@@ -1320,7 +1318,6 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.DollMaster)
                     || pc.Is(CustomRoles.Flash)
                     || pc.Is(CustomRoles.Zombie)
-                    || pc.Is(CustomRoles.Wraith)
                     || pc.Is(CustomRoles.Spurt)
                     || pc.Is(CustomRoles.Chameleon)
                     || pc.Is(CustomRoles.Alchemist)
@@ -1525,7 +1522,6 @@ public static class CustomRolesHelper
            CustomRoles.Arsonist => Arsonist.CanIgniteAnytime() ? CountTypes.Arsonist : CountTypes.Crew,
            CustomRoles.Shroud => CountTypes.Shroud,
            CustomRoles.Werewolf => CountTypes.Werewolf,
-           CustomRoles.Wraith => CountTypes.Wraith,
            var r when r.IsNA() => CountTypes.Apocalypse,
            var r when r.IsCoven() => CountTypes.Coven,
            CustomRoles.Enchanted => CountTypes.Coven,
@@ -1583,7 +1579,6 @@ public static class CustomRolesHelper
             CustomRoles.Collector => CustomWinner.Collector,
             CustomRoles.BloodKnight => CustomWinner.BloodKnight,
             CustomRoles.Cultist => CustomWinner.Cultist,
-            CustomRoles.Wraith => CustomWinner.Wraith,
             CustomRoles.Bandit => CustomWinner.Bandit,
             CustomRoles.Pirate => CustomWinner.Pirate,
             CustomRoles.SerialKiller => CustomWinner.SerialKiller,
@@ -1626,7 +1621,6 @@ public static class CustomRolesHelper
             CountTypes.Cultist => CustomRoles.Cultist,
             CountTypes.Shroud => CustomRoles.Shroud,
             CountTypes.Werewolf => CustomRoles.Werewolf,
-            CountTypes.Wraith => CustomRoles.Wraith,
             CountTypes.Apocalypse => CustomRoles.Apocalypse,
             CountTypes.Agitater => CustomRoles.Agitater,
             CountTypes.SerialKiller => CustomRoles.SerialKiller,
@@ -1650,6 +1644,8 @@ public static class CustomRolesHelper
 
     public static bool IsInRoleSlot(this CustomRoles role, RoleSlot slot)
     {
+        if (!slot.Types.Any(x => role.IsRoleAssignType(x))) return false;
+
         if (slot.Roles.Contains(role)) return true;
 
         foreach (var bucket in slot.Buckets)
@@ -1697,6 +1693,58 @@ public static class CustomRolesHelper
             RoleBucket.CovenRandom => roleType is Custom_RoleType.CovenPower or Custom_RoleType.CovenKilling or Custom_RoleType.CovenTrickery or Custom_RoleType.CovenUtility,
 
             RoleBucket.Any => true,
+            _ => false
+        };
+    }
+
+    public static List<RoleAssign.RoleAssignType> RoleAssignTypes(this RoleBucket bucket)
+    {
+        return bucket switch
+        {
+            RoleBucket.ImpostorKilling or
+            RoleBucket.ImpostorSupport or
+            RoleBucket.ImpostorConcealing or
+            RoleBucket.ImpostorHindering or
+            RoleBucket.ImpostorCommon or
+            RoleBucket.ImpostorRandom => [RoleAssign.RoleAssignType.Impostor],
+
+            RoleBucket.CrewmateBasic or
+            RoleBucket.CrewmateSupport or
+            RoleBucket.CrewmateKilling or
+            RoleBucket.CrewmatePower or
+            RoleBucket.CrewmateCommon or
+            RoleBucket.CrewmateRandom => [RoleAssign.RoleAssignType.Crewmate],
+
+            RoleBucket.NeutralBenign or
+            RoleBucket.NeutralChaos or
+            RoleBucket.NeutralEvil => [RoleAssign.RoleAssignType.NonKillingNeutral],
+            RoleBucket.NeutralKilling => [RoleAssign.RoleAssignType.NeutralKilling],
+            RoleBucket.NeutralApocalypse => [RoleAssign.RoleAssignType.NeutralApocalypse],
+            RoleBucket.NeutralRandom => [RoleAssign.RoleAssignType.NonKillingNeutral, RoleAssign.RoleAssignType.NeutralKilling, RoleAssign.RoleAssignType.NeutralApocalypse],
+
+            RoleBucket.CovenPower or
+            RoleBucket.CovenKilling or
+            RoleBucket.CovenTrickery or
+            RoleBucket.CovenUtility or
+            RoleBucket.CovenCommon or
+            RoleBucket.CovenRandom => [RoleAssign.RoleAssignType.Coven],
+
+            RoleBucket.Any => [RoleAssign.RoleAssignType.Impostor, RoleAssign.RoleAssignType.Crewmate, RoleAssign.RoleAssignType.NonKillingNeutral,
+                RoleAssign.RoleAssignType.NeutralKilling, RoleAssign.RoleAssignType.NeutralApocalypse, RoleAssign.RoleAssignType.Coven],
+            _ => []
+        };
+    }
+
+    public static bool IsRoleAssignType(this CustomRoles role, RoleAssign.RoleAssignType type)
+    {
+        return type switch
+        {
+            RoleAssign.RoleAssignType.Impostor => role.IsImpostor(),
+            RoleAssign.RoleAssignType.Crewmate => role.IsCrewmate(),
+            RoleAssign.RoleAssignType.Coven => role.IsCoven(),
+            RoleAssign.RoleAssignType.NeutralApocalypse => role.IsNA(),
+            RoleAssign.RoleAssignType.NeutralKilling => role.IsNK(),
+            RoleAssign.RoleAssignType.NonKillingNeutral => role.IsNonNK(),
             _ => false
         };
     }
@@ -1763,7 +1811,6 @@ public enum CountTypes
     Poisoner,
     Charmed,
     Cultist,
-    Wraith,
     SerialKiller,
     Juggernaut,
     Infectious,
