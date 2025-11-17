@@ -885,6 +885,8 @@ class ReportDeadBodyPatch
 
         AfterReportTasks(__instance, target);
 
+        Main.CantKill = true;
+
         MeetingRoomManager.Instance.AssignSelf(__instance, target);
         // Meeting playernames are setuped when meetingHud is spawned.
         // Must serialize meetinghud after playernames are synced
@@ -1024,7 +1026,7 @@ class FixedUpdateInNormalGamePatch
 
     public static void Postfix(PlayerControl __instance)
     {
-        if (__instance == null || __instance.PlayerId == 255) return;
+        if (__instance == null || __instance.PlayerId == 255 || __instance.notRealPlayer) return;
 
         CheckMurderPatch.Update(__instance.PlayerId);
 
@@ -1473,7 +1475,7 @@ class FixedUpdateInNormalGamePatch
                         if (player.Is(CustomRoles.Snitch) && player.Is(CustomRoles.Madmate))
                             Mark.Append(CustomRoles.Impostor.GetColoredTextByRole("★"));
                     }
-                    if (((localPlayer.IsPlayerCovenTeam() && player.IsPlayerCovenTeam()) || !localPlayer.IsAlive()) && CovenManager.HasNecronomicon(player))
+                    if ((localPlayer.IsPlayerCovenTeam() || !localPlayer.IsAlive()) && player.IsPlayerCovenTeam() && CovenManager.HasNecronomicon(player))
                     {
                         Mark.Append(CustomRoles.Coven.GetColoredTextByRole("♣"));
                     }

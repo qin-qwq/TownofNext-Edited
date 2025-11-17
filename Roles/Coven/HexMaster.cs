@@ -332,7 +332,7 @@ internal class HexMaster : CovenManager
             if (!dic.Any()) continue;
             if (pc.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool()) continue;
             var whichId = dic.FirstOrDefault().Key;
-            var hexmaster = Utils.GetPlayerById(whichId);
+            var hexmaster = GetPlayerById(whichId);
             if (hexmaster != null && hexmaster.IsAlive())
             {
                 if (!Main.AfterMeetingDeathPlayers.ContainsKey(pc.PlayerId))

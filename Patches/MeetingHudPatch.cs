@@ -122,6 +122,7 @@ class CheckForEndVotingPatch
                     __instance.RpcClearVoteDelay(pc.GetClientId());
                     continue;
                 }
+
                 if (pva.DidVote && pva.VotedFor < 253 && pc.IsAlive())
                 {
                     var voteTarget = GetPlayerById(pva.VotedFor);
@@ -240,6 +241,9 @@ class CheckForEndVotingPatch
 
                 // Swapper swap votes
                 if (voter.GetRoleClass() is Swapper sw) sw.SwapVotes(__instance);
+
+                // Speaker change vote
+                if (voter.GetRoleClass() is Speaker sp) sp.ChangeVote(__instance);
 
                 playerRoleClass?.AddVisualVotes(ps, ref statesList);
 

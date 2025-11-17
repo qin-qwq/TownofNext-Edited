@@ -159,7 +159,7 @@ internal class AbyssBringer : RoleBase
                 var direction = (pos - blackHole.Position).normalized;
                 var newPosition = blackHole.Position + direction * BlackHoleMoveSpeed.GetFloat() * Time.fixedDeltaTime;
                 blackHole.Position = newPosition;
-                blackHole.NetObject.Position = newPosition;
+                blackHole.NetObject.TP(newPosition);
             }
 
             if (Vector2.Distance(pos, blackHole.Position) <= BlackHoleRadius.GetFloat())
@@ -246,7 +246,7 @@ internal class AbyssBringer : RoleBase
     }
     public override string GetLowerText(PlayerControl seer, PlayerControl target = null, bool isMeeting = false, bool isForHud = false)
     {
-        if (seer.PlayerId != target.PlayerId || seer.PlayerId != _state.PlayerId || (seer.IsModded() && !isForHud) || isMeeting || BlackHoles.Count == 0) return string.Empty;
+        if (seer?.PlayerId != target?.PlayerId || seer?.PlayerId != _state?.PlayerId || (seer?.IsModded() == true && !isForHud) || isMeeting || BlackHoles.Count == 0) return string.Empty;
         return string.Format(Translator.GetString("Abyssbringer.Suffix"), BlackHoles.Count, string.Join('\n', BlackHoles.Select(x => GetBlackHoleFormatText(x.Value.RoomName, x.Value.PlayersConsumed))));
 
         static string GetBlackHoleFormatText(string roomName, int playersConsumed)

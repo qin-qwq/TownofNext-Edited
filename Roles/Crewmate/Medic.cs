@@ -159,7 +159,7 @@ internal class Medic : RoleBase
                 break;
         }
 
-        ChangeToCrewmate();
+        if (!killer.IsNonHostModdedClient()) ChangeToCrewmate();
 
         NotifyRoles(SpecifySeer: killer, SpecifyTarget: target);
         NotifyRoles(SpecifySeer: target, SpecifyTarget: killer);

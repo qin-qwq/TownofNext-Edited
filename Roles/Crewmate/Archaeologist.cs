@@ -35,7 +35,7 @@ internal class Archaeologist : RoleBase
     private static OptionItem TalismanDuration;
     private static OptionItem CurseKillCooldown;
 
-    private static byte AntiqueID = 16;
+    private static byte AntiqueID = 251;
     private static bool FixNextSabo = false;
     private static bool IsProtected = false;
     private static bool HasGrail = false;
@@ -69,7 +69,7 @@ internal class Archaeologist : RoleBase
     public override void Init()
     {
         IsProtected = false;
-        AntiqueID = 16;
+        AntiqueID = 251;
         FixNextSabo = false;
         HasGrail = false;
         Votes = 0;
@@ -86,72 +86,8 @@ internal class Archaeologist : RoleBase
             {
                 if (GameStates.IsInTask)
                 {
-                    var player = playerId.GetPlayer();
-                    if (player == null) return;
-
-                    var rand = IRandom.Instance;
-                    AntiqueID = (byte)rand.Next(1, 18);
-
-                    switch (AntiqueID)
-                    {
-                        case 1: // 灵魂回响镜 - 知道何时有玩家死亡
-                            player.Notify(GetString("GotMirror"), 15f);
-                            break;
-                        case 2: // 复活圣杯 - 复活一名死亡的玩家
-                            player.Notify(GetString("GotGrail"), 15f);
-                            break;
-                        case 3: // 相位斗篷 - 使你短暂隐形
-                            player.Notify(GetString("GotCloak"), 15f);
-                            break;
-                        case 4: // 引力石板 - 将所有玩家拉向自己位置
-                            player.Notify(GetString("GotFlagstone"), 15f);
-                            break;
-                        case 5: // 寒冰宝珠 - 冻结附近玩家
-                            player.Notify(GetString("GotOrbs"), 15f);
-                            break;
-                        case 6: // 战争号角 - 所有玩家移动速度提升
-                            player.Notify(GetString("GotBugle"), 15f);
-                            break;
-                        case 7: // 智慧卷轴 - 帮一名船员完成一个任务
-                            player.Notify(GetString("GotReel"), 15f);
-                            break;
-                        case 8: // 能量水晶 - 恢复所有船员的技能使用次数
-                            player.Notify(GetString("GotCrystal"), 15f);
-                            break;
-                        case 9: // 激励圣物 - 会议投票时获得额外投票权
-                            player.Notify(GetString("GotRelic"), 15f);
-                            break;
-                        case 10: // 契约卷轴 - 与一名玩家建立生命链接
-                            player.Notify(GetString("GotIndenture"), 15f);
-                            break;
-                        case 11: // 牺牲匕首 - 牺牲自己，为内鬼增加负面效果，为船员增加正面效果
-                            player.Notify(GetString("GotDagger"), 15f);
-                            break;
-                        case 12: // 太阳护符 - 使自己获得伤害免疫
-                            player.Notify(GetString("GotTalisman"), 15f);
-                            break;
-                        case 13: // 真理石板 - 揭示一名玩家的真实身份
-                            player.Notify(GetString("GotTruth"), 15f);
-                            break;
-                        case 14: // 时光沙漏 - 重置所有玩家的技能冷却时间
-                            player.Notify(GetString("GotHourglass"), 15f);
-                            break;
-                        case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
-                            player.Notify(GetString("GotProphecy"), 15f);
-                            break;
-                        case 16: // 无线按钮 - 召开一次会议
-                            player.Notify(GetString("GetButton"), 15f);
-                            break;
-                        case 17: // 万能钥匙 - 打开所有的门
-                            player.Notify(GetString("GetKey"), 15f);
-                            break;
-                        default: // just in case
-                            break;
-                    }
-
-                    SendRPC(player);
+                    RandomAntique();
                 }
-                return;
             }, 8f, "Archaeologist In Start");
         }
     }
@@ -163,73 +99,7 @@ internal class Archaeologist : RoleBase
 
     public override void AfterMeetingTasks()
     {
-        var player = _Player;
-        if (!player.IsAlive()) return;
-
-        var rand = IRandom.Instance;
-        AntiqueID = (byte)rand.Next(1, 18);
-        FixNextSabo = false;
-        HasGrail = false;
-        LifeConnection = false;
-
-        switch (AntiqueID)
-        {
-            case 1: // 灵魂回响镜 - 知道何时有玩家死亡
-                player.Notify(GetString("GotMirror"), 15f);
-                break;
-            case 2: // 复活圣杯 - 复活一名死亡的玩家
-                player.Notify(GetString("GotGrail"), 15f);
-                break;
-            case 3: // 相位斗篷 - 使你短暂隐形
-                player.Notify(GetString("GotCloak"), 15f);
-                break;
-            case 4: // 引力石板 - 将所有玩家拉向自己位置
-                player.Notify(GetString("GotFlagstone"), 15f);
-                break;
-            case 5: // 寒冰宝珠 - 冻结附近玩家
-                player.Notify(GetString("GotOrbs"), 15f);
-                break;
-            case 6: // 战争号角 - 所有玩家移动速度提升
-                player.Notify(GetString("GotBugle"), 15f);
-                break;
-            case 7: // 智慧卷轴 - 帮一名船员完成一个任务
-                player.Notify(GetString("GotReel"), 15f);
-                break;
-            case 8: // 能量水晶 - 恢复所有船员的技能使用次数
-                player.Notify(GetString("GotCrystal"), 15f);
-                break;
-            case 9: // 激励圣物 - 会议投票时获得额外投票权
-                player.Notify(GetString("GotRelic"), 15f);
-                break;
-            case 10: // 契约卷轴 - 与一名玩家建立生命链接
-                player.Notify(GetString("GotIndenture"), 15f);
-                break;
-            case 11: // 牺牲匕首 - 牺牲自己，为内鬼增加负面效果，为船员增加正面效果
-                player.Notify(GetString("GotDagger"), 15f);
-                break;
-            case 12: // 太阳护符 - 使自己获得伤害免疫
-                player.Notify(GetString("GotTalisman"), 15f);
-                break;
-            case 13: // 真理石板 - 揭示一名玩家的真实身份
-                player.Notify(GetString("GotTruth"), 15f);
-                break;
-            case 14: // 时光沙漏 - 重置所有玩家的技能冷却时间
-                player.Notify(GetString("GotHourglass"), 15f);
-                break;
-            case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
-                player.Notify(GetString("GotProphecy"), 15f);
-                break;
-            case 16: // 无线按钮 - 召开一次会议
-                player.Notify(GetString("GetButton"), 15f);
-                break;
-            case 17: // 万能钥匙 - 打开所有的门
-                player.Notify(GetString("GetKey"), 15f);
-                break;
-            default: // just in case
-                break;
-        }
-
-        SendRPC(player);
+        RandomAntique();
     }
 
     private static void SendRPC(PlayerControl pc)
@@ -295,6 +165,7 @@ internal class Archaeologist : RoleBase
                     var tmpSpeed = Main.AllPlayerSpeed[target.PlayerId];
                     Main.AllPlayerSpeed[target.PlayerId] = Main.MinSpeed;
                     target.Notify(GetString("OrbsAndFreeze"), 5f);
+                    target.MarkDirtySettings();
                     _ = new LateTask(() =>
                     {
                         Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + tmpSpeed;
@@ -351,6 +222,7 @@ internal class Archaeologist : RoleBase
             case 10: // 契约卷轴 - 与一名玩家建立生命链接
                 player.RpcGuardAndKill();
                 player.Notify(GetString("LifeConnection"));
+                LifeConnection = true;
                 break;
             case 11: // 牺牲匕首 - 牺牲自己，为内鬼增加负面效果，为船员增加正面效果
                 player.RpcGuardAndKill();
@@ -383,8 +255,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 13: // 真理石板 - 揭示一名玩家的真实身份
                 player.RpcGuardAndKill();
-                var pcList = Main.AllAlivePlayerControls.Where(pc => pc.PlayerId != player.PlayerId && pc.Is(CustomRoles.SuperStar) && pc.Is(CustomRoles.Workaholic)
-                && pc.Is(CustomRoles.Solsticer) && pc.Is(CustomRoles.Mayor) && pc.Is(CustomRoles.NiceMini) && pc.Is(CustomRoles.EvilMini) && pc.Is(CustomRoles.President)).ToList();
+                var pcList = Main.AllAlivePlayerControls.Where(pc => pc.PlayerId != player.PlayerId && !pc.GetCustomRole().IsRevealingRole(pc)).ToList();
 
                 PlayerControl rp = pcList.RandomElement();
                 if (pcList.Any() && !SlateRoles.Contains(rp.PlayerId))
@@ -412,7 +283,7 @@ internal class Archaeologist : RoleBase
                 break;
         }
 
-        AntiqueID = 16;
+        AntiqueID = 251;
         SendRPC(player);
     }
 
@@ -464,6 +335,7 @@ internal class Archaeologist : RoleBase
         Logger.Info($"{player.GetNameWithRole().RemoveHtmlTags()} instant - fix-lights", "SwitchSystem");
     }
 
+    public override int AddRealVotesNum(PlayerVoteArea PVA) => (int)Votes;
     public override void AddVisualVotes(PlayerVoteArea votedPlayer, ref List<MeetingHud.VoterState> statesList)
     {
         for (var i = 0; i < Votes; i++)
@@ -490,6 +362,7 @@ internal class Archaeologist : RoleBase
                 rp.RpcMurderPlayer(rp);
                 rp.SetRealKiller(target);
             }
+            LifeConnection = false;
             return true;
         }
         if (!IsProtected) return true;
@@ -586,11 +459,82 @@ internal class Archaeologist : RoleBase
             var countDeadBody = UnityEngine.Object.FindObjectsOfType<DeadBody>().Count(bead => bead.ParentId == deadBody.PlayerId);
             if (countDeadBody >= 2) return true;
 
-            reporter.Notify(Translator.GetString("Altruist_YouTriedReportRevivedDeadBody"));
+            reporter.Notify(GetString("Altruist_YouTriedReportRevivedDeadBody"));
             SendRPC(reporter);
             return false;
         }
         return true;
     }
     public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => seer.Is(CustomRoles.Archaeologist) && SlateRoles.Contains(target.PlayerId);
+
+    public void RandomAntique()
+    {
+        var player = _Player;
+        if (!player.IsAlive() || player == null) return;
+
+        var rand = IRandom.Instance;
+        AntiqueID = (byte)rand.Next(1, 18);
+        FixNextSabo = false;
+        HasGrail = false;
+        LifeConnection = false;
+
+        switch (AntiqueID)
+        {
+            case 1: // 灵魂回响镜 - 知道何时有玩家死亡
+                player.Notify(GetString("GotMirror"), 15f);
+                break;
+            case 2: // 复活圣杯 - 复活一名死亡的玩家
+                player.Notify(GetString("GotGrail"), 15f);
+                break;
+            case 3: // 相位斗篷 - 使你短暂隐形
+                player.Notify(GetString("GotCloak"), 15f);
+                break;
+            case 4: // 引力石板 - 将所有玩家拉向自己位置
+                player.Notify(GetString("GotFlagstone"), 15f);
+                break;
+            case 5: // 寒冰宝珠 - 冻结附近玩家
+                player.Notify(GetString("GotOrbs"), 15f);
+                break;
+            case 6: // 战争号角 - 所有玩家移动速度提升
+                player.Notify(GetString("GotBugle"), 15f);
+                break;
+            case 7: // 智慧卷轴 - 帮一名船员完成一个任务
+                player.Notify(GetString("GotReel"), 15f);
+                break;
+            case 8: // 能量水晶 - 恢复所有船员的技能使用次数
+                player.Notify(GetString("GotCrystal"), 15f);
+                break;
+            case 9: // 激励圣物 - 会议投票时获得额外投票权
+                player.Notify(GetString("GotRelic"), 15f);
+                break;
+            case 10: // 契约卷轴 - 与一名玩家建立生命链接
+                player.Notify(GetString("GotIndenture"), 15f);
+                break;
+            case 11: // 牺牲匕首 - 牺牲自己，为内鬼增加负面效果，为船员增加正面效果
+                player.Notify(GetString("GotDagger"), 15f);
+                break;
+            case 12: // 太阳护符 - 使自己获得伤害免疫
+                player.Notify(GetString("GotTalisman"), 15f);
+                break;
+            case 13: // 真理石板 - 揭示一名玩家的真实身份
+                player.Notify(GetString("GotTruth"), 15f);
+                break;
+            case 14: // 时光沙漏 - 重置所有玩家的技能冷却时间
+                player.Notify(GetString("GotHourglass"), 15f);
+                break;
+            case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
+                player.Notify(GetString("GotProphecy"), 15f);
+                break;
+            case 16: // 无线按钮 - 召开一次会议
+                player.Notify(GetString("GetButton"), 15f);
+                break;
+            case 17: // 万能钥匙 - 打开所有的门
+                player.Notify(GetString("GetKey"), 15f);
+                break;
+            default: // just in case
+                break;
+        }
+
+        SendRPC(player);
+    }
 }

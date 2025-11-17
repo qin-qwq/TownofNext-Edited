@@ -128,7 +128,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Godfather => CustomRoles.ChiefOfPolice, // 教父 => 警察局长
                 CustomRoles.Twister => CustomRoles.TimeMaster, // 龙卷风 => 时间之主
                 CustomRoles.Disperser => CustomRoles.Transporter, // 分散者 => 传送师
-                CustomRoles.Eraser => CustomRoles.Cleanser, // 抹除者 => 清洗者
+                CustomRoles.Eraser or CustomRoles.Bandit => CustomRoles.Cleanser, // 抹除者，强盗 => 清洗者
                 CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
                 CustomRoles.Workaholic => CustomRoles.Snitch, // 工作狂 => 告密者
                 CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
@@ -149,14 +149,17 @@ internal class CopyCat : RoleBase
                 CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 0 => CustomRoles.Overseer, // 药剂师 0 => 预言家
                 CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 1 => CustomRoles.Medic, // 药剂师 1 => 医生
                 CustomRoles.Sacrifist => CustomRoles.Alchemist, // 献祭者 => 炼金术士
-                CustomRoles.MoonDancer or CustomRoles.Harvester or CustomRoles.Bandit => CustomRoles.Merchant, // 月光舞者，收割者，强盗 => 商人
+                CustomRoles.MoonDancer or CustomRoles.Harvester => CustomRoles.Merchant, // 月光舞者，收割者 => 商人
                 CustomRoles.Jinx => CustomRoles.Crusader, // 扫把星 => 十字军
                 CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(), // 骗术师，幻术师 => 随机
                 CustomRoles.Instigator => CustomRoles.Requiter, // 教唆者 => 清算者
                 CustomRoles.Jackal => CustomRoles.ChiefOfPolice, // 豺狼 => 警察局长
-                CustomRoles.Sidekick => CustomRoles.Sheriff, // 跟班 => 警长
+                CustomRoles.Sidekick or CustomRoles.SerialKiller => CustomRoles.Sheriff, // 跟班，连环杀手 => 警长
                 CustomRoles.Underdog => CustomRoles.Brave, // 失败者 => 勇者
                 CustomRoles.Saboteur => CustomRoles.Mechanic, // 破坏者 => 修理工
+                CustomRoles.PlagueBearer => CustomRoles.Socialite, // 瘟疫使者 => 社交达人
+                CustomRoles.Demon => CustomRoles.Spy, // 玩家 => 间谍
+                CustomRoles.Maverick => CustomRoles.Vigilante, // 独行者 => 义务警员
                 _ => role
             };
         }

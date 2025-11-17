@@ -486,15 +486,15 @@ internal class Jackal : RoleBase
                 hasConverted = true;
             }
         }
-    }
+    }*/
 
     public override void AfterMeetingTasks()
     {
         if (_Player && !_Player.IsAlive() && !hasConverted)
         {
-            OnMurderPlayerAsTarget(_Player, _Player, true, false);
+            SidekickBecomeJackal();
         }
-    }*/
+    }
 
     public override string GetProgressText(byte playerId, bool comms)
         => CanRecruitSidekick.GetBool() ? Utils.GetAbilityUseLimitDisplay(playerId, true) : string.Empty;

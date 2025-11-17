@@ -73,11 +73,10 @@ public static class Options
 
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
-    public static OptionItem CompatibilityMode;
     public static OptionItem DraftableCount;
     //public static OptionItem BucketCount;
     public static bool devEnableDraft = false;
-    //public static OptionItem DraftDeck;
+    public static OptionItem DraftDeck;
 
     // 役職数・確率
     public static Dictionary<CustomRoles, int> roleCounts;
@@ -737,7 +736,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33400 last id for roles/add-ons (Next use 33500)
+        // 33500 last id for roles/add-ons (Next use 33600)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1401,18 +1400,14 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true);
 
-        CompatibilityMode = BooleanOptionItem.Create(61001, "CompatibilityMode", false, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetParent(DraftMode);
-
         DraftableCount = IntegerOptionItem.Create(61002, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode);
 
-        /*DraftAssign.LoadRoleDecks();
+        DraftAssign.LoadRoleDecks();
         DraftDeck = StringOptionItem.Create(61003, "DraftDeck", DraftAssign.RoleDecks.Keys.ToArray(), 0, TabGroup.ModSettings, false, useGetString: false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetParent(DraftMode);*/
+            .SetParent(DraftMode);
 
         Logger.Info("Draft Bucket Options set up", "OptionsHolder.CoLoadOptions");
 

@@ -642,10 +642,6 @@ public static class Utils
             case CustomRoles.GM:
                 hasTasks = false;
                 break;
-            case CustomRoles.Knight:
-            case CustomRoles.Medic:
-                hasTasks = true;
-                break;
             default:
                 // player based on an impostor not should have tasks
                 if (States.RoleClass.ThisRoleBase is CustomRoles.Impostor or CustomRoles.Shapeshifter or CustomRoles.Phantom or CustomRoles.Viper)
@@ -918,7 +914,7 @@ public static class Utils
                     mode = GetChance(Options.CustomAdtRoleSpawnRate[role].GetFloat());
 
                 }
-                var roleDisplay = $"{GetRoleName(role)}: {mode} x{role.GetCount()}";
+                var roleDisplay = ColorString(GetRoleColor(role), $"{GetRoleName(role)}") + $": {mode} x{role.GetCount()}";
                 if (role.IsAdditionRole()) addonsb.Add(roleDisplay);
                 else if (role.IsCrewmate()) crewsb.Add(roleDisplay);
                 else if (role.IsImpostor() || role.IsMadmate()) impsb.Add(roleDisplay);
@@ -2079,7 +2075,7 @@ public static class Utils
                         if (seer.Is(Custom_Team.Impostor) && target.Is(CustomRoles.Snitch) && target.Is(CustomRoles.Madmate) && target.GetPlayerTaskState().IsTaskFinished)
                             TargetMark.Append(ColorString(GetRoleColor(CustomRoles.Impostor), "★"));
 
-                        if ((seer.IsPlayerCoven() && target.IsPlayerCoven()) && (CovenManager.HasNecronomicon(target)))
+                        if ((seer.IsPlayerCovenTeam() || !seer.IsAlive()) && target.IsPlayerCovenTeam() && CovenManager.HasNecronomicon(target))
                         {
                             TargetMark.Append(ColorString(GetRoleColor(CustomRoles.Coven), "♣"));
                         }
@@ -2245,7 +2241,7 @@ public static class Utils
                         }
 
                         // Fix Vanilla Red Name
-                        TargetName = $"<color=#ffffff>{TargetName}</color>";
+                        //TargetName = $"<color=#ffffff>{TargetName}</color>";
 
                         realTarget.RpcSetNamePrivate(TargetName, seer, force: NoCache);
                     }
@@ -2322,6 +2318,7 @@ public static class Utils
 
         return checkbanned ? !BannedReason(reason) : reason switch
         {
+            PlayerState.DeathReason.Equilibrium => (CustomRoles.YinYanger.IsEnable()),
             PlayerState.DeathReason.Eaten => (CustomRoles.Pelican.IsEnable()),
             PlayerState.DeathReason.Expired => (CustomRoles.Summoner.IsEnable()),
             PlayerState.DeathReason.Spell => (CustomRoles.Witch.IsEnable()),

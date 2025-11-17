@@ -10,7 +10,6 @@ internal class Blaster : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Blaster;
     private const int Id = 32300;
-    public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

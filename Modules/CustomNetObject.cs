@@ -30,6 +30,7 @@ namespace TOHE.Modules
         public PlayerControl playerControl;
         public Vector2 Position;
         protected string Sprite;
+        protected byte ColorId = 255;
 
         public void RpcChangeSprite(string sprite)
         {
@@ -50,7 +51,7 @@ namespace TOHE.Modules
                 MessageWriter writer = sender.stream;
                 sender.StartMessage();
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].PlayerName = "<size=14><br></size>" + sprite;
-                PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].ColorId = 255;
+                PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].ColorId = ColorId;
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].HatId = "";
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].SkinId = "";
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].PetId = "";
@@ -82,7 +83,7 @@ namespace TOHE.Modules
 
                 sender.EndMessage();
                 sender.SendMessage();
-            }, 0f);
+            }, 0f, "CustomNetObject RpcChangeSprite");
         }
 
         public void TP(Vector2 position)
@@ -132,7 +133,7 @@ namespace TOHE.Modules
 
             if (player.AmOwner)
             {
-                _ = new LateTask(() => playerControl.transform.FindChild("Names").FindChild("NameText_TMP").gameObject.SetActive(false), 0.1f);
+                _ = new LateTask(() => playerControl.transform.FindChild("Names").FindChild("NameText_TMP").gameObject.SetActive(false), 0.1f, "CustomNetObject Hide Owner");
                 playerControl.Visible = false;
                 return;
             }
@@ -147,7 +148,7 @@ namespace TOHE.Modules
                     .EndRpc();
 
                 sender.SendMessage();
-            }, 0.4f);
+            }, 0.4f, "CustomNetObject Hide");
 
             MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
             writer.StartMessage(6);
@@ -163,7 +164,7 @@ namespace TOHE.Modules
 
         protected virtual void OnFixedUpdate() { }
 
-        protected void CreateNetObject(string sprite, Vector2 position)
+        protected void CreateNetObject(string sprite, Vector2 position, byte colId = 18, bool visible = false)
         {
             if (GameStates.IsEnded || !AmongUsClient.Instance.AmHost) return;
 
@@ -187,7 +188,7 @@ namespace TOHE.Modules
             
             Logger.Info($" Create Custom Net Object {GetType().Name} (ID {MaxId + 1}) at {position}", "CNO.CreateNetObject");
             playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab, Vector2.zero, Quaternion.identity);
-            playerControl.PlayerId = 254;
+            playerControl.PlayerId = (byte)(visible ? 253 : 254);
             playerControl.isNew = false;
             playerControl.notRealPlayer = true;
             AmongUsClient.Instance.NetIdCnt += 1U;
@@ -244,7 +245,7 @@ namespace TOHE.Modules
                 MessageWriter writer = sender.stream;
                 sender.StartMessage();
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].PlayerName = "<size=14><br></size>" + sprite;
-                PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].ColorId = 255;
+                PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].ColorId = colId;
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].HatId = "";
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].SkinId = "";
                 PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].PetId = "";
@@ -276,10 +277,11 @@ namespace TOHE.Modules
 
                 sender.EndMessage();
                 sender.SendMessage();
-            }, 0.6f);
+            }, 0.6f, "CustomNetObject CreateNetObject 1");
 
             Position = position;
             Sprite = sprite;
+            ColorId = colId;
             ++MaxId;
             Id = MaxId;
             if (MaxId == int.MaxValue) MaxId = int.MinValue;
@@ -302,6 +304,7 @@ namespace TOHE.Modules
                     }
                     writer.EndMessage();
 
+                    // Without this Rpc, sprite doesn't get set for vanilla (gets set to ??? instead)
                     sender.StartRpc(playerControl.NetId, (byte)RpcCalls.MurderPlayer)
                         .WriteNetObject(playerControl)
                         .Write((int)MurderResultFlags.FailedError)
@@ -316,11 +319,11 @@ namespace TOHE.Modules
 
                     sender.EndMessage();
                     sender.SendMessage();
-                }, 0.1f);
+                }, 0.1f, "CustomNetObject CreateNetObject 2");
             }
 
-            _ = new LateTask(() => playerControl.transform.FindChild("Names").FindChild("NameText_TMP").gameObject.SetActive(true), 0.7f); // Fix for Host
-            _ = new LateTask(() => Utils.SendRPC(CustomRPC.FixModdedClientCNO, playerControl, true), 0.95f); // Fix for Non-Host Modded
+            _ = new LateTask(() => playerControl?.transform?.FindChild("Names")?.FindChild("NameText_TMP")?.gameObject?.SetActive(true), 0.7f, "CustomNetObject CreateNetObject 3"); // Fix for Host
+            _ = new LateTask(() => Utils.SendRPC(CustomRPC.FixModdedClientCNO, playerControl, true), 0.95f, "CustomNetObject CreateNetObject 4"); // Fix for Non-Host Modded
         }
 
         public static void FixedUpdate()
@@ -463,7 +466,7 @@ internal static class RawSetNamePatch
                     // Complete error, don't log this, or it will spam the console
                     break;
             }
-        }, 0.5f);
+        }, 0.5f, "RawSetNamePatch");
 
         return false;
     }

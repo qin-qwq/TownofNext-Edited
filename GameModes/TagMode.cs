@@ -14,8 +14,6 @@ public static class TagMode
 {
     private const int Id = 67_226_001;
 
-    public static OptionItem PlaySound;
-
     public static OptionItem ZombieMaximun;
     public static OptionItem ZombieVision;
     public static OptionItem ZombieSpeed;
@@ -48,11 +46,6 @@ public static class TagMode
         TextOptionItem.Create(10000035, "MenuTitle.TagMode", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.TagMode)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-
-        PlaySound = BooleanOptionItem.Create(Id + 1, "PlaySound", true, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.TagMode)
-            .SetColor(new Color32(44, 204, 0, byte.MaxValue))
-            .SetHeader(true);
 
         ZombieMaximun = IntegerOptionItem.Create(Id + 2, "TagMode_ZombieMaximum", new(1, 4, 1), 1, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
@@ -88,7 +81,7 @@ public static class TagMode
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-        CrewmateVentMaxTime = FloatOptionItem.Create(Id + 10, "TagMode_CrewmateVentMaxTime", new(0f, 60f, 1f), 15f, TabGroup.ModSettings, false)
+        CrewmateVentMaxTime = FloatOptionItem.Create(Id + 10, "TagMode_CrewmateVentMaxTime", new(0f, 60f, 1f), 5f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
@@ -135,10 +128,6 @@ public static class TagMode
                 break;
         }
         TaskCount = (0, TaskNum);
-        if (PlaySound.GetBool())
-        {
-            Main.AllPlayerControls.Where(x => x.IsHost()).Do(x => RPC.PlaySound(x.PlayerId, Sounds.HnSLong));
-        }
     }
 
     public static void SendTaskRPC()
@@ -317,6 +306,11 @@ public class TCrewmate : RoleBase
 
     public override void Add(byte playerId)
     {
+        var player = GetPlayerById(playerId);
+        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2)
+        {
+            player.RpcSetColor(13);
+        }
         playerId.SetAbilityUseLimit(0);
         ProtectState = (false, 0f);
         InvisibleState = (false, 0f);

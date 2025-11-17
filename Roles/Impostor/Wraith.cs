@@ -147,6 +147,8 @@ internal class Wraithh : RoleBase
     {
         if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18 || !killer.RpcCheckAndMurder(target, true)) return true;
 
+        if (target.GetCustomRole().IsImpostor()) return false;
+
         killer.RpcMurderPlayer(target);
         killer.RpcResetAbilityCooldown();
         return false;

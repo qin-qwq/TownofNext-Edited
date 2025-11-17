@@ -58,12 +58,14 @@ internal class Veteran : RoleBase
         if (killerRole is CustomRoles.Taskinator
             or CustomRoles.Crusader
             or CustomRoles.Bodyguard
-            or CustomRoles.Deputy)
+            or CustomRoles.Deputy
+            or CustomRoles.Jinx)
             return true;
 
         if (killer.PlayerId != target.PlayerId && VeteranInProtect.TryGetValue(target.PlayerId, out var time))
             if (time + VeteranSkillDuration.GetInt() >= GetTimeStamp())
             {
+                if (!killer.IsAlive()) return false;
                 if (killer.Is(CustomRoles.Pestilence) || killer.Is(CustomRoles.War))
                 {
                     killer.RpcMurderPlayer(target);

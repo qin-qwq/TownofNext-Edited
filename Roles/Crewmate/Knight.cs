@@ -66,10 +66,13 @@ internal class Knight : RoleBase
         }
         killer.RpcRemoveAbilityUse();
         Logger.Info($"{killer.GetNameWithRole()} : " + "Kill chance used", "Knight");
-        GiveTasks = true;
-        killer.RpcSetRoleDesync(RoleTypes.Crewmate, killer.GetClientId());
-        Main.DesyncPlayerList.Remove(killer.PlayerId);
-        killer.RpcResetTasks();
+        if (!killer.IsNonHostModdedClient())
+        {
+            GiveTasks = true;
+            killer.RpcSetRoleDesync(RoleTypes.Crewmate, killer.GetClientId());
+            Main.DesyncPlayerList.Remove(killer.PlayerId);
+            killer.RpcResetTasks();
+        }
         return true;
     }
 

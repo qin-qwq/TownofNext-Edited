@@ -400,7 +400,8 @@ public static class CustomRolesHelper
             CustomRoles.Tired or
             CustomRoles.Sloth or
             CustomRoles.Fury or
-            CustomRoles.TimeAssassin;
+            CustomRoles.TimeAssassin or
+            CustomRoles.Zombie;
     }
     public static bool IsRevealingRole(this CustomRoles role, PlayerControl target)
     {
@@ -411,7 +412,9 @@ public static class CustomRolesHelper
             || (role is CustomRoles.Doctor && Doctor.VisibleToEveryone(target))
             || (role is CustomRoles.Bait && Bait.BaitNotification.GetBool() && Inspector.CheckBaitCountType)
             || (role is CustomRoles.President && President.CheckReveal(target.PlayerId))
-            || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain());
+            || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
+            || (role is CustomRoles.Solsticer)
+            || (role is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.EveryoneCanKnowMini.GetBool());
     }
     public static bool IsBetrayalAddon(this CustomRoles role)
     {
@@ -1028,7 +1031,8 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.Vindicator)
                     || pc.Is(CustomRoles.Bomber)
                     || pc.Is(CustomRoles.VoidBallot)
-                    || pc.Is(CustomRoles.Swift))
+                    || pc.Is(CustomRoles.Swift)
+                    || pc.Is(CustomRoles.Wraith))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
