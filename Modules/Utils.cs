@@ -1293,7 +1293,7 @@ public static class Utils
             + $"\n  ○ /rn {GetString("Command.rename")}"
             + $"\n  ○ /poll {GetString("Command.Poll")}"
             + $"\n  ○ /xf {GetString("Command.solvecover")}"
-            + $"\n  ○ /mw {GetString("Command.mw")}"
+            // + $"\n  ○ /mw {GetString("Command.mw")}"
             + $"\n  ○ /kill {GetString("Command.kill")}"
             + $"\n  ○ /exe {GetString("Command.exe")}"
             + $"\n  ○ /level {GetString("Command.level")}"
@@ -1301,7 +1301,8 @@ public static class Utils
             + $"\n  ○ /qq {GetString("Command.qq")}"
             + $"\n  ○ /dump {GetString("Command.dump")}"
             + $"\n  ○ /start {GetString("Command.start")}"
-        //    + $"\n  ○ /iconhelp {GetString("Command.iconhelp")}"
+            + $"\n  ○ /sicon {GetString("Command.siconinfo")}"
+            // + $"\n  ○ /iconhelp {GetString("Command.iconhelp")}"
             , ID);
     }
     public static string[] SplitMessage(this string LongMsg)

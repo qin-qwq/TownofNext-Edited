@@ -1,4 +1,3 @@
-using AmongUs.GameOptions;
 using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
@@ -16,10 +15,8 @@ internal class Transporter : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Transporter;
     private const int Id = 7400;
-    public override bool IsDesyncRole => Change;
-    public override CustomRoles ThisRoleBase => Change ? CustomRoles.Phantom : CustomRoles.Crewmate;
+    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
-    public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
     public static OptionItem TransporterConstructCooldown;
@@ -27,7 +24,6 @@ internal class Transporter : RoleBase
 
     private readonly Dictionary<Vector2, Portal> TransporterLocation = [];
     private static readonly Dictionary<byte, long> LastTP = [];
-    private bool Change;
 
     public override void SetupCustomOption()
     {
@@ -38,7 +34,6 @@ internal class Transporter : RoleBase
         TransporterTeleportCooldown = FloatOptionItem.Create(Id + 11, "TransporterTeleportCooldown", new(0f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Transporter])
             .SetValueFormat(OptionFormat.Seconds);
-        OverrideTasksData.Create(Id + 12, TabGroup.CrewmateRoles, CustomRoles.Transporter);
     }
 
     public override void Init()
@@ -50,16 +45,10 @@ internal class Transporter : RoleBase
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(2);
-        Change = false;
         if (AmongUsClient.Instance.AmHost)
         {
             CustomRoleManager.OnFixedUpdateOthers.Add(OnFixedUpdateOthers);
         }
-    }
-
-    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
-    {
-        AURoleOptions.PhantomCooldown = TransporterConstructCooldown.GetFloat();
     }
 
     private void SendRPC()
@@ -77,26 +66,20 @@ internal class Transporter : RoleBase
     {
         float xLoc = reader.ReadSingle();
         float yLoc = reader.ReadSingle();
-        if (TransporterLocation.Count >= 2) TransporterLocation.Remove(TransporterLocation.ElementAt(0).Key);
         TransporterLocation.Add(new Vector2(xLoc, yLoc), new(pc.GetCustomPosition(), pc.PlayerId));
     }
 
-    public override void OnPet(PlayerControl pc)
-    {
-        OnCheckVanish(pc);
-    }
-
-    public override bool OnCheckVanish(PlayerControl player)
+    public override void OnPet(PlayerControl player)
     {
         var totalMarked = TransporterLocation.Count;
-        if (totalMarked >= 2 || player.GetAbilityUseLimit() <= 0) return false;
+        if (totalMarked >= 2 || player.GetAbilityUseLimit() <= 0) return;
 
         player.RpcRemoveAbilityUse();
         TransporterLocation.Add(player.GetCustomPosition(), new(player.GetCustomPosition(), player.PlayerId));
         player.Notify(GetString("TransporterCreated"));
 
         SendRPC();
-        return false;
+        return;
     }
 
     private void OnFixedUpdateOthers(PlayerControl player, bool lowLoad, long nowTime)
@@ -130,40 +113,10 @@ internal class Transporter : RoleBase
         return;
     }
 
-    public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
-    {
-        if (UsePets.GetBool()) return true;
-        if (completedTaskCount == totalTaskCount)
-        {
-            player.RpcChangeRoleBasis(CustomRoles.Phantom);
-            Change = true;          
-        }
-        return true;
-    }
-
-    public override bool CanUseKillButton(PlayerControl pc) => false;
-
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
-        if (UsePets.GetBool())
-        {
-            hud.PetButton.OverrideText(GetString("TransporterButtonText"));        
-        }
-        else
-        {
-            hud.AbilityButton.OverrideText(GetString("TransporterButtonText"));
-            hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
-        }
+        hud.PetButton.OverrideText(GetString("TransporterButtonText"));        
     }
 
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
-    {
-        if (!UsePets.GetBool()) return CustomButton.Get("Teleport");
-        return null;
-    }
-    public override Sprite GetPetButtonSprite(PlayerControl player)
-    {
-        if (UsePets.GetBool()) return CustomButton.Get("Teleport");
-        return null;
-    }
+    public override Sprite GetPetButtonSprite(PlayerControl player) => CustomButton.Get("Teleport");
 }

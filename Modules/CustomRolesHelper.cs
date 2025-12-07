@@ -20,6 +20,10 @@ public static class CustomRolesHelper
     public static readonly CustomRoles[] AllRoles = EnumHelper.GetAllValues<CustomRoles>();
     public static Dictionary<CustomRoles, Type> DuplicatedRoles = [];
     public static readonly Custom_Team[] AllRoleTypes = EnumHelper.GetAllValues<Custom_Team>();
+    public static bool OnlySpawnsWithPetsRole(this CustomRoles role)
+    {
+        return role is CustomRoles.Transporter; 
+    }
     public static CustomRoles GetVNRole(this CustomRoles role) // RoleBase: Impostor, Shapeshifter, Crewmate, Engineer, Scientist
     {
         // Vanilla roles

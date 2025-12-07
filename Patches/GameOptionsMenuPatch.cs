@@ -655,7 +655,8 @@ public static class StringOptionPatch
                     _ => 0.35f,
                 };
 
-                if (role.GetStaticRoleClass().IsMethodOverridden("OnPet")) name += GetString("SupportsPet");
+                if (role.OnlySpawnsWithPetsRole()) name += GetString("RequiresPet");
+                if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) name += GetString("SupportsPet");
 
                 SetupHelpIcon(role, __instance);
             }
@@ -713,6 +714,14 @@ public static class StringOptionPatch
             //Logger.Info($"{item.Name}, {index}", "StringOption.UpdateValue.TryAdd");
 
             item.SetValue(__instance.GetInt(), true, true, true);
+
+            string name = item.GetName();
+            string name1 = name;
+
+            if (Enum.GetValues<CustomRoles>().Find(x => GetString($"{x}") == name1.RemoveHtmlTags(), out CustomRoles role))
+            {
+                if (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool()) DestroyableSingleton<HudManager>.Instance.ShowPopUp(GetString("Warning.UsePetsIsNotEnabled"));
+            }
 
             if (item is PresetOptionItem || (item is StringOptionItem && item.Name == "GameMode"))
             {

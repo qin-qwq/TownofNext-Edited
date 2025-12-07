@@ -924,7 +924,7 @@ class ReportDeadBodyPatch
             Logger.Info($"target.Object is null? - {target?.Object == null}", "AfterReportTasks");
             Logger.Info($"target.PlayerId is - {target?.PlayerId}", "AfterReportTasks");
 
-            CustomNetObject.OnMeetingTasks();
+            //CustomNetObject.OnMeetingTasks();
 
             foreach (var playerStates in Main.PlayerStates.Values.ToArray())
             {

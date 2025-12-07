@@ -470,6 +470,17 @@ internal class ChatCommands
                         break;
                     }
 
+                case "/sicon":
+                case "/sicons":
+                case "/settingicons":
+                case "/settingsicons":
+                case "/设置符号":
+                case "/设置标志":
+                    {
+                        Utils.SendMessage(GetString("Command.sicons"), PlayerControl.LocalPlayer.PlayerId, GetString("IconsTitle"));
+                        break;
+                    }
+
                 case "/iconhelp":
                 case "/符号帮助":
                 case "/标志帮助":
