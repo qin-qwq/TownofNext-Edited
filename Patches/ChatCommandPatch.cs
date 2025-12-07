@@ -484,7 +484,7 @@ internal class ChatCommands
                 case "/убийцы":
                 case "/存活阵营":
                 case "/阵营":
-                case "/存货阵营信息":
+                case "/存活阵营信息":
                 case "/阵营信息":
                     if (GameStates.IsLobby) break;
 
@@ -643,7 +643,7 @@ internal class ChatCommands
                     if (GameStates.IsInGame)
                     {
                         var lp = PlayerControl.LocalPlayer;
-                        var Des = lp.GetRoleInfo(true);
+                        var Des = lp.PetActivatedAbility() ? lp.GetRoleInfo(true) + $"<size=50%>{GetString("SupportsPetMessage")}</size>" : lp.GetRoleInfo(true);
                         var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                         var Conf = new StringBuilder();
                         var Sub = new StringBuilder();
@@ -655,7 +655,6 @@ internal class ChatCommands
                         var cleared = Conf.ToString();
                         var Setting = $"<color={rlHex}>{GetString(role.ToString())} {GetString("Settings:")}</color>\n";
                         Conf.Clear().Append($"<color=#ffffff>" + $"<size={Csize}>" + Setting + cleared + "</size>" + "</color>");
-
 
                         foreach (var subRole in Main.PlayerStates[lp.PlayerId].SubRoles.ToArray())
                             Sub.Append($"\n\n" + $"<size={Asize}>" + Utils.GetRoleTitle(subRole) + Utils.GetInfoLong(subRole) + "</size>");
@@ -1105,7 +1104,7 @@ internal class ChatCommands
                     {
                         string moderatorFriendCode10 = addModPlayerId.FriendCode.ToString();
                         string Message10 = $"{moderatorFriendCode10}";
-                        File.AppendAllText(modFiles, Message10);
+                        File.AppendAllText(modFiles, Message10 + Environment.NewLine);
                         Utils.SendMessage(GetString("PlayerJoinModList"), PlayerControl.LocalPlayer.PlayerId);
                     }
                     break;
@@ -1174,7 +1173,7 @@ internal class ChatCommands
                     {
                         string vipFriendCode10 = addVipPlayerId.FriendCode.ToString();
                         string Message11 = $"{vipFriendCode10}";
-                        File.AppendAllText(vipFiles, Message11);
+                        File.AppendAllText(vipFiles, Message11 + Environment.NewLine);
                         Utils.SendMessage(GetString("PlayerJoinVipList"), PlayerControl.LocalPlayer.PlayerId);
                     }
                     break;
@@ -1302,7 +1301,7 @@ internal class ChatCommands
                 case "/修改职业":
                     canceled = true;
                     if (GameStates.IsHideNSeek) break;
-                    if (!(DebugModeManager.AmDebugger && GameStates.IsInGame)) break;
+                    if (!GameStates.IsInGame) break;
                     if (GameStates.IsOnlineGame && !PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug) break;
                     subArgs = text.Remove(0, 11);
                     var setRole = FixRoleNameInput(subArgs).ToLower().Trim().Replace(" ", string.Empty);
@@ -1318,7 +1317,7 @@ internal class ChatCommands
                             PlayerControl.LocalPlayer.RpcChangeRoleBasis(rl);
                             PlayerControl.LocalPlayer.RpcSetCustomRole(rl);
                             PlayerControl.LocalPlayer.GetRoleClass().OnAdd(PlayerControl.LocalPlayer.PlayerId);
-                            Utils.SendMessage(string.Format("Debug Set your role to {0}", rl.ToString()), PlayerControl.LocalPlayer.PlayerId);
+                            Utils.SendMessage(string.Format("Debug Set your role to {0}", rl.GetActualRoleName()), PlayerControl.LocalPlayer.PlayerId);
                             Utils.NotifyRoles(SpecifyTarget: PlayerControl.LocalPlayer, NoCache: true);
                             Utils.MarkEveryoneDirtySettings();
                             break;
@@ -2474,7 +2473,8 @@ internal class ChatCommands
         }
 
 
-        var Des = result.GetInfoLong();
+        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=50%>{GetString("SupportsPetMessage")}</size>" 
+           : result.GetInfoLong();
         var title = "▲" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
         string rlHex = Utils.GetRoleColorCode(result);
@@ -2570,7 +2570,7 @@ internal class ChatCommands
                 var role = player.GetCustomRole();
                 if (GameStates.IsInGame)
                 {
-                    var Des = player.GetRoleInfo(true);
+                    var Des = player.PetActivatedAbility() ? player.GetRoleInfo(true) + $"<size=50%>{GetString("SupportsPetMessage")}</size>" : player.GetRoleInfo(true);
                     var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                     var Conf = new StringBuilder();
                     var Sub = new StringBuilder();
@@ -2838,7 +2838,7 @@ internal class ChatCommands
             case "/убийцы":
             case "/存活阵营":
             case "/阵营":
-            case "/存货阵营信息":
+            case "/存活阵营信息":
             case "/阵营信息":
                 if (GameStates.IsLobby) break;
 

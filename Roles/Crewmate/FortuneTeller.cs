@@ -15,7 +15,6 @@ internal class FortuneTeller : RoleBase
     public override CustomRoles Role => CustomRoles.FortuneTeller;
     private const int Id = 8000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.FortuneTeller);
-    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\

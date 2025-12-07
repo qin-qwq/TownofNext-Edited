@@ -901,7 +901,7 @@ class ReportDeadBodyPatch
                 DestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(__instance);
                 __instance.RpcStartMeeting(target);
             }
-        }, 0.15f, "StartMeeting");
+        }, 0.30f, "StartMeeting");
         return false;
     }
     public static void AfterReportTasks(PlayerControl player, NetworkedPlayerInfo target, bool force = false)
@@ -972,6 +972,7 @@ class ReportDeadBodyPatch
 
         foreach (var pc in Main.AllPlayerControls)
         {
+            pc.RpcRemoveAbilityCD();
             if (!Main.OvverideOutfit.ContainsKey(pc.PlayerId))
             {
                 // Update skins again, since players have different skins
@@ -1257,6 +1258,14 @@ class FixedUpdateInNormalGamePatch
 
                 if (isInTask && !AntiBlackout.SkipTasks)
                 {
+                    if (!lowLoad && player.HasAbilityCD() && player.IsAlive())
+                    {
+                        if (player.RemainingCD() <= 0)
+                            player.RpcRemoveAbilityCD();
+
+                        if (!player.IsModded() && player.RemainingCD() <= 60)
+                            Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false);
+                    }
                     CustomRoleManager.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
 
                     player.OnFixedAddonUpdate(lowLoad);
@@ -1532,10 +1541,10 @@ class FixedUpdateInNormalGamePatch
                 float offset = 0.2f;
                 float colorBlind = -0.2f;
 
-                if (NameNotifyManager.Notice.TryGetValue(localPlayerId, out var notify) && notify.Text.Contains('\n'))
+                if (NameNotifyManager.Notice.TryGetValue(localPlayerId, out var notifies) && notifies != null && notifies.Any())
                 {
-                    int count = notify.Text.Count(x => x == '\n');
-                    for (int i = 0; i < count; i++)
+                    int notifyCount = notifies.Count;
+                    for (int i = 0; i < notifyCount - 1; i++)
                     {
                         offset += 0.1f;
                         colorBlind -= 0.1f;

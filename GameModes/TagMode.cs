@@ -382,38 +382,38 @@ public class TCrewmate : RoleBase
 
         if (Power == 1)
         {
-            player.Notify(GetString("CanVent"), 5f);
+            player.Notify(GetString("CanVent"));
             player.RpcIncreaseAbilityUseLimitBy(1);
         }
         else if (Power == 2)
         {
-            player.Notify(GetString("YouInvisible"), 5f);
+            player.Notify(GetString("YouInvisible"));
             player.RpcMakeInvisible();
             InvisibleState = (true, TagMode.CrewmateInvisibleTime.GetFloat());
         }
         else if (Power == 3)
         {
-            player.Notify(GetString("YouProtect"), 5f);
+            player.Notify(GetString("YouProtect"));
             ProtectState = (true, 300f);
         }
         else if (Power == 4)
         {
-            player.Notify(GetString("YouDetect"), 5f);
+            player.Notify(GetString("YouDetect"));
             foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
                 TargetArrow.Add(player.PlayerId, target.PlayerId);
             DetectState = (true, TagMode.CrewmateDetectTime.GetFloat());
         }
         else if (Power == 5)
         {
-            player.Notify(GetString("ZapZombie"), 5f);
+            player.Notify(GetString("ZapZombie"));
             foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
-                target.Notify(GetString("YouZap"), 5f);
+                target.Notify(GetString("YouZap"));
             TagMode.Zap = true;
             _ = new LateTask(() =>
             {
                 TagMode.Zap = false;
                 foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
-                    target.Notify(GetString("ZapFinished"), 5f);
+                    target.Notify(GetString("ZapFinished"));
             }, TagMode.CrewmateZapTime.GetFloat(), "Zap Finished");
         }
         TagMode.TaskCount.Item1++;

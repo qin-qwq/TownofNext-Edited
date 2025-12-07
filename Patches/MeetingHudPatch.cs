@@ -998,7 +998,7 @@ class MeetingHudStartPatch
             foreach (var pc in Main.AllAlivePlayerControls.Where(x => !x.IsModded()).ToArray())
             {
                 var role = pc.GetCustomRole();
-                var Des = pc.GetRoleInfo(true);
+                var Des = pc.PetActivatedAbility() ? pc.GetRoleInfo(true) + $"<size=50%>{GetString("SupportsPetMessage")}</size>" : pc.GetRoleInfo(true);
                 var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                 var Conf = new StringBuilder();
                 var Sub = new StringBuilder();

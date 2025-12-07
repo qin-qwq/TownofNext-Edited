@@ -459,7 +459,7 @@ static class ExtendedPlayerControl
         if (seer == null || player == null) return;
 
         var leftPlayer = OnPlayerLeftPatch.LeftPlayerId;
-        if (seer.PlayerId == leftPlayer || player.PlayerId == leftPlayer) return;
+        if (seer?.PlayerId == leftPlayer || player?.PlayerId == leftPlayer) return;
 
         var clientId = seer.GetClientId();
         if (clientId == -1) return;
@@ -1789,6 +1789,7 @@ static class ExtendedPlayerControl
     }
     public static void RpcMakeInvisible(this PlayerControl player, bool phantom = false)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         if (!Main.Invisible.Add(player.PlayerId)) return;
         if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
         var petId = player.Data.DefaultOutfit.PetId;
@@ -1798,12 +1799,22 @@ static class ExtendedPlayerControl
         }
         player.RpcSetPet("");
 
+        if (!(phantom && PlayerControl.LocalPlayer.IsPlayerImpostorTeam()))
+            player.MakeInvisible();
+
         if (!phantom)
         {
-            player.MakeInvisible();
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.Invisibility, SendOption.Reliable);
-            writer.Write(true);
+            writer.WritePacked(1);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
+            Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false);
+        }
+        else
+        {
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.Invisibility, SendOption.Reliable);
+            writer.WritePacked(11);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            Utils.NotifyRoles(SpecifyTarget: player, ForceLoop: false);
         }
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
@@ -1829,6 +1840,7 @@ static class ExtendedPlayerControl
 
     public static void RpcMakeVisible(this PlayerControl player, bool phantom = false)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         if (!Main.Invisible.Remove(player.PlayerId)) return;
         if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
         if (PhantomRolePatch.PetsList.TryGetValue(player.PlayerId, out var petId))
@@ -1838,10 +1850,17 @@ static class ExtendedPlayerControl
 
         if (!phantom)
         {
-            player.MakeVisible();
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.Invisibility, SendOption.Reliable);
-            writer.Write(false);
+            writer.WritePacked(0);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
+            Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false);
+        }
+        else
+        {
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.Invisibility, SendOption.Reliable);
+            writer.WritePacked(10);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            Utils.NotifyRoles(SpecifyTarget: player, ForceLoop: false);
         }
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
@@ -1871,6 +1890,7 @@ static class ExtendedPlayerControl
 
     public static void RpcResetInvisibility(this PlayerControl player, bool phantom = false)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         if (!Main.Invisible.Contains(player.PlayerId)) return;
         if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
 
@@ -1981,7 +2001,7 @@ static class ExtendedPlayerControl
         CustomRoles role = player.GetCustomRole();
         if (player.IsHost() && role is CustomRoles.Balancer) return false;
         if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper) return false;
-        return role.IsMeetingShapeshifterRole();
+        return player.IsMeetingShapeshifterRole();
     }
     
     public static void RpcTeleportRandomSpawn(this PlayerControl player)

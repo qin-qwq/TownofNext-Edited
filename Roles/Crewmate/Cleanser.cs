@@ -12,7 +12,6 @@ internal class Cleanser : RoleBase
     public override CustomRoles Role => CustomRoles.Cleanser;
     private const int Id = 6600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Cleanser);
-    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\

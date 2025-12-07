@@ -144,6 +144,12 @@ public static class Options
         "CamouflageMode.Sarha",
         "CamouflageMode.Marg"
     ];
+    public static readonly string[] PetToAssign =
+    [
+        "pet_GoosePet",
+        "pet_Pusheen",
+        "pet_RANDOM_FOR_EVERYONE"
+    ];
     [Obfuscation(Exclude = true)]
     public enum QuickChatSpamMode
     {
@@ -572,6 +578,10 @@ public static class Options
     public static OptionItem CantGuessDuringDiscussionTime;
     public static OptionItem UseQuickChatSpamCheat;
 
+    // 技能相关设定
+    public static OptionItem UsePets;
+    public static OptionItem PetToAssignToEveryone;
+    public static OptionItem CancelPetAnimation;
 
     // ------------ General Role Settings ------------
 
@@ -2188,6 +2198,23 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(217, 218, 255, byte.MaxValue));
+
+        // 技能相关设定
+        TextOptionItem.Create(10000036, "MenuTitle.Ability", TabGroup.ModSettings)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        // 技能设置
+        UsePets = BooleanOptionItem.Create(61004, "UsePets", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        PetToAssignToEveryone = StringOptionItem.Create(61005, "PetToAssign", PetToAssign, PetToAssign.Length, TabGroup.ModSettings, false)
+            .SetParent(UsePets)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        CancelPetAnimation = BooleanOptionItem.Create(61006, "CancelPetAnimation", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 
         yield return null;

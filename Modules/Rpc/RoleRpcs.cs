@@ -868,15 +868,4 @@ namespace TOHE.Modules.Rpc
         private readonly int playerId;
         private readonly CustomRoles role;
     }
-    class RpcFixBlackscreen : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.FixBlackscreen;
-        public RpcFixBlackscreen(uint netId) : base(netId)
-        {
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-        }
-    }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using TMPro;
 using TOHE.Patches;
+using TOHE.Roles.Core;
 using UnityEngine;
 using UnityEngine.Events;
 using static TOHE.Translator;
@@ -653,6 +654,8 @@ public static class StringOptionPatch
                     SupportedLangs.Russian or SupportedLangs.Japanese or SupportedLangs.SChinese or SupportedLangs.TChinese => 0.15f,
                     _ => 0.35f,
                 };
+
+                if (role.GetStaticRoleClass().IsMethodOverridden("OnPet")) name += GetString("SupportsPet");
 
                 SetupHelpIcon(role, __instance);
             }

@@ -433,6 +433,15 @@ namespace TOHE.Modules
             // this.OwnerId = OwnerId;
         }
     }
+    internal sealed class Portal : CustomNetObject
+    {
+        internal Portal(Vector2 position, byte OwnerId)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#20efef>█<#20efef>█<#20efef>█<#20efef>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#20efef>█<#5ae0e0>█<#5ae0e0>█<#5ae0e0>█<#5ae0e0>█<#20efef>█<alpha=#00>█<br><#20efef>█<#5ae0e0>█<#2da7a7>█<#2da7a7>█<#2da7a7>█<#2da7a7>█<#5ae0e0>█<#20efef>█<br><#20efef>█<#5ae0e0>█<#2da7a7>█<#5ae0e0>█<#5ae0e0>█<#2da7a7>█<#5ae0e0>█<#20efef>█<br><#20efef>█<#5ae0e0>█<#2da7a7>█<#5ae0e0>█<#2da7a7>█<#2da7a7>█<#5ae0e0>█<#20efef>█<br><#20efef>█<#5ae0e0>█<#2da7a7>█<#5ae0e0>█<#5ae0e0>█<#5ae0e0>█<#5ae0e0>█<#20efef>█<br><alpha=#00>█<#20efef>█<#5ae0e0>█<#2da7a7>█<#2da7a7>█<#2da7a7>█<#20efef>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#20efef>█<#5ae0e0>█<#5ae0e0>█<#5ae0e0>█<alpha=#00>█<alpha=#00>█<br></color></line-height></font></size>", position);
+            // this.OwnerId = OwnerId;
+        }
+    }
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RawSetName))]

@@ -131,14 +131,7 @@ internal class Archaeologist : RoleBase
             case 3: // 相位斗篷 - 使你短暂隐形
                 player.RpcGuardAndKill();
                 player.RpcMakeInvisible();
-                _ = new LateTask(() =>
-                {
-                    player.Notify(GetString("SwooperInvisStateCountdown"), 3f);
-                }, InvisDuration.GetFloat() - 10f);
-                _ = new LateTask(() =>
-                {
-                    player.Notify(GetString("SwooperInvisStateCountdownn"), 3f);
-                }, InvisDuration.GetFloat() - 5f);
+                player.Notify(GetString("SwooperInvisState"), InvisDuration.GetFloat() - 1);
                 _ = new LateTask(() =>
                 {
                     player.RpcMakeVisible();

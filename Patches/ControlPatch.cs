@@ -160,24 +160,6 @@ internal class ControllerManagerUpdatePatch
                 Main.ExportCustomRoleColors();
                 Logger.SendInGame("Exported Custom Translation and Role File");
             }
-            // Fix Black Screen
-            if (GetKeysDown(KeyCode.F5, KeyCode.F))
-            {
-                if (AmongUsClient.Instance.AmHost)
-                {
-                    Logger.Info("Attempted to fix Black Screen", "KeyCommand");
-                    AntiBlackout.SetIsDead();
-                    Logger.SendInGame("尝试修复黑屏");
-                }
-                else
-                {
-                    if (Utils.IsPlayerModerator(PlayerControl.LocalPlayer.FriendCode) || PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
-                    {
-                        var msg = new RpcFixBlackscreen(PlayerControl.LocalPlayer.NetId);
-                        RpcUtils.LateBroadcastReliableMessage(msg);
-                    }
-                }
-            }
             // Send logs
             if (GetKeysDown(KeyCode.F1, KeyCode.LeftControl))
             {
@@ -257,7 +239,7 @@ internal class ControllerManagerUpdatePatch
                     PlayerControl.LocalPlayer.NoCheckStartMeeting(null, force: true);
                 }
             }
-            // Forse start game       
+            // Force start game       
             if (Input.GetKeyDown(KeyCode.LeftShift) && GameStates.IsCountDown && !HudManager.Instance.Chat.IsOpenOrOpening)
             {
                 var invalidColor = Main.AllPlayerControls.Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId).ToArray();

@@ -236,9 +236,15 @@ public static class CustomRolesHelper
         // Based on Imp but counted as crewmate
         return role.HasImpBasis() && role.IsCrewmate();
     }
-    public static bool IsMeetingShapeshifterRole(this CustomRoles role)
+    public static bool IsMeetingShapeshifterRole(this PlayerControl pc)
     {
-        return role.GetStaticRoleClass().IsMsr;
+        return Utils.IsMethodOverridden(pc.GetRoleClass(), "OnMeetingShapeshift");
+    }
+    public static bool PetActivatedAbility(this PlayerControl pc)
+    {
+        if (!Options.UsePets.GetBool()) return false;
+
+        return Utils.IsMethodOverridden(pc.GetRoleClass(), "OnPet");
     }
     public static bool IsTaskBasedCrewmate(this CustomRoles role)
     {
@@ -412,6 +418,19 @@ public static class CustomRolesHelper
             || (role is CustomRoles.Doctor && Doctor.VisibleToEveryone(target))
             || (role is CustomRoles.Bait && Bait.BaitNotification.GetBool() && Inspector.CheckBaitCountType)
             || (role is CustomRoles.President && President.CheckReveal(target.PlayerId))
+            || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
+            || (role is CustomRoles.Solsticer)
+            || (role is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.EveryoneCanKnowMini.GetBool());
+    }
+    public static bool IsRevealingRole2(this CustomRoles role)
+    {
+        return (role is CustomRoles.Mayor && Mayor.MayorRevealWhenDoneTasks.GetBool())
+            || (role is CustomRoles.SuperStar && SuperStar.EveryOneKnowSuperStar.GetBool())
+            || (role is CustomRoles.Marshall)
+            || (role is CustomRoles.Workaholic && Workaholic.WorkaholicVisibleToEveryone.GetBool())
+            || (role is CustomRoles.Doctor && Doctor.VisibleToEveryoneOpt.GetBool())
+            || (role is CustomRoles.Bait && Bait.BaitNotification.GetBool() && Inspector.CheckBaitCountType)
+            || (role is CustomRoles.President)
             || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
             || (role is CustomRoles.Solsticer)
             || (role is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.EveryoneCanKnowMini.GetBool());
@@ -898,7 +917,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.God)
                     || pc.Is(CustomRoles.Visionary)
                     || pc.Is(CustomRoles.GuardianAngelTOHE)
-                    || pc.Is(CustomRoles.Mimic))
+                    || pc.Is(CustomRoles.Mimic)
+                    || pc.Is(CustomRoles.Iceologer))
                     return false;
                 break;
 

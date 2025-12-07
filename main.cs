@@ -53,11 +53,11 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.4.4"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.5.0 Beta 3";
+    public const string PluginVersion = "25.12.07"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.5.0 Beta 4";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 17.0.0 & 17.0.1
+            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
@@ -779,6 +779,7 @@ public enum CustomRoles
     Godfather,
     Greedy,
     Hangman,
+    Iceologer,
     Instigator,
     Kamikaze,
     KillingMachine,
@@ -940,7 +941,6 @@ public enum CustomRoles
     Juggernaut,
     Lawyer,
     Lich,
-    Logos,
     Maverick,
     Opportunist,
     Pelican,

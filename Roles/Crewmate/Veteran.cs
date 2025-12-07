@@ -15,13 +15,13 @@ internal class Veteran : RoleBase
     public override CustomRoles Role => CustomRoles.Veteran;
     private const int Id = 11350;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Veteran);
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
-    private static OptionItem VeteranSkillCooldown;
-    private static OptionItem VeteranSkillDuration;
+    public static OptionItem VeteranSkillCooldown;
+    public static OptionItem VeteranSkillDuration;
     private static OptionItem VeteranSkillMaxOfUseage;
 
     private static readonly Dictionary<byte, long> VeteranInProtect = [];
@@ -102,6 +102,10 @@ internal class Veteran : RoleBase
             player.Notify(string.Format(GetString("AbilityExpired"), player.GetAbilityUseLimit()));
         }
     }
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
+    }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
         // Ability use limit reached
@@ -129,8 +133,24 @@ internal class Veteran : RoleBase
 
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
-        hud.AbilityButton.buttonLabelText.text = GetString("VeteranVentButtonText");
-        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.buttonLabelText.text = GetString("VeteranVentButtonText");
+            hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        }
+        else
+        {
+            hud.PetButton.OverrideText(GetString("VeteranVentButtonText"));
+        }
     }
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Veteran");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
+    {
+        if (!UsePets.GetBool()) return CustomButton.Get("Veteran");
+        return null;
+    }
+    public override Sprite GetPetButtonSprite(PlayerControl player)
+    {
+        if (UsePets.GetBool()) return CustomButton.Get("Veteran");
+        return null;
+    }
 }

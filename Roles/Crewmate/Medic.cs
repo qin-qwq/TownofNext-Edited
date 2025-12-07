@@ -313,4 +313,5 @@ internal class Medic : RoleBase
         hud.KillButton?.OverrideText(GetString("MedicalerButtonText"));
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Shield");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Shield");
 }

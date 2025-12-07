@@ -56,6 +56,7 @@ internal class ChangeRoleSettings
             RoleAssign.RoleResult = [];
             KillTimerManager.Initializate();
             AbilityUseManager.Initializate();
+            AbilityTimeManager.Initializate();
 
             Main.AllPlayerKillCooldown.Clear();
             Main.AllPlayerSpeed.Clear();
@@ -179,6 +180,16 @@ internal class ChangeRoleSettings
                 {
                     var pair = (target.PlayerId, pc.PlayerId);
                     Main.LastNotifyNames[pair] = currentName;
+                }
+
+                if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard)
+                {
+                    foreach (var player in Main.AllPlayerControls)
+                    {
+                        if (player.Is(CustomRoles.GM)) continue;
+
+                        _ = new LateTask(() => { player.RpcSetPet(PetsPatch.GetPetId()); }, 3f);
+                    }
                 }
 
                 Main.PlayerStates[pc.PlayerId] = new(pc.PlayerId)
