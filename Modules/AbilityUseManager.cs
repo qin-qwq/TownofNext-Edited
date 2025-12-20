@@ -59,7 +59,7 @@ public static class AbilityUseManager
             CustomRoles.Lich or CustomRoles.SoulCollector or CustomRoles.Benefactor or CustomRoles.Berserker
                 or CustomRoles.Keeper or CustomRoles.Collector or CustomRoles.Doomsayer or CustomRoles.Maverick
                 or CustomRoles.Pirate or CustomRoles.Pixie or CustomRoles.PunchingBag or CustomRoles.Seeker
-                or CustomRoles.Taskinator or CustomRoles.Vector or CustomRoles.Vulture
+                or CustomRoles.Taskinator or CustomRoles.Vector or CustomRoles.Vulture or CustomRoles.Transporter
                     => false,
 
             _ => true

@@ -12,12 +12,12 @@ internal partial class Pyrophoric : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Pyrophoric;
     private const int Id = 31900;
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
-    private static OptionItem PyrophoricSkillCooldown;
+    public static OptionItem PyrophoricSkillCooldown;
     private static OptionItem PyrophoricVision;
     private static OptionItem PyrophoricKilledMeetings;
     private static OptionItem PyrophoricCanKill;
@@ -64,6 +64,10 @@ internal partial class Pyrophoric : RoleBase
             opt.SetFloat(FloatOptionNames.ImpostorLightMod, Main.DefaultImpostorVision);
         }
     }
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
+    }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
         if (!InPyrophoric)
@@ -81,9 +85,25 @@ internal partial class Pyrophoric : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
-        hud.AbilityButton.buttonLabelText.text = GetString("PyrophoricVentButtonText");
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.buttonLabelText.text = GetString("PyrophoricVentButtonText");
+        }
+        else
+        {
+            hud.PetButton.buttonLabelText.text = GetString("PyrophoricVentButtonText");
+        }        
     }
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Ignite");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
+    {
+        if (!UsePets.GetBool()) return CustomButton.Get("Ignite");
+        return null;
+    }
+    public override Sprite GetPetButtonSprite(PlayerControl player)
+    {
+        if (UsePets.GetBool()) return CustomButton.Get("Ignite");
+        return null;
+    }
     public override void AfterMeetingTasks()
     {
         if (Revenge)
@@ -130,7 +150,7 @@ internal partial class Pyrophoric : RoleBase
         if (!PyrophoricCanRevenge.GetBool()) return;
         if (!InPyrophoric) return;
 
-        name += string.Format(Translator.GetString("SomeoneMissing"));
+        name += string.Format(GetString("SomeoneMissing"));
         Revenge = true;
     }
 }

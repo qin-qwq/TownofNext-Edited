@@ -18,15 +18,16 @@ internal class TimeMaster : RoleBase
     public override CustomRoles Role => CustomRoles.TimeMaster;
     private const int Id = 9900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.TimeMaster);
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override bool IsExperimental => true;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
-    private static OptionItem TimeMasterSkillCooldown;
-    private static OptionItem TimeMasterSkillDuration;
+    public static OptionItem TimeMasterSkillCooldown;
+    public static OptionItem TimeMasterSkillDuration;
     private static OptionItem TimeMasterSkillDuration2;
+    public static OptionItem TimeMasterUsePetRewind;
     private static OptionItem TimeMasterMaxUses;
 
     private static readonly Dictionary<byte, long> TimeMasterInProtect = [];
@@ -42,9 +43,10 @@ internal class TimeMaster : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         TimeMasterSkillDuration2 = FloatOptionItem.Create(Id + 12, "TimeMasterSkillDuration2", new(1f, 180f, 1f), 10f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeMaster])
             .SetValueFormat(OptionFormat.Seconds);
-        TimeMasterMaxUses = IntegerOptionItem.Create(Id + 13, "AbilityUseLimit", new(0, 20, 1), 1, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeMaster])
+        TimeMasterUsePetRewind = BooleanOptionItem.Create(Id + 13, "TimeMasterUsePetRewind", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeMaster]);
+        TimeMasterMaxUses = IntegerOptionItem.Create(Id + 14, "AbilityUseLimit", new(0, 20, 1), 1, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeMaster])
             .SetValueFormat(OptionFormat.Times);
-        TimeMasterAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Id + 14, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeMaster])
+        TimeMasterAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Id + 15, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeMaster])
             .SetValueFormat(OptionFormat.Times);
     }
     public override void Init()
@@ -65,8 +67,16 @@ internal class TimeMaster : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
-        hud.AbilityButton.buttonLabelText.text = GetString("TimeMasterVentButtonText");
-        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.buttonLabelText.text = GetString("TimeMasterVentButtonText");
+            hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        }
+        else
+        {
+            if (!TimeMasterUsePetRewind.GetBool()) hud.PetButton.OverrideText(GetString("TimeMasterVentButtonText"));
+            else hud.PetButton.OverrideText(GetString("TimeMasterPetButtonText"));
+        }
     }
     private static IEnumerator Rewind()
     {
@@ -139,7 +149,7 @@ internal class TimeMaster : RoleBase
         long now = TimeStamp;
         if (BackTrack.ContainsKey(now)) return;
 
-        BackTrack[now] = Main.AllAlivePlayerControls.ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
+        BackTrack[now] = Main.AllAlivePlayerControls.Where(x => !x.inVent && !x.onLadder && !x.inMovingPlat).ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
 
         if (!lowLoad && TimeMasterInProtect.TryGetValue(player.PlayerId, out var vtime) && vtime + TimeMasterSkillDuration.GetInt() < nowTime)
         {
@@ -147,6 +157,26 @@ internal class TimeMaster : RoleBase
             if (!DisableShieldAnimations.GetBool()) player.RpcGuardAndKill();
             else player.RpcResetAbilityCooldown();
             player.Notify(GetString("TimeMasterSkillStop"));
+        }
+    }
+    public override void OnPet(PlayerControl pc)
+    {
+        if (!TimeMasterUsePetRewind.GetBool())
+        {
+            OnEnterVent(pc, null);
+        }
+        else
+        {
+            if (pc.GetAbilityUseLimit() >= 1)
+            {
+                pc.RpcRemoveAbilityUse();
+
+                Main.Instance.StartCoroutine(Rewind());
+            }
+            else
+            {
+                pc.Notify(GetString("OutOfAbilityUsesDoMoreTasks"));
+            }
         }
     }
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
@@ -180,5 +210,14 @@ internal class TimeMaster : RoleBase
             pc.Notify(GetString("OutOfAbilityUsesDoMoreTasks"));
         }
     }
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Time Master");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
+    {
+        if (!UsePets.GetBool()) return CustomButton.Get("Time Master");
+        return null;
+    }
+    public override Sprite GetPetButtonSprite(PlayerControl player)
+    {
+        if (UsePets.GetBool()) return CustomButton.Get("Time Master");
+        return null;
+    }
 }

@@ -70,7 +70,7 @@ internal class Undertaker : RoleBase
         else
             MarkedLocation.Add(PlayerId, ExtendedPlayerControl.GetBlackRoomPosition());
     }
-    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         var shapeshifterId = shapeshifter.PlayerId;
         MarkedLocation[shapeshifterId] = shapeshifter.GetCustomPosition();

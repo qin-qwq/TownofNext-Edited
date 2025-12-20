@@ -58,7 +58,7 @@ public class Randomizer : IAddon
                 || (killer.Is(CustomRoles.Oblivious) && Oblivious.ObliviousBaitImmune.GetBool()))
                 return;
 
-            if (killer.PlayerId != target.PlayerId || (target.GetRealKiller()?.GetCustomRole() is CustomRoles.Swooper or CustomRoles.Wraith) || !killer.Is(CustomRoles.KillingMachine) || !killer.Is(CustomRoles.Oblivious) || (killer.Is(CustomRoles.Oblivious) && !Oblivious.ObliviousBaitImmune.GetBool()))
+            if (killer.PlayerId != target.PlayerId || (target.GetRealKiller()?.GetCustomRole() is CustomRoles.Swooper) || !killer.Is(CustomRoles.KillingMachine) || !killer.Is(CustomRoles.Oblivious) || (killer.Is(CustomRoles.Oblivious) && !Oblivious.ObliviousBaitImmune.GetBool()))
             {
                 killer.RPCPlayCustomSound("Congrats");
                 target.RPCPlayCustomSound("Congrats");
@@ -110,8 +110,7 @@ public class Randomizer : IAddon
         {
             Logger.Info($"{killer.GetNameWithRole()} 击杀了萧暮触发凶手CD变成600 => {target.GetNameWithRole()}", "Randomizer");
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Randomizer), GetString("YouKillRandomizer3")));
-            Main.AllPlayerKillCooldown[killer.PlayerId] = 600f;
-            killer.SyncSettings();
+            killer.SetKillCooldown(600f, forceAnime: true);
         }
         else if (Randomizer == 4)
         {

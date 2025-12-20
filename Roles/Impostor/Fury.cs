@@ -48,11 +48,11 @@ internal class Fury : RoleBase
         AURoleOptions.PhantomCooldown = AngryCooldown.GetFloat();
     }
 
-    public override bool OnCheckVanish(PlayerControl player, float KillCooldown)
+    public override bool OnCheckVanish(PlayerControl player)
     {
         if (PlayerToAngry.Contains(player.PlayerId)) return false;
         PlayerToAngry.Add(player.PlayerId);
-        KillCooldown = AngryKillCooldown.GetFloat();
+        player.SetKillCooldown(AngryKillCooldown.GetFloat());
         foreach (var target in Main.AllPlayerControls)
         {
             if (!target.IsModded()) target.KillFlash();

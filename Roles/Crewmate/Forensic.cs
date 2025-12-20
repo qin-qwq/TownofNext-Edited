@@ -13,26 +13,21 @@ internal class Forensic : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Forensic;
     private const int Id = 7900;
-    public override CustomRoles ThisRoleBase => CustomRoles.Detective;
+    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
 
-    private static OptionItem DetectiveSuspectLimit;
     private static OptionItem DetectiveCanknowKiller;
     private static OptionItem DetectiveCanknowDeathReason;
     private static OptionItem DetectiveCanknowRealKiller;
     private static OptionItem FindKillerProbability;
 
     private string Notify;
-    private static readonly HashSet<byte> KillerList = [];
     private readonly Dictionary<byte, string> InfoAboutDeadPlayerAndKiller = [];
 
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Forensic);
-        DetectiveSuspectLimit = IntegerOptionItem.Create(Id + 10, GeneralOption.DetectiveBase_DetectiveSuspectLimit, new(2, 4, 1), 2, TabGroup.CrewmateRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic])
-            .SetValueFormat(OptionFormat.Players);
         DetectiveCanknowKiller = BooleanOptionItem.Create(Id + 11, "DetectiveCanknowKiller", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
         DetectiveCanknowDeathReason = BooleanOptionItem.Create(Id + 12, "DetectiveCanknowDeathReason", true, TabGroup.CrewmateRoles, false)
@@ -48,16 +43,11 @@ internal class Forensic : RoleBase
     {
         Notify = string.Empty;
         InfoAboutDeadPlayerAndKiller.Clear();
-        KillerList.Clear();
     }
 
     public override void Add(byte playerId)
     {
         CustomRoleManager.CheckDeadBodyOthers.Add(GetInfoFromDeadBody);
-    }
-    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
-    {
-        AURoleOptions.DetectiveSuspectLimit = DetectiveSuspectLimit.GetInt();
     }
     private void GetInfoFromDeadBody(PlayerControl killer, PlayerControl target, bool inMeeting)
     {
@@ -91,9 +81,11 @@ internal class Forensic : RoleBase
                 var realKiller = deadBody.PlayerId.GetRealKillerById();
 
                 var rd = IRandom.Instance;
-                if (DetectiveCanknowRealKiller.GetBool() && rd.Next(0, 101) < FindKillerProbability.GetInt() && !KillerList.Contains(realKiller.PlayerId))
+                if (DetectiveCanknowRealKiller.GetBool() && rd.Next(0, 101) < FindKillerProbability.GetInt() && realKiller != null
+                    && realKiller.Data != null)
                 {
-                    KillerList.Add(realKiller.PlayerId);
+                    var killerName = realKiller.GetRealName();
+                    msg.Append($"；\n{string.Format(GetString("DetectiveNoticeKillerName"), killerName)}");
                 }
 
                 if (realKiller == null
@@ -118,15 +110,6 @@ internal class Forensic : RoleBase
             Notify = msg.ToString();
         }
         InfoAboutDeadPlayerAndKiller.Clear();
-    }
-
-    public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
-    {
-        if ((!seer.IsAlive() || seer.Is(CustomRoles.Forensic)) && KillerList.Contains(target.PlayerId))
-        {
-            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Forensic), "○");
-        }
-        return string.Empty;
     }
 
     public override void OnMeetingHudStart(PlayerControl pc)

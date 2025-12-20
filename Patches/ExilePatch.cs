@@ -186,7 +186,7 @@ class ExileControllerWrapUpPatch
                     player?.RpcExileV2();
 
                     // Just to be sure
-                    _ = new LateTask(() => player?.RpcExileV2(), 0.5f, "Extra Exile to be Sure");
+                    _ = new LateTask(() => player?.RpcExile(), 0.5f, "Extra Exile to be Sure");
 
                     if (x.Value == PlayerState.DeathReason.Suicide)
                         player?.SetRealKiller(player, true);
@@ -209,23 +209,23 @@ class ExileControllerWrapUpPatch
                     Utils.NotifyRoles();
                 }
 
-                _ = new LateTask(() =>
+                /*_ = new LateTask(() =>
                 {
                     foreach (var player in Main.AllAlivePlayerControls)
                     {
                         if (player.GetRoleClass() is not DefaultSetup)
                         {
-                            if (player.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter)
+                            if (player.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
                             {
                                 player.ResetKillCooldown();
                                 if (Main.AllPlayerKillCooldown.TryGetValue(player.PlayerId, out var killTimer) && (killTimer - 2f) > 0f)
                                 {
-                                    player.SetKillCooldown(Options.ChangeFirstKillCooldown.GetBool() ? Options.FixKillCooldownValue.GetFloat() - 2f : killTimer - 2f);
+                                    player.SetKillCooldown(killTimer - 2f);
                                 }
                             }
                         }
                     }
-                }, 1f, $"Fix Kill Cooldown Task after meeting");
+                }, 1f, $"Fix Kill Cooldown Task after meeting");*/
 
                 Main.LastMeetingEnded = Utils.TimeStamp;
             }, 1f, "AfterMeetingDeathPlayers Task");

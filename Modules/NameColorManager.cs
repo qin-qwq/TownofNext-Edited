@@ -131,6 +131,7 @@ public static class NameColorManager
             {
                 if (Nemesis.PreventKnowRole(seer)) return false;
                 if (Retributionist.PreventKnowRole(seer)) return false;
+                if (Wraithh.PreventKnowRole(seer)) return false;
 
                 if (!Options.GhostCanSeeOtherRoles.GetBool())
                     return false;

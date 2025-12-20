@@ -146,4 +146,3 @@ internal class Kamikaze : RoleBase
         }
     }
 }
-

@@ -17,7 +17,7 @@ internal class Mini : RoleBase
     //==================================================================\\
 
     private static OptionItem GrowUpDuration;
-    private static OptionItem EveryoneCanKnowMini;
+    public static OptionItem EveryoneCanKnowMini;
     private static OptionItem CountMeetingTime;
     private static OptionItem EvilMiniSpawnChances;
     private static OptionItem CanBeEvil;

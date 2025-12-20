@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
+using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Neutral;
 using UnityEngine;
@@ -18,7 +19,6 @@ public abstract class RoleBase
 
     public virtual bool IsEnable { get; set; } = false;
     public bool HasVoted = false;
-    public virtual bool IsMsr => false;
     public virtual bool IsExperimental => false;
     public virtual bool IsDesyncRole => false;
     public virtual bool IsSideKick => false;
@@ -270,7 +270,9 @@ public abstract class RoleBase
     { }
     public virtual void OnMeetingShapeshift(PlayerControl shapeshifter, PlayerControl target)
     { }
-    public virtual bool OnCheckVanish(PlayerControl phantom, float killCooldown) => true;
+    public virtual bool OnCheckVanish(PlayerControl phantom) => true;
+    public virtual void OnPet(PlayerControl pc)
+    { }
 
     // NOTE: when using UnShapeshift button, it will not be possible to revert to normal state because of complications
     // So OnCheckShapeShift and OnShapeshift are pointless when using it
@@ -426,6 +428,7 @@ public abstract class RoleBase
     /// Set custom sprite for Shapeshift/Vanish/Vent(Engineer)/Protect/Track button
     /// </summary>
     public virtual Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => null;
+    public virtual Sprite GetPetButtonSprite(PlayerControl player) => null;
     public virtual Sprite ImpostorVentButtonSprite(PlayerControl player) => null;
     public virtual Sprite ReportButtonSprite { get; }
     public virtual Sprite SabotageButtonSprite { get; }
@@ -439,7 +442,12 @@ public abstract class RoleBase
     // return string.empty if "seer != seen" if only seer should have it
     // otherwise make some list or byte or smt of sorts to only get the target
     public virtual string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false) => string.Empty;
-    public virtual string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false) => string.Empty;
+    public virtual string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
+    {
+        var sb = new StringBuilder();
+        sb.Append(Utils.GetAbilityTimeDisplay(seer, seen));
+        return sb.ToString();
+    }
     public virtual string GetSuffix(PlayerControl seer, PlayerControl seen, bool isForMeeting = false) => string.Empty;
     [Obfuscation(Exclude = true)]
     public virtual string GetProgressText(byte playerId, bool comms)

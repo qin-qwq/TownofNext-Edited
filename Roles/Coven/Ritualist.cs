@@ -131,6 +131,11 @@ internal class Ritualist : CovenManager
                 RitualLimit[pc.PlayerId] = 0;
                 return true;
             }
+            if (target.GetCustomRole().IsRevealingRole(target))
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessRevealingRole"));
+                return true;
+            }
             if (!target.CanBeRecruitedBy(pc))
             {
                 pc.ShowInfoMessage(isUI, GetString("RitualistRitualImpossible"));
@@ -283,6 +288,6 @@ internal class Ritualist : CovenManager
     }
     public static bool CanBeConverted(PlayerControl pc)
     {
-        return pc != null && (!pc.GetCustomRole().IsCovenTeam() && !pc.IsTransformedNeutralApocalypse());
+        return pc != null && !(pc.GetCustomRole().IsCovenTeam() || pc.GetBetrayalAddon().IsCovenTeam()) && !pc.IsTransformedNeutralApocalypse() && !pc.Is(CustomRoles.Solsticer);
     }
 }

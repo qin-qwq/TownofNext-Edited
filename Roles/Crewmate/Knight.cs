@@ -1,6 +1,5 @@
 using AmongUs.GameOptions;
 using TOHE.Modules;
-using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
 using TOHE.Roles.Double;
 using static TOHE.Options;
@@ -14,8 +13,8 @@ internal class Knight : RoleBase
     public override CustomRoles Role => CustomRoles.Knight;
     private const int Id = 10800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Knight);
-    public override bool IsDesyncRole => !GiveTasks;
-    public override CustomRoles ThisRoleBase => GiveTasks ? CustomRoles.Crewmate : CustomRoles.Impostor;
+    public override bool IsDesyncRole => true;
+    public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\
 
@@ -24,8 +23,6 @@ internal class Knight : RoleBase
     public static OptionItem CanKillBeforeFirstMeeting;
     public static OptionItem RequiterChance;
     public static OptionItem RequiterIgnoresShields;
-
-    private bool GiveTasks = false;
 
     public override void SetupCustomOption()
     {
@@ -42,10 +39,6 @@ internal class Knight : RoleBase
             .SetValueFormat(OptionFormat.Percent);
         RequiterIgnoresShields = BooleanOptionItem.Create(Id + 15, "RequiterIgnoresShields", false, TabGroup.CrewmateRoles, false)
             .SetParent(RequiterChance);
-    }
-    public override void Init()
-    {
-        GiveTasks = false;
     }
     public override void Add(byte playerId)
     {
@@ -67,14 +60,8 @@ internal class Knight : RoleBase
         }
         killer.RpcRemoveAbilityUse();
         Logger.Info($"{killer.GetNameWithRole()} : " + "Kill chance used", "Knight");
-        GiveTasks = true;
-        killer.RpcSetRoleDesync(RoleTypes.Crewmate, killer.GetClientId());
-        Main.DesyncPlayerList.Remove(killer.PlayerId);
-        killer.RpcResetTasks();
         return true;
     }
-
-    public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => GiveTasks;
 }
 
 internal class Requiter : RoleBase

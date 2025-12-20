@@ -140,7 +140,7 @@ internal class DoubleAgent : RoleBase
             CurrentBombedTime = -1;
             CurrentBombedPlayers.Add(target.PlayerId);
             BombIsActive = true;
-            SendMessage(GetString("VoteHasReturned"), voter.PlayerId, title: ColorString(GetRoleColor(CustomRoles.DoubleAgent), string.Format(GetString("VoteAbilityUsed"), GetString("DoubleAgent"))));
+            SendMessage(GetString("VoteHasReturned"), voter.PlayerId, title: ColorString(GetRoleColor(CustomRoles.DoubleAgent), string.Format(GetString("VoteAbilityUsed"), GetString("DoubleAgent"))), noReplay: true);
             return false;
         }
         return true;
@@ -203,7 +203,7 @@ internal class DoubleAgent : RoleBase
             if (!player.IsModded())
             {
                 string Duration = ColorString(player.GetRoleColor(), string.Format(GetString("DoubleAgent_BombExplodesIn"), (int)CurrentBombedTime));
-                if ((!NameNotifyManager.Notice.TryGetValue(player.PlayerId, out var a) || a.Text != Duration) && Duration != string.Empty) player.Notify(Duration, 1.1f);
+                if ((!NameNotifyManager.Notice.TryGetValue(player.PlayerId, out var a) || a.Any()) && Duration != string.Empty) player.Notify(Duration, 1.1f);
             }
 
             if (CurrentBombedPlayers.Any(playerId => !GetPlayerById(playerId).IsAlive())) // If playerId is a null Player clear bomb.

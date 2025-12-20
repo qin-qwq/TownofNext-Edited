@@ -32,6 +32,7 @@ internal class Dictator : RoleBase
         if (!ChangeCommandToExpel.GetBool()) return false;
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
+        if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating) return false;
         if (!pc.IsAlive()) return false;
         if (!pc.Is(CustomRoles.Dictator)) return false;
         int operate = 0; // 1:ID 2:猜测

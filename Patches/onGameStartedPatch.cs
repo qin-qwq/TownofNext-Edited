@@ -56,6 +56,7 @@ internal class ChangeRoleSettings
             RoleAssign.RoleResult = [];
             KillTimerManager.Initializate();
             AbilityUseManager.Initializate();
+            AbilityTimeManager.Initializate();
 
             Main.AllPlayerKillCooldown.Clear();
             Main.AllPlayerSpeed.Clear();
@@ -180,6 +181,16 @@ internal class ChangeRoleSettings
                     Main.LastNotifyNames[pair] = currentName;
                 }
 
+                if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard)
+                {
+                    foreach (var player in Main.AllPlayerControls)
+                    {
+                        if (player.Is(CustomRoles.GM)) continue;
+
+                        _ = new LateTask(() => { player.RpcSetPet(PetsPatch.GetPetId()); }, 3f);
+                    }
+                }
+
                 Main.PlayerStates[pc.PlayerId] = new(pc.PlayerId)
                 {
                     NormalOutfit = new NetworkedPlayerInfo.PlayerOutfit().Set(currentName, pc.Data.Outfits[PlayerOutfitType.Default].ColorId, pc.Data.Outfits[PlayerOutfitType.Default].HatId, pc.Data.Outfits[PlayerOutfitType.Default].SkinId, pc.Data.Outfits[PlayerOutfitType.Default].VisorId, pc.Data.Outfits[PlayerOutfitType.Default].PetId, pc.Data.Outfits[PlayerOutfitType.Default].NamePlateId),
@@ -243,6 +254,7 @@ internal class ChangeRoleSettings
             AntiBlackout.Reset();
             NameNotifyManager.Reset();
             CustomNetObject.Reset();
+            PhantomRolePatch.PetsList.Clear();
 
             SabotageSystemPatch.SabotageSystemTypeRepairDamagePatch.Initialize();
             DoorsReset.Initialize();

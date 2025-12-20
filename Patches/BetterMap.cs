@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using HarmonyLib;
+using TOHE.Roles.Core;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -11,7 +12,8 @@ public class MapBehaviourPatch
 {
     private static Dictionary<PlayerControl, SpriteRenderer> herePoints = new Dictionary<PlayerControl, SpriteRenderer>();
     private static Dictionary<PlayerControl, Vector3> preMeetingPostions = new Dictionary<PlayerControl, Vector3>();
-    private static bool ShouldShowRealTime => !PlayerControl.LocalPlayer.IsAlive() || Main.GodMode.Value;
+    private static bool ShouldShowRealTime => !PlayerControl.LocalPlayer.IsAlive() || Main.GodMode.Value
+    || Options.CurrentGameMode == CustomGameMode.TagMode && PlayerControl.LocalPlayer.GetRoleClass() is TCrewmate tc && tc.DetectState.Item1;
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowNormalMap)), HarmonyPostfix]
     public static void ShowNormalMapPostfix(MapBehaviour __instance)
     {
@@ -39,7 +41,7 @@ public class MapBehaviourPatch
 
     public static void InitializeCustomHerePoints(MapBehaviour __instance)
     {
-        __instance.DisableTrackerOverlays();
+        if (!PlayerControl.LocalPlayer.IsAlive()) __instance.DisableTrackerOverlays();
         // 删除旧图标
         foreach (var oldHerePoint in herePoints)
         {
@@ -49,6 +51,19 @@ public class MapBehaviourPatch
         herePoints.Clear();
 
         // 创建新图标
+        if (Options.CurrentGameMode == CustomGameMode.TagMode)
+        {
+            foreach (var pc in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
+            {
+                if (!pc.AmOwner && pc != null)
+                {
+                    var herePoint = Object.Instantiate(__instance.HerePoint, __instance.HerePoint.transform.parent);
+                    herePoint.gameObject.SetActive(false);
+                    herePoints.Add(pc, herePoint);
+                }
+            }
+            return;
+        }
         foreach (var pc in Main.AllAlivePlayerControls)
         {
             if (!pc.AmOwner && pc != null)

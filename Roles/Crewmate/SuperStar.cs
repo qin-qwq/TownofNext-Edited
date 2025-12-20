@@ -13,7 +13,7 @@ internal class SuperStar : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\
 
-    private static OptionItem EveryOneKnowSuperStar; // You should always have this enabled TBHHH 💀💀
+    public static OptionItem EveryOneKnowSuperStar; // You should always have this enabled TBHHH 💀💀
 
     public override void SetupCustomOption()
     {

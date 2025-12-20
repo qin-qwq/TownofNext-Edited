@@ -53,17 +53,17 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "1.4.1"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.4.1";
+    public const string PluginVersion = "25.12.20"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.5.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 9, 9, 0) // 2025.9.9 & 17.0.0
+            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.4.0 Alpha 6
-    public static readonly bool canaryRelease = false; // Latest: V1.4.0 Beta 3
-    public static readonly bool fullRelease = true; // Latest: V1.4.1
+    public static readonly bool devRelease = false; // Latest: V1.5.0 Alpha 1
+    public static readonly bool canaryRelease = false; // Latest: V1.5.0 Beta 5
+    public static readonly bool fullRelease = true; // Latest: V1.5.0
 
     public static bool hasAccess = true;
 
@@ -147,6 +147,14 @@ public class Main : BasePlugin
     public static readonly Dictionary<byte, Color32> PlayerColors = [];
     public static readonly Dictionary<byte, PlayerState.DeathReason> AfterMeetingDeathPlayers = [];
     public static readonly Dictionary<CustomRoles, string> roleColors = [];
+    public static Dictionary<CustomGameMode, Color> GameModeColors = new()
+    {
+        [CustomGameMode.Standard] = Color.white,
+        [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
+        [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
+        [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
+        [CustomGameMode.HidenSeekTOHE] = new Color32(255, 25, 25, byte.MaxValue),
+    };
 
 #if ANDROID
     public static readonly string LANGUAGE_FOLDER_NAME = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Language");
@@ -224,7 +232,6 @@ public class Main : BasePlugin
     public static int MeetingsPassed = 0;
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static readonly HashSet<byte> Invisible = [];
-
 
     public static PlayerControl[] AllPlayerControls
     {
@@ -651,7 +658,7 @@ public class Main : BasePlugin
         TemplateManager.Init();
         TagManager.Init();
         //SpamManager.Init();
-        DevManager.Init();
+        Utils.Init();
         Cloud.Init();
 
         IRandom.SetInstance(new NetRandomWrapper());
@@ -686,7 +693,9 @@ public class Main : BasePlugin
         Harmony.PatchAll();
 
         // ConsoleManager.DetachConsole();
+#if !ANDROID
         if (DebugModeManager.AmDebugger) ConsoleManager.CreateConsole();
+#endif
 
         // InitializeFileHash();
         FileHash = "Support_2025_09_09";
@@ -730,6 +739,7 @@ public enum CustomRoles
     Bloodmoon,
     Minion,
     Possessor,
+    Wraithh,
 
     //Impostor
     Abyssbringer,
@@ -768,7 +778,7 @@ public enum CustomRoles
     Godfather,
     Greedy,
     Hangman,
-    Inhibitor,
+    Iceologer,
     Instigator,
     Kamikaze,
     KillingMachine,
@@ -793,6 +803,7 @@ public enum CustomRoles
     ShapeMaster,
     Sniper,
     SoulCatcher,
+    Speaker,
     Stealth,
     YinYanger,
     Swooper,
@@ -809,6 +820,7 @@ public enum CustomRoles
     Warlock,
     Wildling,
     Witch,
+    Wraith,
     Zombie,
 
     //Crewmate Ghost
@@ -912,6 +924,7 @@ public enum CustomRoles
     Demon,
     Doomsayer,
     Doppelganger,
+    Dreamer,
     Executioner,
     Famine,
     Follower,
@@ -971,7 +984,6 @@ public enum CustomRoles
     War,
     Werewolf,
     Workaholic,
-    Wraith,
 
     //Coven
     Coven,
@@ -1134,7 +1146,6 @@ public enum CustomWinner
     HexMaster = CustomRoles.HexMaster,
     Quizmaster = CustomRoles.Quizmaster,
     Cultist = CustomRoles.Cultist,
-    Wraith = CustomRoles.Wraith,
     Bandit = CustomRoles.Bandit,
     Pirate = CustomRoles.Pirate,
     SerialKiller = CustomRoles.SerialKiller,
@@ -1170,6 +1181,7 @@ public enum CustomWinner
     Tunny = CustomRoles.Tunny,
     TZombie = CustomRoles.TZombie,
     TCrewmate = CustomRoles.TCrewmate,
+    Dreamer = CustomRoles.Dreamer,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners
@@ -1198,7 +1210,6 @@ public enum AdditionalWinners
     Taskinator = CustomRoles.Taskinator,
     Pixie = CustomRoles.Pixie,
     Quizmaster = CustomRoles.Quizmaster,
-    SchrodingersCat = CustomRoles.SchrodingersCat,
     Troller = CustomRoles.Troller,
     //   NiceMini = CustomRoles.NiceMini,
     //   Baker = CustomRoles.Baker,

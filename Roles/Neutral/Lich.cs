@@ -18,7 +18,6 @@ internal class Lich : RoleBase
     public override CustomRoles Role => CustomRoles.Lich;
     private const int Id = 32900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Lich);
-    public override bool IsExperimental => true;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;

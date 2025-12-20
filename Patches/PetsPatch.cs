@@ -1,3 +1,5 @@
+using AmongUs.Data;
+
 namespace TOHE;
 
 public static class PetsPatch
@@ -10,5 +12,14 @@ public static class PetsPatch
         if (pc.CurrentOutfit.PetId == "") return;
 
         pc.RpcSetPet("");
+    }
+
+    public static string GetPetId()
+    {
+        var random = IRandom.Instance;
+        string[] pets = Options.PetToAssign;
+        string pet = pets[Options.PetToAssignToEveryone.GetValue()];
+        string petId = pet == "pet_RANDOM_FOR_EVERYONE" ? HatManager.Instance.allPets[random.Next(1, HatManager.Instance.allPets.Length)].ProdId : pet;
+        return string.IsNullOrEmpty(petId.Trim()) ? "pet_test" : petId;
     }
 }

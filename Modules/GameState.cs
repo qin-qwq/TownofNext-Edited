@@ -39,7 +39,7 @@ public class PlayerState(byte playerId)
     }
     public bool IsNecromancer { get; set; } = false;
     public (DateTime TimeStamp, byte) RealKiller = (DateTime.MinValue, byte.MaxValue);
-    public List<(DateTime, CustomRoles)> MainRoleLogs = [];
+    public List<(DateTime, CustomRoles, CustomRoles)> MainRoleLogs = [];
     public PlainShipRoom LastRoom = null;
     public bool HasSpawned { get; set; } = false;
     public Dictionary<byte, string> TargetColorData = [];
@@ -123,7 +123,7 @@ public class PlayerState(byte playerId)
             countTypes = CountTypes.Coven;
         }
 
-        if (record) MainRoleLogs.Add((DateTime.Now, role));
+        if (record) MainRoleLogs.Add((DateTime.Now, role, preMainRole));
 
         if (GameStates.IsInGame && preMainRole != CustomRoles.NotAssigned)
         {
@@ -356,6 +356,7 @@ public class PlayerState(byte playerId)
         BlastedOff,
         Expired,
         Suffocate,
+        Ice,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

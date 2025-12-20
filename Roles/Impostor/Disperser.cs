@@ -34,7 +34,7 @@ internal class Disperser : RoleBase
     {
         AURoleOptions.PhantomCooldown = DisperserShapeshiftCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         foreach (var pc in Main.AllAlivePlayerControls)
         {

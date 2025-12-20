@@ -4,6 +4,8 @@ using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.AddOns.Crewmate;
 using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Core;
+using TOHE.Roles.Core.AssignManager;
+using TOHE.Roles.Core.DraftAssign;
 using TOHE.Roles.Coven;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Double;
@@ -18,6 +20,10 @@ public static class CustomRolesHelper
     public static readonly CustomRoles[] AllRoles = EnumHelper.GetAllValues<CustomRoles>();
     public static Dictionary<CustomRoles, Type> DuplicatedRoles = [];
     public static readonly Custom_Team[] AllRoleTypes = EnumHelper.GetAllValues<Custom_Team>();
+    public static bool OnlySpawnsWithPetsRole(this CustomRoles role)
+    {
+        return role is CustomRoles.Transporter; 
+    }
     public static CustomRoles GetVNRole(this CustomRoles role) // RoleBase: Impostor, Shapeshifter, Crewmate, Engineer, Scientist
     {
         // Vanilla roles
@@ -213,7 +219,6 @@ public static class CustomRolesHelper
             CustomRoles.Sidekick or
             CustomRoles.Infectious or
             CustomRoles.Pyromaniac or
-            CustomRoles.Wraith or
             CustomRoles.Shroud or
             CustomRoles.Pelican or
             CustomRoles.Refugee or
@@ -235,9 +240,15 @@ public static class CustomRolesHelper
         // Based on Imp but counted as crewmate
         return role.HasImpBasis() && role.IsCrewmate();
     }
-    public static bool IsMeetingShapeshifterRole(this CustomRoles role)
+    public static bool IsMeetingShapeshifterRole(this PlayerControl pc)
     {
-        return role.GetStaticRoleClass().IsMsr;
+        return Utils.IsMethodOverridden(pc.GetRoleClass(), "OnMeetingShapeshift");
+    }
+    public static bool PetActivatedAbility(this PlayerControl pc)
+    {
+        if (!Options.UsePets.GetBool()) return false;
+
+        return Utils.IsMethodOverridden(pc.GetRoleClass(), "OnPet");
     }
     public static bool IsTaskBasedCrewmate(this CustomRoles role)
     {
@@ -398,7 +409,10 @@ public static class CustomRolesHelper
             CustomRoles.Alchemist or
             CustomRoles.Tired or
             CustomRoles.Sloth or
-            CustomRoles.Fury;
+            CustomRoles.Fury or
+            CustomRoles.TimeAssassin or
+            CustomRoles.Zombie or
+            CustomRoles.Dreamer;
     }
     public static bool IsRevealingRole(this CustomRoles role, PlayerControl target)
     {
@@ -409,7 +423,22 @@ public static class CustomRolesHelper
             || (role is CustomRoles.Doctor && Doctor.VisibleToEveryone(target))
             || (role is CustomRoles.Bait && Bait.BaitNotification.GetBool() && Inspector.CheckBaitCountType)
             || (role is CustomRoles.President && President.CheckReveal(target.PlayerId))
-            || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain());
+            || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
+            || (role is CustomRoles.Solsticer)
+            || (role is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.EveryoneCanKnowMini.GetBool());
+    }
+    public static bool IsRevealingRole2(this CustomRoles role)
+    {
+        return (role is CustomRoles.Mayor && Mayor.MayorRevealWhenDoneTasks.GetBool())
+            || (role is CustomRoles.SuperStar && SuperStar.EveryOneKnowSuperStar.GetBool())
+            || (role is CustomRoles.Marshall)
+            || (role is CustomRoles.Workaholic && Workaholic.WorkaholicVisibleToEveryone.GetBool())
+            || (role is CustomRoles.Doctor && Doctor.VisibleToEveryoneOpt.GetBool())
+            || (role is CustomRoles.Bait && Bait.BaitNotification.GetBool() && Inspector.CheckBaitCountType)
+            || (role is CustomRoles.President)
+            || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
+            || (role is CustomRoles.Solsticer)
+            || (role is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.EveryoneCanKnowMini.GetBool());
     }
     public static bool IsBetrayalAddon(this CustomRoles role)
     {
@@ -893,7 +922,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.God)
                     || pc.Is(CustomRoles.Visionary)
                     || pc.Is(CustomRoles.GuardianAngelTOHE)
-                    || pc.Is(CustomRoles.Mimic))
+                    || pc.Is(CustomRoles.Mimic)
+                    || pc.Is(CustomRoles.Iceologer))
                     return false;
                 break;
 
@@ -1026,7 +1056,8 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.Vindicator)
                     || pc.Is(CustomRoles.Bomber)
                     || pc.Is(CustomRoles.VoidBallot)
-                    || pc.Is(CustomRoles.Swift))
+                    || pc.Is(CustomRoles.Swift)
+                    || pc.Is(CustomRoles.Wraith))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1047,7 +1078,6 @@ public static class CustomRolesHelper
             case CustomRoles.Mare:
                 if (pc.Is(CustomRoles.Underdog)
                     || pc.Is(CustomRoles.Berserker)
-                    || pc.Is(CustomRoles.Inhibitor)
                     || pc.Is(CustomRoles.Saboteur)
                     || pc.Is(CustomRoles.Swift)
                     || pc.Is(CustomRoles.Nemesis)
@@ -1220,7 +1250,6 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.DollMaster)
                     || pc.Is(CustomRoles.Sloth)
                     || pc.Is(CustomRoles.Zombie)
-                    || pc.Is(CustomRoles.Wraith)
                     || pc.Is(CustomRoles.Spurt)
                     || pc.Is(CustomRoles.Chameleon)
                     || pc.Is(CustomRoles.Alchemist)
@@ -1278,8 +1307,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.DollMaster)
                     || pc.Is(CustomRoles.Chameleon)
                     || pc.Is(CustomRoles.Swooper)
-                    || pc.Is(CustomRoles.Alchemist)
-                    || pc.Is(CustomRoles.Wraith))
+                    || pc.Is(CustomRoles.Alchemist))
                     return false;
                 break;
 
@@ -1319,7 +1347,6 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.DollMaster)
                     || pc.Is(CustomRoles.Flash)
                     || pc.Is(CustomRoles.Zombie)
-                    || pc.Is(CustomRoles.Wraith)
                     || pc.Is(CustomRoles.Spurt)
                     || pc.Is(CustomRoles.Chameleon)
                     || pc.Is(CustomRoles.Alchemist)
@@ -1524,7 +1551,6 @@ public static class CustomRolesHelper
            CustomRoles.Arsonist => Arsonist.CanIgniteAnytime() ? CountTypes.Arsonist : CountTypes.Crew,
            CustomRoles.Shroud => CountTypes.Shroud,
            CustomRoles.Werewolf => CountTypes.Werewolf,
-           CustomRoles.Wraith => CountTypes.Wraith,
            var r when r.IsNA() => CountTypes.Apocalypse,
            var r when r.IsCoven() => CountTypes.Coven,
            CustomRoles.Enchanted => CountTypes.Coven,
@@ -1550,6 +1576,7 @@ public static class CustomRolesHelper
            CustomRoles.SchrodingersCat => CountTypes.None,
            CustomRoles.Solsticer => CountTypes.None,
            CustomRoles.Revenant => CountTypes.None,
+           CustomRoles.Dreamer => CountTypes.Dreamer,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1582,7 +1609,6 @@ public static class CustomRolesHelper
             CustomRoles.Collector => CustomWinner.Collector,
             CustomRoles.BloodKnight => CustomWinner.BloodKnight,
             CustomRoles.Cultist => CustomWinner.Cultist,
-            CustomRoles.Wraith => CustomWinner.Wraith,
             CustomRoles.Bandit => CustomWinner.Bandit,
             CustomRoles.Pirate => CustomWinner.Pirate,
             CustomRoles.SerialKiller => CustomWinner.SerialKiller,
@@ -1609,6 +1635,7 @@ public static class CustomRolesHelper
             CustomRoles.Mini => CustomWinner.NiceMini,
             CustomRoles.Doppelganger => CustomWinner.Doppelganger,
             CustomRoles.Shocker => CustomWinner.Shocker,
+            CustomRoles.Dreamer => CustomWinner.Dreamer,
             _ => throw new NotImplementedException()
 
         };
@@ -1625,7 +1652,6 @@ public static class CustomRolesHelper
             CountTypes.Cultist => CustomRoles.Cultist,
             CountTypes.Shroud => CustomRoles.Shroud,
             CountTypes.Werewolf => CustomRoles.Werewolf,
-            CountTypes.Wraith => CustomRoles.Wraith,
             CountTypes.Apocalypse => CustomRoles.Apocalypse,
             CountTypes.Agitater => CustomRoles.Agitater,
             CountTypes.SerialKiller => CustomRoles.SerialKiller,
@@ -1643,10 +1669,23 @@ public static class CustomRolesHelper
             CountTypes.Arsonist => CustomRoles.Arsonist,
             CountTypes.RuthlessRomantic => CustomRoles.RuthlessRomantic,
             CountTypes.Shocker => CustomRoles.Shocker,
+            CountTypes.Dreamer => CustomRoles.Dreamer,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
 
+    public static bool IsInRoleSlot(this CustomRoles role, RoleSlot slot)
+    {
+        if (!slot.Types.Any(x => role.IsRoleAssignType(x))) return false;
+
+        if (slot.Roles.Contains(role)) return true;
+
+        foreach (var bucket in slot.Buckets)
+        {
+            if (role.IsInRoleBucket(bucket)) return true;
+        }
+        return false;
+    }
 
     /// <summary>
     /// Whether the role is in the given role bucket
@@ -1676,6 +1715,7 @@ public static class CustomRolesHelper
             RoleBucket.NeutralChaos => roleType is Custom_RoleType.NeutralChaos,
             RoleBucket.NeutralKilling => roleType is Custom_RoleType.NeutralKilling,
             RoleBucket.NeutralApocalypse => roleType is Custom_RoleType.NeutralApocalypse,
+            RoleBucket.NeutralCommon => roleType is Custom_RoleType.NeutralBenign or Custom_RoleType.NeutralEvil or Custom_RoleType.NeutralChaos,
             RoleBucket.NeutralRandom => roleType is Custom_RoleType.NeutralBenign or Custom_RoleType.NeutralEvil or Custom_RoleType.NeutralChaos or Custom_RoleType.NeutralKilling or Custom_RoleType.NeutralApocalypse,
 
             RoleBucket.CovenPower => roleType is Custom_RoleType.CovenPower,
@@ -1686,6 +1726,59 @@ public static class CustomRolesHelper
             RoleBucket.CovenRandom => roleType is Custom_RoleType.CovenPower or Custom_RoleType.CovenKilling or Custom_RoleType.CovenTrickery or Custom_RoleType.CovenUtility,
 
             RoleBucket.Any => true,
+            _ => false
+        };
+    }
+
+    public static List<RoleAssign.RoleAssignType> RoleAssignTypes(this RoleBucket bucket)
+    {
+        return bucket switch
+        {
+            RoleBucket.ImpostorKilling or
+            RoleBucket.ImpostorSupport or
+            RoleBucket.ImpostorConcealing or
+            RoleBucket.ImpostorHindering or
+            RoleBucket.ImpostorCommon or
+            RoleBucket.ImpostorRandom => [RoleAssign.RoleAssignType.Impostor],
+
+            RoleBucket.CrewmateBasic or
+            RoleBucket.CrewmateSupport or
+            RoleBucket.CrewmateKilling or
+            RoleBucket.CrewmatePower or
+            RoleBucket.CrewmateCommon or
+            RoleBucket.CrewmateRandom => [RoleAssign.RoleAssignType.Crewmate],
+
+            RoleBucket.NeutralBenign or
+            RoleBucket.NeutralChaos or
+            RoleBucket.NeutralEvil => [RoleAssign.RoleAssignType.NonKillingNeutral],
+            RoleBucket.NeutralKilling => [RoleAssign.RoleAssignType.NeutralKilling],
+            RoleBucket.NeutralApocalypse => [RoleAssign.RoleAssignType.NeutralApocalypse],
+            RoleBucket.NeutralCommon => [RoleAssign.RoleAssignType.NonKillingNeutral],
+            RoleBucket.NeutralRandom => [RoleAssign.RoleAssignType.NonKillingNeutral, RoleAssign.RoleAssignType.NeutralKilling, RoleAssign.RoleAssignType.NeutralApocalypse],
+
+            RoleBucket.CovenPower or
+            RoleBucket.CovenKilling or
+            RoleBucket.CovenTrickery or
+            RoleBucket.CovenUtility or
+            RoleBucket.CovenCommon or
+            RoleBucket.CovenRandom => [RoleAssign.RoleAssignType.Coven],
+
+            RoleBucket.Any => [RoleAssign.RoleAssignType.Impostor, RoleAssign.RoleAssignType.Crewmate, RoleAssign.RoleAssignType.NonKillingNeutral,
+                RoleAssign.RoleAssignType.NeutralKilling, RoleAssign.RoleAssignType.NeutralApocalypse, RoleAssign.RoleAssignType.Coven],
+            _ => []
+        };
+    }
+
+    public static bool IsRoleAssignType(this CustomRoles role, RoleAssign.RoleAssignType type)
+    {
+        return type switch
+        {
+            RoleAssign.RoleAssignType.Impostor => role.IsImpostor(),
+            RoleAssign.RoleAssignType.Crewmate => role.IsCrewmate(),
+            RoleAssign.RoleAssignType.Coven => role.IsCoven(),
+            RoleAssign.RoleAssignType.NeutralApocalypse => role.IsNA(),
+            RoleAssign.RoleAssignType.NeutralKilling => role.IsNK(),
+            RoleAssign.RoleAssignType.NonKillingNeutral => role.IsNonNK(),
             _ => false
         };
     }
@@ -1752,7 +1845,6 @@ public enum CountTypes
     Poisoner,
     Charmed,
     Cultist,
-    Wraith,
     SerialKiller,
     Juggernaut,
     Infectious,
@@ -1773,7 +1865,8 @@ public enum CountTypes
     Agitater,
     RuthlessRomantic,
     Shocker,
-    Coven
+    Coven,
+    Dreamer,
 }
 [Obfuscation(Exclude = true)]
 public enum RoleBucket
@@ -1802,6 +1895,7 @@ public enum RoleBucket
     NeutralChaos,
     NeutralKilling,
     NeutralApocalypse,
+    NeutralCommon, // Common = All except Killing and Apocalypse
     NeutralRandom,
 
     // Coven

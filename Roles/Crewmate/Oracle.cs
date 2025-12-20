@@ -14,7 +14,6 @@ internal class Oracle : RoleBase
     public override CustomRoles Role => CustomRoles.Oracle;
     private const int Id = 9100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Oracle);
-    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
@@ -144,7 +143,7 @@ internal class Oracle : RoleBase
             }
 
             SendMessage(GetString("OracleCheck") + "\n" + msg + "\n\n" + string.Format(GetString("OracleCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.Oracle), GetString("Oracle").ToUpper()));
-            SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.Oracle), string.Format(GetString("VoteAbilityUsed"), GetString("Oracle"))));
+            SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.Oracle), string.Format(GetString("VoteAbilityUsed"), GetString("Oracle"))), noReplay: true);
             return false;
         }
     }

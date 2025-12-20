@@ -856,7 +856,7 @@ public abstract class GameEndPredicate
         {
             reason = GameOverReason.CrewmatesByTask;
             ResetAndSetWinner(CustomWinner.Crewmate);
-            Logger.Info($"Game End By Completed All Tasks", "CheckGameEndBySabotage");
+            Logger.Info($"Game End By Completed All Tasks", "CheckGameEndByTasks");
             return true;
         }
         return false;

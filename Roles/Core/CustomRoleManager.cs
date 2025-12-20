@@ -180,6 +180,13 @@ public static class CustomRoleManager
         if (Glow.IsEnable) Glow.ApplyGameOptions(opt, player); //keep this at last
         if (Bewilder.IsEnable) Bewilder.ApplyGameOptions(opt, player);
         if (Ghoul.IsEnable) Ghoul.ApplyGameOptions(player);
+
+        var playerstates = Main.PlayerStates[player.PlayerId];
+        if (playerstates.IsBlackOut)
+        {
+            opt.SetFloat(FloatOptionNames.ImpostorLightMod, 0);
+            opt.SetFloat(FloatOptionNames.CrewLightMod, 0);         
+        }
     }
 
     /// <summary>

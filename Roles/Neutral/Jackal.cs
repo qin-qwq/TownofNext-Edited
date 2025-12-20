@@ -232,7 +232,7 @@ internal class Jackal : RoleBase
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
 
                 ConvertedPlayerId = target.PlayerId;
                 break;
@@ -260,7 +260,7 @@ internal class Jackal : RoleBase
                 Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
 
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
 
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
@@ -310,7 +310,7 @@ internal class Jackal : RoleBase
                 Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
 
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
 
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
@@ -486,15 +486,15 @@ internal class Jackal : RoleBase
                 hasConverted = true;
             }
         }
-    }
+    }*/
 
     public override void AfterMeetingTasks()
     {
         if (_Player && !_Player.IsAlive() && !hasConverted)
         {
-            OnMurderPlayerAsTarget(_Player, _Player, true, false);
+            SidekickBecomeJackal();
         }
-    }*/
+    }
 
     public override string GetProgressText(byte playerId, bool comms)
         => CanRecruitSidekick.GetBool() ? Utils.GetAbilityUseLimitDisplay(playerId, true) : string.Empty;

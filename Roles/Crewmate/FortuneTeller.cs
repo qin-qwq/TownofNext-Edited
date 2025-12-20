@@ -15,7 +15,6 @@ internal class FortuneTeller : RoleBase
     public override CustomRoles Role => CustomRoles.FortuneTeller;
     private const int Id = 8000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.FortuneTeller);
-    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
@@ -174,7 +173,7 @@ internal class FortuneTeller : RoleBase
         }
 
         SendMessage(GetString("FortuneTellerCheck") + "\n" + msg + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()));
-        SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.FortuneTeller), string.Format(GetString("VoteAbilityUsed"), GetString("FortuneTeller"))));
+        SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.FortuneTeller), string.Format(GetString("VoteAbilityUsed"), GetString("FortuneTeller"))), noReplay: true);
         return false;
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)

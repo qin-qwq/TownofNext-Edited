@@ -12,6 +12,9 @@ public class TextOptionItem : OptionItem
         IsText = true;
         IsHeader = true;
     }
+
+    public bool CollapsesSection { get; set; } = false;
+
     public static TextOptionItem Create(
         int id, string name, TabGroup tab, bool isSingleValue = false, bool vanillaText = false
     )

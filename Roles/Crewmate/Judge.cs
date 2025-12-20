@@ -17,7 +17,6 @@ internal class Judge : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Judge;
     private const int Id = 10700;
-    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\

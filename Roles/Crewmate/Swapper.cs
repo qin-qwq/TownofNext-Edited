@@ -19,7 +19,6 @@ internal class Swapper : RoleBase
     public override CustomRoles Role => CustomRoles.Swapper;
     private const int Id = 12400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swapper);
-    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\

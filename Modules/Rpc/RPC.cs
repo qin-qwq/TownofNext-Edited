@@ -19,7 +19,7 @@ namespace TOHE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 181/255 USED
+public enum CustomRPC : byte // 183/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -68,6 +68,7 @@ public enum CustomRPC : byte // 181/255 USED
     SyncDeadPassedMeetingList,
     SyncAbilityUseLimit,
     PlayGuardAndKill,
+    SyncAbilityCD,
 
     //Roles 
     SyncRoleSkill,
@@ -114,6 +115,8 @@ public enum CustomRPC : byte // 181/255 USED
     Necronomicon,
     ExorcistExorcise,
     Invisibility,
+    FixBlackscreen,
+    Balancer,
 
     //FFA
     SyncFFAPlayer,
@@ -171,7 +174,9 @@ internal class RPCHandlerPatch
         or CustomRPC.DumpLog
         or CustomRPC.SetFriendCode
         or CustomRPC.BetterCheck
-        or CustomRPC.DictatorRPC;
+        or CustomRPC.DictatorRPC
+        or CustomRPC.FixBlackscreen
+        or CustomRPC.Balancer;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
         var rpcType = (RpcCalls)callId;
@@ -423,6 +428,16 @@ internal class RPCHandlerPatch
                     pc.SetAbilityUseLimit(reader.ReadSingle(), rpc: false);
                 }
                 break;
+            case CustomRPC.SyncAbilityCD:
+                {
+                    var pc = Utils.GetPlayerById(reader.ReadByte());
+                    pc.RpcRemoveAbilityCD(rpc: false);
+                    long cooldown = long.Parse(reader.ReadString());
+                    long duration = long.Parse(reader.ReadString());
+                    if (duration > 0) pc.RpcAddAbilityCD(rpc: false, includeDuration: true);
+                    else if (cooldown > 0) pc.RpcAddAbilityCD(rpc: false);
+                    break;
+                }
             case CustomRPC.SetBountyTarget:
                 BountyHunter.ReceiveRPC(reader);
                 break;
@@ -636,6 +651,11 @@ internal class RPCHandlerPatch
             case CustomRPC.Guess:
                 GuessManager.ReceiveRPC(reader, __instance);
                 break;
+            case CustomRPC.FixBlackscreen:
+                Logger.Info("Attempted to fix Black Screen", "KeyCommand");
+                AntiBlackout.SetIsDead();
+                Logger.SendInGame("尝试修复黑屏");
+                break;
             case CustomRPC.NemesisRevenge:
                 Nemesis.ReceiveRPC_Custom(reader, __instance);
                 break;
@@ -714,18 +734,31 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.Invisibility:
                 {
-                    if (reader.ReadBoolean())
+                    int num3 = reader.ReadPackedInt32();
+
+                    switch (num3)
                     {
-                        __instance.MakeInvisible();
-                        Main.Invisible.Add(__instance.PlayerId);
+                        case 1:
+                            __instance.MakeInvisible();
+                            Main.Invisible.Add(__instance.PlayerId);
+                            break;
+                        case 0:
+                            __instance.MakeVisible();
+                            Main.Invisible.Remove(__instance.PlayerId);
+                            break;
+                        case 11:
+                            Main.Invisible.Add(__instance.PlayerId);
+                            break;
+                        case 10:
+                            Main.Invisible.Remove(__instance.PlayerId);
+                            break;
                     }
-                    else
-                    {
-                        __instance.MakeVisible();
-                        Main.Invisible.Remove(__instance.PlayerId);
-                    }
+
                     break;
                 }
+            case CustomRPC.Balancer:
+                Balancer.ReceiveRPC_Custom(reader, __instance);
+                break;
         }
     }
 

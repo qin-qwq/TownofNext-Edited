@@ -19,6 +19,7 @@ public static class HudSpritePatch
     private static Sprite OriginalImpVent;
     private static Sprite OriginalReport;
     private static Sprite OriginalSabotage;
+    private static Sprite OriginalPet;
     public static void Postfix(HudManager __instance, [HarmonyArgument(0)] PlayerControl localPlayer, [HarmonyArgument(2)] bool isActive)
     {
         if (!Main.EnableCustomButton.Value || __instance == null || !isActive || !localPlayer.IsAlive()) return;
@@ -31,6 +32,7 @@ public static class HudSpritePatch
             OriginalImpVent = __instance.ImpostorVentButton.graphic.sprite;
             OriginalReport = __instance.ReportButton.graphic.sprite;
             OriginalSabotage = __instance.SabotageButton.graphic.sprite;
+            OriginalPet = __instance.PetButton.graphic.sprite;
             return;
         }
         OriginalKill ??= __instance.KillButton.graphic.sprite;
@@ -38,6 +40,7 @@ public static class HudSpritePatch
         OriginalImpVent ??= __instance.ImpostorVentButton.graphic.sprite;
         OriginalReport ??= __instance.ReportButton.graphic.sprite;
         OriginalSabotage ??= __instance.SabotageButton.graphic.sprite;
+        OriginalPet ??= __instance.PetButton.graphic.sprite;
 
         bool shapeshifting = Main.CheckShapeshift.GetValueOrDefault(localPlayer.PlayerId, false);
 
@@ -46,6 +49,7 @@ public static class HudSpritePatch
         Sprite newVentButton = OriginalImpVent;
         Sprite newReportButton = OriginalReport;
         Sprite newSabotageButton = OriginalSabotage;
+        Sprite newPetButton = OriginalPet;
 
         var playerRoleClass = localPlayer.GetRoleClass();
         if (playerRoleClass == null) goto EndOfSelectImg;
@@ -58,6 +62,9 @@ public static class HudSpritePatch
 
         if (playerRoleClass?.GetAbilityButtonSprite(localPlayer, shapeshifting) is Sprite Abilitybutton)
             newAbilityButton = Abilitybutton;
+
+        if (playerRoleClass?.GetPetButtonSprite(localPlayer) is Sprite Petbutton)
+            newPetButton = Petbutton;
 
         if (playerRoleClass?.ReportButtonSprite is Sprite Reportbutton)
             newReportButton = Reportbutton;
@@ -77,6 +84,9 @@ public static class HudSpritePatch
         // Set custom icon for Ability button (Shapeshift, Vitals, Engineer Vent)
         __instance.AbilityButton.graphic.sprite = newAbilityButton;
 
+        // Set custom icon for Pet button
+        __instance.PetButton.graphic.sprite = newPetButton;
+
         // Set custom icon for Report button
         __instance.ReportButton.graphic.sprite = newReportButton;
 
@@ -88,6 +98,7 @@ public static class HudSpritePatch
         __instance.KillButton.graphic.SetCooldownNormalizedUvs();
         __instance.ImpostorVentButton.graphic.SetCooldownNormalizedUvs();
         __instance.AbilityButton.graphic.SetCooldownNormalizedUvs();
+        __instance.PetButton.graphic.SetCooldownNormalizedUvs();
         __instance.ReportButton.graphic.SetCooldownNormalizedUvs();
         __instance.SabotageButton.graphic.SetCooldownNormalizedUvs();
     }

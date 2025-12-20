@@ -249,7 +249,7 @@ class VentButtonDoClickPatch
         var pc = PlayerControl.LocalPlayer;
         {
             if (pc.inVent || __instance.currentTarget == null || !pc.CanMove || !__instance.isActiveAndEnabled) return true;
-            if (!pc.Is(CustomRoles.Swooper) && !pc.Is(CustomRoles.Wraith) && !pc.Is(CustomRoles.Chameleon)) return true;
+            if (!pc.Is(CustomRoles.Chameleon)) return true;
             pc?.MyPhysics?.RpcEnterVent(__instance.currentTarget.Id);
             return false;
         }

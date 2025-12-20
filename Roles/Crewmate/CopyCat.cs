@@ -24,7 +24,7 @@ internal class CopyCat : RoleBase
     private static OptionItem CopyOnlyEnabledRoles;
 
     private static float CurrentKillCooldown = new();
-    private static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
+    public static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
 
     public override void SetupCustomOption()
     {
@@ -69,7 +69,7 @@ internal class CopyCat : RoleBase
 
             if (!pc.IsAlive())
             {
-                if (!pc.HasGhostRole())
+                if (!pc.HasGhostRole() && !pc.Is(CustomRoles.CopyCat))
                 {
                     pc.RpcSetCustomRole(CustomRoles.CopyCat, false, false);
                 }
@@ -123,12 +123,12 @@ internal class CopyCat : RoleBase
                 CustomRoles.Stealth or CustomRoles.Medusa or CustomRoles.Pitfall => CustomRoles.Grenadier, // 隐形者，美杜莎 => 掷雷兵
                 CustomRoles.TimeThief => CustomRoles.TimeManager, // 蚀时者 => 时间操控者
                 CustomRoles.Consigliere => CustomRoles.Overseer, // 军师 => 预言家
-                CustomRoles.Mercenary => CustomRoles.Addict, // 嗜血杀手 => 瘾君子
+                CustomRoles.Mercenary or CustomRoles.Wraith => CustomRoles.Addict, // 嗜血杀手，幽魂 => 瘾君子
                 CustomRoles.Miner => CustomRoles.Mole, // 矿工 => 鼹鼠
                 CustomRoles.Godfather => CustomRoles.ChiefOfPolice, // 教父 => 警察局长
                 CustomRoles.Twister => CustomRoles.TimeMaster, // 龙卷风 => 时间之主
-                CustomRoles.Disperser => CustomRoles.Transporter, // 分散者 => 传送师
-                CustomRoles.Eraser => CustomRoles.Cleanser, // 抹除者 => 清洗者
+                CustomRoles.Disperser or CustomRoles.RiftMaker => CustomRoles.Transporter, // 分散者，裂缝制造者 => 传送师
+                CustomRoles.Eraser or CustomRoles.Bandit => CustomRoles.Cleanser, // 抹除者，强盗 => 清洗者
                 CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
                 CustomRoles.Workaholic => CustomRoles.Snitch, // 工作狂 => 告密者
                 CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
@@ -138,7 +138,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.AntiAdminer => CustomRoles.Telecommunication, // 监管者 => 通信员
                 CustomRoles.Pursuer => CustomRoles.Deceiver, // 起诉人 => 赝品商
                 CustomRoles.CursedWolf => CustomRoles.Veteran, // 呪狼 => 老兵
-                CustomRoles.Swooper or CustomRoles.Wraith => CustomRoles.Chameleon, // 隐匿者，魅影 => 变色龙
+                CustomRoles.Swooper => CustomRoles.Chameleon, // 隐匿者 => 变色龙
                 CustomRoles.Vindicator or CustomRoles.Pickpocket => CustomRoles.Mayor, // 卫道士，小偷 => 市长
                 CustomRoles.Opportunist or CustomRoles.BloodKnight or CustomRoles.Wildling => CustomRoles.Guardian, // 投机者，嗜血骑士，野人 => 守护者
                 CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist => CustomRoles.Admirer, // 魅魔，病毒，歹徒，大祭司 => 仰慕者
@@ -149,12 +149,17 @@ internal class CopyCat : RoleBase
                 CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 0 => CustomRoles.Overseer, // 药剂师 0 => 预言家
                 CustomRoles.PotionMaster when PotionMaster.CurrentPotion() is 1 => CustomRoles.Medic, // 药剂师 1 => 医生
                 CustomRoles.Sacrifist => CustomRoles.Alchemist, // 献祭者 => 炼金术士
-                CustomRoles.MoonDancer or CustomRoles.Harvester or CustomRoles.Bandit => CustomRoles.Merchant, // 月光舞者，收割者，强盗 => 商人
+                CustomRoles.MoonDancer or CustomRoles.Harvester => CustomRoles.Merchant, // 月光舞者，收割者 => 商人
                 CustomRoles.Jinx => CustomRoles.Crusader, // 扫把星 => 十字军
                 CustomRoles.Trickster or CustomRoles.Illusionist => CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement(), // 骗术师，幻术师 => 随机
                 CustomRoles.Instigator => CustomRoles.Requiter, // 教唆者 => 清算者
                 CustomRoles.Jackal => CustomRoles.ChiefOfPolice, // 豺狼 => 警察局长
-                CustomRoles.Sidekick => CustomRoles.Sheriff, // 跟班 => 警长
+                CustomRoles.Sidekick or CustomRoles.SerialKiller => CustomRoles.Sheriff, // 跟班，连环杀手 => 警长
+                CustomRoles.Underdog => CustomRoles.Brave, // 失败者 => 勇者
+                CustomRoles.Saboteur => CustomRoles.Mechanic, // 破坏者 => 修理工
+                CustomRoles.PlagueBearer => CustomRoles.Socialite, // 瘟疫使者 => 社交达人
+                CustomRoles.Demon => CustomRoles.Spy, // 玩家 => 间谍
+                CustomRoles.Maverick => CustomRoles.Vigilante, // 独行者 => 义务警员
                 _ => role
             };
         }
@@ -222,4 +227,6 @@ internal class CopyCat : RoleBase
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
         hud.KillButton.OverrideText(GetString("CopyButtonText"));
     }
+
+    public static bool HasAddon(byte id, CustomRoles addon) => OldAddons[id].Contains(addon);
 }

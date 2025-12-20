@@ -122,6 +122,7 @@ class CheckForEndVotingPatch
                     __instance.RpcClearVoteDelay(pc.GetClientId());
                     continue;
                 }
+
                 if (pva.DidVote && pva.VotedFor < 253 && pc.IsAlive())
                 {
                     var voteTarget = GetPlayerById(pva.VotedFor);
@@ -240,6 +241,9 @@ class CheckForEndVotingPatch
 
                 // Swapper swap votes
                 if (voter.GetRoleClass() is Swapper sw) sw.SwapVotes(__instance);
+
+                // Speaker change vote
+                if (voter.GetRoleClass() is Speaker sp) sp.ChangeVote(__instance);
 
                 playerRoleClass?.AddVisualVotes(ps, ref statesList);
 
@@ -583,7 +587,7 @@ class CheckForEndVotingPatch
 
         CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiledPlayer, ref DecidedWinner, isMeetingHud: true, name: ref name));
 
-        if (Tiebreaker) name += $"({Utils.ColorString(Utils.GetRoleColor(CustomRoles.Tiebreaker), GetString("Tiebreaker"))})";
+        if (Tiebreaker) name += $"({ColorString(GetRoleColor(CustomRoles.Tiebreaker), GetString("Tiebreaker"))})";
         if (DecidedWinner) name += "<size=0>";
         if (Options.ShowImpRemainOnEject.GetBool() && !DecidedWinner)
         {
@@ -994,7 +998,7 @@ class MeetingHudStartPatch
             foreach (var pc in Main.AllAlivePlayerControls.Where(x => !x.IsModded()).ToArray())
             {
                 var role = pc.GetCustomRole();
-                var Des = pc.GetRoleInfo(true);
+                var Des = pc.PetActivatedAbility() ? pc.GetRoleInfo(true) + $"<size=50%>{GetString("SupportsPetMessage")}</size>" : pc.GetRoleInfo(true);
                 var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                 var Conf = new StringBuilder();
                 var Sub = new StringBuilder();
@@ -1096,11 +1100,11 @@ class MeetingHudStartPatch
                 Main.AllAlivePlayerControls.Where(x => x.GetRealKiller()?.PlayerId == pc.PlayerId).Do(x => MimicMsg += $"\n{x.GetNameWithRole(true)}");
         }
 
-        if (Eavesdropper.IsEnable)
-            Eavesdropper.GetMessage();
-
         if (Rat.IsEnable)
             Rat.GetMessage();
+
+        if (Eavesdropper.IsEnable)
+            Eavesdropper.GetMessage();
 
         // Add Mimic msg
         if (MimicMsg != "")
@@ -1461,7 +1465,7 @@ class MeetingHudUpdatePatch
     {
         if (__instance == null || !GameStates.IsInGame) return;
 
-        //Meeting Skip with vote counting on keystroke (m + delete)
+        //Meeting Skip with vote counting on keystroke (F6)
         if (AmongUsClient.Instance.AmHost && Input.GetKeyDown(KeyCode.F6))
         {
             __instance.CheckForEndVoting();

@@ -14,12 +14,12 @@ internal class Pacifist : RoleBase
     public override CustomRoles Role => CustomRoles.Pacifist;
     private const int Id = 9200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pacifist);
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
-    private static OptionItem PacifistCooldown;
+    public static OptionItem PacifistCooldown;
     private static OptionItem PacifistMaxOfUseage;
 
     public override void SetupCustomOption()
@@ -40,6 +40,10 @@ internal class Pacifist : RoleBase
     {
         AURoleOptions.EngineerCooldown = PacifistCooldown.GetFloat();
         AURoleOptions.EngineerInVentMaxTime = 1;
+    }
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
     }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
@@ -80,7 +84,14 @@ internal class Pacifist : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
-        hud.AbilityButton.buttonLabelText.text = GetString("PacifistVentButtonText");
-        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.buttonLabelText.text = GetString("PacifistVentButtonText");
+            hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        }
+        else
+        {
+            hud.PetButton.buttonLabelText.text = GetString("PacifistVentButtonText");            
+        }
     }
 }

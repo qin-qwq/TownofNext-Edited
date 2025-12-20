@@ -13,15 +13,15 @@ internal class Lighter : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Lighter;
     private const int Id = 8400;
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
     private static OptionItem LighterVisionNormal;
     private static OptionItem LighterVisionOnLightsOut;
-    private static OptionItem LighterSkillCooldown;
-    private static OptionItem LighterSkillDuration;
+    public static OptionItem LighterSkillCooldown;
+    public static OptionItem LighterSkillDuration;
     private static OptionItem LighterSkillMaxOfUseage;
 
     private long Timer;
@@ -72,6 +72,10 @@ internal class Lighter : RoleBase
             player.MarkDirtySettings();
         }
     }
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
+    }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
         if (pc.GetAbilityUseLimit() >= 1)
@@ -104,8 +108,24 @@ internal class Lighter : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
-        hud.AbilityButton.buttonLabelText.text = GetString("LighterVentButtonText");
-        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.buttonLabelText.text = GetString("LighterVentButtonText");
+            hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        }
+        else
+        {
+            hud.PetButton.buttonLabelText.text = GetString("LighterVentButtonText");            
+        }
     }
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Lighter");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
+    {
+        if (!UsePets.GetBool()) return CustomButton.Get("Lighter");
+        return null;
+    }
+    public override Sprite GetPetButtonSprite(PlayerControl player)
+    {
+        if (UsePets.GetBool()) return CustomButton.Get("Lighter");
+        return null;
+    }
 }

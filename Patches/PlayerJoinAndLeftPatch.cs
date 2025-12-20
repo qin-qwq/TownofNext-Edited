@@ -42,6 +42,7 @@ class OnGameJoinedPatch
         EAC.Init();
         Main.AllClientRealNames.Clear();
         FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
+        Utils.GetRegionName(ServerManager.Instance.CurrentRegion ?? null);
 
         if (AmongUsClient.Instance.AmHost) // Execute the following only on the Host
         {
@@ -348,7 +349,7 @@ class OnPlayerLeftPatch
 
         if (GameStates.IsNormalGame && GameStates.IsInGame)
         {
-            if (data.Character != null) CustomNetObject.DespawnOnQuit(data.Character.PlayerId);
+            //if (data.Character != null) CustomNetObject.DespawnOnQuit(data.Character.PlayerId);
             MurderPlayerPatch.AfterPlayerDeathTasks(data?.Character, data?.Character, GameStates.IsMeeting);
         }
 

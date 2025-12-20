@@ -1,4 +1,6 @@
+using Hazel;
 using TOHE.Modules;
+using TOHE.Modules.Rpc;
 using UnityEngine;
 using static TOHE.CheckForEndVotingPatch;
 using static TOHE.Translator;
@@ -11,7 +13,6 @@ internal class Balancer : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Balancer;
     private const int Id = 32700;
-    public override bool IsMsr => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\
@@ -51,7 +52,7 @@ internal class Balancer : RoleBase
         if (Choose) return true;
         if (voter.GetAbilityUseLimit() < 1) return true;
         if (voter == null || target == null) return true;
-        if (voter.IsHost()) return true;
+        if (voter.IsModded()) return true;
         if (Target1 != 253)
         {
             Target2 = target.PlayerId;
@@ -87,7 +88,8 @@ internal class Balancer : RoleBase
     {
         var Tar1 = GetPlayerById(Target1);
         var Tar2 = GetPlayerById(Target2);
-        if (Choose) MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), Tar1.GetRealName(), Tar2.GetRealName()), 255, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+        if (Choose) MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), ColorString(Main.PlayerColors[Target1], Tar1.GetRealName()), ColorString(Main.PlayerColors[Target2], Tar2.GetRealName()), 
+            255, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper())));
         else
         {
             Target1 = 253;
@@ -134,7 +136,7 @@ internal class Balancer : RoleBase
         _ = new LateTask(() =>
         {
             Tar1?.NoCheckStartMeeting(null);
-        }, 2.5f);
+        }, 1f);
     }
     public override void AfterMeetingTasks()
     {
@@ -142,11 +144,58 @@ internal class Balancer : RoleBase
         Target2 = 253;
         Choose = false;
     }
+    private static void SendRPC(byte targetId)
+    {
+        var msg = new RpcBalancer(PlayerControl.LocalPlayer.NetId, targetId);
+        RpcUtils.LateBroadcastReliableMessage(msg);
+    }
+    public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
+    {
+        byte targetId = reader.ReadByte();
+        var target = GetPlayerById(targetId);
+
+        if (Target1 != 253)
+        {
+            Target2 = targetId;
+            if (Target1 == Target2)
+            {
+                SendMessage(GetString("Choose1=2"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+                Target1 = 253;
+                Target2 = 253;
+                return;
+            }
+            var Tar1 = GetPlayerById(Target1);
+            if (!Tar1.IsAlive())
+            {
+                Target1 = 253;
+                Target2 = 253;
+                SendMessage(string.Format(GetString("Choose1IsDead"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+                return;
+            }
+            pc.RpcRemoveAbilityUse();
+
+            List<MeetingHud.VoterState> statesList = [];
+            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+            MeetingHud.Instance.RpcClose();
+
+            Choose = true;
+            Choose2 = true;
+            return;
+        }
+        Target1 = targetId;
+        SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+    }
+
     private static void BalancerOnClick(byte targetId /*, MeetingHud __instance*/)
     {
         Logger.Msg($"Click: ID {targetId}", "Balancer UI");
         var target = targetId.GetPlayer();
         if (target == null || !target.IsAlive() || !GameStates.IsVoting || PlayerControl.LocalPlayer.GetAbilityUseLimit() < 1) return;
+        if (!AmongUsClient.Instance.AmHost)
+        {
+            SendRPC(targetId);
+            return;
+        }
         if (Target1 != 253)
         {
             Target2 = targetId;
@@ -166,16 +215,17 @@ internal class Balancer : RoleBase
                 return;
             }
             PlayerControl.LocalPlayer.RpcRemoveAbilityUse();
+
             List<MeetingHud.VoterState> statesList = [];
             MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
             MeetingHud.Instance.RpcClose();
+
             Choose = true;
             Choose2 = true;
             return;
         }
         Target1 = targetId;
         SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), PlayerControl.LocalPlayer.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
-        return;
     }
 
     [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
@@ -183,7 +233,7 @@ internal class Balancer : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.IsHost())
+            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive())
                 CreateBalancerButton(__instance);
         }
     }

@@ -13,7 +13,7 @@ public class RoleAssign
     public static CustomRoles[] AllRoles => [.. RoleResult.Values];
 
     [Obfuscation(Exclude = true)]
-    enum RoleAssignType
+    public enum RoleAssignType
     {
         Impostor,
         NeutralKilling,
@@ -31,6 +31,11 @@ public class RoleAssign
         public int SpawnChance { get => spawnChance; set => spawnChance = value; }
         public int MaxCount { get => maxCount; set => maxCount = value; }
         public int AssignedCount { get => assignedCount; set => assignedCount = value; }
+
+        public RoleAssignInfo Copy()
+        {
+            return new(Role, SpawnChance, MaxCount, AssignedCount);
+        }
     }
 
     public static void GetNeutralCounts(int NKmaxOpt, int NKminOpt, int NNKmaxOpt, int NNKminOpt, int NAmaxOpt, int NAminOpt, ref int ResultNKnum, ref int ResultNNKnum, ref int ResultNAnum)
@@ -180,7 +185,7 @@ public class RoleAssign
         foreach (var role in EnumHelper.GetAllValues<CustomRoles>())
         {
             int chance = role.GetMode();
-            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole()) continue;
+            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) continue;
             switch (role)
             {
                 case CustomRoles.Stalker when GameStates.FungleIsActive:
@@ -195,7 +200,6 @@ public class RoleAssign
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
                 case CustomRoles.PhantomTOHE when NarcManager.IsNarcAssigned():
-                case CustomRoles.Cupid:
                     continue;
             }
 
@@ -1013,7 +1017,7 @@ public class RoleAssign
         if (Imps.Any()) Logger.Info(string.Join(", ", Imps.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "ImpRoleResult");
         if (NNKs.Any()) Logger.Info(string.Join(", ", NNKs.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "NNKRoleResult");
         if (NKs.Any()) Logger.Info(string.Join(", ", NKs.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "NKRoleResult");
-        if (NAs.Any()) Logger.Info(string.Join(", ", NKs.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "NARoleResult");
+        if (NAs.Any()) Logger.Info(string.Join(", ", NAs.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "NARoleResult");
         if (Covs.Any()) Logger.Info(string.Join(", ", Covs.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "CovRoleResult");
         if (Crews.Any()) Logger.Info(string.Join(", ", Crews.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "CrewRoleResult");
 

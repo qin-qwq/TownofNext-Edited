@@ -196,7 +196,7 @@ public static class TemplateManager
                 {
                     var player = Utils.GetPlayerById(playerId);
                     if (player == null) continue;
-                    Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.GetRealName())));
+                    Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.IsHost() ? Main.HostRealName : player.GetRealName())));
                 }
                 else Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId);
             }

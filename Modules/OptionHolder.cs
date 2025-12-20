@@ -73,18 +73,10 @@ public static class Options
 
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
-    public static OptionItem CompatibilityMode;
     public static OptionItem DraftableCount;
     //public static OptionItem BucketCount;
     public static bool devEnableDraft = false;
-    public static readonly string[] roleBuckets =
-    [
-        .. EnumHelper.GetAllValues<RoleBucket>().Where(x => x != RoleBucket.None).Select(x => x.ToColoredString()),
-        .. CustomRolesHelper.AllRoles.Where(role => role.IsBucketableRole()).Select(x => x.ToColoredString()),
-    ];
-    public static MultipleStringOptionItem DraftBuckets;
-    public static OptionItem[] draftBuckets = new OptionItem[15];
-    public static string ConvertRoleBucketToString(RoleBucket bucket) => $"RoleBucket.{bucket}";
+    public static OptionItem DraftDeck;
 
     // 役職数・確率
     public static Dictionary<CustomRoles, int> roleCounts;
@@ -151,6 +143,12 @@ public static class Options
         "CamouflageMode.TommyXL",
         "CamouflageMode.Sarha",
         "CamouflageMode.Marg"
+    ];
+    public static readonly string[] PetToAssign =
+    [
+        "pet_GoosePet",
+        "pet_Pusheen",
+        "pet_RANDOM_FOR_EVERYONE"
     ];
     [Obfuscation(Exclude = true)]
     public enum QuickChatSpamMode
@@ -580,6 +578,10 @@ public static class Options
     public static OptionItem CantGuessDuringDiscussionTime;
     public static OptionItem UseQuickChatSpamCheat;
 
+    // 技能相关设定
+    public static OptionItem UsePets;
+    public static OptionItem PetToAssignToEveryone;
+    public static OptionItem CancelPetAnimation;
 
     // ------------ General Role Settings ------------
 
@@ -744,7 +746,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33400 last id for roles/add-ons (Next use 33500)
+        // 33600 last id for roles/add-ons (Next use 33700)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1408,22 +1410,14 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true);
 
-        CompatibilityMode = BooleanOptionItem.Create(61001, "CompatibilityMode", false, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetParent(DraftMode);
-
         DraftableCount = IntegerOptionItem.Create(61002, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode);
 
-        // BucketCount = IntegerOptionItem.Create(61002, "BucketCount", new(5, 225, 1), 15, TabGroup.ModSettings, false)
-        //     .SetGameMode(CustomGameMode.Standard)
-        //     .SetParent(DraftMode)
-        //     .RegisterUpdateValueEvent((obj, args) => BucketCountChanged(args));
-
-        DraftBuckets = MultipleStringOptionItem.Create(61004, 225, 15, "RoleBucket", roleBuckets, 0, TabGroup.ModSettings, false, useGetString: false)
-            .SetParent(DraftableCount)
-            .SetGameMode(CustomGameMode.Standard);
+        DraftAssign.LoadRoleDecks();
+        DraftDeck = StringOptionItem.Create(61003, "DraftDeck", DraftAssign.RoleDecks.Keys.ToArray(), 0, TabGroup.ModSettings, false, useGetString: false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetParent(DraftMode);
 
         Logger.Info("Draft Bucket Options set up", "OptionsHolder.CoLoadOptions");
 
@@ -2204,6 +2198,23 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(217, 218, 255, byte.MaxValue));
+
+        // 技能相关设定
+        TextOptionItem.Create(10000036, "MenuTitle.Ability", TabGroup.ModSettings)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        // 技能设置
+        UsePets = BooleanOptionItem.Create(61004, "UsePets", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        PetToAssignToEveryone = StringOptionItem.Create(61005, "PetToAssign", PetToAssign, PetToAssign.Length, TabGroup.ModSettings, false)
+            .SetParent(UsePets)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        CancelPetAnimation = BooleanOptionItem.Create(61006, "CancelPetAnimation", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 
         yield return null;
@@ -2356,11 +2367,6 @@ public static class Options
 
         CustomRoleSpawnChances.Add(role, spawnOption);
         CustomRoleCounts.Add(role, countOption);
-    }
-    static void BucketCountChanged(OptionItem.UpdateValueEventArgs args)
-    {
-        DraftBuckets.Count = args.CurrentValue + 5;
-        DraftBuckets.Refresh();
     }
     public class OverrideTasksData
     {

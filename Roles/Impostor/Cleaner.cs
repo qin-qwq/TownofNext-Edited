@@ -1,3 +1,4 @@
+using TOHE.Modules;
 using UnityEngine;
 
 namespace TOHE.Roles.Impostor;
@@ -14,7 +15,7 @@ internal class Cleaner : RoleBase
     public override Sprite ReportButtonSprite => CustomButton.Get("Clean");
 
     private static OptionItem KillCooldown;
-    private static OptionItem KillCooldownAfterCleaning;
+    public static OptionItem CleanCooldown;
 
     public override void SetupCustomOption()
     {
@@ -22,7 +23,7 @@ internal class Cleaner : RoleBase
         KillCooldown = FloatOptionItem.Create(Id + 2, GeneralOption.KillCooldown, new(5f, 180f, 2.5f), 30f, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Cleaner])
             .SetValueFormat(OptionFormat.Seconds);
-        KillCooldownAfterCleaning = FloatOptionItem.Create(Id + 3, "KillCooldownAfterCleaning", new(5f, 180f, 2.5f), 60f, TabGroup.ImpostorRoles, false)
+        CleanCooldown = FloatOptionItem.Create(Id + 3, "CleanCooldown", new(5f, 180f, 2.5f), 30f, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Cleaner])
             .SetValueFormat(OptionFormat.Seconds);
     }
@@ -33,13 +34,13 @@ internal class Cleaner : RoleBase
     {
         if (Main.UnreportableBodies.Contains(deadBody.PlayerId)) return false;
 
-        if (reporter.Is(CustomRoles.Cleaner))
+        if (reporter.Is(CustomRoles.Cleaner) && !reporter.HasAbilityCD())
         {
             Main.UnreportableBodies.Add(deadBody.PlayerId);
 
             reporter.Notify(Translator.GetString("CleanerCleanBody"));
-            reporter.SetKillCooldownV3(KillCooldownAfterCleaning.GetFloat(), forceAnime: true);
-            reporter.SyncSettings();
+
+            reporter.RpcAddAbilityCD();
 
             Logger.Info($"Cleaner: {reporter.GetRealName()} clear body: {deadBody.PlayerName}", "Cleaner");
             return false;

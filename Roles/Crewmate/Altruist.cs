@@ -12,8 +12,9 @@ internal class Altruist : RoleBase
     public override CustomRoles Role => CustomRoles.Altruist;
     private const int Id = 29800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Altruist);
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => Options.UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
     private static OptionItem RevivedDeadBodyCannotBeReported;
@@ -75,6 +76,12 @@ internal class Altruist : RoleBase
         RevivedPlayerId = reader.ReadByte();
     }
 
+    public override void OnPet(PlayerControl pc)
+    {
+        IsRevivingMode = !IsRevivingMode;
+        Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: false);
+        SendRPC();
+    }
     public override void OnCoEnterVent(PlayerPhysics physics, int ventId)
     {
         IsRevivingMode = !IsRevivingMode;
@@ -212,10 +219,20 @@ internal class Altruist : RoleBase
     {
         if (_Player.IsAlive())
         {
-            hud?.AbilityButton?.OverrideText(Translator.GetString("AltruistAbilityButton"));
+            if (!Options.UsePets.GetBool())
+            {
+                hud?.AbilityButton?.OverrideText(Translator.GetString("AltruistAbilityButton"));
 
-            if (IsRevivingMode)
-                hud?.ReportButton?.OverrideText(Translator.GetString("AltruistReviveMode"));
+                if (IsRevivingMode)
+                    hud?.ReportButton?.OverrideText(Translator.GetString("AltruistReviveMode"));
+            }
+            else
+            {
+                hud?.PetButton?.OverrideText(Translator.GetString("AltruistAbilityButton"));
+
+                if (IsRevivingMode)
+                    hud?.ReportButton?.OverrideText(Translator.GetString("AltruistReviveMode"));
+            }            
         }
     }
 }

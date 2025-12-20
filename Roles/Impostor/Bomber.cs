@@ -55,7 +55,7 @@ internal class Bomber : RoleBase
     {
         AURoleOptions.PhantomCooldown = BombCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl shapeshifter, float killCooldown)
+    public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
         var playerRole = shapeshifter.GetCustomRole();
 
