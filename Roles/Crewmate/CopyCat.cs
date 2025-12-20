@@ -69,7 +69,7 @@ internal class CopyCat : RoleBase
 
             if (!pc.IsAlive())
             {
-                if (!pc.HasGhostRole())
+                if (!pc.HasGhostRole() && !pc.Is(CustomRoles.CopyCat))
                 {
                     pc.RpcSetCustomRole(CustomRoles.CopyCat, false, false);
                 }
@@ -127,7 +127,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Miner => CustomRoles.Mole, // 矿工 => 鼹鼠
                 CustomRoles.Godfather => CustomRoles.ChiefOfPolice, // 教父 => 警察局长
                 CustomRoles.Twister => CustomRoles.TimeMaster, // 龙卷风 => 时间之主
-                CustomRoles.Disperser => CustomRoles.Transporter, // 分散者 => 传送师
+                CustomRoles.Disperser or CustomRoles.RiftMaker => CustomRoles.Transporter, // 分散者，裂缝制造者 => 传送师
                 CustomRoles.Eraser or CustomRoles.Bandit => CustomRoles.Cleanser, // 抹除者，强盗 => 清洗者
                 CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
                 CustomRoles.Workaholic => CustomRoles.Snitch, // 工作狂 => 告密者

@@ -434,8 +434,28 @@ class RandomSpawn
         }
         public Vector2 GetLocation(bool first = false)
         {
+            if (Options.CurrentGameMode == CustomGameMode.TagMode)
+            {
+                var Locations = Positions.ToArray();
+                switch (Main.NormalOptions.MapId)
+                {
+                    case 0 or 3:
+                        return Locations.ToArray()[0..3].OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault().Value;
+                    case 1:
+                        return Locations.ToArray()[0..4].OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault().Value;
+                    case 2:
+                        return Locations.ToArray()[0..2].OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault().Value;
+                    // Skip Airship
+                    case 5:
+                        return Locations.ToArray()[0..5].OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault().Value;
+                    default:
+                        Logger.Error($"MapIdFailed ID:{Main.NormalOptions.MapId}", "IsRandomSpawn");
+                        break;
+                }
+            }
             var EnableLocations = Positions.Where(o => o.Key.GetBool()).ToArray();
             var locations = EnableLocations.Length != 0 ? EnableLocations : Positions.ToArray();
+
             if (first) return locations[0].Value;
 
             var location = locations.ToArray().OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault();
@@ -451,19 +471,19 @@ class RandomSpawn
     {
         public override Dictionary<OptionItem, Vector2> Positions { get; } = new()
         {
+            [RandomSpawnSkeldSecurity] = new(-13.5f, -5.5f),
+            [RandomSpawnSkeldReactor] = new(-20.5f, -5.5f),
+            [RandomSpawnSkeldNav] = new(16.5f, -4.8f),
+            [RandomSpawnSkeldComms] = new(4.0f, -15.5f),
             [RandomSpawnSkeldCafeteria] = new(-1.0f, 3.0f),
             [RandomSpawnSkeldWeapons] = new(9.3f, 1.0f),
             [RandomSpawnSkeldLifeSupp] = new(6.5f, -3.8f),
-            [RandomSpawnSkeldNav] = new(16.5f, -4.8f),
             [RandomSpawnSkeldShields] = new(9.3f, -12.3f),
-            [RandomSpawnSkeldComms] = new(4.0f, -15.5f),
             [RandomSpawnSkeldStorage] = new(-1.5f, -15.5f),
             [RandomSpawnSkeldAdmin] = new(4.5f, -7.9f),
             [RandomSpawnSkeldElectrical] = new(-7.5f, -8.8f),
             [RandomSpawnSkeldLowerEngine] = new(-17.0f, -13.5f),
             [RandomSpawnSkeldUpperEngine] = new(-17.0f, -1.3f),
-            [RandomSpawnSkeldSecurity] = new(-13.5f, -5.5f),
-            [RandomSpawnSkeldReactor] = new(-20.5f, -5.5f),
             [RandomSpawnSkeldMedBay] = new(-9.0f, -4.0f)
         };
     }
@@ -474,13 +494,13 @@ class RandomSpawn
             [RandomSpawnMiraCafeteria] = new(25.5f, 2.0f),
             [RandomSpawnMiraBalcony] = new(24.0f, -2.0f),
             [RandomSpawnMiraStorage] = new(19.5f, 4.0f),
+            [RandomSpawnMiraLaboratory] = new(9.5f, 12.0f),
+            [RandomSpawnMiraReactor] = new(2.5f, 10.5f),
             [RandomSpawnMiraJunction] = new(17.8f, 11.5f),
             [RandomSpawnMiraComms] = new(15.3f, 3.8f),
             [RandomSpawnMiraMedBay] = new(15.5f, -0.5f),
             [RandomSpawnMiraLockerRoom] = new(9.0f, 1.0f),
             [RandomSpawnMiraDecontamination] = new(6.1f, 6.0f),
-            [RandomSpawnMiraLaboratory] = new(9.5f, 12.0f),
-            [RandomSpawnMiraReactor] = new(2.5f, 10.5f),
             [RandomSpawnMiraLaunchpad] = new(-4.5f, 2.0f),
             [RandomSpawnMiraAdmin] = new(21.0f, 17.5f),
             [RandomSpawnMiraOffice] = new(15.0f, 19.0f),
@@ -491,21 +511,21 @@ class RandomSpawn
     {
         public override Dictionary<OptionItem, Vector2> Positions { get; } = new()
         {
+            [RandomSpawnPolusSpecimens] = new(36.5f, -22.0f),
+            [RandomSpawnPolusBoilerRoom] = new(2.3f, -24.0f),
+            [RandomSpawnPolusLifeSupp] = new(2.0f, -17.5f),
             [RandomSpawnPolusOfficeLeft] = new(19.5f, -18.0f),
             [RandomSpawnPolusOfficeRight] = new(26.0f, -17.0f),
             [RandomSpawnPolusAdmin] = new(24.0f, -22.5f),
             [RandomSpawnPolusComms] = new(12.5f, -16.0f),
             [RandomSpawnPolusWeapons] = new(12.0f, -23.5f),
-            [RandomSpawnPolusBoilerRoom] = new(2.3f, -24.0f),
-            [RandomSpawnPolusLifeSupp] = new(2.0f, -17.5f),
             [RandomSpawnPolusElectrical] = new(9.5f, -12.5f),
             [RandomSpawnPolusSecurity] = new(3.0f, -12.0f),
             [RandomSpawnPolusDropship] = new(16.7f, -3.0f),
             [RandomSpawnPolusStorage] = new(20.5f, -12.0f),
             [RandomSpawnPolusRocket] = new(26.7f, -8.5f),
             [RandomSpawnPolusLaboratory] = new(36.5f, -7.5f),
-            [RandomSpawnPolusToilet] = new(34.0f, -10.0f),
-            [RandomSpawnPolusSpecimens] = new(36.5f, -22.0f)
+            [RandomSpawnPolusToilet] = new(34.0f, -10.0f)
         };
     }
 
@@ -545,6 +565,12 @@ class RandomSpawn
     {
         public override Dictionary<OptionItem, Vector2> Positions { get; } = new()
         {
+            [RandomSpawnFungleReactor] = new(21.8f, -7.2f),
+            [RandomSpawnFungleGreenhouse] = new(9.2f, -11.8f),
+            [RandomSpawnFungleLookout] = new(6.4f, 3.1f),
+            [RandomSpawnFungleMiningPit] = new(12.5f, 9.6f),
+            [RandomSpawnFungleHighlands] = new(15.5f, 3.9f),    //展望台右の高地
+            [RandomSpawnFungleUpperEngine] = new(21.9f, 3.2f),
             [RandomSpawnFungleKitchen] = new(-17.8f, -7.3f),
             [RandomSpawnFungleBeach] = new(-21.3f, 3.0f),   //海岸
             [RandomSpawnFungleCafeteria] = new(-16.9f, 5.5f),
@@ -555,14 +581,8 @@ class RandomSpawn
             [RandomSpawnFungleMeetingRoom] = new(-4.2f, -2.2f),
             [RandomSpawnFungleSleepingQuarters] = new(1.7f, -1.4f),  //宿舎
             [RandomSpawnFungleLaboratory] = new(-4.2f, -7.9f),
-            [RandomSpawnFungleGreenhouse] = new(9.2f, -11.8f),
-            [RandomSpawnFungleReactor] = new(21.8f, -7.2f),
             [RandomSpawnFungleJungleTop] = new(4.2f, -5.3f),
             [RandomSpawnFungleJungleBottom] = new(15.9f, -14.8f),
-            [RandomSpawnFungleLookout] = new(6.4f, 3.1f),
-            [RandomSpawnFungleMiningPit] = new(12.5f, 9.6f),
-            [RandomSpawnFungleHighlands] = new(15.5f, 3.9f),    //展望台右の高地
-            [RandomSpawnFungleUpperEngine] = new(21.9f, 3.2f),
             [RandomSpawnFunglePrecipice] = new(19.8f, 7.3f),   //通信室下の崖
             [RandomSpawnFungleComms] = new(20.9f, 13.4f),
         };

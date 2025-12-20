@@ -885,8 +885,6 @@ class ReportDeadBodyPatch
 
         AfterReportTasks(__instance, target);
 
-        Main.CantKill = true;
-
         MeetingRoomManager.Instance.AssignSelf(__instance, target);
         // Meeting playernames are setuped when meetingHud is spawned.
         // Must serialize meetinghud after playernames are synced
@@ -924,7 +922,7 @@ class ReportDeadBodyPatch
             Logger.Info($"target.Object is null? - {target?.Object == null}", "AfterReportTasks");
             Logger.Info($"target.PlayerId is - {target?.PlayerId}", "AfterReportTasks");
 
-            //CustomNetObject.OnMeetingTasks();
+            CustomNetObject.OnMeetingTasks();
 
             foreach (var playerStates in Main.PlayerStates.Values.ToArray())
             {
@@ -994,7 +992,7 @@ class ReportDeadBodyPatch
                 pc.FixMixedUpOutfit();
             }
 
-            PhantomRolePatch.OnReportDeadBody(pc);
+            //PhantomRolePatch.OnReportDeadBody(pc);
 
             Logger.Info($"Player {pc?.Data?.PlayerName}: Id {pc.PlayerId} - is alive: {pc.IsAlive()}", "CheckIsAlive");
         }

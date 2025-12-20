@@ -41,7 +41,7 @@ public class MapBehaviourPatch
 
     public static void InitializeCustomHerePoints(MapBehaviour __instance)
     {
-        __instance.DisableTrackerOverlays();
+        if (!PlayerControl.LocalPlayer.IsAlive()) __instance.DisableTrackerOverlays();
         // 删除旧图标
         foreach (var oldHerePoint in herePoints)
         {

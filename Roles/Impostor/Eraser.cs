@@ -48,7 +48,7 @@ internal class Eraser : RoleBase
             return killer.CheckDoubleTrigger(target, () =>
             {
                 killer.RpcGuardAndKill();
-                killer.SetKillCooldown();
+                killer.SetKillCooldown(5f);
                 killer.RpcRemoveAbilityUse();
                 PlayerToErase.Add(target.PlayerId);
             });

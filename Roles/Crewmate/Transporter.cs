@@ -31,7 +31,7 @@ internal class Transporter : RoleBase
         TransporterConstructCooldown = FloatOptionItem.Create(Id + 10, "TransporterConstructCooldown", new(0f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Transporter])
             .SetValueFormat(OptionFormat.Seconds);
-        TransporterTeleportCooldown = FloatOptionItem.Create(Id + 11, "TransporterTeleportCooldown", new(0f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false)
+        TransporterTeleportCooldown = FloatOptionItem.Create(Id + 11, "TransporterTeleportCooldown", new(2.5f, 180f, 2.5f), 25f, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Transporter])
             .SetValueFormat(OptionFormat.Seconds);
     }

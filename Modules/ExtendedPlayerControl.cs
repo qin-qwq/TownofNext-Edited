@@ -1256,7 +1256,7 @@ static class ExtendedPlayerControl
     }
     public static bool CanUseKillButton(this PlayerControl pc)
     {
-        if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId) || TimeMaster.Rewinding || Main.CantKill) return false;
+        if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId) || TimeMaster.Rewinding) return false;
         if (MeetingStates.FirstMeeting && !Options.ShieldedCanUseKillButton.GetBool() && pc.CheckFirstDied()) return false;
         if (pc.Is(CustomRoles.Killer) || Mastermind.PlayerIsManipulated(pc)) return true;
         if (pc.Is(CustomRoles.Narc) && !NarcManager.NarcCanUseKillButton(pc)) return false;
@@ -1272,7 +1272,7 @@ static class ExtendedPlayerControl
 
         return pc.GetCustomRole().HasImpBasis();
     }
-    public static bool CanUseVents(this PlayerControl player) => player != null && (player.CanUseImpostorVentButton() || player.GetCustomRole().GetVNRole() == CustomRoles.Engineer);
+    public static bool CanUseVents(this PlayerControl player) => player != null && (player.CanUseImpostorVentButton() || player.GetCustomRole().GetVNRole() == CustomRoles.Engineer) && !Main.Invisible.Contains(player.PlayerId);
     public static bool CantUseVent(this PlayerControl player, int ventId) => player == null || !player.CanUseVents() || (CustomRoleManager.BlockedVentsList.TryGetValue(player.PlayerId, out var blockedVents) && blockedVents.Contains(ventId));
     public static bool HasAnyBlockedVent(this PlayerControl player) => player != null && CustomRoleManager.BlockedVentsList.TryGetValue(player.PlayerId, out var blockedVents) && blockedVents.Any();
     public static bool NotUnlockVent(this PlayerControl player, int ventId) => player != null && CustomRoleManager.DoNotUnlockVentsList.TryGetValue(player.PlayerId, out var blockedVents) && blockedVents.Contains(ventId);
@@ -1799,7 +1799,7 @@ static class ExtendedPlayerControl
         }
         player.RpcSetPet("");
 
-        if (!(phantom && PlayerControl.LocalPlayer.IsPlayerImpostorTeam()))
+        if (!(phantom && PlayerControl.LocalPlayer.GetCustomRole().IsImpostor()))
             player.MakeInvisible();
 
         if (!phantom)
@@ -1819,7 +1819,7 @@ static class ExtendedPlayerControl
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
-            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.IsPlayerImpostorTeam())) continue;
+            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcMakeInvisible", SendOption.Reliable);
             sender.StartMessage(pc.GetClientId());
@@ -1848,6 +1848,9 @@ static class ExtendedPlayerControl
             player.RpcSetPet(petId);
         }
 
+        if (!(phantom && PlayerControl.LocalPlayer.GetCustomRole().IsImpostor()))
+            player.MakeVisible();
+
         if (!phantom)
         {
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.Invisibility, SendOption.Reliable);
@@ -1865,7 +1868,7 @@ static class ExtendedPlayerControl
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
-            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.IsPlayerImpostorTeam())) continue;
+            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcMakeVisible", SendOption.Reliable);
             sender.StartMessage(pc.GetClientId());
@@ -1896,7 +1899,7 @@ static class ExtendedPlayerControl
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
-            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.IsPlayerImpostorTeam())) continue;
+            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);
             sender.StartMessage(pc.GetClientId());
@@ -1999,8 +2002,7 @@ static class ExtendedPlayerControl
     public static bool UsesMeetingShapeshift(this PlayerControl player)
     {
         CustomRoles role = player.GetCustomRole();
-        if (player.IsHost() && role is CustomRoles.Balancer) return false;
-        if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper) return false;
+        if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper or CustomRoles.Balancer) return false;
         return player.IsMeetingShapeshifterRole();
     }
     
@@ -2030,5 +2032,54 @@ static class ExtendedPlayerControl
                 map.RandomTeleport(player);
                 break;
         }
+    }
+
+    // Next 2 from https://github.com/Rabek009/MoreGamemodes/blob/master/Roles/Impostor/Concealing/Droner.cs
+    public static void RevertFreeze(this PlayerControl pc, Vector2 realPosition)
+    {
+        if (!AmongUsClient.Instance.AmHost) return;
+
+        pc.NetTransform.SnapTo(realPosition, (ushort)(pc.NetTransform.lastSequenceId + 128));
+        CustomRpcSender sender = CustomRpcSender.Create($"Revert SnapTo Freeze ({pc.GetNameWithRole()})", SendOption.Reliable);
+        sender.StartMessage();
+        sender.StartRpc(pc.NetTransform.NetId, (byte)RpcCalls.SnapTo)
+            .WriteVector2(pc.transform.position)
+            .Write((ushort)(pc.NetTransform.lastSequenceId + 32767))
+            .EndRpc();
+        sender.StartRpc(pc.NetTransform.NetId, (byte)RpcCalls.SnapTo)
+            .WriteVector2(pc.transform.position)
+            .Write((ushort)(pc.NetTransform.lastSequenceId + 32767 + 16383))
+            .EndRpc();
+        sender.StartRpc(pc.NetTransform.NetId, (byte)RpcCalls.SnapTo)
+            .WriteVector2(pc.transform.position)
+            .Write(pc.NetTransform.lastSequenceId)
+            .EndRpc();
+        sender.EndMessage();
+        sender.SendMessage();
+        pc.Visible = true;
+    }
+
+    public static void FreezeForOthers(this PlayerControl player)
+    {
+        if (!AmongUsClient.Instance.AmHost) return;
+ 
+        foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+        {
+            if (pc == player || pc.AmOwner) continue;
+            CustomRpcSender sender = CustomRpcSender.Create($"SnapTo Freeze ({player.GetNameWithRole()})", SendOption.Reliable);
+            sender.StartMessage(pc.GetClientId());
+            sender.StartRpc(player.NetTransform.NetId, (byte)RpcCalls.SnapTo)
+                .WriteVector2(player.transform.position)
+                .Write(player.NetTransform.lastSequenceId)
+                .EndRpc();
+            sender.StartRpc(player.NetTransform.NetId, (byte)RpcCalls.SnapTo)
+                .WriteVector2(player.transform.position)
+                .Write((ushort)(player.NetTransform.lastSequenceId + 16383))
+                .EndRpc();
+            sender.EndMessage();
+            sender.SendMessage();
+        }
+
+        player.Visible = false;
     }
 }

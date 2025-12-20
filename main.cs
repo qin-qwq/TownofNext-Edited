@@ -53,17 +53,17 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "25.12.08"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.5.0 Beta 4 Hotfix 1";
+    public const string PluginVersion = "25.12.20"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.5.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.5.0 Alpha 1, Discontinued, use Beta instead
-    public static readonly bool canaryRelease = true; // Latest: V1.5.0 Beta 3
-    public static readonly bool fullRelease = false; // Latest: V1.4.1
+    public static readonly bool devRelease = false; // Latest: V1.5.0 Alpha 1
+    public static readonly bool canaryRelease = false; // Latest: V1.5.0 Beta 5
+    public static readonly bool fullRelease = true; // Latest: V1.5.0
 
     public static bool hasAccess = true;
 
@@ -232,7 +232,6 @@ public class Main : BasePlugin
     public static int MeetingsPassed = 0;
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static readonly HashSet<byte> Invisible = [];
-    public static bool CantKill = false;
 
     public static PlayerControl[] AllPlayerControls
     {
@@ -925,6 +924,7 @@ public enum CustomRoles
     Demon,
     Doomsayer,
     Doppelganger,
+    Dreamer,
     Executioner,
     Famine,
     Follower,
@@ -1181,6 +1181,7 @@ public enum CustomWinner
     Tunny = CustomRoles.Tunny,
     TZombie = CustomRoles.TZombie,
     TCrewmate = CustomRoles.TCrewmate,
+    Dreamer = CustomRoles.Dreamer,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners

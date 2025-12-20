@@ -9,14 +9,14 @@ internal class Addict : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Addict;
     private const int Id = 6300;
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
-    private static OptionItem VentCooldown;
+    public static OptionItem VentCooldown;
     private static OptionItem TimeLimit;
-    private static OptionItem ImmortalTimeAfterVent;
+    public static OptionItem ImmortalTimeAfterVent;
     private static OptionItem FreezeTimeAfterImmortal;
 
     private static readonly Dictionary<byte, float> SuicideTimer = [];
@@ -105,6 +105,12 @@ internal class Addict : RoleBase
             }
         }
     }
+
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
+    }
+
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
         SuicideTimer[pc.PlayerId] = 0f;
@@ -130,6 +136,13 @@ internal class Addict : RoleBase
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        hud.AbilityButton.OverrideText(Translator.GetString("AddictVentButtonText"));
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.OverrideText(Translator.GetString("AddictVentButtonText"));
+        }
+        else
+        {
+            hud.PetButton.OverrideText(Translator.GetString("AddictVentButtonText"));
+        }
     }
 }

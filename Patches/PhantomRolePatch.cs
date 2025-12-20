@@ -13,7 +13,7 @@ namespace TOHE.Patches;
 [HarmonyPatch(typeof(PlayerControl))]
 public static class PhantomRolePatch
 {
-    private static readonly Il2CppSystem.Collections.Generic.List<PlayerControl> InvisibilityList = new();
+    /*private static readonly Il2CppSystem.Collections.Generic.List<PlayerControl> InvisibilityList = new();*/
     public static readonly Dictionary<byte, string> PetsList = [];
 
     /*
@@ -120,11 +120,11 @@ public static class PhantomRolePatch
             sender.EndMessage();
             sender.SendMessage();
 
-            _ = new LateTask(() =>
-            {
-                if (phantom.GetCustomRole() is CustomRoles.Fury or CustomRoles.QuickShooter) return;
+            //_ = new LateTask(() =>
+            //{
+                if (phantom.GetCustomRole() is CustomRoles.Fury) return false;
                 phantom.SetKillCooldown(Math.Max(phantom.GetKillTimer(), 0.001f));
-            }, 0.2f, $"Phantom Check");
+            //}, 0.2f, $"Phantom Check");
 
             return false;
         }
@@ -133,7 +133,7 @@ public static class PhantomRolePatch
     }
 
     // Called when Phantom press appear button when is invisible
-    [HarmonyPatch(nameof(PlayerControl.CheckAppear)), HarmonyPrefix]
+    /*[HarmonyPatch(nameof(PlayerControl.CheckAppear)), HarmonyPrefix]
     private static void CheckAppear_Prefix(PlayerControl __instance, bool shouldAnimate)
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -246,7 +246,7 @@ public static class PhantomRolePatch
     {
         InvisibilityList.Clear();
         PetsList.Clear();
-    }
+    }*/
 }
 // Fixed vanilla bug for host (from TOH-Y)
 [HarmonyPatch(typeof(PhantomRole), nameof(PhantomRole.UseAbility))]

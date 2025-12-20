@@ -45,7 +45,7 @@ public static class DraftAssign
             // Logger.Info(role.ToString(), "LoadDraftRoles");
             int chance = role.GetMode();
 
-            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole()) continue;
+            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) continue;
             switch (role)
             {
                 case CustomRoles.Stalker when GameStates.FungleIsActive:
@@ -174,7 +174,7 @@ public static class DraftAssign
                 for (int k = 0; k < item.MaxCount; k++)
                 {
                     // Make "Spawn Chance ÷ 5 = x" (Example: 65 ÷ 5 = 13)
-                    for (int j = 0; j < item.SpawnChance / 5; j++)
+                    for (int j = 0; j < /*item.SpawnChance*/ 95 / 5; j++)
                     {
                         // Add roles 'x' times (13)
                         ChanceRoles.Add(item.Role);
@@ -285,7 +285,7 @@ public static class DraftAssign
 
                 var info = Roles.FirstOrDefault(x => x.Role == slotRole);
 
-                for (int j = 0; j < info.SpawnChance / 5; j++)
+                for (int j = 0; j < /*item.SpawnChance*/ 95 / 5; j++)
                     ChanceRoles.Remove(slotRole);
 
                 info.AssignedCount++;
@@ -593,6 +593,7 @@ public static class DraftAssign
             RoleBucket.NeutralApocalypse => CustomRoles.Apocalypse.GetColoredTextByRole(GetString($"RoleBucket.{bucket}")),
             RoleBucket.NeutralEvil => CustomRoles.Jester.GetColoredTextByRole(GetString($"RoleBucket.{bucket}")),
             RoleBucket.NeutralKilling => CustomRoles.Traitor.GetColoredTextByRole(GetString($"RoleBucket.{bucket}")),
+            RoleBucket.NeutralCommon => CustomRoles.Tunny.GetColoredTextByRole(GetString($"RoleBucket.{bucket}")),
             RoleBucket.NeutralRandom => CustomRoles.Executioner.GetColoredTextByRole(GetString($"RoleBucket.{bucket}")),
 
             _ => CustomRoles.Crewmate.GetColoredTextByRole(GetString($"RoleBucket.{bucket}"))

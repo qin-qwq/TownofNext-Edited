@@ -411,7 +411,8 @@ public static class CustomRolesHelper
             CustomRoles.Sloth or
             CustomRoles.Fury or
             CustomRoles.TimeAssassin or
-            CustomRoles.Zombie;
+            CustomRoles.Zombie or
+            CustomRoles.Dreamer;
     }
     public static bool IsRevealingRole(this CustomRoles role, PlayerControl target)
     {
@@ -1575,6 +1576,7 @@ public static class CustomRolesHelper
            CustomRoles.SchrodingersCat => CountTypes.None,
            CustomRoles.Solsticer => CountTypes.None,
            CustomRoles.Revenant => CountTypes.None,
+           CustomRoles.Dreamer => CountTypes.Dreamer,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1633,6 +1635,7 @@ public static class CustomRolesHelper
             CustomRoles.Mini => CustomWinner.NiceMini,
             CustomRoles.Doppelganger => CustomWinner.Doppelganger,
             CustomRoles.Shocker => CustomWinner.Shocker,
+            CustomRoles.Dreamer => CustomWinner.Dreamer,
             _ => throw new NotImplementedException()
 
         };
@@ -1666,6 +1669,7 @@ public static class CustomRolesHelper
             CountTypes.Arsonist => CustomRoles.Arsonist,
             CountTypes.RuthlessRomantic => CustomRoles.RuthlessRomantic,
             CountTypes.Shocker => CustomRoles.Shocker,
+            CountTypes.Dreamer => CustomRoles.Dreamer,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1711,6 +1715,7 @@ public static class CustomRolesHelper
             RoleBucket.NeutralChaos => roleType is Custom_RoleType.NeutralChaos,
             RoleBucket.NeutralKilling => roleType is Custom_RoleType.NeutralKilling,
             RoleBucket.NeutralApocalypse => roleType is Custom_RoleType.NeutralApocalypse,
+            RoleBucket.NeutralCommon => roleType is Custom_RoleType.NeutralBenign or Custom_RoleType.NeutralEvil or Custom_RoleType.NeutralChaos,
             RoleBucket.NeutralRandom => roleType is Custom_RoleType.NeutralBenign or Custom_RoleType.NeutralEvil or Custom_RoleType.NeutralChaos or Custom_RoleType.NeutralKilling or Custom_RoleType.NeutralApocalypse,
 
             RoleBucket.CovenPower => roleType is Custom_RoleType.CovenPower,
@@ -1748,6 +1753,7 @@ public static class CustomRolesHelper
             RoleBucket.NeutralEvil => [RoleAssign.RoleAssignType.NonKillingNeutral],
             RoleBucket.NeutralKilling => [RoleAssign.RoleAssignType.NeutralKilling],
             RoleBucket.NeutralApocalypse => [RoleAssign.RoleAssignType.NeutralApocalypse],
+            RoleBucket.NeutralCommon => [RoleAssign.RoleAssignType.NonKillingNeutral],
             RoleBucket.NeutralRandom => [RoleAssign.RoleAssignType.NonKillingNeutral, RoleAssign.RoleAssignType.NeutralKilling, RoleAssign.RoleAssignType.NeutralApocalypse],
 
             RoleBucket.CovenPower or
@@ -1859,7 +1865,8 @@ public enum CountTypes
     Agitater,
     RuthlessRomantic,
     Shocker,
-    Coven
+    Coven,
+    Dreamer,
 }
 [Obfuscation(Exclude = true)]
 public enum RoleBucket
@@ -1888,6 +1895,7 @@ public enum RoleBucket
     NeutralChaos,
     NeutralKilling,
     NeutralApocalypse,
+    NeutralCommon, // Common = All except Killing and Apocalypse
     NeutralRandom,
 
     // Coven

@@ -16,7 +16,7 @@ internal class Archaeologist : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Archaeologist;
     private const int Id = 32100;
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override bool IsExperimental => true;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
@@ -25,7 +25,7 @@ internal class Archaeologist : RoleBase
     private static readonly HashSet<byte> SlateRoles = [];
     private static byte RevivedPlayerId = byte.MaxValue;
 
-    private static OptionItem VentCooldown;
+    public static OptionItem VentCooldown;
     private static OptionItem InvisDuration;
     private static OptionItem FreezeTime;
     private static OptionItem FreezeRadius;
@@ -115,6 +115,10 @@ internal class Archaeologist : RoleBase
         RevivedPlayerId = reader.ReadByte();
     }
 
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
+    }
     public override void OnEnterVent(PlayerControl player, Vent vent)
     {
         switch (AntiqueID)
@@ -256,7 +260,7 @@ internal class Archaeologist : RoleBase
                     SlateRoles.Add(rp.PlayerId);
                 }
                 break;
-            case 14: // 时光沙漏 - 重置所有玩家的技能冷却时间
+            case 14: // 时光沙漏 - 重置所有玩家的击杀/技能冷却时间
                 player.RpcGuardAndKill();
                 foreach (var target in Main.AllAlivePlayerControls) target.SetKillCooldown();
                 break;
@@ -265,7 +269,7 @@ internal class Archaeologist : RoleBase
                 FixNextSabo = true;
                 break;
             case 16: // 无线按钮 - 召开一次会议
-                player?.MyPhysics?.RpcBootFromVent(vent.Id);
+                if (!UsePets.GetBool()) player?.MyPhysics?.RpcBootFromVent(vent.Id);
                 player?.NoCheckStartMeeting(null);
                 break;
             case 17: // 万能钥匙 - 打开所有的门
@@ -423,11 +427,19 @@ internal class Archaeologist : RoleBase
                 break;
         }
         if (FixNextSabo) str.Append(GetString("PotionStore") + GetString("Aro"));
+        if (UsePets.GetBool()) str.Append("\n" + Utils.GetAbilityTimeDisplay(seer, seen));
         return str.ToString();
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        hud.AbilityButton.OverrideText(GetString("ArchaeologistVentButtonText"));
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.OverrideText(GetString("ArchaeologistVentButtonText"));
+        }
+        else
+        {
+            hud.PetButton.OverrideText(GetString("ArchaeologistVentButtonText"));
+        }
     }
     public override bool OnCheckReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo deadBody, PlayerControl killer)
     {

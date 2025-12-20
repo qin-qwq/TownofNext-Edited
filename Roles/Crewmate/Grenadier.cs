@@ -13,7 +13,7 @@ internal class Grenadier : RoleBase
     public override CustomRoles Role => CustomRoles.Grenadier;
     private const int Id = 8200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Grenadier);
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
@@ -21,8 +21,8 @@ internal class Grenadier : RoleBase
     private static readonly Dictionary<byte, long> GrenadierBlinding = [];
     private static readonly Dictionary<byte, long> MadGrenadierBlinding = [];
 
-    private static OptionItem GrenadierSkillCooldown;
-    private static OptionItem GrenadierSkillDuration;
+    public static OptionItem GrenadierSkillCooldown;
+    public static OptionItem GrenadierSkillDuration;
     private static OptionItem GrenadierCauseVision;
     private static OptionItem GrenadierCanAffectNeutral;
     private static OptionItem GrenadierCanAffectCoven;
@@ -81,6 +81,10 @@ internal class Grenadier : RoleBase
         MadGrenadierBlinding.Clear();
     }
 
+    public override void OnPet(PlayerControl pc)
+    {
+        OnEnterVent(pc, null);
+    }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
         if (pc.GetAbilityUseLimit() >= 1)
@@ -159,7 +163,14 @@ internal class Grenadier : RoleBase
     }
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
-        hud.AbilityButton.buttonLabelText.text = GetString("GrenadierVentButtonText");
-        hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.buttonLabelText.text = GetString("GrenadierVentButtonText");
+            hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+        }
+        else
+        {
+            hud.PetButton.buttonLabelText.text = GetString("GrenadierVentButtonText");            
+        }
     }
 }

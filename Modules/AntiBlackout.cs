@@ -376,6 +376,18 @@ public static class AntiBlackout
         foreach (var seer in Main.AllPlayerControls)
         {
             seer.RpcResetAbilityCooldown();
+            seer.RpcAddAbilityCD();
+            if (seer.GetRoleClass() is not DefaultSetup)
+            {
+                if (seer.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
+                {
+                    seer.ResetKillCooldown();
+                    if (Main.AllPlayerKillCooldown.TryGetValue(seer.PlayerId, out var killTimer) && killTimer > 0f)
+                    {
+                        seer.SetKillCooldown(killTimer);
+                    }
+                }
+            }
         }
     }
     public static void ResetAfterMeeting()

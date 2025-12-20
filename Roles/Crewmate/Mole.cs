@@ -10,12 +10,12 @@ internal class Mole : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Mole;
     private const int Id = 26000;
-    public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
+    public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
 
-    private static OptionItem VentCooldown;
+    public static OptionItem VentCooldown;
 
     public override void SetupCustomOption()
     {
@@ -27,6 +27,10 @@ internal class Mole : RoleBase
     {
         AURoleOptions.EngineerCooldown = VentCooldown.GetFloat();
         AURoleOptions.EngineerInVentMaxTime = 1;
+    }
+    public override void OnPet(PlayerControl pc)
+    {
+        OnExitVent(pc, 114);
     }
     public override void OnExitVent(PlayerControl pc, int ventId)
     {
@@ -44,6 +48,13 @@ internal class Mole : RoleBase
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        hud.AbilityButton.OverrideText(GetString("MoleVentButtonText"));
+        if (!UsePets.GetBool())
+        {
+            hud.AbilityButton.OverrideText(GetString("MoleVentButtonText"));
+        }
+        else
+        {
+            hud.PetButton.OverrideText(GetString("MoleVentButtonText"));
+        }
     }
 }

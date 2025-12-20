@@ -123,6 +123,6 @@ internal static class ExternalRpcPetPatch
 
         if (pc.HasAbilityCD()) return;
 
-        pc.RpcAddAbilityCD();
+        pc.RpcAddAbilityCD(includeDuration: true);
     }
 }

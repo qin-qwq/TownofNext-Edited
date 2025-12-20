@@ -125,7 +125,7 @@ public class SetUpRoleTextPatch
 
             var mapName = Utils.GetActiveMapName();
             Logger.Msg($"{mapName}", "Map");
-            if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound())
+            if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode)
             {
                 RandomSpawn.SpawnMap spawnMap = mapName switch
                 {
@@ -930,8 +930,9 @@ class IntroCutsceneDestroyPatch
                 foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
                 {
                     pc.RpcResetAbilityCooldown();
+                    pc.RpcAddAbilityCD();
 
-                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode != CustomGameMode.FFA)
+                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode is not CustomGameMode.FFA or CustomGameMode.TagMode)
                     {
                         _ = new LateTask(() =>
                         {
@@ -953,6 +954,11 @@ class IntroCutsceneDestroyPatch
             {
                 SpeedRun.StartedAt = Utils.GetTimeStamp();
                 SpeedRun.RpcSyncSpeedRunStates();
+            }
+ 
+            if (Options.CurrentGameMode is CustomGameMode.TagMode)
+            {
+                Main.AllPlayerControls.Where(x => x.Is(CustomRoles.TZombie)).Do(x => x.RpcTeleportRandomSpawn());
             }
 
             foreach (var player in Main.AllPlayerControls)
@@ -1108,8 +1114,9 @@ public class IntroCutsceneDestroyPatch
                 foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
                 {
                     pc.RpcResetAbilityCooldown();
+                    pc.RpcAddAbilityCD();
 
-                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode != CustomGameMode.FFA)
+                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode is not CustomGameMode.FFA or CustomGameMode.TagMode)
                     {
                         _ = new LateTask(() =>
                         {
@@ -1131,6 +1138,11 @@ public class IntroCutsceneDestroyPatch
             {
                 SpeedRun.StartedAt = Utils.GetTimeStamp();
                 SpeedRun.RpcSyncSpeedRunStates();
+            }
+
+            if (Options.CurrentGameMode is CustomGameMode.TagMode)
+            {
+                Main.AllPlayerControls.Where(x => x.Is(CustomRoles.TZombie)).Do(x => x.RpcTeleportRandomSpawn());
             }
 
             foreach (var player in Main.AllPlayerControls)

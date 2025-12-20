@@ -22,8 +22,8 @@ internal class Speaker : RoleBase
     private static OptionItem ImpKnowTarget;
     private static OptionItem TarKnowTarget;
 
-    private byte VoteTarget;
-    private byte Target;
+    private byte VoteTarget = byte.MaxValue;
+    private byte Target = byte.MaxValue;
 
     public override void SetupCustomOption()
     {
@@ -84,6 +84,8 @@ internal class Speaker : RoleBase
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
         byte target = reader.ReadByte();
+
+        Target = target;
     }
 
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
@@ -95,8 +97,8 @@ internal class Speaker : RoleBase
 
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
-        if (!seer.IsAlive() || seer.GetCustomRole().IsImpostor() && ImpKnowTarget.GetBool()
-        || seer.PlayerId == Target && isForMeeting && TarKnowTarget.GetBool())
+        if (!seer.IsAlive() || (seer.GetCustomRole().IsImpostor() && ImpKnowTarget.GetBool())
+        || (seer.PlayerId == Target && isForMeeting && TarKnowTarget.GetBool()))
         {
             if (Target == target.PlayerId)
             {
@@ -133,8 +135,10 @@ internal class Speaker : RoleBase
         }
         if (Target != byte.MaxValue)
         {
+            var target = Target.GetPlayer();
             Target = byte.MaxValue;
             SendRPC();
+            NotifyRoles(SpecifyTarget: target);
         }
     }
 }

@@ -22,7 +22,6 @@ internal class QuickShooter : RoleBase
     private static OptionItem LimitBySSCoolDown;
     private static OptionItem SSCoolDown;
 
-    private bool Storaging = false;
     private readonly Dictionary<byte, int> NewSL = [];
 
     public override void SetupCustomOption()
@@ -49,8 +48,7 @@ internal class QuickShooter : RoleBase
 
     public override void SetKillCooldown(byte id)
     {
-        Main.AllPlayerKillCooldown[id] = (Storaging || id.GetAbilityUseLimit() < 1) ? KillCooldown.GetFloat() : 0.1f;
-        Storaging = false;
+        Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     }
 
     public void SendRPC(bool timer = false)
@@ -86,7 +84,6 @@ internal class QuickShooter : RoleBase
         {
             shapeshifter.RpcIncreaseAbilityUseLimitBy(1);
 
-            Storaging = true;
             shapeshifter.ResetKillCooldown();
             shapeshifter.SetKillCooldown();
 
@@ -106,13 +103,13 @@ internal class QuickShooter : RoleBase
         NewSL[_Player.PlayerId] = Math.Clamp((int)_Player.GetAbilityUseLimit(), 0, MeetingReserved.GetInt());
         _Player.SetAbilityUseLimit(NewSL[_state.PlayerId]);
     }
-    public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    public override void OnMurderPlayerAsKiller(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
         if (killer.GetAbilityUseLimit() > 0)
         {
+            killer.SetKillCooldown(0f);
             killer.RpcRemoveAbilityUse();
         }
-        return true;
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

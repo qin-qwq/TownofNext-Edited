@@ -33,6 +33,7 @@ internal class Inspector : RoleBase
     private static OptionItem InspectCheckRevealTargetTeam;
 
     private static readonly Dictionary<byte, int> RoundCheckLimit = [];
+    private byte CheckId = byte.MaxValue;
 
     public override void SetupCustomOption()
     {
@@ -55,6 +56,7 @@ internal class Inspector : RoleBase
     public override void Init()
     {
         RoundCheckLimit.Clear();
+        CheckId = byte.MaxValue;
     }
 
     public override void Add(byte playerId)
@@ -86,6 +88,34 @@ internal class Inspector : RoleBase
         {
             RoundCheckLimit[pid] = InspectCheckLimitPerMeeting.GetInt();
             SendRPC(pid);
+        }
+    }
+
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        if (CheckId == byte.MaxValue)
+        {
+            CheckId = target.PlayerId;
+            SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()));
+            return;
+        }
+        else
+        {
+            if (CheckId == target.PlayerId)
+            {
+                SendMessage(GetString("Choose1=2"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()));
+                CheckId = byte.MaxValue;
+                return;                
+            }
+            if (!CheckId.GetPlayer().IsAlive() || !target.IsAlive())
+            {
+                SendMessage(GetString("InspectCheckNull"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()));
+                CheckId = byte.MaxValue;
+                return;
+            }
+            InspectCheckMsg(pc, $"/cmp {CheckId} {target.PlayerId}");
+            CheckId = byte.MaxValue;
+            return;
         }
     }
 

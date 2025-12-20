@@ -19,7 +19,7 @@ public static class PetsPatch
         var random = IRandom.Instance;
         string[] pets = Options.PetToAssign;
         string pet = pets[Options.PetToAssignToEveryone.GetValue()];
-        string petId = pet == "pet_RANDOM_FOR_EVERYONE" ? HatManager.Instance.allPets[random.Next(0, HatManager.Instance.allPets.Length)].ProdId : pet;
+        string petId = pet == "pet_RANDOM_FOR_EVERYONE" ? HatManager.Instance.allPets[random.Next(1, HatManager.Instance.allPets.Length)].ProdId : pet;
         return string.IsNullOrEmpty(petId.Trim()) ? "pet_test" : petId;
     }
 }

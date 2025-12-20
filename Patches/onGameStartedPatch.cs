@@ -82,7 +82,6 @@ internal class ChangeRoleSettings
             Main.DeadPassedMeetingPlayers.Clear();
             Main.OvverideOutfit.Clear();
             Main.GameIsLoaded = false;
-            Main.CantKill = false;
             Main.CurrentServerIsVanilla = GameStates.IsVanillaServer && !GameStates.IsLocalGame;
 
             Main.LastNotifyNames.Clear();
@@ -255,6 +254,7 @@ internal class ChangeRoleSettings
             AntiBlackout.Reset();
             NameNotifyManager.Reset();
             CustomNetObject.Reset();
+            PhantomRolePatch.PetsList.Clear();
 
             SabotageSystemPatch.SabotageSystemTypeRepairDamagePatch.Initialize();
             DoorsReset.Initialize();

@@ -209,7 +209,7 @@ class ExileControllerWrapUpPatch
                     Utils.NotifyRoles();
                 }
 
-                _ = new LateTask(() =>
+                /*_ = new LateTask(() =>
                 {
                     foreach (var player in Main.AllAlivePlayerControls)
                     {
@@ -221,13 +221,11 @@ class ExileControllerWrapUpPatch
                                 if (Main.AllPlayerKillCooldown.TryGetValue(player.PlayerId, out var killTimer) && (killTimer - 2f) > 0f)
                                 {
                                     player.SetKillCooldown(killTimer - 2f);
-                                    Main.CantKill = false;
-                                    Utils.MarkEveryoneDirtySettings();
                                 }
                             }
                         }
                     }
-                }, 1f, $"Fix Kill Cooldown Task after meeting");
+                }, 1f, $"Fix Kill Cooldown Task after meeting");*/
 
                 Main.LastMeetingEnded = Utils.TimeStamp;
             }, 1f, "AfterMeetingDeathPlayers Task");

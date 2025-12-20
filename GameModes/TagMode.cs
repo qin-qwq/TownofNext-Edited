@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using Hazel;
+using System;
 using System.Text;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
@@ -22,11 +23,14 @@ public static class TagMode
     public static OptionItem CrewmateTasks;
     public static OptionItem CrewmateVision;
     public static OptionItem CrewmateSpeed;
+    public static OptionItem CrewmateVentLimit;
     public static OptionItem CrewmateVentCD;
     public static OptionItem CrewmateVentMaxTime;
     public static OptionItem CrewmateInvisibleTime;
     public static OptionItem CrewmateDetectTime;
     public static OptionItem CrewmateZapTime;
+    public static OptionItem CrewmateFastSpeed;
+    public static OptionItem CrewmateFastSpeedTime;
 
     [Obfuscation(Exclude = true)]
     private enum TCrewmateTaskList
@@ -37,7 +41,6 @@ public static class TagMode
         TagMode_VeryMuch,
     }
 
-    public static bool Dark;
     public static bool Zap;
     public static (int, int) TaskCount = (0, 0);
 
@@ -52,11 +55,11 @@ public static class TagMode
             .SetColor(new Color32(44, 204, 0, byte.MaxValue))
             .SetValueFormat(OptionFormat.Players)
             .SetHeader(true);
-        ZombieVision = FloatOptionItem.Create(Id + 3, "TagMode_ZombieVision", new(0.25f, 5f, 0.25f), 1f, TabGroup.ModSettings, false)
+        ZombieVision = FloatOptionItem.Create(Id + 3, "TagMode_ZombieVision", new(0.25f, 5f, 0.25f), 0.75f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Multiplier)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-        ZombieSpeed = FloatOptionItem.Create(Id + 4, "TagMode_ZombieSpeed", new(0.25f, 5f, 0.25f), 1.25f, TabGroup.ModSettings, false)
+        ZombieSpeed = FloatOptionItem.Create(Id + 4, "TagMode_ZombieSpeed", new(0.25f, 5f, 0.25f), 0.75f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Multiplier)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
@@ -77,23 +80,34 @@ public static class TagMode
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Multiplier)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-        CrewmateVentCD = FloatOptionItem.Create(Id + 9, "TagMode_CrewmateVentCD", new(0f, 60f, 1f), 15f, TabGroup.ModSettings, false)
+        CrewmateVentLimit = FloatOptionItem.Create(Id + 9, "TagMode_CrewmateVentLimit", new(0f, 5f, 1f), 2f, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.TagMode)
+            .SetColor(new Color32(44, 204, 0, byte.MaxValue));
+        CrewmateVentCD = FloatOptionItem.Create(Id + 10, "TagMode_CrewmateVentCD", new(0f, 60f, 1f), 15f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-        CrewmateVentMaxTime = FloatOptionItem.Create(Id + 10, "TagMode_CrewmateVentMaxTime", new(0f, 60f, 1f), 5f, TabGroup.ModSettings, false)
+        CrewmateVentMaxTime = FloatOptionItem.Create(Id + 11, "TagMode_CrewmateVentMaxTime", new(0f, 60f, 1f), 5f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-        CrewmateInvisibleTime = FloatOptionItem.Create(Id + 11, "TagMode_CrewmateInvisibleTime", new(0f, 60f, 2.5f), 15f, TabGroup.ModSettings, false)
+        CrewmateInvisibleTime = FloatOptionItem.Create(Id + 12, "TagMode_CrewmateInvisibleTime", new(0f, 60f, 2.5f), 15f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-        CrewmateDetectTime = FloatOptionItem.Create(Id + 12, "TagMode_CrewmateDetectTime", new(0f, 60f, 2.5f), 15f, TabGroup.ModSettings, false)
+        CrewmateDetectTime = FloatOptionItem.Create(Id + 13, "TagMode_CrewmateDetectTime", new(0f, 60f, 2.5f), 15f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
-        CrewmateZapTime = FloatOptionItem.Create(Id + 13, "TagMode_CrewmateZapTime", new(0f, 60f, 2.5f), 15f, TabGroup.ModSettings, false)
+        CrewmateZapTime = FloatOptionItem.Create(Id + 14, "TagMode_CrewmateZapTime", new(0f, 60f, 2.5f), 10f, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.TagMode)
+            .SetValueFormat(OptionFormat.Seconds)
+            .SetColor(new Color32(44, 204, 0, byte.MaxValue));
+        CrewmateFastSpeed = FloatOptionItem.Create(Id + 15, "TagMode_CrewmateFastSpeed", new(0f, 5f, 0.25f), 2.25f, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.TagMode)
+            .SetValueFormat(OptionFormat.Multiplier)
+            .SetColor(new Color32(44, 204, 0, byte.MaxValue));
+        CrewmateFastSpeedTime = FloatOptionItem.Create(Id + 16, "TagMode_CrewmateFastSpeedTime", new(0f, 60f, 1f), 10f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
@@ -103,14 +117,8 @@ public static class TagMode
     {
         if (Options.CurrentGameMode != CustomGameMode.TagMode) return;
 
-        Dark = true;
         Zap = false;
-        _ = new LateTask(() =>
-        {
-            Dark = false;
-            foreach (var tac in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
-                tac.MarkDirtySettings();
-        }, 25f, "Zombie Can Move");
+
         int TaskNum = 0;
         switch (CrewmateTasks.GetInt())
         {
@@ -198,7 +206,7 @@ public class TZombie : RoleBase
     public override CustomRoles Role => CustomRoles.TZombie;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.None;
-    public override bool IsDesyncRole => true;
+    public override bool IsDesyncRole => false;
 
     public override void Add(byte playerId)
     {
@@ -209,18 +217,11 @@ public class TZombie : RoleBase
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         opt.SetVision(false);
-        opt.SetFloat(FloatOptionNames.ImpostorLightMod, TagMode.Dark ? 0f : TagMode.ZombieVision.GetFloat());
+        opt.SetFloat(FloatOptionNames.ImpostorLightMod, TagMode.ZombieVision.GetFloat());
 
         float speed;
 
-        if (TagMode.Dark)
-        {
-            speed = Main.MinSpeed;
-        }
-        else
-        {
-            speed = TagMode.ZombieSpeed.GetFloat();
-        }
+        speed = TagMode.ZombieSpeed.GetFloat();
 
         Main.AllPlayerSpeed[playerId] = speed;
         AURoleOptions.PlayerSpeedMod = speed;
@@ -273,9 +274,10 @@ public class TZombie : RoleBase
         killer.ResetKillCooldown();
         target.ResetKillCooldown();
         target.SetKillCooldown(forceAnime: true);
-        NotifyRoles(killer, target, true);
-        NotifyRoles(target, killer, true);
+        NotifyRoles(killer, target);
+        NotifyRoles(target, killer);
         target.Notify(ColorString(GetRoleColor(CustomRoles.TZombie), GetString("YouBecomeZombie")));
+        target.MarkDirtySettings();
 
         foreach (var tac in Main.AllPlayerControls)
             RPC.PlaySoundRPC(Sounds.ImpTransform, tac.PlayerId);
@@ -302,6 +304,7 @@ public class TCrewmate : RoleBase
     public (bool, float) ProtectState = (false, 0f);
     public (bool, float) InvisibleState = (false, 0f);
     public (bool, float) DetectState = (false, 0f);
+    public (bool, float) FastState = (false, 0f);
     public int TaskInt = 0;
 
     public override void Add(byte playerId)
@@ -311,10 +314,11 @@ public class TCrewmate : RoleBase
         {
             player.RpcSetColor(13);
         }
-        playerId.SetAbilityUseLimit(0);
+        playerId.SetAbilityUseLimit(TagMode.CrewmateVentLimit.GetFloat());
         ProtectState = (false, 0f);
         InvisibleState = (false, 0f);
         DetectState = (false, 0f);
+        FastState = (false, 0f);
         TaskInt = 0;
     }
 
@@ -327,10 +331,9 @@ public class TCrewmate : RoleBase
 
         speed = TagMode.CrewmateSpeed.GetFloat();
 
-        Main.AllPlayerSpeed[playerId] = speed;
-        AURoleOptions.PlayerSpeedMod = speed;
+        Main.AllPlayerSpeed[playerId] = FastState.Item1 ? TagMode.CrewmateFastSpeed.GetFloat() : speed;
+        AURoleOptions.PlayerSpeedMod = FastState.Item1 ? TagMode.CrewmateFastSpeed.GetFloat() : speed;
 
-        var pc = GetPlayerById(playerId);
         AURoleOptions.EngineerCooldown = TagMode.CrewmateVentCD.GetFloat();
         AURoleOptions.EngineerInVentMaxTime = TagMode.CrewmateVentMaxTime.GetFloat();
     }
@@ -356,6 +359,8 @@ public class TCrewmate : RoleBase
         writer.Write(InvisibleState.Item2);
         writer.Write(DetectState.Item1);
         writer.Write(DetectState.Item2);
+        writer.Write(FastState.Item1);
+        writer.Write(FastState.Item2);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
 
@@ -364,7 +369,8 @@ public class TCrewmate : RoleBase
         TaskInt = reader.ReadInt32();
         ProtectState = (reader.ReadBoolean(), reader.ReadSingle());
         InvisibleState = (reader.ReadBoolean(), reader.ReadSingle());
-        DetectState = (reader.ReadBoolean(), reader.ReadByte());
+        DetectState = (reader.ReadBoolean(), reader.ReadSingle());
+        FastState = (reader.ReadBoolean(), reader.ReadSingle());
     }
 
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
@@ -375,35 +381,29 @@ public class TCrewmate : RoleBase
             player.RpcResetTasks();
             TaskInt = 0;
         }
-        player.SetAbilityUseLimit(0);
 
         var Fg = IRandom.Instance;
         int Power = Fg.Next(1, 6);
 
         if (Power == 1)
         {
-            player.Notify(GetString("CanVent"));
-            player.RpcIncreaseAbilityUseLimitBy(1);
-        }
-        else if (Power == 2)
-        {
             player.Notify(GetString("YouInvisible"));
             player.RpcMakeInvisible();
             InvisibleState = (true, TagMode.CrewmateInvisibleTime.GetFloat());
         }
-        else if (Power == 3)
+        else if (Power == 2)
         {
             player.Notify(GetString("YouProtect"));
             ProtectState = (true, 300f);
         }
-        else if (Power == 4)
+        else if (Power == 3)
         {
             player.Notify(GetString("YouDetect"));
             foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
                 TargetArrow.Add(player.PlayerId, target.PlayerId);
             DetectState = (true, TagMode.CrewmateDetectTime.GetFloat());
         }
-        else if (Power == 5)
+        else if (Power == 4)
         {
             player.Notify(GetString("ZapZombie"));
             foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
@@ -415,6 +415,12 @@ public class TCrewmate : RoleBase
                 foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
                     target.Notify(GetString("ZapFinished"));
             }, TagMode.CrewmateZapTime.GetFloat(), "Zap Finished");
+        }
+        else if (Power == 5)
+        {
+            player.Notify(GetString("Runfaster"));
+            player.MarkDirtySettings();
+            FastState = (true, TagMode.CrewmateFastSpeedTime.GetFloat());
         }
         TagMode.TaskCount.Item1++;
         TaskInt++;
@@ -445,7 +451,6 @@ public class TCrewmate : RoleBase
             {
                 InvisibleState = (false, 0f);
                 player.RpcMakeVisible();
-                player.MarkDirtySettings();
                 changed = true;
             }
         }
@@ -462,6 +467,17 @@ public class TCrewmate : RoleBase
             }
         }
 
+        if (FastState.Item1)
+        {
+            FastState.Item2 -= Time.fixedDeltaTime;
+            if (FastState.Item2 <= 0)
+            {
+                FastState = (false, 0f);
+                player.MarkDirtySettings();
+                changed = true;
+            }
+        }
+
         if (changed)
         {
             SendRPC();
@@ -473,6 +489,8 @@ public class TCrewmate : RoleBase
     {
         if (pc.GetAbilityUseLimit() > 0)
             pc.RpcRemoveAbilityUse();
+        else
+            pc.MyPhysics?.RpcBootFromVent(vent.Id);
     }
 
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
@@ -509,7 +527,9 @@ public class TCrewmate : RoleBase
 
     public override string GetProgressText(byte playerId, bool comms)
     {
-        return ColorString(Color.yellow, $"({TagMode.TaskCount.Item1}/{TagMode.TaskCount.Item2}) - ({playerId.GetAbilityUseLimit()})");
+        float limit = playerId.GetAbilityUseLimit();
+        UnityEngine.Color TextColor = GetRoleColor(Main.PlayerStates[playerId].MainRole).ShadeColor(0.25f);
+        return ColorString(UnityEngine.Color.yellow, $"({TagMode.TaskCount.Item1}/{TagMode.TaskCount.Item2})") + ColorString(UnityEngine.Color.white, " - ") + ColorString(TextColor, $"({Math.Round(limit, 1)})");
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte id)

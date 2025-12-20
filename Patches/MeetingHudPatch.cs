@@ -587,7 +587,7 @@ class CheckForEndVotingPatch
 
         CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiledPlayer, ref DecidedWinner, isMeetingHud: true, name: ref name));
 
-        if (Tiebreaker) name += $"({Utils.ColorString(Utils.GetRoleColor(CustomRoles.Tiebreaker), GetString("Tiebreaker"))})";
+        if (Tiebreaker) name += $"({ColorString(GetRoleColor(CustomRoles.Tiebreaker), GetString("Tiebreaker"))})";
         if (DecidedWinner) name += "<size=0>";
         if (Options.ShowImpRemainOnEject.GetBool() && !DecidedWinner)
         {
