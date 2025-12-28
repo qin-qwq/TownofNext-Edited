@@ -4310,7 +4310,7 @@
   "RandomSpawnAirship": "启用<color=#ed0007>高空飞艇</color>随机出生点",
   "RandomSpawnFungle": "启用<color=#ffa646>真菌丛林</color>随机出生点",
   "Message.Revive": "<b>{0}</b>Was resurrected by the host using command",
-  "EscapistMarkButtonText": "标记",
+  "EscapistMarkButtonText": "Mark",
   "EscapistTeleportButtonText": "Escape",
   "DraftDeckTemplate": "Deck List:\\n\\n- {0}",
   "DraftDeck": "Role Deck",
