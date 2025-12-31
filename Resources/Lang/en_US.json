@@ -4356,7 +4356,7 @@
   "UsePets": "可以使用宠物释放技能",
   "PetToAssign": "分配给每个人的宠物",
   "CancelPetAnimation": "取消宠物动画",
-  "pet_RANDOM_FOR_EVERYONE": "<color=#FFFF00>随机</color>",
+  "pet_RANDOM_FOR_EVERYONE": "<color=#FFFF00> Random </color>",
   "pet_GoosePet": "Goose",
   "pet_Pusheen": "Pusheen",
   "TimeMasterUsePetRewind": "使用宠物释放技能改为<color=#44baff>时间回溯</color>",
