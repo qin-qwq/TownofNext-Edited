@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using TONE.Roles.Neutral;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Altruist : RoleBase
 {

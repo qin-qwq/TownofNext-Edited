@@ -2,10 +2,10 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static TOHE.Translator;
+using static TONE.Translator;
 using Object = UnityEngine.Object;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start)), HarmonyPriority(Priority.First)]
 public class MainMenuManagerStartPatch
@@ -19,7 +19,7 @@ public class MainMenuManagerStartPatch
         amongUsLogo = GameObject.Find("LOGO-AU");
 
         var rightpanel = __instance.gameModeButtons.transform.parent;
-        var logoObject = new GameObject("titleLogo_TOHE");
+        var logoObject = new GameObject("titleLogo_TONE");
         var logoTransform = logoObject.transform;
 
         ToheLogo = logoObject.AddComponent<SpriteRenderer>();
@@ -116,7 +116,7 @@ public static class MainMenuManagerPatch
         GameObject splashArt = new("SplashArt");
         splashArt.transform.position = new Vector3(0, 0f, 600f); //= new Vector3(0, 0.40f, 600f);
         var spriteRenderer = splashArt.AddComponent<SpriteRenderer>();
-        string folder = "TOHE.Resources.Background.";
+        string folder = "TONE.Resources.Background.";
         folder += "CurrentArtWinner";
         IRandom rand = IRandom.Instance;
         //if (rand.Next(0, 100) < 30) folder += "PrevArtWinner";

@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using TOHE.Modules;
+using TONE.Modules;
 using LogLevel = BepInEx.Logging.LogLevel;
 
-namespace TOHE;
+namespace TONE;
 
 class Webhook
 {
@@ -17,7 +17,7 @@ class Webhook
         Dictionary<string, string> strs = new()
         {
             { "content", text },
-            { "username", "TOHE-Debugger" },
+            { "username", "TONE-Debugger" },
             { "avatar_url", "https://npm.elemecdn.com/hexo-static@1.0.1/img/avatar.webp" }
         };
         TaskAwaiter<HttpResponseMessage> awaiter = httpClient.PostAsync(

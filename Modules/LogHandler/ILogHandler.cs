@@ -1,6 +1,6 @@
 using System;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public interface ILogHandler
 {

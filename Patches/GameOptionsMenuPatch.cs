@@ -2,14 +2,14 @@ using BepInEx.Unity.IL2CPP.Utils.Collections;
 using System;
 using System.Collections.Concurrent;
 using TMPro;
-using TOHE.Patches;
-using TOHE.Roles.Core;
+using TONE.Patches;
+using TONE.Roles.Core;
 using UnityEngine;
 using UnityEngine.Events;
-using static TOHE.Translator;
+using static TONE.Translator;
 using Object = UnityEngine.Object;
 
-namespace TOHE;
+namespace TONE;
 
 // Thanks: https://github.com/Yumenopai/TownOfHost_Y/blob/main/Patches/GameOptionsMenuPatch.cs
 public static class ModGameOptionsMenu
@@ -451,10 +451,10 @@ public static class ToggleOptionPatch
                 TabGroup.CovenRoles => new Color32(172, 66, 242, 255),
                 _ => new Color32(255, 129, 166, 255)
             } : Main.GameModeColors.TryGetValue(gm, out var c) ? c : new Color32(255, 129, 166, 255);
-            __instance.CheckMark.sprite = Utils.LoadSprite("TOHE.Resources.Images.Checkmark.png", 100f);
+            __instance.CheckMark.sprite = Utils.LoadSprite("TONE.Resources.Images.Checkmark.png", 100f);
             __instance.CheckMark.color = color;
             var renderer = __instance.CheckMark.transform.parent.FindChild("ActiveSprite").GetComponent<SpriteRenderer>();
-            renderer.sprite = Utils.LoadSprite("TOHE.Resources.Images.CheckMarkBox.png", 100f);
+            renderer.sprite = Utils.LoadSprite("TONE.Resources.Images.CheckMarkBox.png", 100f);
             renderer.color = color;
 
             __instance.TitleText.text = item.GetName();
@@ -688,7 +688,7 @@ public static class StringOptionPatch
                 var name = item.GetName();
                 if (Enum.GetValues<CustomRoles>().Find(x => GetString($"{x}") == name.RemoveHtmlTags(), out var role))
                 {
-                    var roleName = role.IsVanilla() ? role + "TOHE" : role.ToString();
+                    var roleName = role.IsVanilla() ? role + "TONE" : role.ToString();
                     var str = GetString($"{roleName}InfoLong");
                     int size = str.Length > 500 ? str.Length > 550 ? 65 : 70 : 100;
                     var infoLong = str[(str.IndexOf('\n') + 1)..str.Length];

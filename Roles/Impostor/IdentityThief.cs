@@ -1,8 +1,8 @@
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using static TOHE.Options;
+using TONE.Modules;
+using TONE.Roles.Core;
+using static TONE.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class IdentityThief : RoleBase
 {

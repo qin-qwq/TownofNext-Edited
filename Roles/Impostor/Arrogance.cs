@@ -1,9 +1,9 @@
 using Hazel;
 using System;
-using TOHE.Modules.Rpc;
-using static TOHE.Options;
+using TONE.Modules.Rpc;
+using static TONE.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Arrogance : RoleBase
 {

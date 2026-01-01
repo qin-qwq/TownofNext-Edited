@@ -5,21 +5,21 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Core.DraftAssign;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Core.DraftAssign;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
 internal class ChatCommands
@@ -421,7 +421,7 @@ internal class ChatCommands
                 //    {
                 //        break;
                 //    }
-                //    PlayerControl.LocalPlayer.RpcChangeRoleBasis(CustomRoles.PhantomTOHE);
+                //    PlayerControl.LocalPlayer.RpcChangeRoleBasis(CustomRoles.PhantomTONE);
                 //    break;
 
                 case "/setplayers":
@@ -1993,12 +1993,12 @@ internal class ChatCommands
             "GM(遊戲大師)" or "管理员" or "管理" or "gm" or "GM" => GetString("GM"),
             
             // 原版职业
-            "船員" or "船员" or "白板" or "天选之子" => GetString("CrewmateTOHE"),
-            "工程師" or "工程师" => GetString("EngineerTOHE"),
-            "科學家" or "科学家" => GetString("ScientistTOHE"),
-            "守護天使" or "守护天使" => GetString("GuardianAngelTOHE"),
-            "偽裝者" or "内鬼" => GetString("ImpostorTOHE"),
-            "變形者" or "变形者" => GetString("ShapeshifterTOHE"),
+            "船員" or "船员" or "白板" or "天选之子" => GetString("CrewmateTONE"),
+            "工程師" or "工程师" => GetString("EngineerTONE"),
+            "科學家" or "科学家" => GetString("ScientistTONE"),
+            "守護天使" or "守护天使" => GetString("GuardianAngelTONE"),
+            "偽裝者" or "内鬼" => GetString("ImpostorTONE"),
+            "變形者" or "变形者" => GetString("ShapeshifterTONE"),
 
             // 隱藏職業 and 隐藏职业
             "陽光開朗大男孩" or "阳光开朗大男孩" => GetString("Sunnyboy"),
@@ -2489,8 +2489,8 @@ internal class ChatCommands
             {
                 CustomRoles setrole = result.GetCustomRoleTeam() switch
                 {
-                    Custom_Team.Impostor => CustomRoles.ImpostorTOHE,
-                    _ => CustomRoles.CrewmateTOHE
+                    Custom_Team.Impostor => CustomRoles.ImpostorTONE,
+                    _ => CustomRoles.CrewmateTONE
 
                 };
                 RoleAssign.SetRoles[pid] = setrole;
@@ -4213,7 +4213,7 @@ internal class UpdateCharCountPatch
     public static void Postfix(FreeChatInputField __instance)
     {
         int length = __instance.textArea.text.Length;
-        __instance.charCountText.SetText(length <= 0 ? GetString("ThankYouForUsingTOHE") : $"{length}/{__instance.textArea.characterLimit}");
+        __instance.charCountText.SetText(length <= 0 ? GetString("ThankYouForUsingTONE") : $"{length}/{__instance.textArea.characterLimit}");
         __instance.charCountText.enableWordWrapping = false;
         if (length < (AmongUsClient.Instance.AmHost ? 888 : 444))
             __instance.charCountText.color = Color.black;

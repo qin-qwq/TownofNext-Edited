@@ -5,16 +5,16 @@ using Hazel;
 using InnerNet;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Core.DraftAssign;
-using TOHE.Roles.Crewmate;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Patches;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Core.DraftAssign;
+using TONE.Roles.Crewmate;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameJoined))]
 class OnGameJoinedPatch
@@ -90,8 +90,8 @@ class OnGameJoinedPatch
                     if (AURoleOptions.GuardianAngelCooldown == 0f)
                         AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
 
-                    // If custom Gamemode is HideNSeekTOHE in normal game, set Standard
-                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTOHE)
+                    // If custom Gamemode is HideNSeekTONE in normal game, set Standard
+                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTONE)
                     {
                         // Select Standard
                         Options.GameMode.SetValue(0);
@@ -102,10 +102,10 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTOHE
-                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekTOHE)
+                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTONE
+                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekTONE)
                     {
-                        // Select HideNSeekTOHE
+                        // Select HideNSeekTONE
                         Options.GameMode.SetValue(4);
                     }
                     break;

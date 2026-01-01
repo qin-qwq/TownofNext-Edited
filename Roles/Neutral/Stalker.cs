@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Roles.Core;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 // 来源：https://github.com/Yumenopai/TownOfHost_Y
 internal class Stalker : RoleBase

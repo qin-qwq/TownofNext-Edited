@@ -1,6 +1,6 @@
 using System;
 
-namespace TOHE;
+namespace TONE;
 
 public class HashRandomWrapper : IRandom
 {

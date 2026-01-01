@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace TOHE;
+namespace TONE;
 
 public class DevUser(string code = "", string color = "null", string userType = "null", string tag = "null", bool isUp = false, bool isDev = false, bool deBug = false, bool colorCmd = false, bool nameCmd = false, string upName = "未认证用户")
 {

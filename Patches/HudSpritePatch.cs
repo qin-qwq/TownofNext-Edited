@@ -1,12 +1,12 @@
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 public static class CustomButton
 {
-    public static Sprite Get(string name) => Utils.LoadSprite($"TOHE.Resources.Images.Skills.{name}.png", 115f);
+    public static Sprite Get(string name) => Utils.LoadSprite($"TONE.Resources.Images.Skills.{name}.png", 115f);
 }
 
 [HarmonyPriority(Priority.First)]

@@ -1,6 +1,6 @@
 using AmongUs.Data;
 
-namespace TOHE;
+namespace TONE;
 
 public static class PetsPatch
 {

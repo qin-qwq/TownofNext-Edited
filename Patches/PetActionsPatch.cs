@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Modules;
-using TOHE.Roles.Neutral;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Modules;
+using TONE.Roles.Neutral;
 using Hazel;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 /*
  * HUGE THANKS TO
  * ImaMapleTree / 단풍잎 / Tealeaf

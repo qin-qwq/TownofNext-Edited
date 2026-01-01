@@ -1,9 +1,9 @@
 using System;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Neutral;
 
-namespace TOHE.Roles.Core.AssignManager;
+namespace TONE.Roles.Core.AssignManager;
 
 public static class AddonAssign
 {
@@ -251,7 +251,7 @@ public static class AddonAssign
                     || pc.Is(CustomRoles.Doomsayer)
                     || pc.Is(CustomRoles.Nemesis)
                     || pc.Is(CustomRoles.Councillor)
-                    || pc.Is(CustomRoles.GuardianAngelTOHE)
+                    || pc.Is(CustomRoles.GuardianAngelTONE)
                     || pc.Is(CustomRoles.GM)
                     || (pc.HasSubRole() && pc.GetCustomSubRoles().Count >= Options.NoLimitAddonsNumMax.GetInt())
                     || pc.Is(CustomRoles.PunchingBag))

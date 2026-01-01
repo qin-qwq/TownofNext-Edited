@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System;
-using TOHE.Modules.Rpc;
-using static TOHE.Options;
+using TONE.Modules.Rpc;
+using static TONE.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Juggernaut : RoleBase
 {

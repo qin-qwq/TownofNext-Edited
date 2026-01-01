@@ -1,5 +1,5 @@
 
-namespace TOHE;
+namespace TONE;
 
 internal class DefaultSetup : RoleBase
 {

@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Hater : RoleBase
 {

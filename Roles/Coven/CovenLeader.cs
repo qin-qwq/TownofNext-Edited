@@ -1,13 +1,13 @@
-using TOHE.Modules;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace TONE.Roles.Coven;
 
 internal class CovenLeader : CovenManager
 {
@@ -86,7 +86,7 @@ internal class CovenLeader : CovenManager
         var roleList = CustomRolesHelper.AllRoles.Where(role => role.IsCoven() && role.IsEnable() && !role.RoleExist(countDead: true)).ToList();
         retrainPlayer[target.PlayerId] = roleList.RandomElement();
         // if every enabled coven role is already in the game then use one of them anyways
-        if (retrainPlayer[target.PlayerId] == CustomRoles.Crewmate || retrainPlayer[target.PlayerId] == CustomRoles.CrewmateTOHE)
+        if (retrainPlayer[target.PlayerId] == CustomRoles.Crewmate || retrainPlayer[target.PlayerId] == CustomRoles.CrewmateTONE)
             retrainPlayer[target.PlayerId] = CustomRolesHelper.AllRoles.Where(role => role.IsCoven() && role.IsEnable()).ToList().RandomElement();
         killer.ResetKillCooldown();
         killer.SetKillCooldown();

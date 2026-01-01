@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Crewmate;
+namespace TONE.Roles.AddOns.Crewmate;
 
 public class Torch : IAddon
 {

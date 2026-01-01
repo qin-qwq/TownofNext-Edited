@@ -1,7 +1,7 @@
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Roles.Core;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Godfather : RoleBase
 {

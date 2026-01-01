@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public static class AFKDetector
 {

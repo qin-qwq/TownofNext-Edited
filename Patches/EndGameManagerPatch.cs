@@ -1,9 +1,9 @@
 using TMPro;
-using TOHE.Roles.Core.DraftAssign;
+using TONE.Roles.Core.DraftAssign;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 [HarmonyPatch(typeof(EndGameManager), nameof(EndGameManager.ShowButtons))]
 public class EndGameManagerPatch

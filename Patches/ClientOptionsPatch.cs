@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 //锟斤拷源锟斤拷https://github.com/tukasa0001/TownOfHost/pull/1265
 [HarmonyPatch(typeof(OptionsMenuBehaviour), nameof(OptionsMenuBehaviour.Start))]

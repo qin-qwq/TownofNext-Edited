@@ -1,7 +1,7 @@
 
 using AmongUs.GameOptions;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Refugee : RoleBase
 {

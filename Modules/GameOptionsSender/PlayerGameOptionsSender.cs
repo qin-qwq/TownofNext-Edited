@@ -3,10 +3,10 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Linq;
 using InnerNet;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using Mathf = UnityEngine.Mathf;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 {

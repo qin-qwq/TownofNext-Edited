@@ -4,12 +4,12 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
 using System;
 using UnityEngine;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Neutral;
-using TOHE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
+using TONE.Modules;
 
-namespace TOHE;
+namespace TONE;
 
 public class CustomRpcSender
 {

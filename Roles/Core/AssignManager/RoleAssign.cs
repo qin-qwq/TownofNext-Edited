@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Double;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 
-namespace TOHE.Roles.Core.AssignManager;
+namespace TONE.Roles.Core.AssignManager;
 
 public class RoleAssign
 {
@@ -199,7 +199,7 @@ public class RoleAssign
                 case CustomRoles.NiceMini:
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
-                case CustomRoles.PhantomTOHE when NarcManager.IsNarcAssigned():
+                case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
                     continue;
             }
 
@@ -239,7 +239,7 @@ public class RoleAssign
 
         //if (Roles[RoleAssignType.Impostor].Count == 0 && !SetRoles.Values.Any(x => x.IsImpostor()))
         //{
-        //    Roles[RoleAssignType.Impostor].Add(new(CustomRoles.ImpostorTOHE, 100, optImpNum));
+        //    Roles[RoleAssignType.Impostor].Add(new(CustomRoles.ImpostorTONE, 100, optImpNum));
         //    Logger.Warn("Adding Vanilla Impostor", "CustomRoleSelector");
         //}
 
@@ -1036,7 +1036,7 @@ public class RoleAssign
         {
             while (FinalRolesList.Count < AllPlayers.Count)
             {
-                FinalRolesList.Add(CustomRoles.CrewmateTOHE);
+                FinalRolesList.Add(CustomRoles.CrewmateTONE);
             }
         }
 

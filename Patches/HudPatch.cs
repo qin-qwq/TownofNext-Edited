@@ -1,13 +1,13 @@
 using AmongUs.GameOptions;
 using System.Text;
 using TMPro;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.Start))]
 class HudManagerStartPatch

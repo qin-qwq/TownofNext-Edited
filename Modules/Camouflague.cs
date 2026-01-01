@@ -1,8 +1,8 @@
 using AmongUs.Data;
-using TOHE.Modules;
-using TOHE.Roles.Impostor;
+using TONE.Modules;
+using TONE.Roles.Impostor;
 
-namespace TOHE;
+namespace TONE;
 
 static class PlayerOutfitExtension
 {

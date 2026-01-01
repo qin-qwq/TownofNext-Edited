@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 public static class TemplateManager
 {
@@ -120,7 +120,7 @@ public static class TemplateManager
 #endif
 
             if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
-            var defaultTemplateMsg = GetResourcesTxt($"TOHE.Resources.Config.template.{fileName}.txt");
+            var defaultTemplateMsg = GetResourcesTxt($"TONE.Resources.Config.template.{fileName}.txt");
 
             if (!File.Exists(defaultTemplatePath))
             {

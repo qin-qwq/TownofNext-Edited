@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using TOHE.Modules;
-using static TOHE.Translator;
+using TONE.Modules;
+using static TONE.Translator;
 
-namespace TOHE.Patches.HideNSeek;
+namespace TONE.Patches.HideNSeek;
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckMurder))]
 class CheckMurderInHidenSeekPatch

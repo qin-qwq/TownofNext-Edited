@@ -13,22 +13,22 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Crewmate;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Patches;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Crewmate;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [Obfuscation(Exclude = true, Feature = "renaming", ApplyToMembers = true)]
 public static class Utils
@@ -1118,7 +1118,7 @@ public static class Utils
 
         if (AmongUsClient.Instance.NetworkMode != NetworkModes.OnlineGame)
         {
-            name = "本地";
+            name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "本地" : "Local Games";
             return name;
         }
 
@@ -1134,9 +1134,9 @@ public static class Utils
         if (region.PingServer.EndsWith("among.us", StringComparison.Ordinal))
         {
             // Official server
-            if (name == "North America") name = "北美洲";
-            else if (name == "Europe") name = "欧洲";
-            else if (name == "Asia") name = "亚洲";
+            if (name == "North America") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "北美洲" : "NA";
+            else if (name == "Europe") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "欧洲" : "EU";
+            else if (name == "Asia") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "亚洲" : "AS";
 
             return name;
         }
@@ -1673,7 +1673,7 @@ public static class Utils
         {
             name = Options.GetSuffixMode() switch
             {
-                SuffixModes.TOHE => name += $"\r\n<color={Main.ModColor}>TONE v{Main.PluginDisplayVersion}</color>",
+                SuffixModes.TONE => name += $"\r\n<color={Main.ModColor}>TONE v{Main.PluginDisplayVersion}</color>",
                 SuffixModes.Streaming => name += $"\r\n<size=1.7><color={Main.ModColor}>{GetString("SuffixMode.Streaming")}</color></size>",
                 SuffixModes.Recording => name += $"\r\n<size=1.7><color={Main.ModColor}>{GetString("SuffixMode.Recording")}</color></size>",
                 SuffixModes.RoomHost => name += $"\r\n<size=1.7><color={Main.ModColor}>{GetString("SuffixMode.RoomHost")}</color></size>",

@@ -1,7 +1,7 @@
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using UnityEngine;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 [HarmonyPatch(typeof(LobbyBehaviour), nameof(LobbyBehaviour.Start))]
 public class LobbyStartPatch
@@ -14,8 +14,8 @@ public class LobbyStartPatch
     private static bool FirstDecorationsLoad = true;
     public static void Prefix()
     {
-        LobbyPaintSprite = Utils.LoadSprite("TOHE.Resources.Images.LobbyPaint.png", 290f);
-        DropshipDecorationsSprite = Utils.LoadSprite("TOHE.Resources.Images.Dropship-Decorations.png", 60f);
+        LobbyPaintSprite = Utils.LoadSprite("TONE.Resources.Images.LobbyPaint.png", 290f);
+        DropshipDecorationsSprite = Utils.LoadSprite("TONE.Resources.Images.Dropship-Decorations.png", 60f);
     }
     public static void Postfix(LobbyBehaviour __instance)
     {

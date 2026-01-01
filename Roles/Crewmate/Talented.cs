@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.AddOns;
-using static TOHE.Options;
+using TONE.Roles.AddOns;
+using static TONE.Options;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Talented : RoleBase
 {

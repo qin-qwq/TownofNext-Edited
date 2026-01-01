@@ -5,23 +5,23 @@ using InnerNet;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Crewmate;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Patches;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Crewmate;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Double;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckProtect))]
 class CheckProtectPatch
@@ -681,7 +681,7 @@ public static class CheckShapeshiftPatch
             Logger.Info("Checking while AntiBlackOut protect, shapeshift was canceled", "CheckShapeshift");
             return false;
         }
-        if (!(instance.Is(CustomRoles.ShapeshifterTOHE) || instance.Is(CustomRoles.Shapeshifter)) && target.CheckFirstDied() && MeetingStates.FirstMeeting && Options.PreventFirstDeadShapeShift.GetBool())
+        if (!(instance.Is(CustomRoles.ShapeshifterTONE) || instance.Is(CustomRoles.Shapeshifter)) && target.CheckFirstDied() && MeetingStates.FirstMeeting && Options.PreventFirstDeadShapeShift.GetBool())
         {
             instance.RpcGuardAndKill(instance);
             instance.Notify(Utils.ColorString(Utils.GetRoleColor(instance.GetCustomRole()), GetString("PlayerIsShieldedByGame")));
@@ -2253,16 +2253,16 @@ class PlayerControlLocalSetRolePatch
         {
             var modRole = role switch
             {
-                RoleTypes.Crewmate => CustomRoles.CrewmateTOHE,
-                RoleTypes.Impostor => CustomRoles.ImpostorTOHE,
-                RoleTypes.Scientist => CustomRoles.ScientistTOHE,
-                RoleTypes.Engineer => CustomRoles.EngineerTOHE,
-                RoleTypes.Shapeshifter => CustomRoles.ShapeshifterTOHE,
-                RoleTypes.Noisemaker => CustomRoles.NoisemakerTOHE,
-                RoleTypes.Phantom => CustomRoles.PhantomTOHE,
-                RoleTypes.Tracker => CustomRoles.TrackerTOHE,
-                RoleTypes.Detective => CustomRoles.DetectiveTOHE,
-                RoleTypes.Viper => CustomRoles.ViperTOHE,
+                RoleTypes.Crewmate => CustomRoles.CrewmateTONE,
+                RoleTypes.Impostor => CustomRoles.ImpostorTONE,
+                RoleTypes.Scientist => CustomRoles.ScientistTONE,
+                RoleTypes.Engineer => CustomRoles.EngineerTONE,
+                RoleTypes.Shapeshifter => CustomRoles.ShapeshifterTONE,
+                RoleTypes.Noisemaker => CustomRoles.NoisemakerTONE,
+                RoleTypes.Phantom => CustomRoles.PhantomTONE,
+                RoleTypes.Tracker => CustomRoles.TrackerTONE,
+                RoleTypes.Detective => CustomRoles.DetectiveTONE,
+                RoleTypes.Viper => CustomRoles.ViperTONE,
                 _ => CustomRoles.NotAssigned,
             };
             if (modRole != CustomRoles.NotAssigned)

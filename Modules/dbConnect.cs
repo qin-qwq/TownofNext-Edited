@@ -3,10 +3,10 @@ using System;
 using System.IO;
 using System.Text.Json;
 using UnityEngine.Networking;
-using static TOHE.Translator;
+using static TONE.Translator;
 using IEnumerator = System.Collections.IEnumerator;
 
-namespace TOHE;
+namespace TONE;
 
 public class dbConnect
 {
@@ -89,7 +89,7 @@ public class dbConnect
         Assembly assembly = Assembly.GetExecutingAssembly();
 
         // Specify the full name of the embedded resource
-        string resourceName = "TOHE.token.env";
+        string resourceName = "TONE.token.env";
         /*
          make a token.env file in the root folder and add `API_TOKEN=your_api_token_here`
         for example :- API_TOKEN=1234567890

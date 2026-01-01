@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class EvilGuesser : RoleBase
 {

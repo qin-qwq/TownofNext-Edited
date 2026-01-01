@@ -7,20 +7,20 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
-using TOHE.Modules;
+using TONE.Modules;
 using UnityEngine;
 using UnityEngine.Networking;
-using static TOHE.Translator;
+using static TONE.Translator;
 using IEnumerator = System.Collections.IEnumerator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch]
 public class ModUpdater
 {
     //private static readonly string URL_2018k = "http://api.tohre.dev";
     private static readonly string URL_Github = "https://api.github.com/repos/qin-qwq/TownofNext-Edited";
-    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TOHEN-Contributions/releases/download/v123123123/TOHE.dll";
+    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TONEN-Contributions/releases/download/v123123123/TONE.dll";
     public static bool hasUpdate = false;
     private static bool firstNotify = true;
     public static bool forceUpdate = false;
@@ -82,8 +82,8 @@ public class ModUpdater
     const string MiniRegionInstallPath = "./BepInEx/plugins/Mini.RegionInstall.dll";
 #endif
 
-    const string RegionConfigResource = "TOHE.Resources.at.duikbo.regioninstall.cfg";
-    const string MiniRegionInstallResource = "TOHE.Resources.Mini.RegionInstall.dll";
+    const string RegionConfigResource = "TONE.Resources.at.duikbo.regioninstall.cfg";
+    const string MiniRegionInstallResource = "TONE.Resources.Mini.RegionInstall.dll";
     private static void CheckCustomRegions()
     {
 #if ANDROID

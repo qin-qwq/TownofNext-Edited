@@ -1,14 +1,14 @@
 using AmongUs.GameOptions;
 using System;
-using TOHE.Modules;
-using TOHE.Roles.AddOns.Crewmate;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Roles.AddOns.Crewmate;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Virus : RoleBase
 {

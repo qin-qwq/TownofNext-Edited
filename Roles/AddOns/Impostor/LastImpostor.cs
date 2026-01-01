@@ -1,6 +1,6 @@
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 
-namespace TOHE.Roles.AddOns.Impostor;
+namespace TONE.Roles.AddOns.Impostor;
 
 public class LastImpostor : IAddon
 {

@@ -1,14 +1,14 @@
 using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules.ChatManager;
-using TOHE.Roles.Crewmate;
+using TONE.Modules.ChatManager;
+using TONE.Roles.Crewmate;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace TONE.Roles.Coven;
 
 internal class Ritualist : CovenManager
 {

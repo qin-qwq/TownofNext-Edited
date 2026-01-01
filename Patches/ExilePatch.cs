@@ -1,10 +1,10 @@
 using AmongUs.Data;
 using AmongUs.GameOptions;
 using System;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
+using TONE.Roles.Core;
+using TONE.Roles.Neutral;
 
-namespace TOHE;
+namespace TONE;
 
 class ExileControllerWrapUpPatch
 {

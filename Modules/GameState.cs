@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using System;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Utils;
+using static TONE.Utils;
 
-namespace TOHE;
+namespace TONE;
 
 public class PlayerState(byte playerId)
 {
@@ -318,7 +318,7 @@ public class PlayerState(byte playerId)
         Fall,
         Exorcised,
 
-        // TOHE
+        // TONE
         Gambled,
         Eaten,
         Sacrifice,

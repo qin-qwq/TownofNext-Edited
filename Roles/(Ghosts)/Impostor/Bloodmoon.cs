@@ -1,14 +1,14 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using TONE.Roles.Double;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles._Ghosts_.Impostor;
+namespace TONE.Roles._Ghosts_.Impostor;
 
 internal class Bloodmoon : RoleBase
 {

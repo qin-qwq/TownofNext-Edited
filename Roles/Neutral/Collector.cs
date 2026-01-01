@@ -1,9 +1,9 @@
 using System.Text;
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Roles.Core;
 using UnityEngine;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Collector : RoleBase
 {

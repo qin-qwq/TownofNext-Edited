@@ -1,10 +1,10 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using static TOHE.Options;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using static TONE.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Executioner : RoleBase
 {
@@ -34,7 +34,7 @@ internal class Executioner : RoleBase
     [
         CustomRoles.Amnesiac,
         CustomRoles.Maverick,
-        CustomRoles.CrewmateTOHE,
+        CustomRoles.CrewmateTONE,
         CustomRoles.Celebrity,
         CustomRoles.Bodyguard,
         CustomRoles.Dictator,
@@ -44,7 +44,7 @@ internal class Executioner : RoleBase
         CustomRoles.Opportunist,
         CustomRoles.Pursuer,
         CustomRoles.Refugee,
-        CustomRoles.TrackerTOHE,
+        CustomRoles.TrackerTONE,
         CustomRoles.Sheriff,
         CustomRoles.Deputy,
         CustomRoles.Medic,

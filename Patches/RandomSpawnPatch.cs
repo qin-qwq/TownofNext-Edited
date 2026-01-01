@@ -1,10 +1,10 @@
 using Hazel;
 using System;
-using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Impostor;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 // Thanks: https://github.com/tukasa0001/TownOfHost/blob/main/Patches/RandomSpawnPatch.cs
 class RandomSpawn

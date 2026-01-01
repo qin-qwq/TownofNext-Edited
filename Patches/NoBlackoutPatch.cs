@@ -1,4 +1,4 @@
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(LogicGameFlowNormal), nameof(LogicGameFlowNormal.IsGameOverDueToDeath))]
 class DontBlackoutPatch

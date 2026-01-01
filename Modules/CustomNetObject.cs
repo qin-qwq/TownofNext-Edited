@@ -3,7 +3,7 @@ using Hazel;
 using InnerNet;
 using System;
 using TMPro;
-using TOHE;
+using TONE;
 using UnityEngine;
 
 
@@ -16,7 +16,7 @@ using UnityEngine;
 
 //Sidenote: 8x8 on 100% size is a pretty golden standard and trying to make something smaller than that is very ugly (as the grean bean is very visible) so I wouldn't recommend it. 
 
-namespace TOHE.Modules
+namespace TONE.Modules
 {
     internal class CustomNetObject
     {
@@ -458,7 +458,7 @@ internal static class RawSetNamePatch
 {
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] string name)
     {
-        if (!AmongUsClient.Instance.AmHost || !TOHE.GameStates.InGame) return true;
+        if (!AmongUsClient.Instance.AmHost || !TONE.GameStates.InGame) return true;
 
         var exception = false;
 
@@ -476,9 +476,9 @@ internal static class RawSetNamePatch
             switch (exception)
             {
                 case true when __instance != null:
-                    TOHE.Logger.Warn($"Failed to set name for {__instance.GetRealName()}, trying alternative method", "RawSetNamePatch");
+                    TONE.Logger.Warn($"Failed to set name for {__instance.GetRealName()}, trying alternative method", "RawSetNamePatch");
                     __instance.transform.FindChild("Names").FindChild("NameText_TMP").GetComponent<TextMeshPro>().text = name;
-                    TOHE.Logger.Msg($"Successfully set name for {__instance.GetRealName()}", "RawSetNamePatch");
+                    TONE.Logger.Msg($"Successfully set name for {__instance.GetRealName()}", "RawSetNamePatch");
                     break;
                 case true:
                     // Complete error, don't log this, or it will spam the console

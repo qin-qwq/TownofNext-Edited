@@ -1,13 +1,13 @@
 using System.Text;
-using TOHE.Modules;
-using TOHE.Roles.AddOns;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Roles.AddOns;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class TaskManager : RoleBase
 {

@@ -2,7 +2,7 @@ using Hazel;
 using InnerNet;
 using System.Xml;
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     class RpcGuessKill : BaseModdedRpc
     {

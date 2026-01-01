@@ -1,7 +1,7 @@
 using Hazel;
 using UnityEngine;
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     class RpcArrow : BaseModdedRpc
     {

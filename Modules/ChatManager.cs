@@ -2,12 +2,12 @@ using Hazel;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Modules.Rpc;
+using TONE.Roles.Impostor;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Modules.ChatManager
+namespace TONE.Modules.ChatManager
 {
     public class ChatManager
     {

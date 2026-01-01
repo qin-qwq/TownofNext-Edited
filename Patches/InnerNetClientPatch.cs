@@ -1,9 +1,9 @@
 using System;
 using Hazel;
 using InnerNet;
-using TOHE.Modules;
+using TONE.Modules;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 [Obfuscation(Exclude = true)]
 public enum GameDataTag : byte

@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using System.Text;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Roles.Core;
+using TONE.Roles.Neutral;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Forensic : RoleBase
 {

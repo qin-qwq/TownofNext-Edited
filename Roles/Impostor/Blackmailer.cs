@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Translator;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Blackmailer : RoleBase
 {

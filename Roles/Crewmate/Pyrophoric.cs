@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using UnityEngine;
-using TOHE.Modules;
-using static TOHE.Options;
-using static TOHE.Translator;
-using TOHE.Roles.Double;
+using TONE.Modules;
+using static TONE.Options;
+using static TONE.Translator;
+using TONE.Roles.Double;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal partial class Pyrophoric : RoleBase
 {

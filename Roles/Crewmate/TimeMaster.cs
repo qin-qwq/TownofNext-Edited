@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using System;
 using System.Collections;
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 using Object = UnityEngine.Object;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 // 部分代码参考：https://github.com/Gurge44/EndlessHostRoles
 internal class TimeMaster : RoleBase

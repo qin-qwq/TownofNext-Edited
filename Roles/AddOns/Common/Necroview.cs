@@ -1,7 +1,7 @@
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
+using TONE.Roles.Neutral;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Necroview : IAddon
 {

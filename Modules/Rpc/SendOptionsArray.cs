@@ -3,7 +3,7 @@ using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     class SendOptionsArray : CustomModdedData
     {

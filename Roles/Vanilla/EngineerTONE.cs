@@ -1,12 +1,12 @@
 
 using AmongUs.GameOptions;
 
-namespace TOHE.Roles.Vanilla;
+namespace TONE.Roles.Vanilla;
 
-internal class EngineerTOHE : RoleBase
+internal class EngineerTONE : RoleBase
 {
     //===========================SETUP================================\\
-    public override CustomRoles Role => CustomRoles.EngineerTOHE;
+    public override CustomRoles Role => CustomRoles.EngineerTONE;
     private const int Id = 6100;
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
@@ -17,12 +17,12 @@ internal class EngineerTOHE : RoleBase
 
     public override void SetupCustomOption()
     {
-        Options.SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.EngineerTOHE);
+        Options.SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.EngineerTONE);
         VentUseCooldown = IntegerOptionItem.Create(Id + 2, GeneralOption.EngineerBase_VentCooldown, new(1, 250, 1), 15, TabGroup.CrewmateRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EngineerTOHE])
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EngineerTONE])
             .SetValueFormat(OptionFormat.Seconds);
         InVentMaxTime = IntegerOptionItem.Create(Id + 3, GeneralOption.EngineerBase_InVentMaxTime, new(0, 250, 5), 15, TabGroup.CrewmateRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EngineerTOHE])
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EngineerTONE])
             .SetValueFormat(OptionFormat.Seconds);
     }
 

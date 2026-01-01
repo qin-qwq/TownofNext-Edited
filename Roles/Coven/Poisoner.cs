@@ -1,9 +1,9 @@
-using TOHE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace TONE.Roles.Coven;
 
 internal class Poisoner : CovenManager
 {

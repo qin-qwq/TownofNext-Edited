@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Neutral;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 public abstract class RoleBase
 {

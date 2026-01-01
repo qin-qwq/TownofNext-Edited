@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
-using static TOHE.Translator;
+using TONE.Roles.Core;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Brave : RoleBase
 {

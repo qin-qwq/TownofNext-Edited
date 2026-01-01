@@ -1,8 +1,8 @@
-using TOHE.Roles.AddOns;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Roles.AddOns;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Merchant : RoleBase
 {

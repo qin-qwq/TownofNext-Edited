@@ -2,9 +2,9 @@ using AmongUs.GameOptions;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem;
-using TOHE.Modules.Rpc;
+using TONE.Modules.Rpc;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public abstract class GameOptionsSender
 {

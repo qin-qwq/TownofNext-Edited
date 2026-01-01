@@ -1,6 +1,6 @@
 using AmongUs.GameOptions;
 
-namespace TOHE.Modules.Extensions;
+namespace TONE.Modules.Extensions;
 
 public static class IGameManagerEx
 {

@@ -1,10 +1,10 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Double;
+namespace TONE.Roles.Double;
 
 internal class Mini : RoleBase
 {

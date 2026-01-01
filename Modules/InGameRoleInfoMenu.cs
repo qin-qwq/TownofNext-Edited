@@ -1,10 +1,10 @@
 using System.Text;
 using TMPro;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public static class InGameRoleInfoMenu
 {

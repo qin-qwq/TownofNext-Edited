@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class QuickShooter : RoleBase
 {

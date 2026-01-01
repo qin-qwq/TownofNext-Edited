@@ -10,7 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace TOHE;
+namespace TONE;
 
 // 参考：https://github.com/Yumenopai/TownOfHost_Y
 public class ModNews
@@ -87,10 +87,10 @@ public class ModNewsHistory
         if (AllModNews.Count < 1)
         {
             var lang = DataManager.Settings.Language.CurrentLanguage.ToString();
-            if (!Assembly.GetExecutingAssembly().GetManifestResourceNames().Any(x => x.StartsWith($"TOHE.Resources.ModNews.{lang}.")))
+            if (!Assembly.GetExecutingAssembly().GetManifestResourceNames().Any(x => x.StartsWith($"TONE.Resources.ModNews.{lang}.")))
                 lang = SupportedLangs.English.ToString();
 
-            var fileNames = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith($"TOHE.Resources.ModNews.{lang}."));
+            var fileNames = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith($"TONE.Resources.ModNews.{lang}."));
             foreach (var file in fileNames)
                 AllModNews.Add(GetContentFromRes(file));
 

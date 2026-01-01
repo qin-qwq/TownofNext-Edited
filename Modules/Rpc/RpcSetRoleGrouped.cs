@@ -2,7 +2,7 @@ using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     public class RpcSetRoleGrouped : CustomModdedData
     {

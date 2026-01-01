@@ -1,12 +1,12 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using static TOHE.CheckForEndVotingPatch;
-using static TOHE.Options;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using static TONE.CheckForEndVotingPatch;
+using static TONE.Options;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Speaker : RoleBase
 {

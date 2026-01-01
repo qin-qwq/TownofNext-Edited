@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Crewmate;
+using TONE.Roles.Crewmate;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Blaster : RoleBase
 {

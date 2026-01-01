@@ -1,6 +1,6 @@
 using Hazel;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(GameManager), nameof(GameManager.Serialize))]
 public static class GameManagerSerializeFix

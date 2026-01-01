@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules.Rpc;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE;
+namespace TONE;
 public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
 {
     public static byte necroHolder = byte.MaxValue;

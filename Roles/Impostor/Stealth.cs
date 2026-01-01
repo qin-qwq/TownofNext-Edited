@@ -1,9 +1,9 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 using UnityEngine;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 // https://github.com/tukasa0001/TownOfHost/blob/main/Roles/Impostor/Stealth.cs
 internal class Stealth : RoleBase

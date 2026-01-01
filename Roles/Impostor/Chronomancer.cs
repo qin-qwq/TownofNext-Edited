@@ -2,13 +2,13 @@ using AmongUs.GameOptions;
 using Hazel;
 using System;
 using System.Text;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Chronomancer : RoleBase
 {

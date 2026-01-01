@@ -2,20 +2,20 @@ using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TMPro;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Double;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 public static class GuessManager
 {
@@ -950,29 +950,29 @@ public static class GuessManager
                 List<CustomRoles> listOfRoles = CustomRolesHelper.AllRoles.Where(role => !role.IsGhostRole() && (role.IsEnable() || role.RoleExist(countDead: true))).ToList();
 
                 // Always show
-                if (!listOfRoles.Contains(CustomRoles.ImpostorTOHE))
-                    listOfRoles.Add(CustomRoles.ImpostorTOHE);
+                if (!listOfRoles.Contains(CustomRoles.ImpostorTONE))
+                    listOfRoles.Add(CustomRoles.ImpostorTONE);
 
-                if (!listOfRoles.Contains(CustomRoles.ShapeshifterTOHE))
-                    listOfRoles.Add(CustomRoles.ShapeshifterTOHE);
+                if (!listOfRoles.Contains(CustomRoles.ShapeshifterTONE))
+                    listOfRoles.Add(CustomRoles.ShapeshifterTONE);
 
-                if (!listOfRoles.Contains(CustomRoles.CrewmateTOHE))
-                    listOfRoles.Add(CustomRoles.CrewmateTOHE);
+                if (!listOfRoles.Contains(CustomRoles.CrewmateTONE))
+                    listOfRoles.Add(CustomRoles.CrewmateTONE);
 
-                if (!listOfRoles.Contains(CustomRoles.ScientistTOHE))
-                    listOfRoles.Add(CustomRoles.ScientistTOHE);
+                if (!listOfRoles.Contains(CustomRoles.ScientistTONE))
+                    listOfRoles.Add(CustomRoles.ScientistTONE);
 
-                if (!listOfRoles.Contains(CustomRoles.EngineerTOHE))
-                    listOfRoles.Add(CustomRoles.EngineerTOHE);
+                if (!listOfRoles.Contains(CustomRoles.EngineerTONE))
+                    listOfRoles.Add(CustomRoles.EngineerTONE);
 
-                if (!listOfRoles.Contains(CustomRoles.TrackerTOHE))
-                    listOfRoles.Add(CustomRoles.TrackerTOHE);
+                if (!listOfRoles.Contains(CustomRoles.TrackerTONE))
+                    listOfRoles.Add(CustomRoles.TrackerTONE);
 
-                if (!listOfRoles.Contains(CustomRoles.PhantomTOHE))
-                    listOfRoles.Add(CustomRoles.PhantomTOHE);
+                if (!listOfRoles.Contains(CustomRoles.PhantomTONE))
+                    listOfRoles.Add(CustomRoles.PhantomTONE);
 
-                if (!listOfRoles.Contains(CustomRoles.DetectiveTOHE))
-                    listOfRoles.Add(CustomRoles.DetectiveTOHE);
+                if (!listOfRoles.Contains(CustomRoles.DetectiveTONE))
+                    listOfRoles.Add(CustomRoles.DetectiveTONE);
 
                 if (!listOfRoles.Contains(CustomRoles.Amnesiac))
                     listOfRoles.Add(CustomRoles.Amnesiac);

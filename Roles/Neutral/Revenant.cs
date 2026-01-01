@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
-using static TOHE.Translator;
+using TONE.Roles.Core;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 internal class Revenant : RoleBase
 {
     //===========================SETUP================================\\
