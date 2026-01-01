@@ -4363,7 +4363,7 @@
   "TimeMasterPetButtonText": "Time backtracking",
   "Dreamer": "Meditator",
   "DreamerInfo": "Kill in meditate",
-  "DreamerInfoLong": "(Neutral Faction)\nDreamer can use the invincible button to enter dream status, increase movement speed and mark the standing position. The other players will see the dreamer stay rooted, but dreamer actually moving. While dream status end,dreamer will return to the original position",
+  "DreamerInfoLong": "(Neutral Faction)\nMeditator can use the invincible button to enter meditate status, increase movement speed and mark the standing position. The other players will see the meditator stay rooted, but meditator actually moving. While meditate status end,meditator will return to the original position",
   "FantasyCooldown": "Meditate cooldown",
   "FantasyDuration": "Meditate duration",
   "FantasySpeed": "Meditate moving speed",
