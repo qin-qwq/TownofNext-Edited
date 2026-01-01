@@ -93,28 +93,36 @@
 > - Improved Role Spawns
 > - Improve text box (TextBoxPatch.cs)
 > - Some ideas to improve performance
+>
 ### :star: [TONEX (Formerly TOHEX)](https://github.com/XtremeWave/TownOfNewEpic_Xtreme)
 >
 > - Provided roles: Swapper, Berserker, Randomizer and Blackmailer
 > - Improve chat spam system (ChatManager.cs)
+>
 ### :star: [Stellar Roles](https://github.com/Mr-Fluuff/StellarRolesAU)
 >
 > - Provided role: Inspector (Inspector)
+>
 ### :star: [Mini.RegionInstall](https://github.com/miniduikboot/Mini.RegionInstall)
 >
 > - Using Mini.RegionInstall to add modded server regions
+>
 ### :star: [TOU-R](https://github.com/eDonnes124/Town-Of-Us-R)
 >
 > - Host icon during the meeting
+>
 ### :star: [MoreGamemodes](https://github.com/Rabek009/MoreGamemodes)
 >
 > - CustomNetObjects (CustomNetObjects.cs)
 > - Changer Role Basis (RoleBasisChanger.cs)
 > - Disable use vent for vanilla players (VentSystemPatch.cs)
+>
 ### :star: [Reactor](https://github.com/NuclearPowered/Reactor)
 >
 > - Reference: Disable the 5s timeout on custom servers
+>
 ### :star: [CrowdedMod](https://github.com/CrowdedMods/CrowdedMod)
 >
 > - We included CrowdedMod in our Mod
+>
 ---
