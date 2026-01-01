@@ -5,6 +5,8 @@
 
 <img align="left" alt="Cover" src="Resources/Background\CurrentArtWinner\TOH-RE-Background-New.png" width="50%" height="300" /> 
 
+<h3>👉 English | <a href="README_zh.md">中文</a> 👈</h3>
+
 <p align="right">
   
 > ### Regarding this mod
