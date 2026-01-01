@@ -32,7 +32,7 @@
 **鸣谢：**
 ### :star: [TOHEN](https://github.com/EnhancedNetwork/TownofHost-Enhanced) :
 > 
-> - 基于 TOHEN
+> - TONE 基于 TOHEN
 >
 ### :star: [TOHRE](https://github.com/Loonie-Toons/) :
 > 
