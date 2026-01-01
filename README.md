@@ -28,7 +28,11 @@
 <br>
 
 **Credit to these mods and their developers for the code and help:**
-### :star: [TOHRE](https://github.com/Loonie-Toons/) 
+### :star: [TOHEN](https://github.com/EnhancedNetwork/TownofHost-Enhanced) :
+> 
+> - Town of Next: Edited was forked from Town of Host: Enhanced.
+>
+### :star: [TOHRE](https://github.com/Loonie-Toons/) :
 > 
 > - Town of Host: Enhanced was forked from Town of Host: Re-Edited.
 >
