@@ -6,6 +6,7 @@ using TOHE.Modules;
 using TOHE.Roles.Core;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Impostor;
+using TOHE.Roles.Neutral;
 using UnityEngine;
 
 namespace TOHE.Patches;
@@ -95,7 +96,7 @@ public static class PhantomRolePatch
     public static bool CheckTrigger(PlayerControl phantom)
     {
         var role = phantom.GetRoleClass();
-        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false)
+        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false || TimeAssassin.TimeStop || Pelican.IsEaten(phantom.PlayerId))
         {
             if (phantom.AmOwner)
             {
@@ -120,11 +121,11 @@ public static class PhantomRolePatch
             sender.EndMessage();
             sender.SendMessage();
 
-            //_ = new LateTask(() =>
-            //{
-                if (phantom.GetCustomRole() is CustomRoles.Fury) return false;
+            _ = new LateTask(() =>
+            {
+                if (phantom.GetCustomRole() is CustomRoles.Fury) return;
                 phantom.SetKillCooldown(Math.Max(phantom.GetKillTimer(), 0.001f));
-            //}, 0.2f, $"Phantom Check");
+            }, 0.2f, $"Phantom Check");
 
             return false;
         }

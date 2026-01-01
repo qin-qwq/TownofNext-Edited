@@ -11,7 +11,6 @@ internal class Catalyst : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Catalyst;
     private const int Id = 33300;
-    public override bool IsExperimental => true;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;

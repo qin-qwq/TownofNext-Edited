@@ -84,20 +84,11 @@ public static class CustomRolesHelper
     public static bool IsBucketableRole(this CustomRoles role)
         => !role.IsGhostRole() && !role.IsVanilla() && !(role is CustomRoles.GM
                     or CustomRoles.SpeedBooster
-                    or CustomRoles.Oblivious
-                    or CustomRoles.Flash
                     or CustomRoles.NotAssigned
                     or CustomRoles.SuperStar
-                    or CustomRoles.Oblivious
                     or CustomRoles.Solsticer
                     or CustomRoles.Killer
                     or CustomRoles.Mini
-                    or CustomRoles.Onbound
-                    or CustomRoles.Rebound
-                    or CustomRoles.LastImpostor
-                    or CustomRoles.Mare
-                    or CustomRoles.Cyber
-                    or CustomRoles.Sloth
                     or CustomRoles.Apocalypse
                     or CustomRoles.Coven)
             && !role.IsTNA() && !role.IsAdditionRole();
@@ -410,9 +401,9 @@ public static class CustomRolesHelper
             CustomRoles.Tired or
             CustomRoles.Sloth or
             CustomRoles.Fury or
-            CustomRoles.TimeAssassin or
             CustomRoles.Zombie or
-            CustomRoles.Dreamer;
+            CustomRoles.Dreamer or
+            CustomRoles.Drunkard;
     }
     public static bool IsRevealingRole(this CustomRoles role, PlayerControl target)
     {
@@ -472,12 +463,12 @@ public static class CustomRolesHelper
         return role is CustomRoles.Mare or
             CustomRoles.LastImpostor or
             CustomRoles.Tricky or
-            CustomRoles.Mare or
             CustomRoles.Clumsy or
             CustomRoles.Mimic or
             CustomRoles.Stealer or
             CustomRoles.Circumvent or
-            CustomRoles.Swift;
+            CustomRoles.Swift or
+            CustomRoles.Plunderer;
     }
 
     public static bool CheckImpCanSeeAllies(this PlayerControl pc, bool CheckAsSeer = false, bool CheckAsTarget = false)
@@ -734,7 +725,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Mare)
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.Rebound)
-                    || pc.Is(CustomRoles.Workaholic) && !Workaholic.WorkaholicVisibleToEveryone.GetBool()
+                    || pc.Is(CustomRoles.Workaholic) && Workaholic.WorkaholicVisibleToEveryone.GetBool()
                     || pc.Is(CustomRoles.PunchingBag))
                     return false; //Based on guess manager
                 break;
@@ -747,7 +738,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Mare)
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.Onbound)
-                    || pc.Is(CustomRoles.Workaholic) && !Workaholic.WorkaholicVisibleToEveryone.GetBool()
+                    || pc.Is(CustomRoles.Workaholic) && Workaholic.WorkaholicVisibleToEveryone.GetBool()
                     || pc.Is(CustomRoles.PunchingBag))
                 {
                     return false;
@@ -1034,8 +1025,7 @@ public static class CustomRolesHelper
                 break;
 
             case CustomRoles.Mimic:
-                if (pc.Is(CustomRoles.Nemesis)
-                    || pc.Is(CustomRoles.Narc)
+                if (pc.Is(CustomRoles.Narc)
                     || pc.Is(CustomRoles.Necroview))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
@@ -1057,7 +1047,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Bomber)
                     || pc.Is(CustomRoles.VoidBallot)
                     || pc.Is(CustomRoles.Swift)
-                    || pc.Is(CustomRoles.Wraith))
+                    || pc.Is(CustomRoles.Wraith)
+                    || pc.Is(CustomRoles.Blaster))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1077,10 +1068,8 @@ public static class CustomRolesHelper
                 break;
             case CustomRoles.Mare:
                 if (pc.Is(CustomRoles.Underdog)
-                    || pc.Is(CustomRoles.Berserker)
                     || pc.Is(CustomRoles.Saboteur)
                     || pc.Is(CustomRoles.Swift)
-                    || pc.Is(CustomRoles.Nemesis)
                     || pc.Is(CustomRoles.Sniper)
                     || pc.Is(CustomRoles.Fireworker)
                     || pc.Is(CustomRoles.Ludopath)
@@ -1096,7 +1085,9 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Flash)
                     || pc.Is(CustomRoles.Sloth)
                     || pc.Is(CustomRoles.KillingMachine)
-                    || pc.Is(CustomRoles.Narc))
+                    || pc.Is(CustomRoles.Narc)
+                    || pc.Is(CustomRoles.Blaster)
+                    || pc.Is(CustomRoles.Wraith))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1114,7 +1105,6 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Warlock)
                     || pc.Is(CustomRoles.Witch)
                     || pc.Is(CustomRoles.Penguin)
-                    || pc.Is(CustomRoles.Nemesis)
                     || pc.Is(CustomRoles.Mare)
                     || pc.Is(CustomRoles.Clumsy)
                     || pc.Is(CustomRoles.Wildling)
@@ -1128,7 +1118,9 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Stealer)
                     || pc.Is(CustomRoles.Tricky)
                     || pc.Is(CustomRoles.DoubleAgent)
-                    || pc.Is(CustomRoles.YinYanger))
+                    || pc.Is(CustomRoles.YinYanger)
+                    || pc.Is(CustomRoles.Blaster)
+                    || pc.Is(CustomRoles.Wraith))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1158,7 +1150,9 @@ public static class CustomRolesHelper
             case CustomRoles.Clumsy:
                 if (pc.Is(CustomRoles.Swift)
                     || pc.Is(CustomRoles.Bomber)
-                    || pc.Is(CustomRoles.KillingMachine))
+                    || pc.Is(CustomRoles.KillingMachine)
+                    || pc.Is(CustomRoles.Wraith)
+                    || pc.Is(CustomRoles.Blaster))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1380,6 +1374,48 @@ public static class CustomRolesHelper
 
             case CustomRoles.Rat:
                 if (pc.Is(CustomRoles.God)) return false;
+                break;
+
+            case CustomRoles.Plunderer:
+                if (pc.Is(CustomRoles.Bomber)
+                    || pc.Is(CustomRoles.Trapster)
+                    || pc.Is(CustomRoles.Kamikaze)
+                    || pc.Is(CustomRoles.Swooper)
+                    || pc.Is(CustomRoles.Vampire)
+                    || pc.Is(CustomRoles.Scavenger)
+                    || pc.Is(CustomRoles.Puppeteer)
+                    || pc.Is(CustomRoles.Mastermind)
+                    || pc.Is(CustomRoles.Warlock)
+                    || pc.Is(CustomRoles.Witch)
+                    || pc.Is(CustomRoles.Penguin)
+                    || pc.Is(CustomRoles.Butcher)
+                    || pc.Is(CustomRoles.Lightning)
+                    || pc.Is(CustomRoles.Hangman)
+                    || pc.Is(CustomRoles.DoubleAgent)
+                    || pc.Is(CustomRoles.YinYanger)
+                    || pc.Is(CustomRoles.Blaster)
+                    || pc.Is(CustomRoles.Wraith))
+                    return false;
+                if (!pc.GetCustomRole().IsImpostor())
+                    return false;
+                break;
+
+            case CustomRoles.Drunkard:
+                if (pc.Is(CustomRoles.Solsticer)
+                    || pc.Is(CustomRoles.Tired)
+                    || pc.Is(CustomRoles.Statue)
+                    || pc.Is(CustomRoles.Seeker)
+                    || pc.Is(CustomRoles.Doppelganger)
+                    || pc.Is(CustomRoles.DollMaster)
+                    || pc.Is(CustomRoles.Sloth)
+                    || pc.Is(CustomRoles.Zombie)
+                    || pc.Is(CustomRoles.Spurt)
+                    || pc.Is(CustomRoles.Alchemist)
+                    || pc.Is(CustomRoles.Mare)
+                    || pc.Is(CustomRoles.ShapeMaster)
+                    || pc.Is(CustomRoles.ShapeshifterTOHE)
+                    || pc.Is(CustomRoles.Morphling))
+                    return false;
                 break;
         }
 
@@ -1636,6 +1672,7 @@ public static class CustomRolesHelper
             CustomRoles.Doppelganger => CustomWinner.Doppelganger,
             CustomRoles.Shocker => CustomWinner.Shocker,
             CustomRoles.Dreamer => CustomWinner.Dreamer,
+            CustomRoles.TreasureHunter => CustomWinner.TreasureHunter,
             _ => throw new NotImplementedException()
 
         };
@@ -1707,8 +1744,9 @@ public static class CustomRolesHelper
             RoleBucket.CrewmateSupport => roleType is Custom_RoleType.CrewmateSupport,
             RoleBucket.CrewmateKilling => roleType is Custom_RoleType.CrewmateKilling,
             RoleBucket.CrewmatePower => roleType is Custom_RoleType.CrewmatePower,
-            RoleBucket.CrewmateCommon => roleType is Custom_RoleType.CrewmateBasic or Custom_RoleType.CrewmateSupport or Custom_RoleType.CrewmateKilling,
-            RoleBucket.CrewmateRandom => roleType is Custom_RoleType.CrewmatePower or Custom_RoleType.CrewmateBasic or Custom_RoleType.CrewmateSupport or Custom_RoleType.CrewmateKilling,
+            RoleBucket.CrewmateInvestigative => roleType is Custom_RoleType.CrewmateInvestigative,
+            RoleBucket.CrewmateCommon => roleType is Custom_RoleType.CrewmateBasic or Custom_RoleType.CrewmateSupport or Custom_RoleType.CrewmateKilling or Custom_RoleType.CrewmateInvestigative,
+            RoleBucket.CrewmateRandom => roleType is Custom_RoleType.CrewmatePower or Custom_RoleType.CrewmateBasic or Custom_RoleType.CrewmateSupport or Custom_RoleType.CrewmateKilling or Custom_RoleType.CrewmateInvestigative,
 
             RoleBucket.NeutralBenign => roleType is Custom_RoleType.NeutralBenign,
             RoleBucket.NeutralEvil => roleType is Custom_RoleType.NeutralEvil,
@@ -1811,6 +1849,7 @@ public enum Custom_RoleType
     CrewmateSupport,
     CrewmateKilling,
     CrewmatePower,
+    CrewmateInvestigative,
     CrewmateGhosts,
 
     // Neutral
@@ -1886,6 +1925,7 @@ public enum RoleBucket
     CrewmateSupport,
     CrewmateKilling,
     CrewmatePower,
+    CrewmateInvestigative,
     CrewmateCommon, // Common = All except Power
     CrewmateRandom,
 

@@ -224,7 +224,15 @@ public abstract class RoleBase
     /// <summary>
     ///  When Role the Killer requires a kill check
     /// </summary>
-    public virtual bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target) => target != null && killer != null;
+    public virtual bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (killer.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Phantom)
+        {
+            killer.ResetKillCooldown();
+            killer.SetKillCooldown();
+        }
+        return target != null && killer != null;
+    }
 
     /// <summary>
     /// When the Killer murders Target

@@ -37,6 +37,7 @@ public class PlayerState(byte playerId)
             _canUseMovingPlatform = value;
         }
     }
+    public byte? StolenId = null;
     public bool IsNecromancer { get; set; } = false;
     public (DateTime TimeStamp, byte) RealKiller = (DateTime.MinValue, byte.MaxValue);
     public List<(DateTime, CustomRoles, CustomRoles)> MainRoleLogs = [];
@@ -289,10 +290,6 @@ public class PlayerState(byte playerId)
         if (AmongUsClient.Instance.AmHost)
         {
             RPC.SendDeathReason(PlayerId, deathReason);
-            if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
-            {
-                MeetingHud.Instance.CheckForEndVoting();
-            }
         }
     }
     public bool IsSuicide => deathReason == DeathReason.Suicide;
@@ -357,6 +354,7 @@ public class PlayerState(byte playerId)
         Expired,
         Suffocate,
         Ice,
+        AFK,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

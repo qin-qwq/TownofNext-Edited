@@ -184,6 +184,7 @@ public static class Options
     public static OptionItem VentguardAbilityUseGainWithEachTaskCompleted;
     public static OptionItem VeteranAbilityUseGainWithEachTaskCompleted;
     public static OptionItem TimeMasterAbilityUseGainWithEachTaskCompleted;
+    public static OptionItem NiceHackerAbilityUseGainWithEachTaskCompleted;
 
     //public static OptionItem EnableGM;
     public static float DefaultKillCooldown = Main.NormalOptions?.KillCooldown ?? 20;
@@ -576,6 +577,7 @@ public static class Options
     public static OptionItem ShowOnlyEnabledRolesInGuesserUI;
     public static OptionItem CanOnlyGuessEnabled;
     public static OptionItem CantGuessDuringDiscussionTime;
+    public static OptionItem CanGuessCrewInvestigative;
     public static OptionItem UseQuickChatSpamCheat;
 
     // 技能相关设定
@@ -746,7 +748,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33600 last id for roles/add-ons (Next use 33700)
+        // 34100 last id for roles/add-ons (Next use 34200)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1014,6 +1016,15 @@ public static class Options
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateSupport).ForEach(r => r.SetupCustomOption());
+
+        /*
+        *  INVESTIGATIVE ROLES
+        */
+        TextOptionItem.Create(10000035, "RoleType.CrewInvestigative", TabGroup.CrewmateRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(140, 255, 255, byte.MaxValue));
+
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateInvestigative).ForEach(r => r.SetupCustomOption());
 
         /*
          * KILLING ROLES
@@ -1518,6 +1529,11 @@ public static class Options
             .SetColor(Color.cyan);
 
         CantGuessDuringDiscussionTime = BooleanOptionItem.Create(60697, "CantGuessDuringDiscussionTime", true, TabGroup.ModSettings, false)
+            .SetHeader(true)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(Color.cyan);
+
+        CanGuessCrewInvestigative = BooleanOptionItem.Create(60698, "CanGuessCrewInvestigative", true, TabGroup.ModSettings, false)
             .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
@@ -2107,7 +2123,7 @@ public static class Options
             .SetParent(LadderDeath);
 
         // Reset Kill Cooldown
-        FixFirstKillCooldown = BooleanOptionItem.Create(60770, "FixFirstKillCooldown", true, TabGroup.ModSettings, false)
+        FixFirstKillCooldown = BooleanOptionItem.Create(60770, "FixFirstKillCooldown", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
         ChangeFirstKillCooldown = BooleanOptionItem.Create(60772, "ChangeFirstKillCooldown", true, TabGroup.ModSettings, false)
@@ -2218,6 +2234,8 @@ public static class Options
         #endregion
 
         yield return null;
+
+        AFKDetector.SetupCustomOption();
 
         // End Load Settings
         OptionSaver.Load();

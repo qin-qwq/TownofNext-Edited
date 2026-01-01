@@ -3,6 +3,7 @@ using System.Text;
 using TMPro;
 using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core;
+using TOHE.Roles.Crewmate;
 using UnityEngine;
 using static TOHE.Translator;
 
@@ -258,14 +259,19 @@ class VentButtonDoClickPatch
 [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.Show))]
 class MapBehaviourShowPatch
 {
-    public static void Prefix(ref MapOptions opts)
+    public static void Prefix(MapBehaviour __instance, ref MapOptions opts)
     {
         if (GameStates.IsMeeting || GameStates.IsHideNSeek) return;
 
+        var player = PlayerControl.LocalPlayer;
+
+        if (player.GetCustomRole() == CustomRoles.NiceHacker)
+        {
+            Logger.Info("Modded Client uses Map", "Hacker");
+            NiceHacker.MapHandle(player, __instance, opts);
+        }
         if (opts.Mode is MapOptions.Modes.Normal or MapOptions.Modes.Sabotage)
         {
-            var player = PlayerControl.LocalPlayer;
-
             if (player.CanUseSabotage())
                 opts.Mode = MapOptions.Modes.Sabotage;
             else
@@ -448,7 +454,7 @@ internal static class ActionButtonSetFillUpPatch
             bool usingAbility = roleType switch
             {
                 RoleTypes.Engineer => PlayerControl.LocalPlayer.inVent,
-                RoleTypes.Shapeshifter => PlayerControl.LocalPlayer.IsShifted(),
+                RoleTypes.Shapeshifter => Main.CheckShapeshift.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out bool shifted) && shifted,
                 _ => false
             };
 

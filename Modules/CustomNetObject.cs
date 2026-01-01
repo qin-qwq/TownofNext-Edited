@@ -440,6 +440,17 @@ namespace TOHE.Modules
             // this.OwnerId = OwnerId;
         }
     }
+    internal sealed class Treasure : CustomNetObject
+    {
+        internal Treasure(Vector2 position, List<byte> visibleList, byte OwnerId)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            //CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#b88608>█<#b88608>█<#b88608>█<#b88608>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#b88608>█<#daa520>█<#ffd700>█<#ffd700>█<#daa520>█<#b88608>█<alpha=#00>█<br><alpha=#00>█<#b88608>█<#daa520>█<#ffec8b>█<#ffd700>█<#daa520>█<#b88608>█<alpha=#00>█<br><#b88608>█<#daa520>█<#ffd700>█<#ffec8b>█<#ffec8b>█<#ffd700>█<#daa520>█<#b88608>█<br><#b88608>█<#d5a624>█<#ffec8b>█<#ffd700>█<#ffd700>█<#ffec8b>█<#daa520>█<#b88608>█<br><alpha=#00>█<#b88608>█<#daa520>█<#ffd700>█<#ffd700>█<#daa520>█<#b88608>█<alpha=#00>█<br><alpha=#00>█<#b88608>█<#daa520>█<#ffec8b>█<#ffd700>█<#daa520>█<#b88608>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#b88608>█<#b88608>█<#b88608>█<#b88608>█<alpha=#00>█<alpha=#00>█<br></color></line-height></font></size>", position);
+            CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<#ffeda8>█<#ffeda8>█<#ffeda8>█<#ffeda8>█<#ffeda8>█<#ffeda8>█<alpha=#00>█<br><#ffeda8>█<#ffeda8>█<#ffeda8>█<#f6bd57>█<#f6bd57>█<#f6bd57>█<#f6bd57>█<#ec9d49>█<br><#ffeda8>█<#ffeda8>█<#ffda63>█<#ffda63>█<#ffda63>█<#ffda63>█<#f6bd57>█<#ec9d49>█<br><#ffeda8>█<#f6bd57>█<#ffda63>█<#ffd886>█<#ffd886>█<#ec9d49>█<#f6bd57>█<#ec9d49>█<br><#ffeda8>█<#f6bd57>█<#ffda63>█<#ffd886>█<#ffd886>█<#ec9d49>█<#f6bd57>█<#ec9d49>█<br><#ffeda8>█<#f6bd57>█<#ffda63>█<#ec9d49>█<#ec9d49>█<#ec9d49>█<#f6bd57>█<#ec9d49>█<br><#f6bd57>█<#f6bd57>█<#f6bd57>█<#f6bd57>█<#f6bd57>█<#f6bd57>█<#f6bd57>█<#ec9d49>█<br><alpha=#00>█<#ec9d49>█<#ec9d49>█<#ec9d49>█<#ec9d49>█<#ec9d49>█<#ec9d49>█<alpha=#00>█<br></color></line-height></font></size>", position);
+            Main.AllAlivePlayerControls.ExceptBy(visibleList, x => x.PlayerId).Do(Hide);
+            // this.OwnerId = OwnerId;
+        }
+    }
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RawSetName))]
