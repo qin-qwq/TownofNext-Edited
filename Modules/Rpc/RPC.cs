@@ -115,7 +115,6 @@ public enum CustomRPC : byte // 183/255 USED
     Necronomicon,
     ExorcistExorcise,
     Invisibility,
-    FixBlackscreen,
     Balancer,
 
     //FFA
@@ -175,7 +174,6 @@ internal class RPCHandlerPatch
         or CustomRPC.SetFriendCode
         or CustomRPC.BetterCheck
         or CustomRPC.DictatorRPC
-        or CustomRPC.FixBlackscreen
         or CustomRPC.Balancer;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
@@ -651,11 +649,6 @@ internal class RPCHandlerPatch
             case CustomRPC.Guess:
                 GuessManager.ReceiveRPC(reader, __instance);
                 break;
-            case CustomRPC.FixBlackscreen:
-                Logger.Info("Attempted to fix Black Screen", "KeyCommand");
-                AntiBlackout.SetIsDead();
-                Logger.SendInGame("尝试修复黑屏");
-                break;
             case CustomRPC.NemesisRevenge:
                 Nemesis.ReceiveRPC_Custom(reader, __instance);
                 break;
@@ -1012,13 +1005,13 @@ internal static class RPC
                     SoundManager.Instance.PlaySound(DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherImpostorTransformSfx, false, 0.8f);
                     break;
                 case Sounds.HnSShort:
-                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorShortMusic, true);
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorShortMusic, true, 1f);
                     break;
                 case Sounds.HnSLong:
-                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorLongMusic, true);
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorLongMusic, true, 1f);
                     break;
                 case Sounds.HnSRanch:
-                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorRanchMusic, true);
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorRanchMusic, true, 1f);
                     break;
                 case Sounds.SabotageSound:
                     SoundManager.Instance.PlaySound(ShipStatus.Instance.SabotageSound, false, 0.8f);

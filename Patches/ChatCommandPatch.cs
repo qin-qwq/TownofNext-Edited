@@ -1947,6 +1947,17 @@ internal class ChatCommands
                     ChatManager.SendQuickChatSpam();
                     ChatManager.SendPreviousMessagesToAll();
                     break;
+
+                case "/fix" 
+                or "/blackscreenfix" 
+                or "/fixblackscreen":
+                    FixCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
+                case "/afkexempt":
+                    AFKExemptCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
                 default:
                     Main.isChatCommand = false;
                     break;
@@ -2440,7 +2451,7 @@ internal class ChatCommands
 
         bool shouldDevAssign = isDev || isUp;
 
-        if (CustomRolesHelper.IsAdditionRole(result) || result is CustomRoles.GM or CustomRoles.Mini || result.IsGhostRole() && !isDev
+        if (result is CustomRoles.GM or CustomRoles.Mini || result.IsGhostRole() && !isDev
             || result.GetCount() < 1 || result.GetMode() == 0)
         {
             shouldDevAssign = false;
@@ -2450,14 +2461,23 @@ internal class ChatCommands
 
         if (isUp)
         {
-            if (result.IsGhostRole() || !shouldDevAssign)
+            if (result.IsGhostRole() || !shouldDevAssign || result.IsAddonAssignedMidGame())
             {
                 Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId);
                 return;
             }
 
             GhostRoleAssign.forceRole.Remove(pid);
-            RoleAssign.SetRoles[pid] = result;
+
+            if (result.IsAdditionRole())
+            {
+                if (!AddonAssign.SetAddOns.ContainsKey(pid)) AddonAssign.SetAddOns[pid] = [];
+
+                if (!AddonAssign.SetAddOns[pid].Contains(result))
+                    AddonAssign.SetAddOns[pid].Add(result);
+            }
+            else
+                RoleAssign.SetRoles[pid] = result;
 
             Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), Translator.GetActualRoleName(result)), playerId);
             return;
@@ -2475,11 +2495,6 @@ internal class ChatCommands
                 };
                 RoleAssign.SetRoles[pid] = setrole;
                 GhostRoleAssign.forceRole[pid] = result;
-            }
-            else
-            {
-                GhostRoleAssign.forceRole.Remove(pid);
-                RoleAssign.SetRoles[pid] = result;
             }
         }
 
@@ -4053,11 +4068,52 @@ internal class ChatCommands
                 }
                 break;
 
+            case "/fix" 
+            or "/blackscreenfix" 
+            or "/fixblackscreen":
+                FixCommand(player, text, args);
+                break;
+
+            case "/afkexempt":
+                AFKExemptCommand(player, text, args);
+                break;
 
             default:
                 if (SpamManager.CheckSpam(player, text)) return;
                 break;
         }
+    }
+
+
+    private static void FixCommand(PlayerControl player, string text, string[] args)
+    {
+        if (!AmongUsClient.Instance.AmHost)
+        {
+            if (!Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
+        }
+
+        if (args.Length < 2 || !byte.TryParse(args[1], out byte id)) return;
+
+        var pc = id.GetPlayer();
+        if (pc == null) return;
+
+        pc.FixBlackScreen();
+
+        if (Main.AllPlayerControls.All(x => x.IsAlive()))
+            Logger.SendInGame(GetString("FixBlackScreenWaitForDead"));
+    }
+
+    private static void AFKExemptCommand(PlayerControl player, string text, string[] args)
+    {
+        if (!AmongUsClient.Instance.AmHost)
+        {
+            if (!Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
+        }
+
+        if (args.Length < 2 || !byte.TryParse(args[1], out byte afkId)) return;
+
+        AFKDetector.ExemptedPlayers.Add(afkId);
+        Utils.SendMessage("\n", player.PlayerId, string.Format(GetString("PlayerExemptedFromAFK"), afkId.GetPlayerName()));
     }
 }
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]

@@ -53,16 +53,16 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "25.12.21"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.6.0 Alpha 1";
+    public const string PluginVersion = "26.01.01"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.6.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = true; // Latest: V1.6.0 Alpha 1
-    public static readonly bool canaryRelease = false; // Latest: V1.5.0 Beta 5
+    public static readonly bool devRelease = false; // Latest: V1.6.0 Alpha 1
+    public static readonly bool canaryRelease = true; // Latest: V1.6.0 Beta 1
     public static readonly bool fullRelease = false; // Latest: V1.5.0
 
     public static bool hasAccess = true;
@@ -394,6 +394,7 @@ public class Main : BasePlugin
 
             foreach (var role in EnumHelper.GetAllValues<CustomRoles>())
             {
+                if (role.IsAdditionRole() && role.IsImpOnlyAddon()) roleColors.TryAdd(role, "#ff1919");
                 switch (role.GetCustomRoleTeam())
                 {
                     case Custom_Team.Impostor:
@@ -779,6 +780,7 @@ public enum CustomRoles
     Greedy,
     Hangman,
     Iceologer,
+    IdentityThief,
     Instigator,
     Kamikaze,
     KillingMachine,
@@ -876,6 +878,7 @@ public enum CustomRoles
     Monarch,
     Mortician,
     NiceGuesser,
+    NiceHacker,
     NiceMini,
     Observer,
     Oracle,
@@ -975,6 +978,7 @@ public enum CustomRoles
     Taskinator,
     Terrorist,
     Traitor,
+    TreasureHunter,
     Troller,
     Tunny,
     Vector,
@@ -1042,6 +1046,7 @@ public enum CustomRoles
     Cyber,
     Diseased,
     DoubleShot,
+    Drunkard,
     Eavesdropper,
     Egoist,
     Enchanted,
@@ -1079,6 +1084,7 @@ public enum CustomRoles
     Onbound,
     Overclocked,
     Paranoia,
+    Plunderer,
     Prohibited,
     Radar,
     Rainbow,
@@ -1182,6 +1188,7 @@ public enum CustomWinner
     TZombie = CustomRoles.TZombie,
     TCrewmate = CustomRoles.TCrewmate,
     Dreamer = CustomRoles.Dreamer,
+    TreasureHunter = CustomRoles.TreasureHunter,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners

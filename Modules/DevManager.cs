@@ -24,7 +24,7 @@ public class DevUser(string code = "", string color = "null", string userType = 
         string tagColorFilePath = @$"./TONE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
 
 #endif
-        if (Color == "null" || Color == string.Empty) return $"<size=1.2>{Tag}</size>\r\n";
+        if (Color == "null" || Color == string.Empty) return $"{Tag}";
         var startColor = Color.TrimStart('#');
 
         if (File.Exists(tagColorFilePath))
@@ -34,7 +34,7 @@ public class DevUser(string code = "", string color = "null", string userType = 
         }
         string t1;
         t1 = Tag == "#Dev" ? Translator.GetString("Developer") : Tag;
-        return $"<size=1.2><color=#{startColor}>{t1}</color></size>\r\r\n";
+        return $"<color=#{startColor}>{t1}</color>";
     }
 }
 

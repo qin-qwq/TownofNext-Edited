@@ -146,12 +146,6 @@ public static class CustomRoleManager
                     case CustomRoles.Watcher:
                         Watcher.RevealVotes(opt);
                         break;
-                    case CustomRoles.Flash:
-                        Flash.SetSpeed(player.PlayerId);
-                        break;
-                    case CustomRoles.Sloth:
-                        Sloth.SetSpeed(player.PlayerId);
-                        break;
                     case CustomRoles.Torch:
                         Torch.ApplyGameOptions(opt);
                         break;
@@ -415,6 +409,10 @@ public static class CustomRoleManager
                 {
                     case CustomRoles.Stealer when !inMeeting && !isSuicide:
                         Stealer.OnMurderPlayer(killer, target);
+                        break;
+
+                    case CustomRoles.Plunderer when !inMeeting && !isSuicide:
+                        Plunderer.OnMurderPlayer(killer, target);
                         break;
 
                     case CustomRoles.Tricky:

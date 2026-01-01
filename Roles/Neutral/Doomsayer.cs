@@ -6,7 +6,6 @@ using TOHE.Roles.Core;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Coven;
 using UnityEngine;
-using static TOHE.MeetingHudStartPatch;
 using static TOHE.Options;
 using static TOHE.Translator;
 using static TOHE.Utils;

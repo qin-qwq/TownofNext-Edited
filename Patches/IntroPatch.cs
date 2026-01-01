@@ -535,6 +535,13 @@ class BeginCrewmatePatch
             case CustomRoles.Inspector:
             case CustomRoles.Snitch:
             case CustomRoles.Investigator:
+            case CustomRoles.Enigma:
+            case CustomRoles.Lookout:
+            case CustomRoles.Medium:
+            case CustomRoles.Mortician:
+            case CustomRoles.Psychic:
+            case CustomRoles.Tracefinder:
+            case CustomRoles.Witness:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Detective);
                 break;
             case CustomRoles.ViperTOHE:
@@ -1008,6 +1015,8 @@ class IntroCutsceneDestroyPatch
 
             Utils.CheckAndSetVentInteractions();
 
+            if (AFKDetector.ActivateOnStart.GetBool()) _ = new LateTask(() => Main.AllAlivePlayerControls.Do(AFKDetector.RecordPosition), 1f);
+
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
             {
                 Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
@@ -1191,6 +1200,8 @@ public class IntroCutsceneDestroyPatch
             }
 
             Utils.CheckAndSetVentInteractions();
+
+            if (AFKDetector.ActivateOnStart.GetBool()) _ = new LateTask(() => Main.AllAlivePlayerControls.Do(AFKDetector.RecordPosition), 1f);
 
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
             {

@@ -1,6 +1,7 @@
 using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
+using TOHE.Roles.Core;
 using static TOHE.CheckForEndVotingPatch;
 using static TOHE.Options;
 using static TOHE.Utils;
@@ -22,8 +23,8 @@ internal class Speaker : RoleBase
     private static OptionItem ImpKnowTarget;
     private static OptionItem TarKnowTarget;
 
-    private byte VoteTarget = byte.MaxValue;
-    private byte Target = byte.MaxValue;
+    private int VoteNum = 0;
+    private static readonly Dictionary<byte, byte> Target = [];
 
     public override void SetupCustomOption()
     {
@@ -42,65 +43,95 @@ internal class Speaker : RoleBase
 
     public override void Init()
     {
-        VoteTarget = byte.MaxValue;
-        Target = byte.MaxValue;
+        VoteNum = 0;
+        Target.Clear();
     }
 
     public override void Add(byte playerId)
     {
-        VoteTarget = byte.MaxValue;
-        Target = byte.MaxValue;
+        VoteNum = 0;
+        Target[playerId] = byte.MaxValue;
         playerId.SetAbilityUseLimit(SkillLimit.GetInt());
 
         var pc = GetPlayerById(playerId);
         pc.AddDoubleTrigger();
     }
 
+    public static bool IsSpoken(byte targetId)
+    {
+        foreach (var player in Target.Keys)
+        {
+            if (Target[player] == targetId) return true;
+        }
+        return false;
+    }
+
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (killer.GetAbilityUseLimit() > 0 && target.PlayerId != Target)
+        if (killer.GetAbilityUseLimit() > 0 && target.PlayerId != Target[killer.PlayerId])
         {
             return killer.CheckDoubleTrigger(target, () =>
             {
                 killer.SetKillCooldown(5f);
                 killer.RpcRemoveAbilityUse();
-                Target = target.PlayerId;
+                Target[killer.PlayerId] = target.PlayerId;
                 NotifyRoles(SpecifyTarget: target);
-                SendRPC();
+                SendRPC(0, killer, target);
             });
         }
         else return true;
     }
 
-    private void SendRPC()
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        if (Target[_Player.PlayerId] != byte.MaxValue)
+        {
+            PlayerVoteArea pva = GetPlayerVoteArea(Target[_Player.PlayerId]);
+            VoteNum = 1 + Target[_Player.PlayerId].GetPlayer().GetRoleClass().AddRealVotesNum(pva);
+        }
+    }
+
+    private void SendRPC(byte typeId, PlayerControl player, PlayerControl target)
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
-        writer.Write(Target);
+        writer.Write(typeId);
+        writer.Write(player.PlayerId);
+        writer.Write(target.PlayerId);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
-        byte target = reader.ReadByte();
+        byte typeId = reader.ReadByte();
+        byte playerId = reader.ReadByte();
+        byte targetId = reader.ReadByte();
 
-        Target = target;
+        switch (typeId)
+        {
+            case 0:
+                Target[playerId] = targetId;
+                break;
+            case 1:
+                Target[playerId] = byte.MaxValue;
+                break;
+        }
     }
 
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        if (seer.PlayerId == seen.PlayerId && Target != byte.MaxValue && Target == seen.PlayerId)
+        if (Target[seer.PlayerId] != byte.MaxValue && Target[seer.PlayerId] == seen.PlayerId)
             return ColorString(GetRoleColor(CustomRoles.Speaker), " ❖");
         return string.Empty;
     }
 
     public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
-        if (!seer.IsAlive() || (seer.GetCustomRole().IsImpostor() && ImpKnowTarget.GetBool())
-        || (seer.PlayerId == Target && isForMeeting && TarKnowTarget.GetBool()))
+        if (!seer.IsAlive() || (seer.GetCustomRole().IsImpostor() && !seer.Is(CustomRoles.Speaker) && ImpKnowTarget.GetBool())
+        || (seer.PlayerId == Target[_Player.PlayerId] && isForMeeting && TarKnowTarget.GetBool()))
         {
-            if (Target == target.PlayerId)
+            if (Target[_Player.PlayerId] != byte.MaxValue && Target[_Player.PlayerId] == target.PlayerId)
             {
                 return ColorString(GetRoleColor(CustomRoles.Speaker), " ❖");
             }
@@ -108,37 +139,20 @@ internal class Speaker : RoleBase
         return string.Empty;
     }
 
-    public void ChangeVote(MeetingHud __instance)
+    public override void AfterMeetingTasks()
     {
-        foreach (var pva in __instance.playerStates)
+        if (VoteNum != 0)
         {
-            if (pva.TargetPlayerId.GetPlayer().Is(CustomRoles.Speaker))
-            {
-                VoteTarget = pva.VotedFor;
-            }
-            if (pva.AmDead || pva.VotedFor == VoteTarget || !_Player.IsAlive() || pva == null) continue;
-            var voter = GetPlayerById(pva.TargetPlayerId);
-            if (voter == null || voter.Data == null || voter.PlayerId != Target) continue;
-            if (VoteTarget < 252)
-            {
-                pva.VotedFor = VoteTarget;
-                ReturnChangedPva(pva);
-            }
+            VoteNum = 0;
+        }
+        if (Target[_Player.PlayerId] != byte.MaxValue)
+        {
+            var target = Target[_Player.PlayerId];
+            Target[_Player.PlayerId] = byte.MaxValue;
+            SendRPC(1, _Player, _Player);
+            NotifyRoles(SpecifyTarget: target.GetPlayer());
         }
     }
 
-    public override void AfterMeetingTasks()
-    {
-        if (VoteTarget != byte.MaxValue)
-        {
-            VoteTarget = byte.MaxValue;
-        }
-        if (Target != byte.MaxValue)
-        {
-            var target = Target.GetPlayer();
-            Target = byte.MaxValue;
-            SendRPC();
-            NotifyRoles(SpecifyTarget: target);
-        }
-    }
+    public override int AddRealVotesNum(PlayerVoteArea PVA) => VoteNum;
 }

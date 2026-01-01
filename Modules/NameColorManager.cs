@@ -98,7 +98,7 @@ public static class NameColorManager
         // Balancer
         if (Balancer.Choose && (Balancer.Target1 == target.PlayerId || Balancer.Target2 == target.PlayerId) && isMeeting) color = Main.roleColors[CustomRoles.Balancer];
 
-        //Virus
+        // Virus
         if (Virus.KnowRoleColor(seer, target) != "") color = Virus.KnowRoleColor(seer, target);
 
         // Narc & Sheriff/ChiefOfPolice

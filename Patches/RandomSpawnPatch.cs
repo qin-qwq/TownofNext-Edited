@@ -404,6 +404,14 @@ class RandomSpawn
         {
             Teleport(player, false);
         }
+        public virtual Vector2 GetAllLocation()
+        {
+            var locations = Positions.ToArray();
+
+            var location = locations.ToArray().OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault();
+
+            return location.Value;
+        }
 
         private void Teleport(PlayerControl player, bool isRadndom)
         {

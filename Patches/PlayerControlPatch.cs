@@ -85,6 +85,8 @@ class CheckMurderPatch
 
         var killer = __instance;
 
+        AFKDetector.SetNotAFK(killer.PlayerId);
+
         Logger.Info($"{killer.GetNameWithRole().RemoveHtmlTags()} => {target.GetNameWithRole().RemoveHtmlTags()}", "CheckMurder");
 
         if (CheckForInvalidMurdering(killer, target, true) == false)
@@ -184,8 +186,7 @@ class CheckMurderPatch
             return false;
         }
 
-        var divice = Options.CurrentGameMode == CustomGameMode.FFA ? 3000f : 1500f;
-        float minTime = Mathf.Max(0.04f, AmongUsClient.Instance.Ping / divice * 6f); //Ping value is milliseconds (ms), so ÷ 2000
+        float minTime = Utils.CalculatePingDelay(); // Ping value is in milliseconds (ms); this computes the corresponding minimum delay (in seconds) based on ping
         // No value is stored in TimeSinceLastKill || Stored time is greater than or equal to minTime => Allow kill
 
         //↓ If not permitted
@@ -256,6 +257,12 @@ class CheckMurderPatch
 
         var targetRoleClass = target.GetRoleClass();
         var targetSubRoles = target.GetCustomSubRoles();
+
+        if (AFKDetector.ShieldedPlayers.Contains(target.PlayerId))
+        {
+            killer.Notify(GetString("AFKShielded"));
+            return false;
+        }
 
         Logger.Info($"Start", "FirstDied.CheckMurder");
 
@@ -1025,14 +1032,15 @@ class FixedUpdateInNormalGamePatch
 
     public static void Postfix(PlayerControl __instance)
     {
-        if (__instance == null || __instance.PlayerId == 255 || __instance.notRealPlayer) return;
+        if (__instance == null || __instance.PlayerId >= 254) return;
 
         CheckMurderPatch.Update(__instance.PlayerId);
+        
+        byte id = __instance.PlayerId;
 
         if (GameStates.IsHideNSeek) return;
         if (!GameStates.IsModHost) return;
 
-        byte id = __instance.PlayerId;
         if (AmongUsClient.Instance.AmHost && GameStates.IsInTask && ReportDeadBodyPatch.CanReport[id] && ReportDeadBodyPatch.WaitReport[id].Count > 0)
         {
             if (Glitch.HasEnabled && Glitch.OnCheckFixedUpdateReport(id))
@@ -1054,6 +1062,8 @@ class FixedUpdateInNormalGamePatch
         }
         catch (Exception ex)
         {
+            if (OnGameJoinedPatch.JoiningGame && ex is NullReferenceException) return;
+
             Utils.ThrowException(ex);
             Logger.Error($"Error for {__instance.GetNameWithRole().RemoveHtmlTags()}: Error: {ex}", "FixedUpdateInNormalGamePatch");
         }
@@ -1210,6 +1220,7 @@ class FixedUpdateInNormalGamePatch
             }
             else if (inGame) // We are not in lobby
             {
+                AFKDetector.OnFixedUpdate(player);
                 DoubleTrigger.OnFixedUpdate(player);
                 KillTimerManager.FixedUpdate(player);
 
@@ -1502,6 +1513,8 @@ class FixedUpdateInNormalGamePatch
                     break;
             }
 
+            Suffix.Append(AFKDetector.GetSuffix(localPlayer, player));
+
             // Devourer
             if (Devourer.HasEnabled)
             {
@@ -1509,6 +1522,15 @@ class FixedUpdateInNormalGamePatch
                 if (targetDevoured)
                 {
                     RealName.Clear().Append(GetString("DevouredName"));
+                }
+            }
+
+            // IdentityThief
+            if (IdentityThief.HasEnabled)
+            {
+                if (IdentityThief.ChangeName.TryGetValue(playerId, out var tname))
+                {
+                    RealName.Clear().Append(tname);
                 }
             }
 

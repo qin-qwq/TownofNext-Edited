@@ -852,7 +852,7 @@ public abstract class GameEndPredicate
             .Where(x => x.Is(Custom_Team.Crewmate) && x.GetCustomRole().GetRoleTypes() is RoleTypes.Crewmate or RoleTypes.Engineer or RoleTypes.Scientist or RoleTypes.Noisemaker or RoleTypes.Tracker or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel)
             .All(x => x.GetCustomSubRoles().Any(y => y.IsConverted()))) return false;
 
-        if (GameData.Instance.TotalTasks <= GameData.Instance.CompletedTasks)
+        if (GameData.Instance.TotalTasks <= GameData.Instance.CompletedTasks || GameData.Instance.AllPlayers.ToArray().Where(x => x.GetCustomRole().IsCrewmate()).All(x => x.Tasks.ToArray().All(y => y.Complete)))
         {
             reason = GameOverReason.CrewmatesByTask;
             ResetAndSetWinner(CustomWinner.Crewmate);

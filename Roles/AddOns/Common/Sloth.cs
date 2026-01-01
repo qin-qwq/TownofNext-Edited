@@ -1,5 +1,4 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Impostor;
 using static TOHE.Options;
 
 namespace TOHE.Roles.AddOns.Common;
@@ -29,9 +28,5 @@ public class Sloth : IAddon
     {
         Main.AllPlayerSpeed[playerId] = Main.RealOptionsData.GetFloat(FloatOptionNames.PlayerSpeedMod);
         playerId.GetPlayer()?.MarkDirtySettings();
-    }
-    public static void SetSpeed(byte playerId)
-    {
-        Main.AllPlayerSpeed[playerId] = TimeAssassin.TimeStop ? Main.MinSpeed : OptionSpeed.GetFloat();
     }
 }
