@@ -1,4 +1,3 @@
-//using System.Linq;
 using static TONE.Options;
 
 namespace TONE.Roles.AddOns.Impostor;

@@ -70,7 +70,7 @@ public class Main : BasePlugin
     public static readonly bool ShowUpdateButton = false;
 
     public static readonly bool ShowGitHubButton = false;
-    public static readonly string GitHubInviteUrl = "https://github.com/EnhancedNetwork/TownofHost-Enhanced";
+    public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
 
     public static readonly bool ShowDiscordButton = false;
     public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
