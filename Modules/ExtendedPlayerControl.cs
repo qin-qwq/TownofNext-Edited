@@ -1958,6 +1958,8 @@ static class ExtendedPlayerControl
     }
     public static void SetChatVisible(this PlayerControl player, bool visible)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
+
         if (player.AmOwner)
         {
             HudManager.Instance.Chat.SetVisible(visible);

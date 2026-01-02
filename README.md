@@ -5,6 +5,8 @@
 
 <img align="left" alt="Cover" src="Resources/Background\CurrentArtWinner\TOH-RE-Background-New.png" width="50%" height="300" /> 
 
+<h3>👉 English | <a href="README_zh.md">中文</a> 👈</h3>
+
 <p align="right">
   
 > ### Regarding this mod
@@ -28,7 +30,11 @@
 <br>
 
 **Credit to these mods and their developers for the code and help:**
-### :star: [TOHRE](https://github.com/Loonie-Toons/) 
+### :star: [TOHEN](https://github.com/EnhancedNetwork/TownofHost-Enhanced) :
+> 
+> - Town of Next: Edited was forked from Town of Host: Enhanced.
+>
+### :star: [TOHRE](https://github.com/Loonie-Toons/) :
 > 
 > - Town of Host: Enhanced was forked from Town of Host: Re-Edited.
 >
@@ -87,28 +93,36 @@
 > - Improved Role Spawns
 > - Improve text box (TextBoxPatch.cs)
 > - Some ideas to improve performance
+>
 ### :star: [TONEX (Formerly TOHEX)](https://github.com/XtremeWave/TownOfNewEpic_Xtreme)
 >
 > - Provided roles: Swapper, Berserker, Randomizer and Blackmailer
 > - Improve chat spam system (ChatManager.cs)
+>
 ### :star: [Stellar Roles](https://github.com/Mr-Fluuff/StellarRolesAU)
 >
 > - Provided role: Inspector (Inspector)
+>
 ### :star: [Mini.RegionInstall](https://github.com/miniduikboot/Mini.RegionInstall)
 >
 > - Using Mini.RegionInstall to add modded server regions
+>
 ### :star: [TOU-R](https://github.com/eDonnes124/Town-Of-Us-R)
 >
 > - Host icon during the meeting
+>
 ### :star: [MoreGamemodes](https://github.com/Rabek009/MoreGamemodes)
 >
 > - CustomNetObjects (CustomNetObjects.cs)
 > - Changer Role Basis (RoleBasisChanger.cs)
 > - Disable use vent for vanilla players (VentSystemPatch.cs)
+>
 ### :star: [Reactor](https://github.com/NuclearPowered/Reactor)
 >
 > - Reference: Disable the 5s timeout on custom servers
+>
 ### :star: [CrowdedMod](https://github.com/CrowdedMods/CrowdedMod)
 >
 > - We included CrowdedMod in our Mod
+>
 ---

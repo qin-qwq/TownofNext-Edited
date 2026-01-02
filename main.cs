@@ -659,7 +659,6 @@ public class Main : BasePlugin
         TemplateManager.Init();
         TagManager.Init();
         //SpamManager.Init();
-        Utils.Init();
         Cloud.Init();
 
         IRandom.SetInstance(new NetRandomWrapper());

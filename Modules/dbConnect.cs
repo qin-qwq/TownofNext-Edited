@@ -14,6 +14,7 @@ public class dbConnect
     private static Dictionary<string, string> UserType = [];
 
     private const string ApiUrl = "https://raw.githubusercontent.com/qin-qwq/TONE-Record/main";
+    private const string FallBackUrl = "https://raw.bgithub.xyz/qin-qwq/TONE-Record/main";
 
     public static IEnumerator Init()
     {
@@ -140,7 +141,7 @@ public class dbConnect
             yield return null;
         }
 
-        string[] apiUrls = [ApiUrl];
+        string[] apiUrls = [ApiUrl, FallBackUrl];
         int maxAttempts = !InitOnce ? 4 : 2;
         int attempt = 0;
         bool success = false;
@@ -165,7 +166,7 @@ public class dbConnect
                         var userData = user;
                         if (!DevManager.IsDevUser(userData["friendcode"].ToString()))
                         {
-                            Utils.DevUserList.Add(new(
+                            DevManager.DevUserList.Add(new(
                                 code: userData["friendcode"].ToString(),
                                 color: userData["color"].ToString(),
                                 tag: ToAutoTranslate(userData["overhead_tag"]),
@@ -245,7 +246,7 @@ public class dbConnect
             yield break;
         }
 
-        string[] apiUrls = { ApiUrl };
+        string[] apiUrls = { ApiUrl, FallBackUrl };
         int maxAttempts = !InitOnce ? 4 : 2;
         int attempt = 0;
         bool success = false;

@@ -67,6 +67,7 @@ internal class NiceHacker : RoleBase
 
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {
+        if (InAbility.Item1) return;
         if (pc.GetAbilityUseLimit() <= 0)
         {
             pc.Notify(GetString("OutOfAbilityUsesDoMoreTasks"));

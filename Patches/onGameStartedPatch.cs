@@ -183,7 +183,7 @@ internal class ChangeRoleSettings
                     Main.LastNotifyNames[pair] = currentName;
                 }
 
-                if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard)
+                if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard && AmongUsClient.Instance.AmHost)
                 {
                     foreach (var player in Main.AllPlayerControls)
                     {

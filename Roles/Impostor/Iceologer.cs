@@ -66,6 +66,7 @@ internal class Iceologer : RoleBase
 
     public override bool OnCheckShapeshift(PlayerControl player, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
     {
+        if (player.PlayerId == target.PlayerId) return false;
         if (!target.IsAlive())
         {
             resetCooldown = false;

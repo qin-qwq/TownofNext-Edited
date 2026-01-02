@@ -7,7 +7,7 @@ public class Drunkard : IAddon
 {
     public CustomRoles Role => CustomRoles.Drunkard;
     private const int Id = 33800;
-    public AddonTypes Type => AddonTypes.Harmful;
+    public AddonTypes Type => AddonTypes.Experimental;
 
     public void SetupCustomOption()
     {

@@ -41,8 +41,9 @@ public class DevUser(string code = "", string color = "null", string userType = 
 public static class DevManager
 {
     private readonly static DevUser DefaultDevUser = new();
-    public static bool IsDevUser(this string code) => Utils.DevUserList.Any(x => x.Code == code);
-    public static DevUser GetDevUser(this string code) => code.IsDevUser() ? Utils.DevUserList.Find(x => x.Code == code) : DefaultDevUser;
+    public readonly static List<DevUser> DevUserList = [];
+    public static bool IsDevUser(this string code) => DevUserList.Any(x => x.Code == code);
+    public static DevUser GetDevUser(this string code) => code.IsDevUser() ? DevUserList.Find(x => x.Code == code) : DefaultDevUser;
     public static string GetUserType(this DevUser user)
     {
         string rolename = "Crewmate";
