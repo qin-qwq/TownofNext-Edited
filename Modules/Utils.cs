@@ -1118,7 +1118,7 @@ public static class Utils
 
         if (AmongUsClient.Instance.NetworkMode != NetworkModes.OnlineGame)
         {
-            name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "本地" : "Local Games";
+            name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese or SupportedLangs.TChinese ? "本地" : "Local Games";
             return name;
         }
 
@@ -1134,9 +1134,9 @@ public static class Utils
         if (region.PingServer.EndsWith("among.us", StringComparison.Ordinal))
         {
             // Official server
-            if (name == "North America") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "北美洲" : "NA";
-            else if (name == "Europe") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "欧洲" : "EU";
-            else if (name == "Asia") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese ? "亚洲" : "AS";
+            if (name == "North America") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese or SupportedLangs.TChinese ? "北美洲" : "NA";
+            else if (name == "Europe") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese or SupportedLangs.TChinese ? "欧洲" : "EU";
+            else if (name == "Asia") name = TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese or SupportedLangs.TChinese ? "亚洲" : "AS";
 
             return name;
         }
@@ -2525,6 +2525,7 @@ public static class Utils
     public static void CountAlivePlayers(bool sendLog = false, bool checkGameEnd = false)
     {
         int AliveImpostorCount = Main.AllAlivePlayerControls.Count(pc => (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !pc.Is(CustomRoles.Narc) && !Main.PlayerStates[pc.PlayerId].IsNecromancer);
+        int AliveCrewmateCount = Main.AllAlivePlayerControls.Count(pc => pc.IsPlayerCrewmateTeam() && !Main.PlayerStates[pc.PlayerId].IsNecromancer);
         if (Main.AliveImpostorCount != AliveImpostorCount)
         {
             Logger.Info("Number Impostor left: " + AliveImpostorCount, "CountAliveImpostors");

@@ -522,6 +522,7 @@ static class ExtendedPlayerControl
     /// </summary>
     public static void RpcMurderPlayer(this PlayerControl killer, PlayerControl target)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         // If Target is Dollmaster or Possessed Player run Dollmasters kill check instead.
         if (DollMaster.SwapPlayerInfo(target) != target)
         {

@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using TONE.Modules;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -527,6 +528,8 @@ internal class Jackal : RoleBase
         }
         return false;
     }
+
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => player.GetAbilityUseLimit() > 0 ? CustomButton.Get("Sidekick") : null;
 }
 
 internal class Sidekick : RoleBase

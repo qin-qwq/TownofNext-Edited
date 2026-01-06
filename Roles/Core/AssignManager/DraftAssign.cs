@@ -725,7 +725,7 @@ public static class DraftAssign
             case CustomGameMode.TagMode:
                 var random = IRandom.Instance;
                 List<PlayerControl> AllPlayers2 = Main.AllPlayerControls.Shuffle(random).ToList();
-                int ZombieNum = TagMode.ZombieMaximun.GetInt();
+                var ZombieNum = TagMode.ZombieMaximun.GetInt();
                 foreach (PlayerControl pc in AllPlayers2)
                 {
                     if (Main.EnableGM.Value && pc.IsHost())

@@ -1063,7 +1063,7 @@ internal class ChatCommands
                     break;
 
                 case "/re":
-                case "/Revive":
+                case "/revive":
                 case "/复活":
                     canceled = true;
                     if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
@@ -1825,10 +1825,6 @@ internal class ChatCommands
                     Logger.Info("Game Starting", "ChatCommand");
                     break;
                 case "/deck":
-                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft)
-                    {
-                        break;
-                    }
                     canceled = true;
                     if (!GameStates.IsLobby)
                     {
@@ -1840,10 +1836,6 @@ internal class ChatCommands
 
                     break;
                 case "/draft":
-                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft)
-                    {
-                        break;
-                    }
                     canceled = true;
                     if (!GameStates.IsLobby)
                     {
@@ -1891,13 +1883,6 @@ internal class ChatCommands
                     else if (args[1] == "reset")
                     {
                         DraftAssign.Reset();
-                    }
-                    else if (args[1] == "enable" && PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
-                    {
-                        Options.devEnableDraft = true;
-                        Options.DraftHeader.SetHidden(false);
-                        Options.DraftMode.SetHidden(false);
-                        Utils.SendMessage($"{PlayerControl.LocalPlayer.GetRealName()}启用了轮抽选角", PlayerControl.LocalPlayer.PlayerId);
                     }
                     else
                     {
@@ -3902,10 +3887,6 @@ internal class ChatCommands
                 GameManager.Instance.LogicFlow.CheckEndCriteria();
                 break;
             case "/deck":
-                if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft && !player.FriendCode.GetDevUser().IsDev)
-                {
-                    break;
-                }
                 if (!GameStates.IsLobby)
                 {
                     Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
@@ -3916,10 +3897,6 @@ internal class ChatCommands
 
                 break;
             case "/draft":
-                if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev && !Options.devEnableDraft && !player.FriendCode.GetDevUser().IsDev)
-                {
-                    break;
-                }
                 if (!GameStates.IsLobby)
                 {
                     Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
@@ -3983,14 +3960,6 @@ internal class ChatCommands
                         break;
                     }
                     DraftAssign.Reset();
-                }
-                else if (args[1] == "enable" && player.FriendCode.GetDevUser().IsDev)
-                {
-                    Options.devEnableDraft = true;
-                    Options.DraftHeader.SetHidden(false);
-                    Options.DraftMode.SetHidden(false);
-                    foreach (var pc in Main.AllPlayerControls)
-                        Utils.SendMessage($"开发者{player.GetRealName()}启用了轮抽选角", pc.PlayerId);
                 }
                 else
                 {

@@ -195,14 +195,14 @@ public static class AddonAssign
                         Logger.Warn("Odd number of lovers assigned.", "AssignSubRoles:Lovers");
                     return;
                 }
-            }
 
-            var player = eligiblePlayers.RandomElement();
-            eligiblePlayers.Remove(player);
+                var player = eligiblePlayers.RandomElement();
+                eligiblePlayers.Remove(player);
 
-            Main.PlayerStates[player.PlayerId].SetSubRole(role);
+                Main.PlayerStates[player.PlayerId].SetSubRole(role);
             
-            Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {role}", $"Assign {role}");
+                Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {role}", $"Assign {role}");
+            }
         }
         catch (Exception error)
         {
@@ -234,10 +234,10 @@ public static class AddonAssign
         if (!Guesser.AdvancedSettings.GetBool() || !CustomRoles.Guesser.IsEnable()) return;
         var random = IRandom.Instance;
         List<PlayerControl> AllPlayers = Main.AllPlayerControls.Shuffle(random).ToList();
-        int ImpNum = Guesser.GImpMax.GetInt();
-        int CrewNum = Guesser.GCrewMax.GetInt();
-        int NeuNum = Guesser.GNeuMax.GetInt();
-        int CovenNum = Guesser.GCovenMax.GetInt();
+        var ImpNum = Guesser.GImpMax.GetInt();
+        var CrewNum = Guesser.GCrewMax.GetInt();
+        var NeuNum = Guesser.GNeuMax.GetInt();
+        var CovenNum = Guesser.GCovenMax.GetInt();
         var role = CustomRoles.Guesser;
         foreach (PlayerControl pc in AllPlayers)
         {
