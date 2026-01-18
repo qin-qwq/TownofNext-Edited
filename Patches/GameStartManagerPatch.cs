@@ -372,7 +372,7 @@ public class GameStartManagerBeginGamePatch
 
         GameManager.Instance.LogicOptions.SetDirty();
         OptionItem.SyncAllOptions();
-        RPC.RpcVersionCheck();
+        //RPC.RpcVersionCheck();
     }
     private static byte SelectRandomMap()
     {

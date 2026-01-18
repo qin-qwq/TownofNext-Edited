@@ -3,6 +3,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
+using Hazel;
 using Il2CppInterop.Runtime.Injection;
 using MonoMod.Utils;
 using System;
@@ -53,8 +54,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.01.11"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.6.0 Beta 2";
+    public const string PluginVersion = "26.01.18"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.6.0 RC 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
@@ -63,7 +64,7 @@ public class Main : BasePlugin
     /******************* Change one of the three variables to true before making a release. *******************/
     public static readonly bool devRelease = false; // Latest: V1.6.0 Alpha 2
     public static readonly bool canaryRelease = true; // Latest: V1.6.0 Beta 2
-    public static readonly bool fullRelease = false; // Latest: V1.5.0
+    public static readonly bool fullRelease = false; // Latest: V1.6.0
 
     public static bool hasAccess = true;
 
@@ -169,7 +170,7 @@ public class Main : BasePlugin
     public static readonly HashSet<byte> winnerList = [];
     public static readonly HashSet<string> winnerNameList = [];
     public static readonly HashSet<int> clientIdList = [];
-    public static readonly List<(string, byte, string)> MessagesToSend = [];
+    public static readonly List<(string, byte, string, SendOption)> MessagesToSend = [];
     public static readonly Dictionary<string, int> PlayerQuitTimes = [];
     public static bool isChatCommand = false;
     public static bool MeetingIsStarted = false;
@@ -213,7 +214,8 @@ public class Main : BasePlugin
     public static int VotingTime;
     public static float DefaultCrewmateVision;
     public static float DefaultImpostorVision;
-    public static bool IsInitialRelease = DateTime.Now.Month == 1 && DateTime.Now.Day is 17;
+    public static bool IsTOHEInitialRelease = DateTime.Now.Month == 1 && DateTime.Now.Day is 17;
+    public static bool IsTONEInitialRelease = DateTime.Now.Month == 6 && DateTime.Now.Day is 17;
     public static bool IsAprilFools
     {
         get

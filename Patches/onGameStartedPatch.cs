@@ -44,6 +44,8 @@ internal class ChangeRoleSettings
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Noisemaker, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Phantom, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Tracker, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Detective, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Viper, 0, 0);
                 }
             }
             else if (GameStates.IsHideNSeek)
@@ -53,6 +55,8 @@ internal class ChangeRoleSettings
             }
 
             Main.PlayerStates = [];
+            RoleAssign.PrevRoleResult = RoleAssign.RoleResult;
+            RoleAssign.PrevRolePreventAttempts = [];
             RoleAssign.RoleResult = [];
             KillTimerManager.Initializate();
             AbilityUseManager.Initializate();
@@ -384,7 +388,7 @@ internal class StartGameHostPatch
             timer += Time.deltaTime;
         }
         thiz.SendClientReady();
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSecondsRealtime(2f);
         yield return AssignRoles();
         //ShipStatus.Instance.Begin(); // Tasks sets in IntroPatch
         yield break;
@@ -577,13 +581,13 @@ internal class StartGameHostPatch
         }
 
         Logger.Info("Others assign finished", "AssignRoleTypes");
-        yield return new WaitForSeconds(GameStates.IsLocalGame ? 1f : 2f);
+        yield return new WaitForSecondsRealtime(GameStates.IsLocalGame ? 1f : 2f);
 
         Logger.Info("Send rpc disconnected for all", "AssignRoleTypes");
         DataDisconnected.Clear();
         RpcSetDisconnected(disconnected: true);
 
-        yield return new WaitForSeconds(GameStates.IsLocalGame ? 2f : 4f);
+        yield return new WaitForSecondsRealtime(GameStates.IsLocalGame ? 2f : 4f);
 
         Logger.Info("Assign self", "AssignRoleTypes");
         SetRoleSelf();
@@ -750,7 +754,7 @@ public static class RpcSetRoleReplacer
             {
                 var roleType = role.GetRoleTypes();
 
-                if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom)
+                if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
                 {
                     foreach (var target in Main.AllPlayerControls)
                     {
@@ -915,7 +919,7 @@ public static class RpcSetRoleReplacer
         foreach (var kvp in Senders)
         {
             kvp.Value.SendMessage();
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSecondsRealtime(0.3f);
         }
         BlockSetRole = false;
     }

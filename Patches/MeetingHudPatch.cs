@@ -50,7 +50,7 @@ class CheckForEndVotingPatch
                 PlayerControl pc = GetPlayerById(pva.TargetPlayerId);
                 if (pc == null) continue;
 
-                if (pva.DidVote && pc.PlayerId == pva.VotedFor && pva.VotedFor < 253 && !pc.Data.IsDead)
+                if (pva.DidVote && pc.PlayerId == pva.VotedFor && pva.VotedFor < 253 && pc.IsAlive())
                 {
                     if (Madmate.MadmateSpawnMode.GetInt() == 2 && Main.MadmateNum < CustomRoles.Madmate.GetCount() && pc.CanBeMadmate())
                     {
@@ -182,7 +182,7 @@ class CheckForEndVotingPatch
                 if (voter == null || voter.Data == null || voter.Data.Disconnected) continue;
                 if (Options.VoteMode.GetBool())
                 {
-                    if (ps.VotedFor == 253 && !voter.Data.IsDead &&
+                    if (ps.VotedFor == 253 && voter.IsAlive() &&
                         !(Options.WhenSkipVoteIgnoreFirstMeeting.GetBool() && MeetingStates.FirstMeeting) && // Ignore First Meeting
                         !(Options.WhenSkipVoteIgnoreNoDeadBody.GetBool() && !MeetingStates.IsExistDeadBody) && // No Dead Body
                         !(Options.WhenSkipVoteIgnoreEmergency.GetBool() && MeetingStates.IsEmergencyMeeting) // Ignore Emergency Meeting
@@ -202,7 +202,7 @@ class CheckForEndVotingPatch
                                 break;
                         }
                     }
-                    if (ps.VotedFor == 254 && !voter.Data.IsDead)
+                    if (ps.VotedFor == 254 && voter.IsAlive())
                     {
                         switch (Options.GetWhenNonVote())
                         {
@@ -1238,11 +1238,6 @@ class MeetingHudStartPatch
                     }
                     result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
                 }
-                // if (Lich.IsCursed(target) && Lich.IsDeceived(player, target))
-                // {
-                //     blankRT.Clear().Append(CustomRoles.Lich.ToColoredString());
-                //     result.Clear().Append($"<size={roleTextMeeting.fontSize}>{blankRT}</size>");
-                // }
                 roleTextMeeting.text = result.ToString();
             }
             if (player.IsAlive() && !target.AmOwner && ExtendedPlayerControl.KnowRoleTarget(player, target) && Lich.IsCursed(target) && Lich.IsDeceived(player, target))
@@ -1314,7 +1309,8 @@ class MeetingHudStartPatch
         //}
 
         if (MeetingStates.FirstMeeting) TemplateManager.SendTemplate("OnFirstMeeting", noErr: true);
-        TemplateManager.SendTemplate("OnMeeting", noErr: true);
+        if (Main.CurrentServerIsVanilla && TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese) TemplateManager.SendTemplate("OnMeetingVanilla", noErr: true);
+        else TemplateManager.SendTemplate("OnMeeting", noErr: true);
 
         try
         {
@@ -1366,7 +1362,7 @@ class MeetingHudStartPatch
             var seerRoleClass = seer.GetRoleClass();
 
             // if based role is Shapeshifter/Phantom and is Desync Shapeshifter/Phantom
-            if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom && seer.HasDesyncRole())
+            if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper && seer.HasDesyncRole())
             {
                 // When target is impostor, set name color as white
                 target.cosmetics.SetNameColor(Color.white);
@@ -1560,13 +1556,37 @@ class MeetingHudOnDestroyPatch
             AntiBlackout.SetIsDead();
 
             Main.LastVotedPlayerInfo = null;
-            if (Options.UseMeetingShapeshift.GetBool() && !AntiBlackout.SkipTasks)
+            if (Options.UseMeetingShapeshift.GetBool())
             {
                 var pc = Main.AllAlivePlayerControls;
-                pc.DoIf(x => x.UsesMeetingShapeshift(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
-                pc.DoIf(x => x.GetCustomRole().IsImpostor(), x => x.RpcSetRoleGlobal(x.GetCustomRole().GetRoleTypes()));
+                pc.DoIf(x => x.UsesMeetingShapeshift() && x.IsHost(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
+                if (!AntiBlackout.SkipTasks)
+                {
+                    pc.DoIf(x => x.UsesMeetingShapeshift(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
+                    pc.DoIf(x => x.GetCustomRole().IsImpostor(), x => x.RpcSetRoleGlobal(x.GetCustomRole().GetRoleTypes()));
+                }
             }
             EAC.ReportTimes = [];
+        }
+
+        if (Main.NormalOptions.MapId == 7) Main.Instance.StartCoroutine(WaitForExileFinish());
+        return;
+
+        System.Collections.IEnumerator WaitForExileFinish()
+        {
+            while (!ExileController.Instance && !GameStates.IsEnded) yield return null;
+            if (GameStates.IsEnded) yield break;
+
+            yield return new WaitForSeconds(1f);
+            if (!ExileController.Instance || GameStates.IsEnded) yield break;
+            
+            if (CheckForEndVotingPatch.TempExileMsg.EndsWith("<size=0>") && Options.CurrentGameMode == CustomGameMode.Standard && CheckForEndVotingPatch.TempExiledPlayer != null)
+                ExileController.Instance.completeString = CheckForEndVotingPatch.TempExileMsg[..^8];
+            
+            while (ExileController.Instance) yield return null;
+
+            try { ExileControllerWrapUpPatch.WrapUpPostfix(CheckForEndVotingPatch.TempExiledPlayer); }
+            finally { ExileControllerWrapUpPatch.WrapUpFinalizer(CheckForEndVotingPatch.TempExiledPlayer); }
         }
     }
 }

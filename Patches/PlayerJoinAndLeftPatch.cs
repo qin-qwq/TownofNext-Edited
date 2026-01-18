@@ -130,8 +130,8 @@ class OnGameJoinedPatch
             try
             {
                 if (!GameStates.IsOnlineGame) return;
-                if (!GameStates.IsModHost)
-                    RPC.RpcRequestRetryVersionCheck();
+                //if (!GameStates.IsModHost)
+                    //RPC.RpcRequestRetryVersionCheck();
                 if (BanManager.CheckEACList(EOSManager.Instance.FriendCode, BanManager.GetHashedPuid(EOSManager.Instance.ProductUserId)) && GameStates.IsOnlineGame)
                 {
                     AmongUsClient.Instance.ExitGame(DisconnectReasons.Banned);
@@ -240,11 +240,11 @@ public static class OnPlayerJoinedPatch
                     return;
                 }
 
-                if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
+                /*if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
                 {
                     var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                     RpcUtils.LateSpecificSendMessage(message, client.Id);
-                }
+                }*/
             }
             catch { }
         }, 4.5f, "Green Bean Kick LateTask", false);
@@ -367,7 +367,7 @@ class OnPlayerLeftPatch
             // Remove messages sending to left player
             for (int i = 0; i < Main.MessagesToSend.Count; i++)
             {
-                var (msg, sendTo, title) = Main.MessagesToSend[i];
+                var (msg, sendTo, title, sendOption) = Main.MessagesToSend[i];
                 if (sendTo == data.Character.PlayerId)
                 {
                     Main.MessagesToSend.RemoveAt(i);
@@ -614,7 +614,7 @@ class InnerNetClientSpawnPatch
                 else TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true);
             }, 3f, "Welcome Message");
 
-            _ = new LateTask(() =>
+            /*_ = new LateTask(() =>
             {
                 if (client == null || client.Character == null)
                 {
@@ -624,7 +624,7 @@ class InnerNetClientSpawnPatch
 
                 var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                 RpcUtils.LateSpecificSendMessage(message, client.Id);
-            }, 3f, "RPC Request Retry Version Check");
+            }, 3f, "RPC Request Retry Version Check");*/
 
             if (GameStates.IsOnlineGame)
             {
@@ -635,8 +635,8 @@ class InnerNetClientSpawnPatch
                         // Only for vanilla
                         if (!client.Character.IsModded())
                         {
-                            var message = new RpcSyncLobbyTimerVanilla(LobbyBehaviour.Instance.NetId, (int)GameStartManagerPatch.timer, false);
-                            RpcUtils.LateSpecificSendMessage(message, client.Id);
+                            /*var message = new RpcSyncLobbyTimerVanilla(LobbyBehaviour.Instance.NetId, (int)GameStartManagerPatch.timer, false);
+                            RpcUtils.LateSpecificSendMessage(message, client.Id);*/
                         }
                         // Non-host modded client
                         else if (client.Character.IsNonHostModdedClient())

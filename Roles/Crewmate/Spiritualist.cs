@@ -86,7 +86,8 @@ internal class Spiritualist : RoleBase
 
         TargetArrow.Add(player.PlayerId, target.PlayerId);
 
-        var writer = CustomRpcSender.Create("SpiritualistSendMessage", SendOption.None);
+        Utils.SendMessage(GetString("SpiritualistNoticeMessage"), target.PlayerId, GetString("Spiritualist").ToUpper());
+        /*var writer = CustomRpcSender.Create("SpiritualistSendMessage", SendOption.None);
         writer.StartMessage(target.GetClientId());
         writer.StartRpc(target.NetId, (byte)RpcCalls.SetName)
             .Write(target.Data.NetId)
@@ -100,7 +101,7 @@ internal class Spiritualist : RoleBase
             .Write(target.Data.PlayerName)
             .EndRpc();
         writer.EndMessage();
-        writer.SendMessage();
+        writer.SendMessage();*/
     }
 
     public override string GetSuffix(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)

@@ -184,7 +184,7 @@ public class Lovers : IAddon
     }
     public static void LoversSuicide(byte deathId = 0x7f, bool isExiled = false)
     {
-        if (!LoverSuicide.GetBool()) return;
+        if (!LoverSuicide.GetBool() && CustomRoles.Lovers.IsEnable()) return;
 
         foreach (var pair in loverPairs)
         {
@@ -194,7 +194,7 @@ public class Lovers : IAddon
 
             if (!p1.IsAlive() && !p2.IsAlive()) return;
 
-            if (Cupid.IsCupidLoverPair(p1, p2)) continue;
+            if (Cupid.IsCupidLoverPair(p1, p2) && Cupid.LoversNotHeartbroken.GetBool()) continue;
 
             if (hasHeartbreak[pair]) continue;
 

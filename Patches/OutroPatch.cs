@@ -181,6 +181,7 @@ class EndGamePatch
             Main.RealOptionsData.Restore(GameOptionsManager.Instance.CurrentGameOptions);
             GameOptionsSender.AllSenders.Clear();
             GameOptionsSender.AllSenders.Add(new NormalGameOptionsSender());
+            Main.Instance.StartCoroutine(dbConnect.Init());
             /* Send SyncSettings RPC */
         }
     }

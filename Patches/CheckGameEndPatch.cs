@@ -602,7 +602,7 @@ class GameEndCheckerForNormal
         Utils.NotifyGameEnding();
 
         // Delay to ensure that resuscitation is delivered after the ghost roll setting
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSecondsRealtime(0.2f);
 
         if (ReviveRequiredPlayerIds.Count > 0)
         {
@@ -617,7 +617,7 @@ class GameEndCheckerForNormal
             // sync game data
             Utils.SendGameData();
             // Delay to ensure that the end of the game is delivered at the end of the game
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSecondsRealtime(0.3f);
         }
 
         foreach (var winnerId in WinnerIds)

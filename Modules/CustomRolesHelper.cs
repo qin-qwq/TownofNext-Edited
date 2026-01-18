@@ -99,7 +99,7 @@ public static class CustomRolesHelper
     public static bool HasImpBasis(this CustomRoles role, bool ForDesyncRole = true)
         => role.GetVNRole() is CustomRoles.Impostor
             or CustomRoles.Shapeshifter
-            or CustomRoles.Phantom or CustomRoles.ViperTONE
+            or CustomRoles.Phantom or CustomRoles.Viper
             || (ForDesyncRole && role.GetDYRole() is RoleTypes.Impostor
                 or RoleTypes.Shapeshifter
                 or RoleTypes.Phantom or RoleTypes.Viper);

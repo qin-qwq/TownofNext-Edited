@@ -183,9 +183,17 @@ class VersionShowerStartPatch
         {
             SpecialEventText.enabled = MainMenuManagerStartPatch.amongUsLogo != null;
         }
-        if (Main.IsInitialRelease)
+        if (Main.IsTOHEInitialRelease)
         {
-            SpecialEventText.text = $"Happy Birthday to {Main.ModName}!";
+            SpecialEventText.text = $"Happy Birthday to TOHE!";
+            if (ColorUtility.TryParseHtmlString(Main.ModColor, out var col))
+            {
+                SpecialEventText.color = col;
+            }
+        }
+        if (Main.IsTONEInitialRelease)
+        {
+            SpecialEventText.text = $"Happy Birthday to TONE!";
             if (ColorUtility.TryParseHtmlString(Main.ModColor, out var col))
             {
                 SpecialEventText.color = col;

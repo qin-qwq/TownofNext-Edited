@@ -31,6 +31,8 @@ class ExileControllerWrapUpPatch
         }
         public static void Postfix(ExileController __instance)
         {
+            if (Main.NormalOptions.MapId == 7) return;
+
             try
             {
                 WrapUpPostfix(__instance.initData.networkedPlayer);
@@ -51,6 +53,8 @@ class ExileControllerWrapUpPatch
     {
         public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
         {
+            if (Main.NormalOptions.MapId == 7) return;
+
             var instance = __instance.__4__this;
             if (!__result)
             {
@@ -87,7 +91,7 @@ class ExileControllerWrapUpPatch
             if (spawnMap != null) Main.AllPlayerControls.Do(spawnMap.RandomTeleport);
         }
     }
-    private static void WrapUpPostfix(NetworkedPlayerInfo exiled)
+    public static void WrapUpPostfix(NetworkedPlayerInfo exiled)
     {
         if (AntiBlackout.BlackOutIsActive) exiled = AntiBlackout_LastExiled;
 
@@ -147,7 +151,7 @@ class ExileControllerWrapUpPatch
         Utils.CountAlivePlayers(sendLog: true, checkGameEnd: Options.CurrentGameMode == CustomGameMode.Standard);
     }
 
-    private static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
+    public static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
     {
         // Even if an exception occurs in WrapUpPostfix, this is the only part that will be executed reliably
         if (AmongUsClient.Instance.AmHost)

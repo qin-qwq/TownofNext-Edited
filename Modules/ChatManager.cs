@@ -134,14 +134,14 @@ namespace TONE.Modules.ChatManager
             {
                 if (GameStates.IsExilling)
                 {
-                    if (Options.HideExileChat.GetBool())
+                    if (HideExileChat.GetBool())
                     {
                         Logger.Info($"Message sent in exiling screen, spamming the chat", "ChatManager");
                         _ = new LateTask(SendPreviousMessagesToAll, 0.3f, "Spamming the chat");
                     }
                     return;
                 }
-                if (!player.IsAlive()) return;
+                if (!player.IsAlive() || !GameStates.IsMeeting) return;
                 message = msg;
                 //Logger.Warn($"Logging msg : {message}","Checking Exile");
                 Dictionary<byte, string> newChatEntry = new()
@@ -167,6 +167,69 @@ namespace TONE.Modules.ChatManager
         {
             if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost) return;
             //This should never function for non host
+            if (Main.CurrentServerIsVanilla)
+            {
+                var pc = PlayerControl.LocalPlayer;
+
+                var title = "​";
+                var name = pc?.Data?.PlayerName;
+
+                var alive = pc.IsAlive();
+                if (!alive)
+                {
+                    pc.Data.IsDead = false;
+                    pc.Data.SendGameData();
+                }
+
+                for (int i = 0; i < 30; i++)
+                {
+                    int clientId = -1;
+                    pc.SetName(title);
+                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(pc, String.Empty);
+                    pc.SetName(name);
+                    var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
+                    writer.StartMessage(clientId);
+                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SetName)
+                        .Write(pc.Data.NetId)
+                        .Write(title)
+                        .EndRpc();
+                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SendChat)
+                        .Write(String.Empty)
+                        .EndRpc();
+                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SetName)
+                        .Write(pc.Data.NetId)
+                        .Write(name)
+                        .EndRpc();
+                    writer.EndMessage();
+                    writer.SendMessage();
+                }
+                _ = new LateTask(() =>
+                {
+                    foreach (var playerId in LastSystemChatMsg.Keys.ToArray())
+                    {
+                        var pc = playerId.GetPlayer();
+                        if (pc == null && playerId != byte.MaxValue) continue;
+                        var title = "<color=#FF0000>" + GetString("LastMessageReplay") + "</color>";
+                        Utils.SendMessage(LastSystemChatMsg[playerId], playerId, title: title, noReplay: true);
+                    }
+                    StringBuilder sb = new();
+                    chatHistory.ForEach(dict =>
+                    {
+                        foreach (var kvp in dict)
+                        {
+                            byte id = kvp.Key;
+                            string msg = kvp.Value;
+
+                            sb.Append(id.ColoredPlayerName());
+                            sb.Append(':');
+                            sb.Append(' ');
+                            sb.AppendLine(msg);
+                        }
+                    });
+                    Utils.SendMessage("\n", title: sb.ToString().Trim(), noReplay: true);
+                }, 0.5f);
+                return;
+            }
             if (GameStates.IsExilling && chatHistory.Count < 20)
             {
                 if (quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
@@ -184,13 +247,10 @@ namespace TONE.Modules.ChatManager
 
                     for (int i = 0; i < 20 - chatHistory.Count; i++)
                     {
-                        int clientId = -1; //sendTo == byte.MaxValue ? -1 : Utils.GetPlayerById(sendTo).GetClientId();
-                                           //if (clientId == -1)
-                                           //{
+                        int clientId = -1;
                         firstAlivePlayer.SetName(title);
                         DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, spamMsg);
                         firstAlivePlayer.SetName(name);
-                        //}
                         var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
                         writer.StartMessage(clientId);
                         writer.StartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SetName)
@@ -206,56 +266,9 @@ namespace TONE.Modules.ChatManager
                             .EndRpc();
                         writer.EndMessage();
                         writer.SendMessage();
-                        //DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, spamMsg);
-                        //var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-
-                        //writer.StartMessage(-1);
-                        //writer.StartRpc(firstAlivePlayer.NetId, (byte)RpcCalls.SendChat)
-                        //    .Write(spamMsg)
-                        //    .EndRpc()
-                        //    .EndMessage()
-                        //    .SendMessage();
                     }
                 }
             }
-            //var rd = IRandom.Instance;
-            //CustomRoles[] roles = (CustomRoles[])Enum.GetValues(typeof(CustomRoles));
-            //string[] specialTexts = new string[] { "bet", "bt", "guess", "gs", "shoot", "st", "赌", "猜", "审判", "tl", "判", "审", "trial" };
-            //int numPlayers = Main.AllAlivePlayerControls.Count();
-            //var allAlivePlayers = Main.AllAlivePlayerControls.ToArray();
-            //int roleCount = roles.Length;
-
-            //for (int i = chatHistory.Count; i < 30; i++)
-            //{
-            //    StringBuilder msgBuilder = new();
-            //    msgBuilder.Append('/');
-            //    if (rd.Next(1, 100) < 20)
-            //    {
-            //        msgBuilder.Append("id");
-            //    }
-            //    else
-            //    {
-            //        msgBuilder.Append(specialTexts[rd.Next(specialTexts.Length)]);
-            //        msgBuilder.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
-            //        msgBuilder.Append(rd.Next(15));
-            //        msgBuilder.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
-            //        CustomRoles role = roles[rd.Next(roleCount)];
-            //        msgBuilder.Append(rd.Next(1, 100) < 50 ? string.Empty : " ");
-            //        msgBuilder.Append(Utils.GetRoleName(role));
-            //    }
-            //    string msg = msgBuilder.ToString();
-
-            //    var player = allAlivePlayers[rd.Next(numPlayers)];
-            //    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
-            //    var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-
-            //    writer.StartMessage(-1);
-            //    writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-            //        .Write(msg)
-            //        .EndRpc()
-            //        .EndMessage()
-            //        .SendMessage();
-            //}
 
             for (int i = 0; i < chatHistory.Count; i++)
             {

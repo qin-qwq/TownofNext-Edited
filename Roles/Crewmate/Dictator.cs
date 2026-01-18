@@ -22,7 +22,7 @@ internal class Dictator : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Dictator);
-        ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator]);
+        ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Dictator]);
     }
 
     public static bool CheckVotingForTarget(PlayerControl pc, PlayerVoteArea pva)
@@ -45,7 +45,7 @@ internal class Dictator : RoleBase
 
         if (operate == 1)
         {
-            Utils.SendMessage(GuessManager.GetFormatString(), pc.PlayerId);
+            SendMessage(GuessManager.GetFormatString(), pc.PlayerId);
             // GuessManager.TryHideMsg();
             // ChatManager.SendPreviousMessagesToAll();
             return true;
@@ -58,7 +58,7 @@ internal class Dictator : RoleBase
             {
                 targetid = Convert.ToByte(num);
             }
-            var target = Utils.GetPlayerById(targetid);
+            var target = GetPlayerById(targetid);
             if (target == pc)
             {
                 pc.ShowInfoMessage(isUI, GetString("DictatorExpelSelf"));

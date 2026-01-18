@@ -164,7 +164,7 @@ namespace TONE.Modules
 
         protected void CreateNetObject(string sprite = "", Vector2 position = default, bool visible = false, NetworkedPlayerInfo.PlayerOutfit pOutfit = null)
         {
-            if (GameStates.IsEnded || !AmongUsClient.Instance.AmHost) return;
+            if (GameStates.IsEnded || !AmongUsClient.Instance.AmHost || Main.CurrentServerIsVanilla) return;
 
             if (!GameStates.InGame || !Main.IntroDestroyed)
             {
@@ -175,7 +175,7 @@ namespace TONE.Modules
                     System.Collections.IEnumerator CoRoutine()
                     {
                         while (GameStates.InGame && !GameStates.IsEnded && !Main.IntroDestroyed) yield return null;
-                        yield return new WaitForSeconds(3f);
+                        yield return new WaitForSecondsRealtime(3f);
                         if (!GameStates.InGame || GameStates.IsEnded) yield break;
                         CreateNetObject(sprite, position);
                     }

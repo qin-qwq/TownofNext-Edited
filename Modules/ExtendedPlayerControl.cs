@@ -80,7 +80,7 @@ static class ExtendedPlayerControl
     {
         var currentAddOns = player.GetCustomSubRoles().Where(x => !x.IsAddonAssignedMidGame()).ToArray();
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSecondsRealtime(0.1f);
 
         foreach (var addon in currentAddOns)
         {
@@ -89,7 +89,7 @@ static class ExtendedPlayerControl
                 Main.PlayerStates[player.PlayerId].RemoveSubRole(addon);
                 Logger.Msg($"{player.GetNameWithRole()} had incompatible addon {addon}, removing addon", $"RemoveIncompatibleAddOnsAsync: {player.GetCustomRole()}");
             }
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSecondsRealtime(0.2f);
         }
     }
     private static System.Collections.IEnumerator CheckAndAssignAddOnAsync(this PlayerControl player, CustomRoles newAddOn)
@@ -98,7 +98,7 @@ static class ExtendedPlayerControl
 
         Main.PlayerStates[player.PlayerId].SetSubRole(newAddOn, pc: player);
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSecondsRealtime(0.1f);
 
         foreach (var addOn in currentAddOns)
         {
@@ -107,7 +107,7 @@ static class ExtendedPlayerControl
                 Main.PlayerStates[player.PlayerId].RemoveSubRole(addOn);
                 Logger.Msg($"{player.GetNameWithRole()} had incompatible addon {addOn}, removing addon", $"CheckAndAssignAddOnAsync: {player.GetCustomRole()}");
             }
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSecondsRealtime(0.2f);
         }
 
     }
@@ -151,6 +151,9 @@ static class ExtendedPlayerControl
 
         if (Camouflage.IsCamouflage)
             Camouflage.RpcSetSkin(player);
+
+        if (player.AmOwner && Main.CurrentServerIsVanilla)
+            player.RpcMakeVisible();
 
         var customRole = player.GetCustomRole();
         Main.PlayerStates[player.PlayerId].IsDead = false;
@@ -1841,7 +1844,7 @@ static class ExtendedPlayerControl
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcMakeInvisible", SendOption.Reliable);
-            sender.StartMessage(pc.GetClientId());
+            sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
                 .WriteVector2(new Vector2(50f, 50f))
                 .Write(player.NetTransform.lastSequenceId)
@@ -1890,7 +1893,7 @@ static class ExtendedPlayerControl
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcMakeVisible", SendOption.Reliable);
-            sender.StartMessage(pc.GetClientId());
+            sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
                 .WriteVector2(new Vector2(50f, 50f))
                 .Write((ushort)(player.NetTransform.lastSequenceId + 32767))
@@ -1921,7 +1924,7 @@ static class ExtendedPlayerControl
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);
-            sender.StartMessage(pc.GetClientId());
+            sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetId, RpcCalls.Exiled)
                 .EndRpc();
             RoleTypes role = Utils.GetRoleMap(pc.PlayerId, player.PlayerId).RoleType;
@@ -2137,7 +2140,7 @@ static class ExtendedPlayerControl
                     yield break;
                 }
 
-                yield return new WaitForSeconds(pc.IsAlive() ? 1f : 3f);
+                yield return new WaitForSecondsRealtime(pc.IsAlive() ? 1f : 3f);
 
                 if (!GameStates.InGame || GameStates.IsEnded)
                 {
@@ -2225,5 +2228,19 @@ static class ExtendedPlayerControl
 
             sender.SendMessage();
         }, 1f + (AmongUsClient.Instance.Ping / 1000f));
+    }
+
+    public static void SendGameData(this NetworkedPlayerInfo playerInfo)
+    {
+        MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+        writer.StartMessage(5);
+        writer.Write(AmongUsClient.Instance.GameId);
+        writer.StartMessage(1);
+        writer.WritePacked(playerInfo.NetId);
+        playerInfo.Serialize(writer, false);
+        writer.EndMessage();
+        writer.EndMessage();
+        AmongUsClient.Instance.SendOrDisconnect(writer);
+        writer.Recycle();
     }
 }

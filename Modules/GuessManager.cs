@@ -611,6 +611,7 @@ public static class GuessManager
 
     public static void TryHideMsg()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
 
         if (ChatManager.quickChatSpamMode != Options.QuickChatSpamMode.QuickChatSpam_Disabled)

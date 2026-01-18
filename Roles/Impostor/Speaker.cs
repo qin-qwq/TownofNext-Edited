@@ -20,8 +20,6 @@ internal class Speaker : RoleBase
 
     private static OptionItem KillCooldown;
     private static OptionItem SkillLimit;
-    private static OptionItem ImpKnowTarget;
-    private static OptionItem TarKnowTarget;
 
     private int VoteNum = 0;
     private static readonly Dictionary<byte, byte> Target = [];
@@ -35,10 +33,6 @@ internal class Speaker : RoleBase
         SkillLimit = IntegerOptionItem.Create(Id + 11, GeneralOption.SkillLimitTimes, new(1, 15, 1), 3, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Speaker])
             .SetValueFormat(OptionFormat.Times);
-        ImpKnowTarget = BooleanOptionItem.Create(Id + 12, "ImpKnowTarget", true, TabGroup.ImpostorRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Speaker]);
-        TarKnowTarget = BooleanOptionItem.Create(Id + 13, "TarKnowTarget", false, TabGroup.ImpostorRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Speaker]);
     }
 
     public override void Init()
@@ -123,19 +117,6 @@ internal class Speaker : RoleBase
     {
         if (Target[seer.PlayerId] != byte.MaxValue && Target[seer.PlayerId] == seen.PlayerId)
             return ColorString(GetRoleColor(CustomRoles.Speaker), " ❖");
-        return string.Empty;
-    }
-
-    public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
-    {
-        if (!seer.IsAlive() || (seer.GetCustomRole().IsImpostor() && !seer.Is(CustomRoles.Speaker) && ImpKnowTarget.GetBool())
-        || (seer.PlayerId == Target[_Player.PlayerId] && isForMeeting && TarKnowTarget.GetBool()))
-        {
-            if (Target[_Player.PlayerId] != byte.MaxValue && Target[_Player.PlayerId] == target.PlayerId)
-            {
-                return ColorString(GetRoleColor(CustomRoles.Speaker), " ❖");
-            }
-        }
         return string.Empty;
     }
 

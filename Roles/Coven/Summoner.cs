@@ -116,6 +116,13 @@ internal class Summoner : CovenManager
         SummonedKillCounts.Clear();
     }
 
+    public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
+    {
+        // Check if the seer is Summoner and alive, and the seen player is dead
+        if (!seer.IsAlive() || seen.IsAlive()) return string.Empty;
+
+        return ColorString(GetRoleColor(CustomRoles.Summoner), $" {seen.Data.PlayerId}");
+    }
     public override bool CanUseKillButton(PlayerControl pc) => HasNecronomicon(pc);
     public override bool OnCheckStartMeeting(PlayerControl reporter)
     {
@@ -264,6 +271,7 @@ internal class Summoner : CovenManager
 
     public static void HideSummonCommand()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
         {
@@ -534,8 +542,6 @@ internal class Summoner : CovenManager
 
     public override void AfterMeetingTasks()
     {
-        base.AfterMeetingTasks();
-
         // Reset the summoning flag for the next meeting
         HasSummonedThisMeeting = false;
 

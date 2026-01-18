@@ -60,6 +60,7 @@ internal class President : RoleBase
 
     public static void TryHideMsgForPresident()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
 
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)

@@ -8,12 +8,15 @@ public class Plunderer : IAddon
     private const int Id = 34000;
     public AddonTypes Type => AddonTypes.Impostor;
 
+    private static OptionItem CantGetHarmful;
     private static OptionItem CantGetRecruiting;
 
     public void SetupCustomOption()
     {
         SetupAdtRoleOptions(Id, CustomRoles.Plunderer, canSetNum: true, tab: TabGroup.Addons);
-        CantGetRecruiting = BooleanOptionItem.Create(Id + 10, "Plunderer.CantGetRecruiting", true, TabGroup.Addons, false)
+        CantGetHarmful = BooleanOptionItem.Create(Id + 10, "Plunderer.CantGetHarmful", true, TabGroup.Addons, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Plunderer]);
+        CantGetRecruiting = BooleanOptionItem.Create(Id + 11, "Plunderer.CantGetRecruiting", true, TabGroup.Addons, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Plunderer]);
     }
     public void Init()
@@ -28,7 +31,14 @@ public class Plunderer : IAddon
         foreach (var addon in target.GetCustomSubRoles())
         {
             if (!CustomRolesHelper.CheckAddonConfilct(addon, killer, checkLimitAddons: false, checkConditions: false)) continue;
+            if (addon is CustomRoles.Lovers
+                or CustomRoles.Knighted
+                or CustomRoles.Cleansed
+                or CustomRoles.Workhorse
+                or CustomRoles.LastImpostor
+                or CustomRoles.Cyber) continue;
             if (CantGetRecruiting.GetBool() && addon.IsBetrayalAddonV2()) continue;
+            if (CantGetHarmful.GetBool() && GroupedAddons[AddonTypes.Harmful].Contains(addon)) continue;
 
             killer.RpcSetCustomRole(addon);
         }

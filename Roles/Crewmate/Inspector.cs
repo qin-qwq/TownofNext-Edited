@@ -396,6 +396,7 @@ internal class Inspector : RoleBase
     }
     private static void TryHideMsgForCompare()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
         {

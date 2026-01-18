@@ -31,6 +31,15 @@ internal class MakePublicPatch
         return true;
     }
 }
+[HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.GetMaxMessagePackingLimit))]
+static class GetMaxMessagePackingLimitPatch
+{
+    public static bool Prefix(ref int __result)
+    {
+        __result = 10;
+        return false;
+    }
+}
 [HarmonyPatch(typeof(MMOnlineManager), nameof(MMOnlineManager.Start))]
 internal class MMOnlineManagerStartPatch
 {

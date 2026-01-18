@@ -1,4 +1,3 @@
-using AmongUs.GameOptions;
 using TONE.Roles.AddOns;
 using static TONE.Options;
 
@@ -31,18 +30,23 @@ internal class Talented : RoleBase
         addons.AddRange(GroupedAddons[AddonTypes.Helpful]);
         if (OnlyCanGetEnabledAddons.GetBool())
         {
-            addons = addons.Where(role => role.GetMode() != 0).ToList();
+            addons = addons.Where(role => role.GetMode() != 0).Shuffle().ToList();
         }
     }
 
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
     {
         if (!player.IsAlive()) return true;
+        if (addons.Count == 0)
+        {
+            player.Notify(Translator.GetString("TaskManager_FailGetAddon"), time: 10);
+        }
+        else
+        {
+            CustomRoles addon = addons.RandomElement();
 
-        var rd = IRandom.Instance;
-        CustomRoles addon = addons.RandomElement();
-
-        player.RpcSetCustomRole(addon, false, false);
+            player.RpcSetCustomRole(addon, false, false);
+        }
         return true;
     }
 }

@@ -33,6 +33,7 @@ internal class Cupid : RoleBase
     public static OptionItem LoversKnowCupid;
     private static OptionItem ProtectCooldown;
     private static OptionItem ProtectDuration;
+    public static OptionItem LoversNotHeartbroken;
 
     public override void SetupCustomOption()
     {
@@ -44,6 +45,7 @@ internal class Cupid : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         ProtectDuration = FloatOptionItem.Create(Id + 13, "CupidSettings.ProtectDuration", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid])
             .SetValueFormat(OptionFormat.Seconds);
+        LoversNotHeartbroken = BooleanOptionItem.Create(Id + 14, "CupidSettings.LoversNotHeartbroken", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid]);
     }
 
     public override void Init()

@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.Crewmate;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
@@ -41,7 +42,7 @@ internal class TimeAssassin : RoleBase
 
     public override bool OnCheckVanish(PlayerControl player)
     {
-        if (TimeStop) return false;
+        if (TimeStop || TimeMaster.Rewinding) return false;
         if (AnySabotageIsActive())
         {
             player.Notify(ColorString(GetRoleColor(CustomRoles.TimeAssassin), GetString("TimeStopError")));

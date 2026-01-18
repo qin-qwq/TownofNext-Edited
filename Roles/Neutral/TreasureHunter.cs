@@ -78,6 +78,7 @@ internal class TreasureHunter : RoleBase
         if (get)
         {
             pc.RpcIncreaseAbilityUseLimitBy(1);
+            pc.RPCPlayCustomSound("MarioCoin");
             pc.Notify(ColorString(GetRoleColor(CustomRoles.TreasureHunter), GetString("TreasureHunterGetTreasure")));
             if (pc.GetAbilityUseLimit() >= TreasureNum.GetFloat())
             {
