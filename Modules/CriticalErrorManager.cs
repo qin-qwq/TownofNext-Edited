@@ -1,8 +1,8 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using static TOHE.Translator;
+using TONE.Modules.Rpc;
+using static TONE.Translator;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public static class CriticalErrorManager
 {

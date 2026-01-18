@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace TOHE;
+namespace TONE;
 
 public class DevUser(string code = "", string color = "null", string userType = "null", string tag = "null", bool isUp = false, bool isDev = false, bool deBug = false, bool colorCmd = false, bool nameCmd = false, string upName = "未认证用户")
 {
@@ -24,7 +24,7 @@ public class DevUser(string code = "", string color = "null", string userType = 
         string tagColorFilePath = @$"./TONE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
 
 #endif
-        if (Color == "null" || Color == string.Empty) return $"<size=1.2>{Tag}</size>\r\n";
+        if (Color == "null" || Color == string.Empty) return $"{Tag}";
         var startColor = Color.TrimStart('#');
 
         if (File.Exists(tagColorFilePath))
@@ -34,15 +34,16 @@ public class DevUser(string code = "", string color = "null", string userType = 
         }
         string t1;
         t1 = Tag == "#Dev" ? Translator.GetString("Developer") : Tag;
-        return $"<size=1.2><color=#{startColor}>{t1}</color></size>\r\r\n";
+        return $"<color=#{startColor}>{t1}</color>";
     }
 }
 
 public static class DevManager
 {
     private readonly static DevUser DefaultDevUser = new();
-    public static bool IsDevUser(this string code) => Utils.DevUserList.Any(x => x.Code == code);
-    public static DevUser GetDevUser(this string code) => code.IsDevUser() ? Utils.DevUserList.Find(x => x.Code == code) : DefaultDevUser;
+    public readonly static List<DevUser> DevUserList = [];
+    public static bool IsDevUser(this string code) => DevUserList.Any(x => x.Code == code);
+    public static DevUser GetDevUser(this string code) => code.IsDevUser() ? DevUserList.Find(x => x.Code == code) : DefaultDevUser;
     public static string GetUserType(this DevUser user)
     {
         string rolename = "Crewmate";

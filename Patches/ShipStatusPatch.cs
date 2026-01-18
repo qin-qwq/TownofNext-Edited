@@ -1,14 +1,14 @@
 using Hazel;
 using System;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Patches;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.FixedUpdate))]
 class ShipFixedUpdatePatch
@@ -185,6 +185,11 @@ class StartPatch
 
         Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
 
+        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || Options.CurrentGameMode != CustomGameMode.Standard)
+        {
+            __instance.BreakEmergencyButton();
+        }
+
         if (Options.AllowConsole.GetBool() && PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug)
         {
             if (!BepInEx.ConsoleManager.ConsoleActive && BepInEx.ConsoleManager.ConsoleEnabled)
@@ -238,7 +243,7 @@ class StartPatch
                     UnityEngine.Object.Destroy(Decorations.GetComponent<Console>());
                     UnityEngine.Object.Destroy(Decorations.GetComponent<BoxCollider2D>());
                     UnityEngine.Object.Destroy(Decorations.GetComponent<PassiveButton>());
-                    Decorations.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TOHE.Resources.Images.Dropship-Decorations.png", 100f);
+                    Decorations.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TONE.Resources.Images.Dropship-Decorations.png", 100f);
                     Decorations.transform.SetSiblingIndex(1);
                     Decorations.transform.localPosition = new(0.0709f, 0.73f);
                 }

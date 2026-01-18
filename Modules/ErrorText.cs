@@ -1,7 +1,7 @@
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [Obfuscation(Exclude = true, Feature = "renaming", ApplyToMembers = true)]
 public class ErrorText : MonoBehaviour

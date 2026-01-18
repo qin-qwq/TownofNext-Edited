@@ -4,7 +4,7 @@ using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using System;
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     // Used to serialize multiple gamedata calls in a single message item
     public abstract class CustomModdedData : BaseGameDataMessage

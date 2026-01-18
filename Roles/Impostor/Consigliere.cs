@@ -1,9 +1,9 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using static TOHE.Options;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using static TONE.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Consigliere : RoleBase
 {

@@ -1,9 +1,10 @@
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using Hazel;
+using TONE.Modules;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Butcher : RoleBase
 {
@@ -15,26 +16,9 @@ internal class Butcher : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
-    private static Dictionary<byte, (int, int, Vector2)> MurderTargetLateTask = [];
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Butcher);
-    }
-    public override void Init()
-    {
-        MurderTargetLateTask = [];
-    }
-    public override void Add(byte playerId)
-    {
-        if (AmongUsClient.Instance.AmHost)
-        {
-            CustomRoleManager.OnFixedUpdateOthers.Add(OnFixedUpdateOthers);
-        }
-    }
-
-    public override void Remove(byte playerId)
-    {
-        CustomRoleManager.OnFixedUpdateOthers.Remove(OnFixedUpdateOthers);
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId) => hud.KillButton.OverrideText(Translator.GetString("ButcherButtonText"));
@@ -49,7 +33,6 @@ internal class Butcher : RoleBase
         Main.PlayerStates[target.PlayerId].SetDead();
 
         Main.OverDeadPlayerList.Add(target.PlayerId);
-        //var ops = target.GetCustomPosition();
         var rd = IRandom.Instance;
 
         if (target.Is(CustomRoles.Avanger))
@@ -70,50 +53,14 @@ internal class Butcher : RoleBase
 
         _ = new LateTask(() =>
         {
-            for (int i = 0; i <= 19; i++)
+            for (var i = 0; i < 30; i++)
             {
-                if (GameStates.IsMeeting) break;
-                if (!target.IsHost())
-                {
-                    target.MurderPlayer(target, ExtendedPlayerControl.ResultFlags);
-                }
-                Main.AllAlivePlayerControls.Where(x => x.PlayerId != target.PlayerId && !x.AmOwner)
-                .Do(x => target.RpcSpecificMurderPlayer(target, x));
-            }
-        }, 0.2f, "Butcher Show Bodies"); //25 exactly takes over the whole screen
-
-        _ = new LateTask(() =>
-        {
-            if (!MurderTargetLateTask.ContainsKey(target.PlayerId))
-                MurderTargetLateTask.Add(target.PlayerId, (0, 0, target.GetCustomPosition()));
-        }, 0.6f, "Butcher Late Kill");
-    }
-
-    public override void AfterMeetingTasks() => MurderTargetLateTask = [];
-    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target) => MurderTargetLateTask.Clear();
-
-    public void OnFixedUpdateOthers(PlayerControl target, bool lowLoad, long nowTime)
-    {
-        if (!target.IsAlive()) return;
-        if (!MurderTargetLateTask.TryGetValue(target.PlayerId, out var data)) return;
-        var ops = data.Item3;
-
-        if (data.Item1 > 19) //on fix update updates 30 times pre second
-        {
-            if (data.Item2 < 5)
-            {
-                var rd = IRandom.Instance;
+                if (!GameStates.IsInTask) return;
+                var ops = target.GetCustomPosition();
 
                 Vector2 location = new(ops.x + ((float)(rd.Next(1, 200) - 100) / 100), ops.y + ((float)(rd.Next(1, 200) - 100) / 100));
-                target.RpcTeleport(location);
-                target.RpcMurderPlayer(target);
-                target.SetRealKiller(_Player, true);
-                MurderTargetLateTask[target.PlayerId] = (0, data.Item2 + 1, ops);
+                Utils.RpcCreateDeadBody(location, (byte)target.CurrentOutfit.ColorId, target, SendOption.None);
             }
-            else MurderTargetLateTask.Remove(target.PlayerId);
-        }
-        else
-            MurderTargetLateTask[target.PlayerId] = (data.Item1 + 1, data.Item2, ops);
+        }, 0.2f, "Butcher Show Bodies");
     }
-
 }

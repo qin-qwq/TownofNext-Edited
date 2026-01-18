@@ -1,7 +1,7 @@
 using Il2CppSystem;
 using static CosmeticsLayer;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 [HarmonyPatch(typeof(AprilFoolsMode), nameof(AprilFoolsMode.ShouldShowAprilFoolsToggle))]
 public static class ShouldShowTogglePatch
@@ -138,7 +138,7 @@ public static class LongBoiPatches
     [HarmonyPrefix]
     public static bool LongBoyNeckSize_Prefix(LongBoiPlayerBody __instance, ref float distance)
     {
-        //Remove the limit of neck size to prevent issues in TOHE HnS
+        //Remove the limit of neck size to prevent issues in TONE HnS
 
         __instance.targetHeight = distance / 10f + 0.5f;
         __instance.SetupNeckGrowth(true, true); //se quiser sim mano

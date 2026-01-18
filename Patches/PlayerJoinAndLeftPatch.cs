@@ -5,22 +5,25 @@ using Hazel;
 using InnerNet;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Core.DraftAssign;
-using TOHE.Roles.Crewmate;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Patches;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Core.DraftAssign;
+using TONE.Roles.Crewmate;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameJoined))]
 class OnGameJoinedPatch
 {
+    public static bool JoiningGame;
+
     public static void Postfix(AmongUsClient __instance)
     {
+        JoiningGame = true;
         while (!Options.IsLoaded) System.Threading.Tasks.Task.Delay(1);
         Logger.Info($"{__instance.GameId} Joining room - Room code: {GameCode.IntToGameName(AmongUsClient.Instance.GameId) ?? string.Empty}", "OnGameJoined");
 
@@ -63,6 +66,7 @@ class OnGameJoinedPatch
             Main.DoBlockNameChange = false;
             DraftAssign.Reset();
             RoleAssign.SetRoles = [];
+            AddonAssign.SetAddOns = [];
             GhostRoleAssign.forceRole = [];
             EAC.DeNum = new();
             Main.AllPlayerNames.Clear();
@@ -86,8 +90,8 @@ class OnGameJoinedPatch
                     if (AURoleOptions.GuardianAngelCooldown == 0f)
                         AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
 
-                    // If custom Gamemode is HideNSeekTOHE in normal game, set Standard
-                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTOHE)
+                    // If custom Gamemode is HideNSeekTONE in normal game, set Standard
+                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTONE)
                     {
                         // Select Standard
                         Options.GameMode.SetValue(0);
@@ -98,10 +102,10 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTOHE
-                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekTOHE)
+                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTONE
+                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekTONE)
                     {
-                        // Select HideNSeekTOHE
+                        // Select HideNSeekTONE
                         Options.GameMode.SetValue(4);
                     }
                     break;
@@ -114,6 +118,11 @@ class OnGameJoinedPatch
                     Logger.Info(" No found", "Game Mode");
                     break;
             }
+
+            _ = new LateTask(() =>
+            {
+                JoiningGame = false;
+            }, 1f, "OnGameJoinedPatch");
         }
 
         _ = new LateTask(() =>
@@ -121,8 +130,8 @@ class OnGameJoinedPatch
             try
             {
                 if (!GameStates.IsOnlineGame) return;
-                if (!GameStates.IsModHost)
-                    RPC.RpcRequestRetryVersionCheck();
+                //if (!GameStates.IsModHost)
+                    //RPC.RpcRequestRetryVersionCheck();
                 if (BanManager.CheckEACList(EOSManager.Instance.FriendCode, BanManager.GetHashedPuid(EOSManager.Instance.ProductUserId)) && GameStates.IsOnlineGame)
                 {
                     AmongUsClient.Instance.ExitGame(DisconnectReasons.Banned);
@@ -231,11 +240,11 @@ public static class OnPlayerJoinedPatch
                     return;
                 }
 
-                if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
+                /*if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
                 {
                     var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                     RpcUtils.LateSpecificSendMessage(message, client.Id);
-                }
+                }*/
             }
             catch { }
         }, 4.5f, "Green Bean Kick LateTask", false);
@@ -358,7 +367,7 @@ class OnPlayerLeftPatch
             // Remove messages sending to left player
             for (int i = 0; i < Main.MessagesToSend.Count; i++)
             {
-                var (msg, sendTo, title) = Main.MessagesToSend[i];
+                var (msg, sendTo, title, sendOption) = Main.MessagesToSend[i];
                 if (sendTo == data.Character.PlayerId)
                 {
                     Main.MessagesToSend.RemoveAt(i);
@@ -605,7 +614,7 @@ class InnerNetClientSpawnPatch
                 else TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true);
             }, 3f, "Welcome Message");
 
-            _ = new LateTask(() =>
+            /*_ = new LateTask(() =>
             {
                 if (client == null || client.Character == null)
                 {
@@ -615,7 +624,7 @@ class InnerNetClientSpawnPatch
 
                 var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                 RpcUtils.LateSpecificSendMessage(message, client.Id);
-            }, 3f, "RPC Request Retry Version Check");
+            }, 3f, "RPC Request Retry Version Check");*/
 
             if (GameStates.IsOnlineGame)
             {
@@ -626,8 +635,8 @@ class InnerNetClientSpawnPatch
                         // Only for vanilla
                         if (!client.Character.IsModded())
                         {
-                            var message = new RpcSyncLobbyTimerVanilla(LobbyBehaviour.Instance.NetId, (int)GameStartManagerPatch.timer, false);
-                            RpcUtils.LateSpecificSendMessage(message, client.Id);
+                            /*var message = new RpcSyncLobbyTimerVanilla(LobbyBehaviour.Instance.NetId, (int)GameStartManagerPatch.timer, false);
+                            RpcUtils.LateSpecificSendMessage(message, client.Id);*/
                         }
                         // Non-host modded client
                         else if (client.Character.IsNonHostModdedClient())

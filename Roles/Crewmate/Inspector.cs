@@ -1,18 +1,18 @@
 using Hazel;
 using System;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 internal class Inspector : RoleBase
 {
     //===========================SETUP================================\\
@@ -396,6 +396,7 @@ internal class Inspector : RoleBase
     }
     private static void TryHideMsgForCompare()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
         {

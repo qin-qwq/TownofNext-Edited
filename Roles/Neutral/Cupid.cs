@@ -1,17 +1,17 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.AddOns.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.AddOns.Common;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using TONE.Roles.AddOns.Impostor;
+using static TONE.Options;
+using static TONE.Translator;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Cupid : RoleBase
 {
@@ -33,6 +33,7 @@ internal class Cupid : RoleBase
     public static OptionItem LoversKnowCupid;
     private static OptionItem ProtectCooldown;
     private static OptionItem ProtectDuration;
+    public static OptionItem LoversNotHeartbroken;
 
     public override void SetupCustomOption()
     {
@@ -44,6 +45,7 @@ internal class Cupid : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         ProtectDuration = FloatOptionItem.Create(Id + 13, "CupidSettings.ProtectDuration", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid])
             .SetValueFormat(OptionFormat.Seconds);
+        LoversNotHeartbroken = BooleanOptionItem.Create(Id + 14, "CupidSettings.LoversNotHeartbroken", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid]);
     }
 
     public override void Init()

@@ -2,7 +2,7 @@ using Il2CppInterop.Runtime.InteropTypes;
 using System;
 using System.Linq.Expressions;
 
-namespace TOHE;
+namespace TONE;
 
 public static class Il2CppHelper
 {

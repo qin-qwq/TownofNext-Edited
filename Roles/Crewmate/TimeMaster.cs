@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using System;
 using System.Collections;
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 using Object = UnityEngine.Object;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 // 部分代码参考：https://github.com/Gurge44/EndlessHostRoles
 internal class TimeMaster : RoleBase
@@ -32,6 +32,7 @@ internal class TimeMaster : RoleBase
 
     private static readonly Dictionary<byte, long> TimeMasterInProtect = [];
     private static Dictionary<long, Dictionary<byte, Vector2>> BackTrack = [];
+    private static readonly Dictionary<byte, float> originalSpeed = [];
     public static bool Rewinding;
 
     public override void SetupCustomOption()
@@ -52,6 +53,7 @@ internal class TimeMaster : RoleBase
     public override void Init()
     {
         TimeMasterInProtect.Clear();
+        originalSpeed.Clear();
         Rewinding = false;
     }
     public override void Add(byte playerId)
@@ -92,6 +94,8 @@ internal class TimeMaster : RoleBase
             {
                 Main.AllPlayerSpeed[pc.PlayerId] = Main.MinSpeed;
                 ReportDeadBodyPatch.CanReport[pc.PlayerId] = false;
+                originalSpeed.Remove(pc.PlayerId);
+                originalSpeed.Add(pc.PlayerId, Main.AllPlayerSpeed[pc.PlayerId]);
             }
 
             string notify = ColorString(Color.yellow, string.Format(GetString("TimeMasterRewindStart"), CustomRoles.TimeMaster.ToColoredString()));
@@ -104,7 +108,7 @@ internal class TimeMaster : RoleBase
                 player.MarkDirtySettings();
             }
 
-            yield return new WaitForSeconds(0.55f);
+            yield return new WaitForSecondsRealtime(0.55f);
 
             for (long i = now - 1; i >= now - length; i--)
             {
@@ -118,7 +122,7 @@ internal class TimeMaster : RoleBase
                     player.RpcTeleport(pos);
                 }
 
-                yield return new WaitForSeconds(delay);
+                yield return new WaitForSecondsRealtime(delay);
             }
 
             foreach (DeadBody deadBody in Object.FindObjectsOfType<DeadBody>())
@@ -135,7 +139,7 @@ internal class TimeMaster : RoleBase
 
             foreach (var pc in Main.AllPlayerControls)
             {
-                Main.AllPlayerSpeed[pc.PlayerId] = Main.AllPlayerSpeed[pc.PlayerId] - Main.MinSpeed + Main.RealOptionsData.GetFloat(FloatOptionNames.PlayerSpeedMod);
+                Main.AllPlayerSpeed[pc.PlayerId] = Main.AllPlayerSpeed[pc.PlayerId] - Main.MinSpeed + originalSpeed[pc.PlayerId];
                 ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
             }
             MarkEveryoneDirtySettings();

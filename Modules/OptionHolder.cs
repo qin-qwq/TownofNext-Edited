@@ -1,12 +1,12 @@
 using System;
-using TOHE.Modules;
-using TOHE.Roles.AddOns;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Core.DraftAssign;
+using TONE.Modules;
+using TONE.Roles.AddOns;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Core.DraftAssign;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 [Obfuscation(Exclude = true)]
 [Flags]
@@ -18,7 +18,7 @@ public enum CustomGameMode
     SpeedRun = 0x04,
     TagMode = 0x05,
 
-    HidenSeekTOHE = 0x08, // HidenSeekTOHE must be after other game modes
+    HidenSeekTONE = 0x08, // HidenSeekTONE must be after other game modes
     All = int.MaxValue
 }
 
@@ -56,7 +56,7 @@ public static class Options
 
             2 => CustomGameMode.SpeedRun,
             3 => CustomGameMode.TagMode,
-            4 => CustomGameMode.HidenSeekTOHE, // HidenSeekTOHE must be after other game modes
+            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
             _ => CustomGameMode.Standard
         };
     public static int prevGameMode = 0;
@@ -68,14 +68,13 @@ public static class Options
         "SpeedRun",
         "TagMode",
 
-        "Hide&SeekTOHE", // HidenSeekTOHE must be after other game modes
+        "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
     ];
 
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
     public static OptionItem DraftableCount;
     //public static OptionItem BucketCount;
-    public static bool devEnableDraft = false;
     public static OptionItem DraftDeck;
 
     // 役職数・確率
@@ -184,6 +183,7 @@ public static class Options
     public static OptionItem VentguardAbilityUseGainWithEachTaskCompleted;
     public static OptionItem VeteranAbilityUseGainWithEachTaskCompleted;
     public static OptionItem TimeMasterAbilityUseGainWithEachTaskCompleted;
+    public static OptionItem NiceHackerAbilityUseGainWithEachTaskCompleted;
 
     //public static OptionItem EnableGM;
     public static float DefaultKillCooldown = Main.NormalOptions?.KillCooldown ?? 20;
@@ -576,6 +576,7 @@ public static class Options
     public static OptionItem ShowOnlyEnabledRolesInGuesserUI;
     public static OptionItem CanOnlyGuessEnabled;
     public static OptionItem CantGuessDuringDiscussionTime;
+    public static OptionItem CanGuessCrewInvestigative;
     public static OptionItem UseQuickChatSpamCheat;
 
     // 技能相关设定
@@ -746,7 +747,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 33600 last id for roles/add-ons (Next use 33700)
+        // 34100 last id for roles/add-ons (Next use 34200)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1014,6 +1015,15 @@ public static class Options
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateSupport).ForEach(r => r.SetupCustomOption());
+
+        /*
+        *  INVESTIGATIVE ROLES
+        */
+        TextOptionItem.Create(10000035, "RoleType.CrewInvestigative", TabGroup.CrewmateRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(140, 255, 255, byte.MaxValue));
+
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateInvestigative).ForEach(r => r.SetupCustomOption());
 
         /*
          * KILLING ROLES
@@ -1389,22 +1399,21 @@ public static class Options
 
         // Hide & Seek
         TextOptionItem.Create(10000055, "MenuTitle.Hide&Seek", TabGroup.ModSettings)
-            .SetGameMode(CustomGameMode.HidenSeekTOHE)
+            .SetGameMode(CustomGameMode.HidenSeekTONE)
             .SetColor(Color.red);
 
         // Num impostors in Hide & Seek
         NumImpostorsHnS = IntegerOptionItem.Create(60891, "NumImpostorsHnS", new(1, 3, 1), 1, TabGroup.ModSettings, false)
             .SetHeader(true)
             .SetColor(Color.red)
-            .SetGameMode(CustomGameMode.HidenSeekTOHE)
+            .SetGameMode(CustomGameMode.HidenSeekTONE)
             .SetValueFormat(OptionFormat.Players);
 
         Logger.Info("Start of Draft Setup", "Draft Setup");
         // Draft Mode
         DraftHeader = TextOptionItem.Create(10000033, "MenuTitle.Draft", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.Standard)
-            .SetColor(new Color32(255, 238, 232, byte.MaxValue))
-            .SetHidden((!PlayerControl.LocalPlayer?.FriendCode?.GetDevUser().IsDev) ?? true);
+            .SetColor(new Color32(255, 238, 232, byte.MaxValue));
 
         DraftMode = BooleanOptionItem.Create(61000, "UseDraftMode", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
@@ -1420,11 +1429,6 @@ public static class Options
             .SetParent(DraftMode);
 
         Logger.Info("Draft Bucket Options set up", "OptionsHolder.CoLoadOptions");
-
-        if ((!PlayerControl.LocalPlayer?.FriendCode?.GetDevUser().IsDev) ?? true)
-        {
-            DraftMode.SetHidden(true);
-        }
 
         Logger.Info("End of Draft Setup", "Draft Setup");
 
@@ -1518,6 +1522,11 @@ public static class Options
             .SetColor(Color.cyan);
 
         CantGuessDuringDiscussionTime = BooleanOptionItem.Create(60697, "CantGuessDuringDiscussionTime", true, TabGroup.ModSettings, false)
+            .SetHeader(true)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(Color.cyan);
+
+        CanGuessCrewInvestigative = BooleanOptionItem.Create(60698, "CanGuessCrewInvestigative", true, TabGroup.ModSettings, false)
             .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
@@ -2107,7 +2116,7 @@ public static class Options
             .SetParent(LadderDeath);
 
         // Reset Kill Cooldown
-        FixFirstKillCooldown = BooleanOptionItem.Create(60770, "FixFirstKillCooldown", true, TabGroup.ModSettings, false)
+        FixFirstKillCooldown = BooleanOptionItem.Create(60770, "FixFirstKillCooldown", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
         ChangeFirstKillCooldown = BooleanOptionItem.Create(60772, "ChangeFirstKillCooldown", true, TabGroup.ModSettings, false)
@@ -2218,6 +2227,8 @@ public static class Options
         #endregion
 
         yield return null;
+
+        AFKDetector.SetupCustomOption();
 
         // End Load Settings
         OptionSaver.Load();

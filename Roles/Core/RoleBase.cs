@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Neutral;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 public abstract class RoleBase
 {
@@ -224,7 +224,15 @@ public abstract class RoleBase
     /// <summary>
     ///  When Role the Killer requires a kill check
     /// </summary>
-    public virtual bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target) => target != null && killer != null;
+    public virtual bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    {
+        if (killer.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Phantom)
+        {
+            killer.ResetKillCooldown();
+            killer.SetKillCooldown();
+        }
+        return target != null && killer != null;
+    }
 
     /// <summary>
     /// When the Killer murders Target

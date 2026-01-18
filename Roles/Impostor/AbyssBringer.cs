@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System;
-using TOHE.Modules;
+using TONE.Modules;
 using UnityEngine;
-using static TOHE.Modules.HazelExtensions;
-using static TOHE.Options;
+using static TONE.Modules.HazelExtensions;
+using static TONE.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 //EHR - https://github.com/Gurge44/EndlessHostRoles/blob/main/Roles/Impostor/Abyssbringer.cs
 internal class AbyssBringer : RoleBase
@@ -27,7 +27,6 @@ internal class AbyssBringer : RoleBase
     private static OptionItem BlackHoleMovesTowardsNearestPlayer;
     private static OptionItem BlackHoleMoveSpeed;
     private static OptionItem BlackHoleRadius;
-    public static OptionItem BlackHoleSkin;
     private static OptionItem CanKillImpostors;
     private static OptionItem CanKillTNA;
 
@@ -55,8 +54,6 @@ internal class AbyssBringer : RoleBase
         BlackHoleRadius = FloatOptionItem.Create(Id + 15, "BlackHoleRadius", new(0.1f, 5f, 0.1f), 1.2f, tab, false)
             .SetParent(CustomRoleSpawnChances[role])
             .SetValueFormat(OptionFormat.Multiplier);
-        BlackHoleSkin = BooleanOptionItem.Create(Id + 17, "BlackHoleSkin", false, tab, false)
-            .SetParent(CustomRoleSpawnChances[role]);
         CanKillImpostors = BooleanOptionItem.Create(Id + 19, "CanKillImpostors", false, tab, false).SetParent(CustomRoleSpawnChances[role]);
         CanKillTNA = BooleanOptionItem.Create(Id + 20, "CanKillTNA", false, tab, false).SetParent(CustomRoleSpawnChances[role]);
     }
@@ -279,8 +276,8 @@ internal class AbyssBringer : RoleBase
         internal BlackHole(Vector2 position)
         {
             if (!AmongUsClient.Instance.AmHost) return;
-            if (!BlackHoleSkin.GetBool()) CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#000000>█<#19131c>█<#000000>█<#000000>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#412847>█<#000000>█<#19131c>█<#000000>█<#412847>█<#260f26>█<alpha=#00>█<br><#000000>█<#412847>█<#412847>█<#000000>█<#260f26>█<#1c0d1c>█<#19131c>█<#000000>█<br><#19131c>█<#000000>█<#412847>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#19131c>█<#000000>█<br><#000000>█<#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#000000>█<#260f26>█<br><#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#19131c>█<#412847>█<#412847>█<#19131c>█<br><alpha=#00>█<#260f26>█<#412847>█<#412847>█<#19131c>█<#260f26>█<#19131c>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#412847>█<#260f26>█<#260f26>█<#000000>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
-            else CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
+            CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#000000>█<#19131c>█<#000000>█<#000000>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#412847>█<#000000>█<#19131c>█<#000000>█<#412847>█<#260f26>█<alpha=#00>█<br><#000000>█<#412847>█<#412847>█<#000000>█<#260f26>█<#1c0d1c>█<#19131c>█<#000000>█<br><#19131c>█<#000000>█<#412847>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#19131c>█<#000000>█<br><#000000>█<#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#000000>█<#260f26>█<br><#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#19131c>█<#412847>█<#412847>█<#19131c>█<br><alpha=#00>█<#260f26>█<#412847>█<#412847>█<#19131c>█<#260f26>█<#19131c>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#412847>█<#260f26>█<#260f26>█<#000000>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
+            //CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
         }
     }
 }

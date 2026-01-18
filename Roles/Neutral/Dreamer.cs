@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
+using TONE.Modules;
 using UnityEngine;
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Dreamer : RoleBase
 {

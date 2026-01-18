@@ -1,13 +1,13 @@
 using AmongUs.GameOptions;
 using System;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Double;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles._Ghosts_.Crewmate;
+namespace TONE.Roles._Ghosts_.Crewmate;
 
 internal class Hawk : RoleBase
 {
@@ -111,7 +111,6 @@ internal class Hawk : RoleBase
             && _Player.GetAbilityUseLimit() > 0
             && rnd.Next(100) >= KillerChanceMiss[target.PlayerId]
             && !target.IsNeutralApocalypse()
-            && !target.Is(CustomRoles.Jinx)
             && !target.Is(CustomRoles.CursedWolf)
             && (!target.Is(CustomRoles.NiceMini) || Mini.Age > 18);
     }

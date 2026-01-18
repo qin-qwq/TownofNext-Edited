@@ -3,19 +3,19 @@ using Hazel;
 using InnerNet;
 using System;
 using System.Threading.Tasks;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Patches;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 
 [Obfuscation(Exclude = true)]
@@ -24,7 +24,7 @@ public enum CustomRPC : byte // 183/255 USED
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
 
-    // Adding Role rpcs that overrides TOHE section and changing BetterCheck will be rejected
+    // Adding Role rpcs that overrides TONE section and changing BetterCheck will be rejected
     // Sync Role Skill can be used under most cases so you should not make a new rpc unless it's necessary
     // NOTE: Set RPC's that are spammed to "ExtendedPlayerControl.RpcSendOption" to prevent kick due innersloth anti-cheat
 
@@ -36,7 +36,7 @@ public enum CustomRPC : byte // 183/255 USED
     PlaySound,
     SetCustomRole,
 
-    // TOHE
+    // TONE
     AntiBlackout,
     SetRealKiller,
     PlayCustomSound,
@@ -69,6 +69,7 @@ public enum CustomRPC : byte // 183/255 USED
     SyncAbilityUseLimit,
     PlayGuardAndKill,
     SyncAbilityCD,
+    BreakEmergencyButton,
 
     //Roles 
     SyncRoleSkill,
@@ -83,11 +84,11 @@ public enum CustomRPC : byte // 183/255 USED
     SetLoverPairs,
     SendFireworkerState,
     SetCurrentDousingTarget,
-    SetEvilTrackerTarget,
 
     // BetterAmongUs (BAU) RPC, This is sent to allow other BAU users know who's using BAU!
     BetterCheck = 150,
 
+    SetEvilTrackerTarget,
     SetDrawPlayer,
     SetCrewpostorTasksDone,
     SetCurrentDrawTarget,
@@ -115,7 +116,6 @@ public enum CustomRPC : byte // 183/255 USED
     Necronomicon,
     ExorcistExorcise,
     Invisibility,
-    FixBlackscreen,
     Balancer,
 
     //FFA
@@ -175,7 +175,6 @@ internal class RPCHandlerPatch
         or CustomRPC.SetFriendCode
         or CustomRPC.BetterCheck
         or CustomRPC.DictatorRPC
-        or CustomRPC.FixBlackscreen
         or CustomRPC.Balancer;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
@@ -438,6 +437,9 @@ internal class RPCHandlerPatch
                     else if (cooldown > 0) pc.RpcAddAbilityCD(rpc: false);
                     break;
                 }
+            case CustomRPC.BreakEmergencyButton:
+                ShipStatus.Instance.BreakEmergencyButton();
+                break;
             case CustomRPC.SetBountyTarget:
                 BountyHunter.ReceiveRPC(reader);
                 break;
@@ -491,7 +493,7 @@ internal class RPCHandlerPatch
             case CustomRPC.BetterCheck: // Better Among Us RPC
                 {
                     var SetBetterUser = reader.ReadBoolean(); // Used to set player as better user, boolean is used for a future for BAU later on.
-                    var IsBetterHost = reader.ReadBoolean(); // Used to set the player as better host, this should never be flagged for a TOHE lobby, if it is it's a spoofed RPC
+                    var IsBetterHost = reader.ReadBoolean(); // Used to set the player as better host, this should never be flagged for a TONE lobby, if it is it's a spoofed RPC
                     var Signature = reader.ReadString(); // Used to verify that the RPC isn't spoofed, only possible in BAU mod due to a special signature that can't really be replicated easily
                     var Version = reader.ReadString(); // Used to read players BAU version
 
@@ -650,11 +652,6 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.Guess:
                 GuessManager.ReceiveRPC(reader, __instance);
-                break;
-            case CustomRPC.FixBlackscreen:
-                Logger.Info("Attempted to fix Black Screen", "KeyCommand");
-                AntiBlackout.SetIsDead();
-                Logger.SendInGame("尝试修复黑屏");
                 break;
             case CustomRPC.NemesisRevenge:
                 Nemesis.ReceiveRPC_Custom(reader, __instance);
@@ -1012,13 +1009,13 @@ internal static class RPC
                     SoundManager.Instance.PlaySound(DestroyableSingleton<HnSImpostorScreamSfx>.Instance.HnSOtherImpostorTransformSfx, false, 0.8f);
                     break;
                 case Sounds.HnSShort:
-                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorShortMusic, true);
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorShortMusic, true, 1f);
                     break;
                 case Sounds.HnSLong:
-                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorLongMusic, true);
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorLongMusic, true, 1f);
                     break;
                 case Sounds.HnSRanch:
-                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorRanchMusic, true);
+                    SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorRanchMusic, true, 1f);
                     break;
                 case Sounds.SabotageSound:
                     SoundManager.Instance.PlaySound(ShipStatus.Instance.SabotageSound, false, 0.8f);

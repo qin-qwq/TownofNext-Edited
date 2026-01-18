@@ -1,16 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
 using InnerNet;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Neutral;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
-using static UnityEngine.GraphicsBuffer;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Overseer : RoleBase
 {
@@ -19,7 +18,7 @@ internal class Overseer : RoleBase
     private const int Id = 12200;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("prophecies");
@@ -62,7 +61,7 @@ internal class Overseer : RoleBase
         CustomRoles.FortuneTeller,
         CustomRoles.Oracle,
         CustomRoles.Tracefinder,
-  //      CustomRoles.Glitch,
+        //CustomRoles.Glitch,
         CustomRoles.Judge,
         CustomRoles.Mortician,
         CustomRoles.Medium,

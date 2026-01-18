@@ -2,13 +2,14 @@ using AmongUs.GameOptions;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using System;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 [HarmonyPatch(typeof(PlayerControl))]
 public static class PhantomRolePatch
@@ -95,7 +96,7 @@ public static class PhantomRolePatch
     public static bool CheckTrigger(PlayerControl phantom)
     {
         var role = phantom.GetRoleClass();
-        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false)
+        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false || TimeAssassin.TimeStop || Pelican.IsEaten(phantom.PlayerId))
         {
             if (phantom.AmOwner)
             {
@@ -120,11 +121,11 @@ public static class PhantomRolePatch
             sender.EndMessage();
             sender.SendMessage();
 
-            //_ = new LateTask(() =>
-            //{
-                if (phantom.GetCustomRole() is CustomRoles.Fury) return false;
+            _ = new LateTask(() =>
+            {
+                if (phantom.GetCustomRole() is CustomRoles.Fury) return;
                 phantom.SetKillCooldown(Math.Max(phantom.GetKillTimer(), 0.001f));
-            //}, 0.2f, $"Phantom Check");
+            }, 0.2f, $"Phantom Check");
 
             return false;
         }
@@ -215,21 +216,21 @@ public static class PhantomRolePatch
         phantom?.RpcSetRoleDesync(RoleTypes.Scientist, seer.GetClientId());
 
         // Return Phantom in meeting
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
         {
             if (InValid(phantom, seer)) yield break;
 
             phantom?.RpcSetRoleDesync(RoleTypes.Phantom, seer.GetClientId());
         }
         // Revert invis for phantom
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
         {
             if (InValid(phantom, seer)) yield break;
 
             phantom?.RpcStartAppearDesync(false, seer);
         }
         // Set Scientist back
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSecondsRealtime(4f);
         {
             if (InValid(phantom, seer)) yield break;
 
@@ -256,7 +257,7 @@ public static class PhantomRoleUseAbilityPatch
     {
         if (!AmongUsClient.Instance.AmHost) return true;
 
-        if (__instance.Player.AmOwner && !__instance.Player.Data.IsDead && __instance.Player.moveable && !Minigame.Instance && !__instance.IsCoolingDown && !__instance.fading)
+        if (__instance.Player.AmOwner && !__instance.Player.Data.IsDead && __instance.Player.IsAlive() && __instance.Player.moveable && !Minigame.Instance && !__instance.IsCoolingDown && !__instance.fading)
         {
             System.Func<RoleEffectAnimation, bool> roleEffectAnimation = x => x.effectType == RoleEffectAnimation.EffectType.Vanish_Charge;
             if (!__instance.Player.currentRoleAnimations.Find(roleEffectAnimation) && !__instance.Player.walkingToVent && !__instance.Player.inMovingPlat)

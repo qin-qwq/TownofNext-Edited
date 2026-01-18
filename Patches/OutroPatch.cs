@@ -1,18 +1,18 @@
 using System;
 using System.Text;
 using TMPro;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
 class EndGamePatch
@@ -82,6 +82,8 @@ class EndGamePatch
 
         CustomRoleManager.RoleClass.Values.Where(x => x.IsEnable).Do(x => x.IsEnable = false);
         CustomNetObject.Reset();
+
+        AFKDetector.ExemptedPlayers.Clear();
 
         var sb = new StringBuilder(GetString("KillLog") + ":");
         if (Options.OldKillLog.GetBool())
@@ -179,6 +181,7 @@ class EndGamePatch
             Main.RealOptionsData.Restore(GameOptionsManager.Instance.CurrentGameOptions);
             GameOptionsSender.AllSenders.Clear();
             GameOptionsSender.AllSenders.Add(new NormalGameOptionsSender());
+            Main.Instance.StartCoroutine(dbConnect.Init());
             /* Send SyncSettings RPC */
         }
     }

@@ -1,4 +1,4 @@
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Influenced : IAddon
 {

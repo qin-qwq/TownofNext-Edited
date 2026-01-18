@@ -1,17 +1,17 @@
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 internal class Mortician : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Mortician;
     private const int Id = 8900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem ShowArrows;

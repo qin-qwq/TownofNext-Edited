@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
-using static TOHE.Options;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Impostor;
+using static TONE.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Doppelganger : RoleBase
 {
@@ -76,6 +76,8 @@ internal class Doppelganger : RoleBase
         killer.SetNewOutfit(targetSkin, newLevel: targetLvl);
         Main.OvverideOutfit[killer.PlayerId] = (targetSkin, Main.PlayerStates[target.PlayerId].NormalOutfit.PlayerName);
         Logger.Info("Changed killer skin", "Doppelganger");
+
+        Main.PlayerStates[killer.PlayerId].StolenId = target.PlayerId;
 
         RPC.SyncAllPlayerNames();
         Utils.NotifyRoles(SpecifyTarget: killer, NoCache: true);

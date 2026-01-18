@@ -1,7 +1,7 @@
 using UnityEngine;
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Guesser : IAddon
 {

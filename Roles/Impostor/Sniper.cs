@@ -1,12 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Crewmate;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
+
+// 贴图来源 : https://github.com/Dolly1016/Nebula-Public
 
 internal class Sniper : RoleBase
 {
@@ -16,7 +19,7 @@ internal class Sniper : RoleBase
     private static readonly HashSet<byte> PlayerIdList = [];
     public static bool HasEnabled => PlayerIdList.Any();
 
-    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => UsePhantomBasis.GetBool() ? CustomRoles.Phantom : CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -25,6 +28,10 @@ internal class Sniper : RoleBase
     private static OptionItem SniperAimAssist;
     private static OptionItem SniperAimAssistOnshot;
     private static OptionItem CanKillWithBullets;
+    private static OptionItem UsePhantomBasis;
+    private static OptionItem SniperCooldown;
+    private static OptionItem SniperRadius;
+    private static OptionItem ArrowDuration;
     //private static OptionItem AlwaysShowShapeshiftAnimations;
 
     private static readonly Dictionary<byte, byte> snipeTarget = [];
@@ -40,6 +47,7 @@ internal class Sniper : RoleBase
     private static bool AimAssist;
     private static bool AimAssistOneshot;
     private static bool SniperCanUseKillButton;
+    private static bool FinishSniper;
 
     public override void SetupCustomOption()
     {
@@ -50,6 +58,13 @@ internal class Sniper : RoleBase
         SniperAimAssist = BooleanOptionItem.Create(Id + 12, "SniperAimAssist", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sniper]);
         SniperAimAssistOnshot = BooleanOptionItem.Create(Id + 13, "SniperAimAssistOneshot", false, TabGroup.ImpostorRoles, false).SetParent(SniperAimAssist);
         CanKillWithBullets = BooleanOptionItem.Create(Id + 14, "SniperCanKill", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sniper]);
+        UsePhantomBasis = BooleanOptionItem.Create(Id + 15, "Sniper.UsePhantomBasis", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sniper]);
+        SniperCooldown = FloatOptionItem.Create(Id + 16, "SniperCooldown", (0f, 180f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(UsePhantomBasis)
+            .SetValueFormat(OptionFormat.Seconds);
+        SniperRadius = FloatOptionItem.Create(Id + 17, "SniperRadius", (0.5f, 100f, 0.5f), 100f, TabGroup.ImpostorRoles, false).SetParent(UsePhantomBasis)
+            .SetValueFormat(OptionFormat.Multiplier);
+        ArrowDuration = FloatOptionItem.Create(Id + 18, "ArrowDuration", (0f, 180f, 2.5f), 10f, TabGroup.ImpostorRoles, false).SetParent(UsePhantomBasis)
+            .SetValueFormat(OptionFormat.Seconds);
         //AlwaysShowShapeshiftAnimations = BooleanOptionItem.Create(Id + 15, GeneralOption.ShowShapeshiftAnimations, true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sniper]);
     }
     public override void Init()
@@ -76,6 +91,7 @@ internal class Sniper : RoleBase
         AimAssist = SniperAimAssist.GetBool();
         AimAssistOneshot = SniperAimAssistOnshot.GetBool();
         SniperCanUseKillButton = CanKillWithBullets.GetBool();
+        FinishSniper = false;
 
         snipeBasePosition[playerId] = new();
         LastPosition[playerId] = new();
@@ -112,6 +128,7 @@ internal class Sniper : RoleBase
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.ShapeshifterCooldown = /*!AlwaysShowShapeshiftAnimations.GetBool() ? 1f :*/ Options.DefaultShapeshiftCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = SniperCooldown.GetFloat();
         //AURoleOptions.ShapeshifterDuration = 1f;
     }
     public override bool CanUseKillButton(PlayerControl pc)
@@ -171,8 +188,72 @@ internal class Sniper : RoleBase
         return targets;
 
     }
+    public override bool OnCheckVanish(PlayerControl phantom)
+    {
+       if (!UsePhantomBasis.GetBool()) return false;
+
+       if (phantom.GetAbilityUseLimit() <= 0) return false;
+
+        phantom.RpcRemoveAbilityUse();
+
+        if (!AmongUsClient.Instance.AmHost) return false;
+
+        phantom.RPCPlayCustomSound("AWP");
+
+        var validTargets = new List<PlayerControl>();
+        foreach (var target in Main.AllAlivePlayerControls)
+        {
+            if (target.PlayerId == phantom.PlayerId) continue;
+
+            FinishSniper = true;
+            LocateArrow.Add(target.PlayerId, phantom.transform.position);
+
+            if (Medic.IsProtected(target.PlayerId) || (target.Is(Custom_Team.Impostor) && !phantom.Is(CustomRoles.Narc)) || target.inVent || target.IsTransformedNeutralApocalypse() || target.Is(CustomRoles.Solsticer)) continue;
+            if (target.IsPolice() && phantom.Is(CustomRoles.Narc)) continue;
+            if (!phantom.RpcCheckAndMurder(target, true)) continue;
+
+            var pos = phantom.transform.position;
+            var dis = Utils.GetDistance(pos, target.transform.position);
+            if (dis > SniperRadius.GetFloat()) continue;
+
+            validTargets.Add(target);
+        }
+
+        if (validTargets.Count > 0)
+        {
+            var selectedTarget = validTargets.RandomElement();
+    
+            if (!Options.DisableShieldAnimations.GetBool())
+                phantom.RpcGuardAndKill();
+            else
+                phantom.SetKillCooldown();
+
+            selectedTarget.RpcMurderPlayer(selectedTarget);
+            selectedTarget.SetRealKiller(phantom);
+
+            Logger.Info($"{selectedTarget?.Data?.PlayerName} 被 {phantom?.Data?.PlayerName} 狙击", "Sniper");
+        }
+        else
+        {
+            phantom.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Sniper), GetString("Sniper.NoValidTarget")));
+            Logger.Info($"无有效目标", "Sniper");
+        }
+
+        _ = new LateTask(() => { FinishSniper = false; }, ArrowDuration.GetFloat(), "End Sniper Arrow");
+        return false;
+    }
+    public override string GetSuffixOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
+    {
+        if (!FinishSniper || isForMeeting || seer.PlayerId != target.PlayerId || !seer.IsAlive()) return string.Empty;
+        if (!seer.Is(CustomRoles.Sniper))
+        {
+            return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Sniper), GetString("Sniper")) + Utils.ColorString(Utils.GetRoleColor(CustomRoles.Sniper), LocateArrow.GetArrows(seer));
+        }
+        return string.Empty;
+    }
     public override void OnShapeshift(PlayerControl shapeshifter, PlayerControl target, bool animate, bool shapeshifting)
     {
+        if (UsePhantomBasis.GetBool()) return;
         var sniper = shapeshifter;
         var sniperId = sniper.PlayerId;
 
@@ -276,6 +357,14 @@ internal class Sniper : RoleBase
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         meetingReset = true;
+        FinishSniper = false;
+        if (UsePhantomBasis.GetBool())
+        {
+            foreach (var pc in Main.AllPlayerControls)
+            {
+                LocateArrow.RemoveAllTarget(pc.PlayerId);
+            }
+        }
     }
     public override string GetProgressText(byte playerId, bool comms)
     {
@@ -337,6 +426,11 @@ internal class Sniper : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         if (IsThisRole(playerId))
-            hud.AbilityButton?.OverrideText(GetString(playerId.GetAbilityUseLimit() <= 0 ? "DefaultShapeshiftText" : "SniperSnipeButtonText"));
+            hud.AbilityButton?.OverrideText(GetString(playerId.GetAbilityUseLimit() <= 0 && !UsePhantomBasis.GetBool() ? "DefaultShapeshiftText" : "SniperSnipeButtonText"));
+    }
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
+    {
+        if (UsePhantomBasis.GetBool() || (!UsePhantomBasis.GetBool() && player.GetAbilityUseLimit() > 0)) return CustomButton.Get("Sniper");
+        return null;
     }
 }

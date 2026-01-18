@@ -1,17 +1,16 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
+using TONE.Modules;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Catalyst : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Catalyst;
     private const int Id = 33300;
-    public override bool IsExperimental => true;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;

@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace TOHE;
+namespace TONE;
 
 public static class TagManager
 {
@@ -30,7 +30,7 @@ public static class TagManager
 #endif
 
             if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
-            var defaultTagMsg = GetResourcesTxt($"TOHE.Resources.Config.TagTemplate.txt");
+            var defaultTagMsg = GetResourcesTxt($"TONE.Resources.Config.TagTemplate.txt");
             if (!File.Exists(templateFilePath)) // Default tag
             {
                 using FileStream fs = File.Create(templateFilePath);

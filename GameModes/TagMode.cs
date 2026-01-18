@@ -2,14 +2,15 @@ using AmongUs.GameOptions;
 using Hazel;
 using System;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using TMPro;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE;
+namespace TONE;
 
 public static class TagMode
 {
@@ -138,18 +139,33 @@ public static class TagMode
         TaskCount = (0, TaskNum);
     }
 
-    public static void SendTaskRPC()
+    public static void SendTaskRPC(byte targetId = 255)
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
+        writer.Write(targetId);
         writer.Write(TaskCount.Item1);
         writer.Write(TaskCount.Item2);
-        var sender = new RpcSyncTagModeTaskStates(PlayerControl.LocalPlayer.NetId, TaskCount.Item1, TaskCount.Item2);
+        var sender = new RpcSyncTagModeTaskStates(PlayerControl.LocalPlayer.NetId, writer);
         RpcUtils.LateBroadcastReliableMessage(sender);
     }
 
     public static void HandleSyncTagModeTaskStates(MessageReader reader)
     {
+        byte targetId = reader.ReadByte();
         TaskCount = (reader.ReadInt32(), reader.ReadInt32());
+
+        if (targetId != 255)
+        {
+            var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
+
+            var newPopUp = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
+
+            var target = targetId.GetPlayer();
+
+            newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
+            newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("TagMode.BecomeZombie");
+            newPopUp.Show(target, 0);      
+        }
     }
 
     public static void AppendTagModeKcount(StringBuilder builder)
@@ -211,7 +227,7 @@ public class TZombie : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        player.RpcSetColor(2);
+        if (AmongUsClient.Instance.AmHost) player.RpcSetColor(2);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -274,13 +290,19 @@ public class TZombie : RoleBase
         killer.ResetKillCooldown();
         target.ResetKillCooldown();
         target.SetKillCooldown(forceAnime: true);
-        NotifyRoles(killer, target);
-        NotifyRoles(target, killer);
+        NotifyRoles(SpecifyTarget: target);
         target.Notify(ColorString(GetRoleColor(CustomRoles.TZombie), GetString("YouBecomeZombie")));
         target.MarkDirtySettings();
 
-        foreach (var tac in Main.AllPlayerControls)
-            RPC.PlaySoundRPC(Sounds.ImpTransform, tac.PlayerId);
+        var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
+
+        var newPopUp = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
+
+        newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
+        newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("TagMode.BecomeZombie");
+        newPopUp.Show(target, 0);   
+
+        TagMode.SendTaskRPC(target.PlayerId);
 
         return false;
     }
@@ -291,6 +313,10 @@ public class TZombie : RoleBase
     {
         hud.KillButton?.OverrideText($"{GetString("TZombieButtonText")}");
     }
+
+    public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => seer.IsAlive();
+
+    public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];
 }
 
 public class TCrewmate : RoleBase
@@ -310,7 +336,7 @@ public class TCrewmate : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2)
+        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2 && AmongUsClient.Instance.AmHost)
         {
             player.RpcSetColor(13);
         }
@@ -528,12 +554,16 @@ public class TCrewmate : RoleBase
     public override string GetProgressText(byte playerId, bool comms)
     {
         float limit = playerId.GetAbilityUseLimit();
-        UnityEngine.Color TextColor = GetRoleColor(Main.PlayerStates[playerId].MainRole).ShadeColor(0.25f);
-        return ColorString(UnityEngine.Color.yellow, $"({TagMode.TaskCount.Item1}/{TagMode.TaskCount.Item2})") + ColorString(UnityEngine.Color.white, " - ") + ColorString(TextColor, $"({Math.Round(limit, 1)})");
+        Color TextColor = GetRoleColor(Main.PlayerStates[playerId].MainRole).ShadeColor(0.25f);
+        return ColorString(Color.yellow, $"({TagMode.TaskCount.Item1}/{TagMode.TaskCount.Item2})") + ColorString(Color.white, " - ") + ColorString(TextColor, $"({Math.Round(limit, 1)})");
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.AbilityButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
+
+    public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => seer.IsAlive();
+
+    public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];
 }

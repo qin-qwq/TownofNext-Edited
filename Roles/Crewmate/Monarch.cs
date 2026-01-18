@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Double;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Monarch : RoleBase
 {

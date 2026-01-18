@@ -3,10 +3,10 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Linq;
 using InnerNet;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using Mathf = UnityEngine.Mathf;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 {
@@ -121,7 +121,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
         if (Main.AllPlayerSpeed.TryGetValue(player.PlayerId, out var speed))
         {
-            AURoleOptions.PlayerSpeedMod = Mathf.Clamp(speed, Main.MinSpeed, 10f);
+            AURoleOptions.PlayerSpeedMod = Mathf.Clamp(speed, -10f, 10f);
         }
 
         state.taskState.hasTasks = Utils.HasTasks(player.Data, false);
@@ -131,7 +131,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             AURoleOptions.ShapeshifterDuration = 1f;
         }
 
-        if (Options.GhostCanSeeOtherVotes.GetBool() && player.Data.IsDead)
+        if (Options.GhostCanSeeOtherVotes.GetBool() && !player.IsAlive())
         {
             opt.SetBool(BoolOptionNames.AnonymousVotes, false);
         }

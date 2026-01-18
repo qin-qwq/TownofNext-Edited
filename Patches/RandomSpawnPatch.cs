@@ -1,10 +1,10 @@
 using Hazel;
 using System;
-using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Impostor;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 // Thanks: https://github.com/tukasa0001/TownOfHost/blob/main/Patches/RandomSpawnPatch.cs
 class RandomSpawn
@@ -403,6 +403,14 @@ class RandomSpawn
         public virtual void FirstTeleport(PlayerControl player)
         {
             Teleport(player, false);
+        }
+        public virtual Vector2 GetAllLocation()
+        {
+            var locations = Positions.ToArray();
+
+            var location = locations.ToArray().OrderBy(_ => Guid.NewGuid()).Take(1).FirstOrDefault();
+
+            return location.Value;
         }
 
         private void Teleport(PlayerControl player, bool isRadndom)

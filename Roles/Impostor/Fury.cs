@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 // 部分代码参考：https://github.com/TOHOptimized/TownofHost-Optimized
 // 贴图来源 : https://github.com/Dolly1016/Nebula-Public

@@ -1,6 +1,6 @@
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Lurker : RoleBase
 {

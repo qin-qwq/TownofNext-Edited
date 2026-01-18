@@ -1,7 +1,6 @@
 using AmongUs.Data.Player;
-using HarmonyLib;
 
-namespace TOHE;
+namespace TONE;
 
 // Some of the below patches are from https://github.com/scp222thj/MalumMenu/
 [HarmonyPatch(typeof(PlayerBanData), nameof(PlayerBanData.BanPoints), MethodType.Setter)]

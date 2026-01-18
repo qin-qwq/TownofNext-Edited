@@ -1,6 +1,6 @@
 using AmongUs.GameOptions;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Statue : IAddon
 {

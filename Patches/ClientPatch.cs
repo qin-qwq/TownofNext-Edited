@@ -1,9 +1,9 @@
 using InnerNet;
-using TOHE.Modules;
+using TONE.Modules;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(GameStartManager), nameof(GameStartManager.MakePublic))]
 internal class MakePublicPatch
@@ -29,6 +29,15 @@ internal class MakePublicPatch
             return false;
         }
         return true;
+    }
+}
+[HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.GetMaxMessagePackingLimit))]
+static class GetMaxMessagePackingLimitPatch
+{
+    public static bool Prefix(ref int __result)
+    {
+        __result = 10;
+        return false;
     }
 }
 [HarmonyPatch(typeof(MMOnlineManager), nameof(MMOnlineManager.Start))]
@@ -96,7 +105,7 @@ internal class RunLoginPatch
         if (!EOSManager.Instance.loginFlowFinished) return;
 
         var friendcode = EOSManager.Instance.friendCode;
-        //Main.Instance.StartCoroutine(dbConnect.Init());
+        Main.Instance.StartCoroutine(dbConnect.Init());
         if (friendcode == null || friendcode == "")
         {
             EOSManager.Instance.attemptAuthAgain = true;

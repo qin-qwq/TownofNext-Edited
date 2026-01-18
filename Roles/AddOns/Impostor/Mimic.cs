@@ -1,6 +1,6 @@
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Impostor;
+namespace TONE.Roles.AddOns.Impostor;
 public class Mimic : IAddon
 {
     public CustomRoles Role => CustomRoles.Mimic;

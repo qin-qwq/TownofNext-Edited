@@ -1,13 +1,13 @@
 using System;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Neutral;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class FortuneTeller : RoleBase
 {
@@ -16,7 +16,7 @@ internal class FortuneTeller : RoleBase
     private const int Id = 8000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.FortuneTeller);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem CheckLimitOpt;
@@ -90,7 +90,7 @@ internal class FortuneTeller : RoleBase
             {
                 var realTarget = GetPlayerById(VoodooMaster.Dolls[target.PlayerId].Where(x => GetPlayerById(x).IsAlive()).ToList().RandomElement());
                 SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), realTarget.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
-                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(realTarget.GetCustomRole().GetActualRoleName()));
+                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(realTarget.GetCustomRole().ToString()));
             }
             else if (Illusionist.IsCovIllusioned(target.PlayerId))
             {
@@ -101,13 +101,13 @@ internal class FortuneTeller : RoleBase
                 msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement().ToString()));
             }
             else if (target.Is(CustomRoles.Narc))
-                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRoles.Sheriff.GetActualRoleName()));
+                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRoles.Sheriff.ToString()));
             else
-                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(target.GetCustomRole().GetActualRoleName()));
+                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(target.GetCustomRole().ToString()));
 
 
             if (Lich.IsCursed(target))
-                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRoles.Lich.GetActualRoleName()));
+                msg = string.Format(GetString("FortuneTellerCheck.TaskDone"), target.GetRealName(), GetString(CustomRoles.Lich.ToString()));
 
         }
         else if (RandomActiveRoles.GetBool())
@@ -172,7 +172,7 @@ internal class FortuneTeller : RoleBase
             }
         }
 
-        SendMessage(GetString("FortuneTellerCheck") + "\n" + msg + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()));
+        SendMessage(GetString("FortuneTellerCheck") + "\n" + msg + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()), sendOption: Hazel.SendOption.Reliable);
         SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.FortuneTeller), string.Format(GetString("VoteAbilityUsed"), GetString("FortuneTeller"))), noReplay: true);
         return false;
     }

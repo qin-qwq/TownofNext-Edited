@@ -1,7 +1,7 @@
 using Hazel;
 
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     public class RpcVersionCheck(uint rpcObjectNetId) : BaseModdedRpc(rpcObjectNetId)
     {

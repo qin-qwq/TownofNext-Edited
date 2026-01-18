@@ -1,9 +1,9 @@
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Celebrity : RoleBase
 {
@@ -45,7 +45,10 @@ internal class Celebrity : RoleBase
         if (!CovenKnowCelebrityDead.GetBool() && seer.GetCustomRole().IsCoven()) return false;
 
         seer.Notify(ColorString(GetRoleColor(CustomRoles.Celebrity), GetString("OnCelebrityDead")));
-        UnityEngine.Object.Instantiate(GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab, HudManager.Instance.transform.parent).Show(target, 0);
+        if (seer.IsHost())
+        {
+            UnityEngine.Object.Instantiate(GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab, HudManager.Instance.transform.parent).Show(target, 0);
+        }
         return !seer.IsHost();
     }
     public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)

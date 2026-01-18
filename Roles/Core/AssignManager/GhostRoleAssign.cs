@@ -1,7 +1,7 @@
 using Hazel;
 using System.Text;
 
-namespace TOHE.Roles.Core.AssignManager;
+namespace TONE.Roles.Core.AssignManager;
 
 public static class GhostRoleAssign
 {

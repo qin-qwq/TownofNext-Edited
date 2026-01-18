@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
 using System;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Tracefinder : RoleBase
 {
@@ -12,7 +12,7 @@ internal class Tracefinder : RoleBase
     public override CustomRoles Role => CustomRoles.Tracefinder;
     private const int Id = 7300;
     public override CustomRoles ThisRoleBase => CustomRoles.Scientist;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem VitalsDuration;

@@ -5,16 +5,16 @@ using System.Text.RegularExpressions;
 using AmongUs.GameOptions;
 using Cpp2IL.Core.Extensions;
 using Rewired;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
-using TOHE.Roles.Vanilla;
+using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Double;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
+using TONE.Roles.Vanilla;
 
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Core.DraftAssign;
+namespace TONE.Roles.Core.DraftAssign;
 
 public static class DraftAssign
 {
@@ -27,7 +27,7 @@ public static class DraftAssign
     public static List<CustomRoles>[] PoolLookup = [];
 
     public static bool DraftActive => AssignedSlots.Any();
-    public static bool CanStartWithDraft => Main.AllAlivePlayerControls.All(x => PoolLookup[x.PlayerId] != null && PoolLookup[x.PlayerId].Any());
+    public static bool CanStartWithDraft => PoolLookup.Length >= Main.AllAlivePlayerControls.Length && Main.AllAlivePlayerControls.All(x => x.PlayerId < PoolLookup.Length && PoolLookup[x.PlayerId] != null && PoolLookup[x.PlayerId].Any());
 
     private static Dictionary<byte, CustomRoles> RoleResult => RoleAssign.RoleResult;
 
@@ -59,7 +59,7 @@ public static class DraftAssign
                 case CustomRoles.NiceMini:
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
-                case CustomRoles.PhantomTOHE when NarcManager.IsNarcAssigned():
+                case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
                     continue;
             }
 
@@ -320,6 +320,8 @@ public static class DraftAssign
 
     AfterPoolsAssigned:
 
+        FixSlotDistribution();
+
         Logger.Info("================================================", "PoolsAssigned");
         foreach (var id in PoolIds)
         {
@@ -337,6 +339,47 @@ public static class DraftAssign
         RoleSlot GetSlot(int index)
         {
             return SlotLookup[index];
+        }
+
+        /// <summary>
+        /// Adjusts the role slot distribution to match the set of currently connected players.
+        /// Ensures that slots marked as always evil are assigned to existing player IDs and that
+        /// non-always-evil slots are not reserved for non-existent players by swapping entries
+        /// in <c>SlotLookup</c> and <c>PoolLookup</c> until a consistent assignment is reached.
+        /// </summary>
+        void FixSlotDistribution()
+        {
+            var allPlayerIds = Main.AllPlayerControls.Select(x => x.PlayerId).ToList();
+            var allSlotIds = SlotLookup.Select((value, index) => new { Value = value, Index = index })
+                .Where(item => item.Value != null).Select(item => item.Index).ToList();
+
+            List<byte> slotsToReassignFrom = [];
+            List<byte> slotsToReassignTo = [];
+
+            foreach (var id in allSlotIds)
+            {
+                if (!allPlayerIds.Contains((byte)id))
+                {
+                    if (GetSlot(id).IsEvil == RoleSlot.Evil.ALWAYS) slotsToReassignFrom.Add((byte)id);
+                }
+                else
+                {
+                    if (GetSlot(id).IsEvil != RoleSlot.Evil.ALWAYS) slotsToReassignTo.Add((byte)id);
+                }
+            }
+
+            while (slotsToReassignFrom.Count > 0 && slotsToReassignTo.Count > 0)
+            {
+                slotsToReassignFrom.Shuffle();
+                slotsToReassignTo.Shuffle();
+
+                // Swaps Slots and Pools at the From/To Locations
+                (SlotLookup[slotsToReassignFrom[0]], SlotLookup[slotsToReassignTo[0]]) = (SlotLookup[slotsToReassignTo[0]], SlotLookup[slotsToReassignFrom[0]]);
+                (PoolLookup[slotsToReassignFrom[0]], PoolLookup[slotsToReassignTo[0]]) = (PoolLookup[slotsToReassignTo[0]], PoolLookup[slotsToReassignFrom[0]]);
+
+                slotsToReassignTo.RemoveAt(0);
+                slotsToReassignFrom.RemoveAt(0);
+            }
         }
 
         CustomRoles GetRoleFromSlot(List<CustomRoles> roles, RoleSlot slot)
@@ -609,7 +652,7 @@ public static class DraftAssign
 
             while (playerCount > UnassignedSlots.Count)
             {
-                UnassignedSlots.Add(new([], [CustomRoles.CrewmateTOHE]));
+                UnassignedSlots.Add(new([], [CustomRoles.CrewmateTONE]));
             }
         }
 
@@ -682,7 +725,7 @@ public static class DraftAssign
             case CustomGameMode.TagMode:
                 var random = IRandom.Instance;
                 List<PlayerControl> AllPlayers2 = Main.AllPlayerControls.Shuffle(random).ToList();
-                int ZombieNum = TagMode.ZombieMaximun.GetInt();
+                var ZombieNum = TagMode.ZombieMaximun.GetInt();
                 foreach (PlayerControl pc in AllPlayers2)
                 {
                     if (Main.EnableGM.Value && pc.IsHost())
@@ -746,26 +789,26 @@ public static class DraftAssign
             {
                 List<CustomRoles> pool = [.. PoolLookup[playerId].Shuffle(rd)];
 
-                RoleResult[playerId] = pool.FirstOrDefault(CustomRoles.CrewmateTOHE);
+                RoleResult[playerId] = pool.FirstOrDefault(CustomRoles.CrewmateTONE);
             }
             // Assign role if draft bucket not assigned
             // else if (UnassignedDraftPools.Any())
             // {
-            //     var role = UnassignedDraftPools.Shuffle(rd).First().Value.Shuffle(rd).FirstOrDefault(CustomRoles.CrewmateTOHE);
+            //     var role = UnassignedDraftPools.Shuffle(rd).First().Value.Shuffle(rd).FirstOrDefault(CustomRoles.CrewmateTONE);
 
             //     RoleResult[playerId] = role;
             // }
             // Assign crewmate if no unassigned roles left
             else
             {
-                RoleResult[playerId] = CustomRoles.CrewmateTOHE;
+                RoleResult[playerId] = CustomRoles.CrewmateTONE;
             }
         }
 
         return;
     }
 
-    public static DraftCmdResult AddPlayersToDraft()
+    /*public static DraftCmdResult AddPlayersToDraft()
     {
         if (!DraftActive) return DraftCmdResult.NoCurrentDraft;
 
@@ -789,7 +832,7 @@ public static class DraftAssign
             Logger.Info($"Pool [{string.Join(", ", pool.Value)}] assigned to {player.name}", "PoolAssigned");
         }
         return DraftCmdResult.Success;
-    }
+    }*/
 
     public static void Reset()
     {
@@ -817,6 +860,14 @@ public static class DraftAssign
         }
 
         return sb.ToString();
+    }
+
+    public static void ResendDraftPoolMsg()
+    {
+        foreach (var pc in Main.AllPlayerControls)
+        {
+            Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), pc.GetFormattedDraftPool()), pc.PlayerId);
+        }
     }
 
     [Obfuscation(Exclude = true)]
@@ -949,4 +1000,14 @@ public class RoleSlot(HashSet<RoleBucket> buckets, HashSet<CustomRoles> roles)
             TryAddType(type);
         }
     }
+
+    public enum Evil
+    {
+        ALWAYS,
+        SOMETIMES,
+        NEVER
+    }
+
+    public Evil IsEvil => !Types.Contains(RoleAssign.RoleAssignType.Crewmate) ? Evil.ALWAYS : 
+        Types.Any(x => x != RoleAssign.RoleAssignType.Crewmate) ? Evil.SOMETIMES : Evil.NEVER;
 }

@@ -5,24 +5,27 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
 using System;
+using System.Collections;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Patches;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 static class ExtendedPlayerControl
 {
+    public static readonly HashSet<byte> BlackScreenWaitingPlayers = [];
+    public static readonly HashSet<byte> CancelBlackScreenFix = [];
     // checkAddons disable checks in MainRole Set, checkAAconflict disable checks in SubRole Set
     public static void RpcSetCustomRole(this PlayerControl player, CustomRoles role, bool checkAddons = true, bool checkAAconflict = true)
     {
@@ -77,7 +80,7 @@ static class ExtendedPlayerControl
     {
         var currentAddOns = player.GetCustomSubRoles().Where(x => !x.IsAddonAssignedMidGame()).ToArray();
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSecondsRealtime(0.1f);
 
         foreach (var addon in currentAddOns)
         {
@@ -86,7 +89,7 @@ static class ExtendedPlayerControl
                 Main.PlayerStates[player.PlayerId].RemoveSubRole(addon);
                 Logger.Msg($"{player.GetNameWithRole()} had incompatible addon {addon}, removing addon", $"RemoveIncompatibleAddOnsAsync: {player.GetCustomRole()}");
             }
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSecondsRealtime(0.2f);
         }
     }
     private static System.Collections.IEnumerator CheckAndAssignAddOnAsync(this PlayerControl player, CustomRoles newAddOn)
@@ -95,7 +98,7 @@ static class ExtendedPlayerControl
 
         Main.PlayerStates[player.PlayerId].SetSubRole(newAddOn, pc: player);
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSecondsRealtime(0.1f);
 
         foreach (var addOn in currentAddOns)
         {
@@ -104,7 +107,7 @@ static class ExtendedPlayerControl
                 Main.PlayerStates[player.PlayerId].RemoveSubRole(addOn);
                 Logger.Msg($"{player.GetNameWithRole()} had incompatible addon {addOn}, removing addon", $"CheckAndAssignAddOnAsync: {player.GetCustomRole()}");
             }
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSecondsRealtime(0.2f);
         }
 
     }
@@ -148,6 +151,9 @@ static class ExtendedPlayerControl
 
         if (Camouflage.IsCamouflage)
             Camouflage.RpcSetSkin(player);
+
+        if (player.AmOwner && Main.CurrentServerIsVanilla)
+            player.RpcMakeVisible();
 
         var customRole = player.GetCustomRole();
         Main.PlayerStates[player.PlayerId].IsDead = false;
@@ -519,6 +525,7 @@ static class ExtendedPlayerControl
     /// </summary>
     public static void RpcMurderPlayer(this PlayerControl killer, PlayerControl target)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         // If Target is Dollmaster or Possessed Player run Dollmasters kill check instead.
         if (DollMaster.SwapPlayerInfo(target) != target)
         {
@@ -1020,6 +1027,9 @@ static class ExtendedPlayerControl
         NetHelpers.WriteVector2(position, messageWriter);
         messageWriter.Write(newSid);
         AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+
+        AFKDetector.TempIgnoredPlayers.Add(player.PlayerId);
+        _ = new LateTask(() => AFKDetector.TempIgnoredPlayers.Remove(player.PlayerId), 0.2f + Utils.CalculatePingDelay());
     }
     public static void RpcRandomVentTeleport(this PlayerControl player)
     {
@@ -1236,7 +1246,19 @@ static class ExtendedPlayerControl
 
         }, FlashDuration + delay, "Fix Desync Reactor");
     }
-
+    /// <summary>
+    /// Gets the obfuscated playerId, taking Doppleganger/Rebirth into account
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
+    public static byte GetVisiblePlayerId(this PlayerControl player)
+    {
+        if (Main.PlayerStates[player.PlayerId].StolenId != null)
+        {
+            return Main.PlayerStates[player.PlayerId].StolenId.Value;
+        }
+        return player.PlayerId;
+    }
     public static string GetRealName(this PlayerControl player, bool isMeeting = false, bool clientData = false)
     {
         if (clientData || player == null)
@@ -1822,7 +1844,7 @@ static class ExtendedPlayerControl
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcMakeInvisible", SendOption.Reliable);
-            sender.StartMessage(pc.GetClientId());
+            sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
                 .WriteVector2(new Vector2(50f, 50f))
                 .Write(player.NetTransform.lastSequenceId)
@@ -1871,7 +1893,7 @@ static class ExtendedPlayerControl
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcMakeVisible", SendOption.Reliable);
-            sender.StartMessage(pc.GetClientId());
+            sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
                 .WriteVector2(new Vector2(50f, 50f))
                 .Write((ushort)(player.NetTransform.lastSequenceId + 32767))
@@ -1902,7 +1924,7 @@ static class ExtendedPlayerControl
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);
-            sender.StartMessage(pc.GetClientId());
+            sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetId, RpcCalls.Exiled)
                 .EndRpc();
             RoleTypes role = Utils.GetRoleMap(pc.PlayerId, player.PlayerId).RoleType;
@@ -1934,16 +1956,14 @@ static class ExtendedPlayerControl
 
         Logger.Info($"Reset invisibility for {player.GetNameWithRole()}", "RpcResetInvisibility");
     }
-    public static bool IsShifted(this PlayerControl pc)
-    {
-        return Main.CheckShapeshift.TryGetValue(pc.PlayerId, out bool shifted) && shifted;
-    }
     public static string ColoredPlayerName(this byte id)
     {
         return Utils.ColorString(Main.PlayerColors.GetValueOrDefault(id, Color.white), Main.AllPlayerNames.GetValueOrDefault(id, Utils.GetPlayerById(id)?.GetRealName() ?? $"Someone (ID {id})"));
     }
     public static void SetChatVisible(this PlayerControl player, bool visible)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
+
         if (player.AmOwner)
         {
             HudManager.Instance.Chat.SetVisible(visible);
@@ -2023,6 +2043,10 @@ static class ExtendedPlayerControl
                 map = new RandomSpawn.PolusSpawnMap();
                 map.RandomTeleport(player);
                 break;
+            case 3:
+                map = new RandomSpawn.DleksSpawnMap();
+                map.RandomTeleport(player);
+                break;
             case 4:
                 map = new RandomSpawn.AirshipSpawnMap();
                 map.RandomTeleport(player);
@@ -2081,5 +2105,142 @@ static class ExtendedPlayerControl
         }
 
         player.Visible = false;
+    }
+
+    // Credit to EHR
+    public static void FixBlackScreen(this PlayerControl pc)
+    {
+        if (pc == null || !AmongUsClient.Instance.AmHost || pc.IsModded()) return;
+
+        if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent || pc.inMovingPlat || pc.onLadder || !Main.AllPlayerControls.FindFirst(x => !x.IsAlive(), out var dummyGhost))
+        {
+            if (BlackScreenWaitingPlayers.Add(pc.PlayerId))
+                Main.Instance.StartCoroutine(Wait());
+
+            return;
+
+            IEnumerator Wait()
+            {
+                Logger.Warn($"FixBlackScreen was called for {pc.GetNameWithRole()}, but the conditions are not met to execute this code right now, waiting until it becomes possible to do so", "FixBlackScreen");
+
+                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId) && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || Main.AllPlayerControls.All(x => x.IsAlive())))
+                    yield return null;
+
+                if (CancelBlackScreenFix.Remove(pc.PlayerId))
+                {
+                    Logger.Msg($"The black screen fix was canceled for {pc.GetNameWithRole()}", "FixBlackScreen");
+                    BlackScreenWaitingPlayers.Remove(pc.PlayerId);
+                    yield break;
+                }
+
+                if (!GameStates.InGame || GameStates.IsEnded)
+                {
+                    Logger.Msg($"During the waiting, the game ended, so the black screen fix will not be executed for {pc.GetNameWithRole()}", "FixBlackScreen");
+                    BlackScreenWaitingPlayers.Remove(pc.PlayerId);
+                    yield break;
+                }
+
+                yield return new WaitForSecondsRealtime(pc.IsAlive() ? 1f : 3f);
+
+                if (!GameStates.InGame || GameStates.IsEnded)
+                {
+                    Logger.Msg($"During the waiting, the game ended, so the black screen fix will not be executed for {pc.GetNameWithRole()}", "FixBlackScreen");
+                    BlackScreenWaitingPlayers.Remove(pc.PlayerId);
+                    yield break;
+                }
+
+                Logger.Msg($"Now that the conditions are met, fixing black screen for {pc.GetNameWithRole()}", "FixBlackScreen");
+                BlackScreenWaitingPlayers.Remove(pc.PlayerId);
+                pc.FixBlackScreen();
+            }
+        }
+
+        SystemTypes systemtype = (MapNames)Utils.GetActiveMapId() switch
+        {
+            MapNames.Polus => SystemTypes.Laboratory,
+            MapNames.Airship => SystemTypes.HeliSabotage,
+            _ => SystemTypes.Reactor
+        };
+
+        var sender = CustomRpcSender.Create($"Fix Black Screen For {pc.GetNameWithRole()}", SendOption.Reliable);
+
+        sender.RpcDesyncRepairSystem(pc, systemtype, 128);
+
+        int targetClientId = pc.OwnerId;
+        var ghostPos = dummyGhost.GetCustomPosition();
+        var pcPos = pc.GetCustomPosition();
+        var timer = Math.Max(Main.AllPlayerKillCooldown[pc.PlayerId], 0.1f);
+
+        if (pc.IsAlive())
+        {
+            // CheckInvalidMovementPatch.ExemptedPlayers.UnionWith([pc.PlayerId, dummyGhost.PlayerId]);
+            AFKDetector.TempIgnoredPlayers.UnionWith([pc.PlayerId, dummyGhost.PlayerId]);
+            _ = new LateTask(() => AFKDetector.TempIgnoredPlayers.ExceptWith([pc.PlayerId, dummyGhost.PlayerId]), 3f);
+
+            var murderPos = Pelican.GetBlackRoomPSForPelican();
+
+            sender.TP(pc, murderPos, noCheckState: true);
+
+            sender.AutoStartRpc(pc.NetId, 12, targetClientId);
+            sender.WriteNetObject(dummyGhost);
+            sender.Write((int)MurderResultFlags.Succeeded);
+            sender.EndRpc();
+
+            dummyGhost.NetTransform.SnapTo(murderPos, (ushort)(dummyGhost.NetTransform.lastSequenceId + 328));
+            dummyGhost.NetTransform.SetDirtyBit(uint.MaxValue);
+
+            sender.AutoStartRpc(dummyGhost.NetTransform.NetId, 21);
+            sender.WriteVector2(murderPos);
+            sender.Write((ushort)(dummyGhost.NetTransform.lastSequenceId + 8));
+            sender.EndRpc();
+        }
+        else
+        {
+            sender.AutoStartRpc(pc.NetId, 12, targetClientId);
+            sender.WriteNetObject(pc);
+            sender.Write((int)MurderResultFlags.Succeeded);
+            sender.EndRpc();
+        }
+
+        sender.SendMessage();
+
+        _ = new LateTask(() =>
+        {
+            sender = CustomRpcSender.Create($"Fix Black Screen For {pc.GetNameWithRole()} (2)", SendOption.Reliable);
+
+            sender.RpcDesyncRepairSystem(pc, systemtype, 16);
+            if (systemtype == SystemTypes.HeliSabotage) sender.RpcDesyncRepairSystem(pc, systemtype, 17);
+
+            if (pc.IsAlive())
+            {
+                sender.TP(pc, pcPos, noCheckState: true);
+                pc.SetKillCooldown(timer);
+                pc.Notify(GetString("BlackScreenFixCompleteNotify"));
+
+                dummyGhost.NetTransform.SnapTo(ghostPos, (ushort)(dummyGhost.NetTransform.lastSequenceId + 328));
+                dummyGhost.NetTransform.SetDirtyBit(uint.MaxValue);
+
+                sender.AutoStartRpc(dummyGhost.NetTransform.NetId, 21);
+                sender.WriteVector2(ghostPos);
+                sender.Write((ushort)(dummyGhost.NetTransform.lastSequenceId + 8));
+                sender.EndRpc();
+            }
+
+            sender.SendMessage();
+        }, 1f + (AmongUsClient.Instance.Ping / 1000f));
+    }
+
+    public static void SendGameData(this NetworkedPlayerInfo playerInfo)
+    {
+        MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+        writer.StartMessage(5);
+        writer.Write(AmongUsClient.Instance.GameId);
+        writer.StartMessage(1);
+        writer.WritePacked(playerInfo.NetId);
+        playerInfo.Serialize(writer, false);
+        writer.EndMessage();
+        writer.EndMessage();
+        AmongUsClient.Instance.SendOrDisconnect(writer);
+        writer.Recycle();
     }
 }

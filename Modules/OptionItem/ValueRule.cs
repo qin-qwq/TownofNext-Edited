@@ -1,6 +1,6 @@
 using System;
 
-namespace TOHE;
+namespace TONE;
 
 public abstract class ValueRule<T>(T minValue, T maxValue, T step)
 {

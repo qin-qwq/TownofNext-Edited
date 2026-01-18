@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns;
-using TOHE.Roles.Double;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns;
+using TONE.Roles.Double;
+using TONE.Roles.Neutral;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Archaeologist : RoleBase
 {

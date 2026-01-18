@@ -3,18 +3,27 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
 using System;
+using System.Text;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
+using TONE.Modules;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 public class CustomRpcSender
 {
+    private int messages;
     public MessageWriter stream;
     public readonly string name;
     public readonly SendOption sendOption;
     public bool isUnsafe;
+    public bool shouldLog;
     public delegate void onSendDelegateType();
     public onSendDelegateType onSendDelegate;
+
+    private readonly List<MessageWriter> doneStreams = [];
 
     public State CurrentState
     {
@@ -32,53 +41,60 @@ public class CustomRpcSender
     //-2: 未設定
     private int currentRpcTarget;
 
-    private int rootMessageCount;
+    // private int rootMessageCount;
 
     private CustomRpcSender() { }
-    public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe)
+    public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe, bool log)
     {
         stream = MessageWriter.Get(sendOption);
 
         this.name = name;
         this.sendOption = sendOption;
         this.isUnsafe = isUnsafe;
+        this.shouldLog = log;
         this.currentRpcTarget = -2;
-        onSendDelegate = () => Logger.Info($"{this.name}'s onSendDelegate =>", "CustomRpcSender");
+        onSendDelegate = () => {if(this.shouldLog) Logger.Info($"{this.name}'s onSendDelegate =>", "CustomRpcSender");};
 
         currentState = State.Ready;
-        rootMessageCount = 0;
-        Logger.Info($"\"{name}\" is ready", "CustomRpcSender");
+        messages = 0;
+        if (this.shouldLog)
+            Logger.Info($"\"{name}\" is ready", "CustomRpcSender");
     }
-    public static CustomRpcSender Create(string name = "No Name Sender", SendOption sendOption = SendOption.None, bool isUnsafe = false)
+    public static CustomRpcSender Create(string name = "No Name Sender", SendOption sendOption = SendOption.None, bool isUnsafe = false, bool log = true)
     {
-        return new CustomRpcSender(name, sendOption, isUnsafe);
+        return new CustomRpcSender(name, sendOption, isUnsafe, log);
     }
 
     #region Start/End Message
+
     public CustomRpcSender StartMessage(int targetClientId = -1)
     {
         if (currentState != State.Ready)
         {
-            string errorMsg = $"Messageを開始しようとしましたが、StateがReadyではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to start Message but State is not Ready (in: \"{name}\")";
+
             if (isUnsafe)
-            {
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
-            }
             else
-            {
                 throw new InvalidOperationException(errorMsg);
-            }
+        }
+
+        if (stream.Length > 500)
+        {
+            doneStreams.Add(stream);
+            stream = MessageWriter.Get(sendOption);
+            messages = 0;
         }
 
         if (targetClientId < 0)
         {
-            // 全員に対するRPC
+            // RPC for everyone
             stream.StartMessage(5);
             stream.Write(AmongUsClient.Instance.GameId);
         }
         else
         {
-            // 特定のクライアントに対するRPC (Desync)
+            // RPC (Desync) to a specific client
             stream.StartMessage(6);
             stream.Write(AmongUsClient.Instance.GameId);
             stream.WritePacked(targetClientId);
@@ -86,30 +102,34 @@ public class CustomRpcSender
 
         currentRpcTarget = targetClientId;
         currentState = State.InRootMessage;
-        rootMessageCount++;
-
-        if (rootMessageCount > 1)
-        {
-            Logger.Info($"\"{name}\" has {rootMessageCount} root messages.", "CustomRpcSender");
-        }
         return this;
     }
-    public CustomRpcSender EndMessage()
+
+    public CustomRpcSender EndMessage(bool startNew = false)
     {
         if (currentState != State.InRootMessage)
         {
-            string errorMsg = $"Messageを終了しようとしましたが、StateがInRootMessageではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to exit Message but State is not InRootMessage (in: \"{name}\")";
+
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
             else
                 throw new InvalidOperationException(errorMsg);
         }
+
         stream.EndMessage();
+
+        if (startNew)
+        {
+            doneStreams.Add(stream);
+            stream = MessageWriter.Get(sendOption);
+        }
 
         currentRpcTarget = -2;
         currentState = State.Ready;
         return this;
     }
+
     #endregion
     #region Start/End Rpc
     public CustomRpcSender StartRpc(uint targetNetId, RpcCalls rpcCall)
@@ -126,6 +146,14 @@ public class CustomRpcSender
             else
                 throw new InvalidOperationException(errorMsg);
         }
+
+        if (messages >= 10)
+        {
+            EndMessage(startNew: true);
+            StartMessage(currentRpcTarget);
+        }
+
+        messages++;
 
         stream.StartMessage(2);
         stream.WritePacked(targetNetId);
@@ -152,6 +180,10 @@ public class CustomRpcSender
     #endregion
     public CustomRpcSender AutoStartRpc(
         uint targetNetId,
+        RpcCalls callId,
+        int targetClientId = -1) => AutoStartRpc(targetNetId, (byte) callId, targetClientId);
+    public CustomRpcSender AutoStartRpc(
+        uint targetNetId,
         byte callId,
         int targetClientId = -1)
     {
@@ -167,7 +199,13 @@ public class CustomRpcSender
         if (currentRpcTarget != targetClientId)
         {
             //StartMessage処理
-            if (currentState == State.InRootMessage) this.EndMessage();
+            if (currentState == State.InRootMessage) this.EndMessage(startNew: true);
+            else if (messages > 0) // state is Ready
+            {
+                doneStreams.Add(stream);
+                stream = MessageWriter.Get(sendOption);
+                messages = 0;
+            }
             this.StartMessage(targetClientId);
         }
         this.StartRpc(targetNetId, callId);
@@ -176,23 +214,46 @@ public class CustomRpcSender
     }
     public void SendMessage(bool dispose = false)
     {
-        if (currentState == State.InRootMessage) this.EndMessage();
-        if (currentState != State.Ready)
+        if (currentState == State.InRootMessage) EndMessage();
+
+        if (currentState != State.Ready && !dispose)
         {
-            string errorMsg = $"Attempted to send RPC, but State is not Ready  (in: \"{name}\")";
+            var errorMsg = $"Tried to send RPC but State is not Ready (in: \"{name}\", state: {currentState})";
+
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
             else
                 throw new InvalidOperationException(errorMsg);
         }
 
+        if (stream.Length >= 1400 && sendOption == SendOption.Reliable && !dispose) Logger.Warn($"Large reliable packet \"{name}\" is sending ({stream.Length} bytes)", "CustomRpcSender");
+        else if (stream.Length > 3) Logger.Info($"\"{name}\" is finished (Length: {stream.Length}, dispose: {dispose}, sendOption: {sendOption})", "CustomRpcSender");
+
         if (!dispose)
         {
+            if (doneStreams.Count > 0)
+            {
+                var sb = new StringBuilder(" + Lengths: ");
+
+                doneStreams.ForEach(x =>
+                {
+                    if (x.Length >= 1400 && sendOption == SendOption.Reliable) Logger.Warn($"Large reliable packet \"{name}\" is sending ({x.Length} bytes)", "CustomRpcSender");
+                    else if (x.Length > 3) sb.Append($" | {x.Length}");
+
+                    AmongUsClient.Instance.SendOrDisconnect(x);
+                    x.Recycle();
+                });
+
+                Logger.Info(sb.ToString(), "CustomRpcSender");
+
+                doneStreams.Clear();
+            }
+
             AmongUsClient.Instance.SendOrDisconnect(stream);
             onSendDelegate();
         }
+
         currentState = State.Finished;
-        Logger.Info($"\"{name}\" is " + (dispose ? "disposed" : "finished"), "CustomRpcSender");
         stream.Recycle();
     }
 
@@ -218,7 +279,6 @@ public class CustomRpcSender
     public CustomRpcSender WriteMessageType(byte val) => Write(w => w.StartMessage(val));
     public CustomRpcSender WriteEndMessage() => Write(w => w.EndMessage());
     public CustomRpcSender WriteVector2(Vector2 vector2) => Write(w => NetHelpers.WriteVector2(vector2, w));
-
     #endregion
 
     private CustomRpcSender Write(Action<MessageWriter> action)
@@ -288,5 +348,58 @@ public static class CustomRpcSenderExtensions
             .Write(name)
             .Write(false)
             .EndRpc();
+    }
+
+    // Credit: EHR
+    public static void RpcDesyncRepairSystem(this CustomRpcSender sender, PlayerControl target, SystemTypes systemType, int amount)
+    {
+        sender.AutoStartRpc(ShipStatus.Instance.NetId, RpcCalls.UpdateSystem, target.OwnerId);
+        sender.Write((byte)systemType);
+        sender.WriteNetObject(target);
+        sender.Write((byte)amount);
+        sender.EndRpc();
+    }
+
+    public static bool TP(this CustomRpcSender sender, PlayerControl pc, Vector2 location, bool noCheckState = false, bool log = true)
+    {
+        if (!AmongUsClient.Instance.AmHost) return false;
+        
+        CustomNetworkTransform nt = pc.NetTransform;
+
+        if (!noCheckState)
+        {
+            // if (pc.Is(CustomRoles.AntiTP)) return false;
+
+            if (pc.inVent || pc.inMovingPlat || pc.onLadder || !pc.IsAlive() || pc.MyPhysics.Animations.IsPlayingAnyLadderAnimation() || pc.MyPhysics.Animations.IsPlayingEnterVentAnimation())
+            {
+                if (log) Logger.Warn($"Target ({pc.GetNameWithRole().RemoveHtmlTags()}) is in an un-teleportable state - Teleporting canceled", "TP");
+                return false;
+            }
+
+            if (Vector2.Distance(pc.GetCustomPosition(), location) < 0.5f)
+            {
+                if (log) Logger.Warn($"Target ({pc.GetNameWithRole().RemoveHtmlTags()}) is too close to the destination - Teleporting canceled", "TP");
+                return false;
+            }
+        }
+
+        
+        nt.SnapTo(location, (ushort)(nt.lastSequenceId + 328));
+        nt.SetDirtyBit(uint.MaxValue);
+
+        var newSid = (ushort)(nt.lastSequenceId + 8);
+
+        sender.AutoStartRpc(nt.NetId, RpcCalls.SnapTo);
+        sender.WriteVector2(location);
+        sender.Write(newSid);
+        sender.EndRpc();
+
+        if (log) Logger.Info($"{pc.GetNameWithRole().RemoveHtmlTags()} => {location}", "TP");
+
+        // CheckInvalidMovementPatch.LastPosition[pc.PlayerId] = location;
+        // CheckInvalidMovementPatch.ExemptedPlayers.Add(pc.PlayerId);
+
+        // if (sender.sendOption == SendOption.Reliable) Utils.NumSnapToCallsThisRound++;
+        return true;
     }
 }

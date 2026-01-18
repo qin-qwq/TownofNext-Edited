@@ -1,15 +1,18 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Double;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 
-namespace TOHE.Roles.Core.AssignManager;
+namespace TONE.Roles.Core.AssignManager;
 
 public class RoleAssign
 {
     public static Dictionary<byte, CustomRoles> SetRoles = [];
     public static Dictionary<byte, CustomRoles> RoleResult = [];
+    public static Dictionary<byte, CustomRoles> PrevRoleResult = [];
+    public static Dictionary<byte, int> PrevRolePreventAttempts = [];
+    public const int PREVENT_REPEAT_STR = 2;
     public static CustomRoles[] AllRoles => [.. RoleResult.Values];
 
     [Obfuscation(Exclude = true)]
@@ -124,7 +127,7 @@ public class RoleAssign
             case CustomGameMode.TagMode:
                 var random = IRandom.Instance;
                 List<PlayerControl> AllPlayers2 = Main.AllPlayerControls.Shuffle(random).ToList();
-                int ZombieNum = TagMode.ZombieMaximun.GetInt();
+                var ZombieNum = TagMode.ZombieMaximun.GetInt();
                 foreach (PlayerControl pc in AllPlayers2)
                 {
                     if (Main.EnableGM.Value && pc.IsHost())
@@ -170,6 +173,12 @@ public class RoleAssign
         int readyCovenNum = 0;
 
         List<CustomRoles> FinalRolesList = [];
+        Dictionary<CustomRoles, int> PreventPrevRolesAttempts = [];
+
+        foreach (var role in PrevRoleResult.Values)
+        {
+            PreventPrevRolesAttempts.TryAdd(role, 0);
+        }
 
         Dictionary<RoleAssignType, List<RoleAssignInfo>> Roles = [];
 
@@ -199,7 +208,7 @@ public class RoleAssign
                 case CustomRoles.NiceMini:
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
-                case CustomRoles.PhantomTOHE when NarcManager.IsNarcAssigned():
+                case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
                     continue;
             }
 
@@ -239,7 +248,7 @@ public class RoleAssign
 
         //if (Roles[RoleAssignType.Impostor].Count == 0 && !SetRoles.Values.Any(x => x.IsImpostor()))
         //{
-        //    Roles[RoleAssignType.Impostor].Add(new(CustomRoles.ImpostorTOHE, 100, optImpNum));
+        //    Roles[RoleAssignType.Impostor].Add(new(CustomRoles.ImpostorTONE, 100, optImpNum));
         //    Logger.Warn("Adding Vanilla Impostor", "CustomRoleSelector");
         //}
 
@@ -471,6 +480,14 @@ public class RoleAssign
                 {
                     var selected = AlwaysImpRoles.RandomElement();
                     var info = ImpRoleCounts.FirstOrDefault(x => x.Role == selected);
+
+                    if (PreventPrevRolesAttempts.ContainsKey(selected))
+                    {
+                        if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                            PreventPrevRolesAttempts.Remove(selected);
+                        continue;
+                    }
+
                     AlwaysImpRoles.Remove(selected);
                     if (info.AssignedCount >= info.MaxCount) continue;
 
@@ -493,6 +510,13 @@ public class RoleAssign
                 {
                     var selected = ChanceImpRoles.RandomElement();
                     var info = ImpRoleCounts.FirstOrDefault(x => x.Role == selected);
+
+                    if (PreventPrevRolesAttempts.ContainsKey(selected))
+                    {
+                        if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                            PreventPrevRolesAttempts.Remove(selected);
+                        continue;
+                    }
 
                     // Remove 'x' times
                     for (int j = 0; j < info.SpawnChance / 5; j++)
@@ -573,6 +597,12 @@ public class RoleAssign
                     {
                         var selected = AlwaysNonNKRoles.RandomElement();
                         var info = NonNKRoleCounts.FirstOrDefault(x => x.Role == selected);
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
                         AlwaysNonNKRoles.Remove(selected);
                         if (info.AssignedCount >= info.MaxCount) continue;
 
@@ -595,7 +625,12 @@ public class RoleAssign
                     {
                         var selected = ChanceNonNKRoles.RandomElement();
                         var info = NonNKRoleCounts.FirstOrDefault(x => x.Role == selected);
-
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
                         // Remove 'x' times
                         for (int j = 0; j < info.SpawnChance / 5; j++)
                             ChanceNonNKRoles.Remove(selected);
@@ -674,6 +709,12 @@ public class RoleAssign
                     {
                         var selected = AlwaysNKRoles.RandomElement();
                         var info = NKRoleCounts.FirstOrDefault(x => x.Role == selected);
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
                         AlwaysNKRoles.Remove(selected);
                         if (info.AssignedCount >= info.MaxCount) continue;
 
@@ -696,7 +737,12 @@ public class RoleAssign
                     {
                         var selected = ChanceNKRoles.RandomElement();
                         var info = NKRoleCounts.FirstOrDefault(x => x.Role == selected);
-
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
                         // Remove 'x' times
                         for (int j = 0; j < info.SpawnChance / 5; j++)
                             ChanceNKRoles.Remove(selected);
@@ -773,6 +819,12 @@ public class RoleAssign
                     {
                         var selected = AlwaysNARoles[rd.Next(0, AlwaysNARoles.Count)];
                         var info = NARoleCounts.FirstOrDefault(x => x.Role == selected);
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
                         AlwaysNARoles.Remove(selected);
                         if (info.AssignedCount >= info.MaxCount) continue;
 
@@ -796,6 +848,13 @@ public class RoleAssign
                         var selectesItem = rd.Next(0, ChanceNARoles.Count);
                         var selected = ChanceNARoles[selectesItem];
                         var info = NARoleCounts.FirstOrDefault(x => x.Role == selected);
+
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
 
                         // Remove 'x' times
                         for (int j = 0; j < info.SpawnChance / 5; j++)
@@ -875,6 +934,12 @@ public class RoleAssign
                     {
                         var selected = AlwaysCVRoles[rd.Next(0, AlwaysCVRoles.Count)];
                         var info = CVRoleCounts.FirstOrDefault(x => x.Role == selected);
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
                         AlwaysCVRoles.Remove(selected);
                         if (info.AssignedCount >= info.MaxCount) continue;
 
@@ -898,6 +963,13 @@ public class RoleAssign
                         var selectesItem = rd.Next(0, ChanceCVRoles.Count);
                         var selected = ChanceCVRoles[selectesItem];
                         var info = CVRoleCounts.FirstOrDefault(x => x.Role == selected);
+
+                        if (PreventPrevRolesAttempts.ContainsKey(selected))
+                        {
+                            if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                                PreventPrevRolesAttempts.Remove(selected);
+                            continue;
+                        }
 
                         // Remove 'x' times
                         for (int j = 0; j < info.SpawnChance / 5; j++)
@@ -974,6 +1046,12 @@ public class RoleAssign
                 {
                     var selected = AlwaysCrewRoles.RandomElement();
                     var info = CrewRoleCounts.FirstOrDefault(x => x.Role == selected);
+                    if (PreventPrevRolesAttempts.ContainsKey(selected))
+                    {
+                        if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                            PreventPrevRolesAttempts.Remove(selected);
+                        continue;
+                    }
                     AlwaysCrewRoles.Remove(selected);
                     if (info.AssignedCount >= info.MaxCount) continue;
 
@@ -994,7 +1072,12 @@ public class RoleAssign
                 {
                     var selected = ChanceCrewRoles.RandomElement();
                     var info = CrewRoleCounts.FirstOrDefault(x => x.Role == selected);
-
+                    if (PreventPrevRolesAttempts.ContainsKey(selected))
+                    {
+                        if (++PreventPrevRolesAttempts[selected] >= PREVENT_REPEAT_STR)
+                            PreventPrevRolesAttempts.Remove(selected);
+                        continue;
+                    }
                     // Remove 'x' times
                     for (int j = 0; j < info.SpawnChance / 5; j++)
                         ChanceCrewRoles.Remove(selected);
@@ -1036,7 +1119,7 @@ public class RoleAssign
         {
             while (FinalRolesList.Count < AllPlayers.Count)
             {
-                FinalRolesList.Add(CustomRoles.CrewmateTOHE);
+                FinalRolesList.Add(CustomRoles.CrewmateTONE);
             }
         }
 
@@ -1056,8 +1139,21 @@ public class RoleAssign
             var randomPlayer = AllPlayers.RandomElement();
             var assignedRole = FinalRolesList.RandomElement();
 
+            var id = randomPlayer.PlayerId;
+
+            if (PrevRoleResult.ContainsKey(id))
+            {
+                PrevRolePreventAttempts.TryAdd(id, 0);
+
+                if (++PrevRolePreventAttempts[id] >= PREVENT_REPEAT_STR)
+                {
+                    PrevRoleResult.Remove(id);
+                }
+                continue;
+            }
+
             // Assign random role for random player
-            RoleResult[randomPlayer.PlayerId] = assignedRole;
+            RoleResult[id] = assignedRole;
             Logger.Info($"Player：{randomPlayer.GetRealName()} => {assignedRole}", "RoleAssign");
 
             // Remove random role and player from list

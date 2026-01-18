@@ -1,16 +1,16 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Impostor;
+using static TONE.Options;
+using static TONE.Translator;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Lich : RoleBase
 {

@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Pickpocket : RoleBase
 {

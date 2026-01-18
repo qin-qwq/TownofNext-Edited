@@ -1,8 +1,7 @@
 using UnityEngine;
-using HarmonyLib;
 using InnerNet;
 
-namespace TOHE;
+namespace TONE;
 // https://github.com/g0aty/SickoMenu/blob/main/hooks/LobbyBehaviour.cpp
 [HarmonyPatch(typeof(GameContainer), nameof(GameContainer.SetupGameInfo))]
 public static class MoreLobbyInfo_GameContainer_SetupGameInfo_Postfix

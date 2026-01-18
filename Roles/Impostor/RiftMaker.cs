@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class RiftMaker : RoleBase
 {
@@ -58,8 +58,9 @@ internal class RiftMaker : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(Translator.GetString("RiftMakerButtonText"));
     // public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Create Rift");
 
-    private void SendRPC(byte riftID, int operate)
+    private void SendRPC(byte riftID, int operate) // Something here is throwing a null ref
     {
+        if (PlayerControl.LocalPlayer == null || _Player == null) return;
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(operate);
         if (operate == 3)

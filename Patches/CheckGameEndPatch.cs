@@ -1,19 +1,19 @@
 using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using System.Collections;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Crewmate;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Crewmate;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.CustomWinnerHolder;
-using static TOHE.Translator;
+using static TONE.CustomWinnerHolder;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(GameManager), nameof(GameManager.CheckEndGameViaTasks))]
 class CheckEndGameViaTasksForNormalPatch
@@ -602,7 +602,7 @@ class GameEndCheckerForNormal
         Utils.NotifyGameEnding();
 
         // Delay to ensure that resuscitation is delivered after the ghost roll setting
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSecondsRealtime(0.2f);
 
         if (ReviveRequiredPlayerIds.Count > 0)
         {
@@ -617,7 +617,7 @@ class GameEndCheckerForNormal
             // sync game data
             Utils.SendGameData();
             // Delay to ensure that the end of the game is delivered at the end of the game
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSecondsRealtime(0.3f);
         }
 
         foreach (var winnerId in WinnerIds)
@@ -852,7 +852,7 @@ public abstract class GameEndPredicate
             .Where(x => x.Is(Custom_Team.Crewmate) && x.GetCustomRole().GetRoleTypes() is RoleTypes.Crewmate or RoleTypes.Engineer or RoleTypes.Scientist or RoleTypes.Noisemaker or RoleTypes.Tracker or RoleTypes.CrewmateGhost or RoleTypes.GuardianAngel)
             .All(x => x.GetCustomSubRoles().Any(y => y.IsConverted()))) return false;
 
-        if (GameData.Instance.TotalTasks <= GameData.Instance.CompletedTasks)
+        if (GameData.Instance.TotalTasks <= GameData.Instance.CompletedTasks || GameData.Instance.AllPlayers.ToArray().Where(x => x.GetCustomRole().IsCrewmate()).All(x => x.Tasks.ToArray().All(y => y.Complete)))
         {
             reason = GameOverReason.CrewmatesByTask;
             ResetAndSetWinner(CustomWinner.Crewmate);

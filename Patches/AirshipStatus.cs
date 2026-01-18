@@ -1,4 +1,4 @@
-namespace TOHE;
+namespace TONE;
 
 //参考元:https://github.com/yukieiji/ExtremeRoles/blob/master/ExtremeRoles/Patches/AirshipStatusPatch.cs
 [HarmonyPatch(typeof(AirshipStatus), nameof(AirshipStatus.PrespawnStep))]

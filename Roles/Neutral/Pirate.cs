@@ -1,18 +1,18 @@
 using Hazel;
 using System.Text;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
+using TONE.Roles.Double;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 internal class Pirate : RoleBase
 {
     //===========================SETUP================================\\
@@ -35,12 +35,12 @@ internal class Pirate : RoleBase
 
     public override void SetupCustomOption()
     {
-        Options.SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Pirate);
-        DuelCooldown = FloatOptionItem.Create(Id + 12, "DuelCooldown", new(0f, 180f, 2.5f), 22.5f, TabGroup.NeutralRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Pirate])
+        SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Pirate);
+        DuelCooldown = FloatOptionItem.Create(Id + 12, "DuelCooldown", new(0f, 180f, 2.5f), 22.5f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pirate])
                 .SetValueFormat(OptionFormat.Seconds);
-        TryHideMsg = BooleanOptionItem.Create(Id + 10, "PirateTryHideMsg", true, TabGroup.NeutralRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Pirate])
+        TryHideMsg = BooleanOptionItem.Create(Id + 10, "PirateTryHideMsg", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pirate])
             .SetColor(Color.green);
-        SuccessfulDuelsToWin = IntegerOptionItem.Create(Id + 11, "SuccessfulDuelsToWin", new(1, 20, 1), 2, TabGroup.NeutralRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Pirate])
+        SuccessfulDuelsToWin = IntegerOptionItem.Create(Id + 11, "SuccessfulDuelsToWin", new(1, 20, 1), 2, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pirate])
             .SetValueFormat(OptionFormat.Times);
     }
 
@@ -307,6 +307,7 @@ internal class Pirate : RoleBase
 
     public static void TryHideMsgForDuel()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
 
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)

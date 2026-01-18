@@ -2,7 +2,7 @@ using Hazel;
 using InnerNet;
 using System.Xml;
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     class RpcGuessKill : BaseModdedRpc
     {
@@ -867,17 +867,6 @@ namespace TOHE.Modules.Rpc
 
         private readonly int playerId;
         private readonly CustomRoles role;
-    }
-    class RpcFixBlackscreen : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.FixBlackscreen;
-        public RpcFixBlackscreen(uint netId) : base(netId)
-        {
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-        }
     }
     class RpcBalancer : BaseModdedRpc
     {

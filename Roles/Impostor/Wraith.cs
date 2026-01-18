@@ -1,13 +1,13 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
+using TONE.Roles.Core;
+using TONE.Roles.Double;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Wraith : RoleBase
 {

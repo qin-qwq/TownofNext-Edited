@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using HarmonyLib;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TOHE;
+namespace TONE;
 
 // Thanks to https://github.com/TownOfNext/TownOfNext/blob/TONX-unofficial/TONX/Patches/MapBehaviourPatch.cs
 [HarmonyPatch]

@@ -1,12 +1,13 @@
 using Hazel;
 using TMPro;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Exorcist : RoleBase
 {
@@ -92,21 +93,30 @@ internal class Exorcist : RoleBase
                 if (player.PlayerId.GetAbilityUseLimit() <= 0 || ExorcismLimitPerMeeting <= 0)
                 {
                     if (TryHideMsg.GetBool() && !player.Data.IsHost())
+                    {
+                        ChatManager.SendPreviousMessagesToAll();
                         GuessManager.TryHideMsg();
+                    }
                     player.ShowInfoMessage(isUI, GetString("ExorcistOutOfUsages"));
                     return true;
                 }
                 if (Dispelled)
                 {
                     if (TryHideMsg.GetBool() && !player.Data.IsHost())
+                    {
+                        ChatManager.SendPreviousMessagesToAll();
                         GuessManager.TryHideMsg();
+                    }
                     player.ShowInfoMessage(isUI, GetString("ExorcistDispelled"));
                     return true;
                 }
                 if (IsExorcismActive || IsDelayActive)
                 {
                     if (TryHideMsg.GetBool() && !player.Data.IsHost())
+                    {
+                        ChatManager.SendPreviousMessagesToAll();
                         GuessManager.TryHideMsg();
+                    }
                     player.ShowInfoMessage(isUI, GetString("ExorcistActive"));
                     return true;
                 }
@@ -129,14 +139,14 @@ internal class Exorcist : RoleBase
         {
             IsExorcismActive = false;
             RPC.PlaySoundRPC(Sounds.TaskComplete, byte.MaxValue);
-            Utils.SendMessage(Translator.GetString("ExorcistEnd"));
+            Utils.SendMessage(GetString("ExorcistEnd"));
         }
         player.SetDeathReason(PlayerState.DeathReason.Exorcised);
         player.SetRealKiller(ExorcistPlayer);
         GuessManager.RpcGuesserMurderPlayer(player);
         Main.PlayersDiedInMeeting.Add(player.PlayerId);
         MurderPlayerPatch.AfterPlayerDeathTasks(player, PlayerControl.LocalPlayer, true);
-        Utils.SendMessage(string.Format(Translator.GetString("ExorcistKill"), player.name.RemoveHtmlTags()));
+        Utils.SendMessage(string.Format(GetString("ExorcistKill"), player.name.RemoveHtmlTags()));
         Exorcist exorcist = (Exorcist)ExorcistPlayer.GetRoleClass();
         exorcist.Sacrifice();
     }
@@ -149,7 +159,10 @@ internal class Exorcist : RoleBase
         player.RpcRemoveAbilityUse();
 
         if (TryHideMsg.GetBool())
+        {
+            ChatManager.SendPreviousMessagesToAll();
             GuessManager.TryHideMsg();
+        }
         ExorcistPlayer = player;
         IsDelayActive = true;
         if (ExorcismDelay.GetFloat() > 0)
@@ -160,7 +173,7 @@ internal class Exorcist : RoleBase
             IsExorcismActive = true;
             IsDelayActive = false;
             RPC.PlaySoundRPC(Sounds.SabotageSound, byte.MaxValue);
-            Utils.SendMessage(string.Format(Translator.GetString("ExorcistStart"), ExorcismActiveFor.GetFloat()));
+            Utils.SendMessage(string.Format(GetString("ExorcistStart"), ExorcismActiveFor.GetFloat()));
 
             _ = new LateTask(() =>
             {

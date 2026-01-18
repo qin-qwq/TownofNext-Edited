@@ -1,17 +1,17 @@
-using TOHE.Roles.Neutral;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using TONE.Roles.Neutral;
+using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 
-using static TOHE.Translator;
+using static TONE.Translator;
 using Hazel;
 using UnityEngine;
 using System;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
 using System.Text;
-using TOHE.Roles.AddOns.Common;
+using TONE.Roles.AddOns.Common;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Inquisitor : RoleBase
 {

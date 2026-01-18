@@ -1,9 +1,11 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Roles.Crewmate;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class TimeAssassin : RoleBase
 {
@@ -40,9 +42,13 @@ internal class TimeAssassin : RoleBase
 
     public override bool OnCheckVanish(PlayerControl player)
     {
-        if (AnySabotageIsActive()) return false;
-        if (TimeStop) return false;
-        foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin) && !x.Is(CustomRoles.GM)))
+        if (TimeStop || TimeMaster.Rewinding) return false;
+        if (AnySabotageIsActive())
+        {
+            player.Notify(ColorString(GetRoleColor(CustomRoles.TimeAssassin), GetString("TimeStopError")));
+            return false;
+        }
+        foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin)))
         {
             player.Notify(GetString("TimeStopStart"));
             TimeStop = true;
@@ -50,7 +56,8 @@ internal class TimeAssassin : RoleBase
             var tmpSpeed = Main.AllPlayerSpeed[target.PlayerId];
             Main.AllPlayerSpeed[target.PlayerId] = Main.MinSpeed;
             ReportDeadBodyPatch.CanReport[target.PlayerId] = false;
-            target.MarkDirtySettings();
+            if (target.GetKillTimer() <= TimeAssassinSkillDuration.GetFloat()) target.SetKillCooldown(TimeAssassinSkillDuration.GetFloat());
+            MarkEveryoneDirtySettings();
             _ = new LateTask(() =>
             {
                 player.Notify(GetString("TimeStopEnd"));
@@ -60,7 +67,7 @@ internal class TimeAssassin : RoleBase
                 Main.PlayerStates[target.PlayerId].IsBlackOut = false;
                 RPC.PlaySoundRPC(Sounds.TaskComplete, target.PlayerId);
                 ReportDeadBodyPatch.CanReport[target.PlayerId] = true;
-                target.MarkDirtySettings();
+                MarkEveryoneDirtySettings();
             }, TimeAssassinSkillDuration.GetFloat(), "TimeAssassin Stop Time");
         }
         return false;

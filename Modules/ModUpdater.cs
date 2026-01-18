@@ -7,20 +7,20 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
-using TOHE.Modules;
+using TONE.Modules;
 using UnityEngine;
 using UnityEngine.Networking;
-using static TOHE.Translator;
+using static TONE.Translator;
 using IEnumerator = System.Collections.IEnumerator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch]
 public class ModUpdater
 {
     //private static readonly string URL_2018k = "http://api.tohre.dev";
     private static readonly string URL_Github = "https://api.github.com/repos/qin-qwq/TownofNext-Edited";
-    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TOHEN-Contributions/releases/download/v123123123/TOHE.dll";
+    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TONEN-Contributions/releases/download/v123123123/TONE.dll";
     public static bool hasUpdate = false;
     private static bool firstNotify = true;
     public static bool forceUpdate = false;
@@ -82,8 +82,8 @@ public class ModUpdater
     const string MiniRegionInstallPath = "./BepInEx/plugins/Mini.RegionInstall.dll";
 #endif
 
-    const string RegionConfigResource = "TOHE.Resources.at.duikbo.regioninstall.cfg";
-    const string MiniRegionInstallResource = "TOHE.Resources.Mini.RegionInstall.dll";
+    const string RegionConfigResource = "TONE.Resources.at.duikbo.regioninstall.cfg";
+    const string MiniRegionInstallResource = "TONE.Resources.Mini.RegionInstall.dll";
     private static void CheckCustomRegions()
     {
 #if ANDROID
@@ -105,7 +105,7 @@ public class ModUpdater
 
         foreach (var region in regions)
         {
-            if (region.Name.Contains("Niko233(NA_US)", StringComparison.OrdinalIgnoreCase) || region.Name.Contains("NikoCat233", StringComparison.OrdinalIgnoreCase) || !region.Name.Contains("Niko233(EU)", StringComparison.OrdinalIgnoreCase))
+            if (region.Name.Contains("Niko233(NA_US)", StringComparison.OrdinalIgnoreCase) || region.Name.Contains("NikoCat233", StringComparison.OrdinalIgnoreCase))
             {
                 forceUpdate = true;
                 break;
@@ -210,7 +210,7 @@ public class ModUpdater
         request.chunkedTransfer = false;
 
         yield return request.SendWebRequest();
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSecondsRealtime(0.5f);
 
         if (request.result != UnityWebRequest.Result.Success)
         {
@@ -236,7 +236,7 @@ public class ModUpdater
             string[] tag = data["tag_name"]?.ToString()[1..].Split(".");
 
             var pluginNum = int.Parse(Main.PluginVersion.Substring(10, 1)) * 10000000 + int.Parse(Main.PluginVersion.Substring(11, 1)) * 1000000 + int.Parse(Main.PluginVersion.Substring(12, 1)) * 100000 + int.Parse(Main.PluginVersion.Substring(14, 3), CultureInfo.InvariantCulture) * 100;
-            var versionNum = int.Parse(tag[0]) * 10000000 + int.Parse(tag[1]) * 1000000 + int.Parse($"{tag[2][0]}") * 100000 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) : 999) * 100;
+            var versionNum = int.Parse(tag[0]) * 10000000 + int.Parse(tag[1]) * 1000000 + int.Parse($"{tag[2][0]}") * 100000 + (tag[2].Length > 2 && tag[2][1] == 'B' ? int.Parse(tag[2][2..]) : 999) * 100 + (tag[2].Length > 2 && tag[2][1] == 'A' ? int.Parse(tag[2][2..]) : 99);
 
             Logger.Info($"Found local version: {pluginNum}; github version: {versionNum}", "CheckRelease");
 
@@ -330,9 +330,9 @@ public class ModUpdater
     public static IEnumerator DeleteFilesAfterCancel()
     {
         ShowPopupAsync(GetString("deletingFiles"), StringNames.None, false);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSecondsRealtime(2f);
         InfoPopup.Close();
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSecondsRealtime(0.3f);
         DeleteOldFiles();
         yield break;
     }

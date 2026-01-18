@@ -1,9 +1,9 @@
-using TOHE.Modules;
-using TOHE.Roles.AddOns.Common;
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Vampire : RoleBase
 {

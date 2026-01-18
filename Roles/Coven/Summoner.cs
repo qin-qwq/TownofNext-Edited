@@ -1,14 +1,14 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Roles.Core;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace TONE.Roles.Coven;
 
 internal class Summoner : CovenManager
 {
@@ -271,6 +271,7 @@ internal class Summoner : CovenManager
 
     public static void HideSummonCommand()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
         {
@@ -541,8 +542,6 @@ internal class Summoner : CovenManager
 
     public override void AfterMeetingTasks()
     {
-        base.AfterMeetingTasks();
-
         // Reset the summoning flag for the next meeting
         HasSummonedThisMeeting = false;
 

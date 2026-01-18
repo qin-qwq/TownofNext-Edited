@@ -1,8 +1,8 @@
 using Hazel;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Spiritualist : RoleBase
 {
@@ -10,7 +10,7 @@ internal class Spiritualist : RoleBase
     public override CustomRoles Role => CustomRoles.Spiritualist;
     private const int Id = 9600;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem ShowGhostArrowEverySeconds;
@@ -86,7 +86,8 @@ internal class Spiritualist : RoleBase
 
         TargetArrow.Add(player.PlayerId, target.PlayerId);
 
-        var writer = CustomRpcSender.Create("SpiritualistSendMessage", SendOption.None);
+        Utils.SendMessage(GetString("SpiritualistNoticeMessage"), target.PlayerId, GetString("Spiritualist").ToUpper());
+        /*var writer = CustomRpcSender.Create("SpiritualistSendMessage", SendOption.None);
         writer.StartMessage(target.GetClientId());
         writer.StartRpc(target.NetId, (byte)RpcCalls.SetName)
             .Write(target.Data.NetId)
@@ -100,7 +101,7 @@ internal class Spiritualist : RoleBase
             .Write(target.Data.PlayerName)
             .EndRpc();
         writer.EndMessage();
-        writer.SendMessage();
+        writer.SendMessage();*/
     }
 
     public override string GetSuffix(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)

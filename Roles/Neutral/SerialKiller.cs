@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Crewmate;
-using static TOHE.Options;
+using TONE.Modules;
+using TONE.Roles.Crewmate;
+using static TONE.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class SerialKiller : RoleBase
 {

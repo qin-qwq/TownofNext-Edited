@@ -1,7 +1,7 @@
 using Hazel;
 using System;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 // Patches here is also activated from ShipStatus.Serialize and IntroCutScene 
 // through Utils.SetAllVentInteractions

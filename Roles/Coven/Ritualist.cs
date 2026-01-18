@@ -1,14 +1,14 @@
 using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules.ChatManager;
-using TOHE.Roles.Crewmate;
+using TONE.Modules.ChatManager;
+using TONE.Roles.Crewmate;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace TONE.Roles.Coven;
 
 internal class Ritualist : CovenManager
 {
@@ -157,6 +157,7 @@ internal class Ritualist : CovenManager
     }
     private static void TryHideMsgForRitual()
     {
+        if (Main.CurrentServerIsVanilla) return;
         ChatUpdatePatch.DoBlockChat = true;
         if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
         {
@@ -184,7 +185,7 @@ internal class Ritualist : CovenManager
                 msg += rd.Next(1, 100) < 50 ? string.Empty : " ";
                 CustomRoles role = roles.RandomElement();
                 msg += rd.Next(1, 100) < 50 ? string.Empty : " ";
-                msg += Utils.GetRoleName(role);
+                msg += GetRoleName(role);
 
             }
             var player = Main.AllAlivePlayerControls.RandomElement();
@@ -249,7 +250,7 @@ internal class Ritualist : CovenManager
             return false;
         }
 
-        PlayerControl target = Utils.GetPlayerById(id);
+        PlayerControl target = GetPlayerById(id);
         if (target == null || target.Data.IsDead)
         {
             error = GetString("GuessNull");

@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using UnityEngine;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 [HarmonyPatch(typeof(ChatBubble), nameof(ChatBubble.SetRight))]
 class ChatBubbleSetRightPatch
@@ -42,7 +42,7 @@ class ChatBubbleSetNamePatch
         var seerRoleClass = seer.GetRoleClass();
 
         // if based role is Shapeshifter/Phantom and is Desync Shapeshifter/Phantom
-        if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom && seer.HasDesyncRole())
+        if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper && seer.HasDesyncRole())
         {
             __instance.NameText.color = Color.white;
         }

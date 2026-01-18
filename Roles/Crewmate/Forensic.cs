@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using System.Text;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Roles.Core;
+using TONE.Roles.Neutral;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Forensic : RoleBase
 {
@@ -14,7 +14,7 @@ internal class Forensic : RoleBase
     public override CustomRoles Role => CustomRoles.Forensic;
     private const int Id = 7900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem DetectiveCanknowKiller;

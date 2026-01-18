@@ -1,10 +1,10 @@
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public static class AbilityTimeManager
 {
@@ -76,6 +76,7 @@ public static class AbilityTimeManager
             CustomRoles.Pyrophoric => (int)Pyrophoric.PyrophoricSkillCooldown.GetFloat(),
             CustomRoles.Altruist => 0,
             CustomRoles.Dreamer => (int)Dreamer.FantasyCooldown.GetFloat(),
+            CustomRoles.NiceHacker => (int)NiceHacker.HackerCooldown.GetFloat(),
             _ => -10
         };
 
@@ -94,6 +95,7 @@ public static class AbilityTimeManager
             CustomRoles.Grenadier => (int)Grenadier.GrenadierSkillDuration.GetFloat(),
             CustomRoles.Lighter => (int)Lighter.LighterSkillDuration.GetFloat(),
             CustomRoles.Dreamer => (int)Dreamer.FantasyDuration.GetFloat(),
+            CustomRoles.NiceHacker => (int)NiceHacker.HackerDuration.GetFloat(),
             _ => -20
         };
 

@@ -1,10 +1,10 @@
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
+using TONE.Roles.Neutral;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class CopyCat : RoleBase
 {
@@ -134,7 +134,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
                 CustomRoles.Councillor => CustomRoles.Judge, // 邪恶法官 => 法官
                 CustomRoles.Taskinator => CustomRoles.Benefactor, // 任务执行者 => 恩人
-                CustomRoles.EvilTracker => CustomRoles.TrackerTOHE, // 邪恶追踪者 => 侦查员
+                CustomRoles.EvilTracker => CustomRoles.TrackerTONE, // 邪恶追踪者 => 侦查员
                 CustomRoles.AntiAdminer => CustomRoles.Telecommunication, // 监管者 => 通信员
                 CustomRoles.Pursuer => CustomRoles.Deceiver, // 起诉人 => 赝品商
                 CustomRoles.CursedWolf => CustomRoles.Veteran, // 呪狼 => 老兵
@@ -160,6 +160,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.PlagueBearer => CustomRoles.Socialite, // 瘟疫使者 => 社交达人
                 CustomRoles.Demon => CustomRoles.Spy, // 玩家 => 间谍
                 CustomRoles.Maverick => CustomRoles.Vigilante, // 独行者 => 义务警员
+                CustomRoles.EvilHacker => CustomRoles.NiceHacker, // 邪恶黑客 => 正义黑客
                 _ => role
             };
         }

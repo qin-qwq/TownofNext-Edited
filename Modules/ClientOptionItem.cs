@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TOHE;
+namespace TONE;
 
 //来源：https://github.com/tukasa0001/TownOfHost/pull/1265
 public class ClientOptionItem
@@ -64,8 +64,8 @@ public class ClientOptionItem
 
                 var modOptionsButton = Object.Instantiate(mouseMoveToggle, generalTab);
                 modOptionsButton.transform.localPosition = leaveButton?.transform?.localPosition ?? new(0f, -2.4f, 1f);
-                modOptionsButton.name = "TOHEOptions";
-                modOptionsButton.Text.text = Translator.GetString("TOHEOptions");
+                modOptionsButton.name = "TONEOptions";
+                modOptionsButton.Text.text = Translator.GetString("TONEOptions");
                 modOptionsButton.Background.color = new Color32(255, 129, 166, byte.MaxValue);
                 var modOptionsPassiveButton = modOptionsButton.GetComponent<PassiveButton>();
                 modOptionsPassiveButton.OnClick = new();

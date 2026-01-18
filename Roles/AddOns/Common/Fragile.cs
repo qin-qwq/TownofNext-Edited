@@ -1,6 +1,6 @@
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Fragile : IAddon
 {
@@ -39,7 +39,7 @@ public class Fragile : IAddon
             || (killerRole.IsCoven() && CovenCanKillFragile.GetBool()))
         {
             target.SetDeathReason(PlayerState.DeathReason.Shattered);
-            if (FragileKillerLunge.GetBool())
+            if (FragileKillerLunge.GetBool() && !killer.Is(CustomRoles.Swift))
             {
                 killer.RpcMurderPlayer(target);
             }

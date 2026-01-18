@@ -1,7 +1,7 @@
-using static TOHE.Options;
-using static TOHE.Utils;
+using static TONE.Options;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Lookout : RoleBase
 {
@@ -9,7 +9,7 @@ internal class Lookout : RoleBase
     public override CustomRoles Role => CustomRoles.Lookout;
     private const int Id = 11800;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     public override void SetupCustomOption()

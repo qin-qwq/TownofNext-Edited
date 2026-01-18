@@ -8,7 +8,7 @@ using UnityEngine;
 // https://github.com/CrowdedMods/CrowdedMod/blob/master/src/CrowdedMod
 // Niko adjusted mono behavior patches to fit into non-reactor mods
 
-namespace TOHE.Patches.Crowded;
+namespace TONE.Patches.Crowded;
 
 internal static class Crowded
 {

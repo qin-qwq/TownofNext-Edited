@@ -1,11 +1,11 @@
-using TOHE.Modules;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Crewmate;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Crewmate;
+using static TONE.Options;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Mastermind : RoleBase
 {

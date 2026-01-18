@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace TOHE;
+namespace TONE;
 
 public class SimpleButton
 {

@@ -1,12 +1,12 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using TONE.Modules;
+using TONE.Modules.Rpc;
 using UnityEngine;
-using static TOHE.CheckForEndVotingPatch;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static TONE.CheckForEndVotingPatch;
+using static TONE.Translator;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Balancer : RoleBase
 {
@@ -233,7 +233,7 @@ internal class Balancer : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive())
+            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
                 CreateBalancerButton(__instance);
         }
     }

@@ -3,6 +3,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
+using Hazel;
 using Il2CppInterop.Runtime.Injection;
 using MonoMod.Utils;
 using System;
@@ -10,21 +11,21 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches.Crowded;
-using TOHE.Roles.AddOns;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Patches.Crowded;
+using TONE.Roles.AddOns;
+using TONE.Roles.Core;
+using TONE.Roles.Double;
+using TONE.Roles.Neutral;
 using UnityEngine;
 
-[assembly: AssemblyFileVersion(TOHE.Main.PluginVersion)]
-[assembly: AssemblyInformationalVersion(TOHE.Main.PluginVersion)]
-[assembly: AssemblyVersion(TOHE.Main.PluginVersion)]
-namespace TOHE;
+[assembly: AssemblyFileVersion(TONE.Main.PluginVersion)]
+[assembly: AssemblyInformationalVersion(TONE.Main.PluginVersion)]
+[assembly: AssemblyVersion(TONE.Main.PluginVersion)]
+namespace TONE;
 
-[BepInPlugin(PluginGuid, "TOHE", PluginVersion)]
+[BepInPlugin(PluginGuid, "TONE", PluginVersion)]
 [BepInIncompatibility("jp.ykundesu.supernewroles")]
 [BepInIncompatibility("com.ten.betteramongus")]
 [BepInIncompatibility("com.ten.thebetterroles")]
@@ -53,24 +54,24 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "25.12.20"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.5.0";
+    public const string PluginVersion = "26.01.18"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.6.0 RC 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
     /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.5.0 Alpha 1
-    public static readonly bool canaryRelease = false; // Latest: V1.5.0 Beta 5
-    public static readonly bool fullRelease = true; // Latest: V1.5.0
+    public static readonly bool devRelease = false; // Latest: V1.6.0 Alpha 2
+    public static readonly bool canaryRelease = true; // Latest: V1.6.0 Beta 2
+    public static readonly bool fullRelease = false; // Latest: V1.6.0
 
     public static bool hasAccess = true;
 
     public static readonly bool ShowUpdateButton = false;
 
     public static readonly bool ShowGitHubButton = false;
-    public static readonly string GitHubInviteUrl = "https://github.com/EnhancedNetwork/TownofHost-Enhanced";
+    public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
 
     public static readonly bool ShowDiscordButton = false;
     public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
@@ -79,7 +80,7 @@ public class Main : BasePlugin
     public static readonly string WebsiteInviteUrl = "https://weareten.ca/";
 
     public static readonly bool ShowDonationButton = false;
-    public static readonly string DonationInviteUrl = "https://weareten.ca/TOHE";
+    public static readonly string DonationInviteUrl = "https://weareten.ca/TONE";
 
     public Harmony Harmony { get; } = new Harmony(PluginGuid);
     public static Version version = Version.Parse(PluginVersion);
@@ -153,7 +154,7 @@ public class Main : BasePlugin
         [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
-        [CustomGameMode.HidenSeekTOHE] = new Color32(255, 25, 25, byte.MaxValue),
+        [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
     };
 
 #if ANDROID
@@ -169,7 +170,7 @@ public class Main : BasePlugin
     public static readonly HashSet<byte> winnerList = [];
     public static readonly HashSet<string> winnerNameList = [];
     public static readonly HashSet<int> clientIdList = [];
-    public static readonly List<(string, byte, string)> MessagesToSend = [];
+    public static readonly List<(string, byte, string, SendOption)> MessagesToSend = [];
     public static readonly Dictionary<string, int> PlayerQuitTimes = [];
     public static bool isChatCommand = false;
     public static bool MeetingIsStarted = false;
@@ -213,7 +214,8 @@ public class Main : BasePlugin
     public static int VotingTime;
     public static float DefaultCrewmateVision;
     public static float DefaultImpostorVision;
-    public static bool IsInitialRelease = DateTime.Now.Month == 1 && DateTime.Now.Day is 17;
+    public static bool IsTOHEInitialRelease = DateTime.Now.Month == 1 && DateTime.Now.Day is 17;
+    public static bool IsTONEInitialRelease = DateTime.Now.Month == 6 && DateTime.Now.Day is 17;
     public static bool IsAprilFools
     {
         get
@@ -301,7 +303,7 @@ public class Main : BasePlugin
         string path = Path.Combine(LANGUAGE_FOLDER_NAME, filename);
         if (File.Exists(path))
         {
-            TOHE.Logger.Info($"Load custom Role Color file：{filename}", "LoadCustomRoleColor");
+            TONE.Logger.Info($"Load custom Role Color file：{filename}", "LoadCustomRoleColor");
             using StreamReader sr = new(path, Encoding.GetEncoding("UTF-8"));
             string text;
             string[] tmp = [];
@@ -319,19 +321,19 @@ public class Main : BasePlugin
                             {
                                 roleColors[role] = "#" + color;
                             }
-                            else TOHE.Logger.Error($"Invalid Hexcolor #{color}", "LoadCustomRoleColor");
+                            else TONE.Logger.Error($"Invalid Hexcolor #{color}", "LoadCustomRoleColor");
                         }
                     }
                     catch (KeyNotFoundException)
                     {
-                        TOHE.Logger.Warn($"Invalid Key：{tmp[0]}", "LoadCustomTranslation");
+                        TONE.Logger.Warn($"Invalid Key：{tmp[0]}", "LoadCustomTranslation");
                     }
                 }
             }
         }
         else
         {
-            TOHE.Logger.Error($"File not found：{filename}", "LoadCustomTranslation");
+            TONE.Logger.Error($"File not found：{filename}", "LoadCustomTranslation");
         }
     }
 
@@ -364,7 +366,7 @@ public class Main : BasePlugin
         {
             roleColors.Clear();
             var assembly = Assembly.GetExecutingAssembly();
-            string resourceName = "TOHE.Resources.roleColor.json";
+            string resourceName = "TONE.Resources.roleColor.json";
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             {
                 if (stream != null)
@@ -382,18 +384,19 @@ public class Main : BasePlugin
                         else
                         {
                             // Handle invalid or unrecognized enum keys
-                            TOHE.Logger.Error($"Invalid enum key: {kvp.Key}", "Reading Role Colors");
+                            TONE.Logger.Error($"Invalid enum key: {kvp.Key}", "Reading Role Colors");
                         }
                     }
                 }
                 else
                 {
-                    TOHE.Logger.Error($"Embedded resource not found.", "Reading Role Colors");
+                    TONE.Logger.Error($"Embedded resource not found.", "Reading Role Colors");
                 }
             }
 
             foreach (var role in EnumHelper.GetAllValues<CustomRoles>())
             {
+                if (role.IsAdditionRole() && role.IsImpOnlyAddon()) roleColors.TryAdd(role, "#ff1919");
                 switch (role.GetCustomRoleTeam())
                 {
                     case Custom_Team.Impostor:
@@ -416,8 +419,8 @@ public class Main : BasePlugin
         }
         catch (ArgumentException ex)
         {
-            TOHE.Logger.Error("错误：字典出现重复项", "LoadDictionary");
-            TOHE.Logger.Exception(ex, "LoadDictionary");
+            TONE.Logger.Error("错误：字典出现重复项", "LoadDictionary");
+            TONE.Logger.Exception(ex, "LoadDictionary");
             hasArgumentException = true;
             ExceptionMessage = ex.Message;
             ExceptionMessageIsShown = false;
@@ -425,7 +428,7 @@ public class Main : BasePlugin
     }
     public static void LoadRoleClasses()
     {
-        TOHE.Logger.Info("Loading All RoleClasses...", "LoadRoleClasses");
+        TONE.Logger.Info("Loading All RoleClasses...", "LoadRoleClasses");
         try
         {
             var RoleTypes = Assembly.GetAssembly(typeof(RoleBase))!
@@ -440,11 +443,11 @@ public class Main : BasePlugin
                     if (Activator.CreateInstance(type) is RoleBase instance)
                         roleInstances.Add(instance);
                     else
-                        TOHE.Logger.Warn($"Failed to create instance of {type.Name}: Activator returned null", "LoadRoleClasses");
+                        TONE.Logger.Warn($"Failed to create instance of {type.Name}: Activator returned null", "LoadRoleClasses");
                 }
                 catch (Exception ex)
                 {
-                    TOHE.Logger.Error($"Failed to create instance of {type.Name}: {ex.Message}", "LoadRoleClasses");
+                    TONE.Logger.Error($"Failed to create instance of {type.Name}: {ex.Message}", "LoadRoleClasses");
                 }
             }
 
@@ -464,7 +467,7 @@ public class Main : BasePlugin
                 CustomRoleManager.RoleClass.Add(role, (RoleBase)Activator.CreateInstance(roleType));
             }
 
-            TOHE.Logger.Info("RoleClasses Loaded Successfully", "LoadRoleClasses");
+            TONE.Logger.Info("RoleClasses Loaded Successfully", "LoadRoleClasses");
         }
         catch (Exception err)
         {
@@ -473,7 +476,7 @@ public class Main : BasePlugin
     }
     public static void LoadAddonClasses()
     {
-        TOHE.Logger.Info("Loading All AddonClasses...", "LoadAddonClasses");
+        TONE.Logger.Info("Loading All AddonClasses...", "LoadAddonClasses");
         try
         {
             var IAddonType = typeof(IAddon);
@@ -485,7 +488,7 @@ public class Main : BasePlugin
             .Where(x => x != null)
             .ToDictionary(x => x.Role, x => x));
 
-            TOHE.Logger.Info("AddonClasses Loaded Successfully", "LoadAddonClasses");
+            TONE.Logger.Info("AddonClasses Loaded Successfully", "LoadAddonClasses");
         }
         catch (Exception err)
         {
@@ -497,7 +500,7 @@ public class Main : BasePlugin
         string path = Path.Combine(LANGUAGE_FOLDER_NAME, "RoleColor.dat");
         if (File.Exists(path))
         {
-            TOHE.Logger.Info("Updating Custom Role Colors", "UpdateRoleColors");
+            TONE.Logger.Info("Updating Custom Role Colors", "UpdateRoleColors");
             try
             {
                 List<string> roleList = [];
@@ -530,7 +533,7 @@ public class Main : BasePlugin
             }
             catch (Exception e)
             {
-                TOHE.Logger.Error("An error occurred: " + e.Message, "UpdateRoleColors");
+                TONE.Logger.Error("An error occurred: " + e.Message, "UpdateRoleColors");
             }
         }
     }
@@ -554,7 +557,7 @@ public class Main : BasePlugin
             using var sha256 = SHA256.Create();
             var hashBytes = sha256.ComputeHash(stream);
             FileHash = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-            TOHE.Logger.Msg("Assembly Hash: " + FileHash, "Plugin Load");
+            TONE.Logger.Msg("Assembly Hash: " + FileHash, "Plugin Load");
         }
     }
 
@@ -594,37 +597,37 @@ public class Main : BasePlugin
             // Disable Horse Mode since it cause client crash
         }
 
-        Logger = BepInEx.Logging.Logger.CreateLogSource("TOHE");
+        Logger = BepInEx.Logging.Logger.CreateLogSource("TONE");
         coroutines = AddComponent<Coroutines>();
         dispatcher = AddComponent<Dispatcher>();
-        TOHE.Logger.Enable();
-        //TOHE.Logger.Disable("NotifyRoles");
-        TOHE.Logger.Disable("SwitchSystem");
-        TOHE.Logger.Disable("ModNews");
-        // TOHE.Logger.Disable("RpcSetNamePrivate");
-        TOHE.Logger.Disable("KnowRoleTarget");
+        TONE.Logger.Enable();
+        //TONE.Logger.Disable("NotifyRoles");
+        TONE.Logger.Disable("SwitchSystem");
+        TONE.Logger.Disable("ModNews");
+        // TONE.Logger.Disable("RpcSetNamePrivate");
+        TONE.Logger.Disable("KnowRoleTarget");
         if (!DebugModeManager.AmDebugger)
         {
-            TOHE.Logger.Disable("2018k");
-            TOHE.Logger.Disable("Github");
-            //TOHE.Logger.Disable("ReceiveRPC");
-            TOHE.Logger.Disable("SendRPC");
-            TOHE.Logger.Disable("SetRole");
-            TOHE.Logger.Disable("Info.Role");
-            TOHE.Logger.Disable("TaskState.Init");
-            //TOHE.Logger.Disable("Vote");
-            //TOHE.Logger.Disable("SendChat");
-            TOHE.Logger.Disable("SetName");
-            //TOHE.Logger.Disable("AssignRoles");
-            //TOHE.Logger.Disable("RepairSystem");
-            //TOHE.Logger.Disable("MurderPlayer");
-            //TOHE.Logger.Disable("CheckMurder");
-            TOHE.Logger.Disable("PlayerControl.RpcSetRole");
-            TOHE.Logger.Disable("SyncCustomSettings");
-            //TOHE.Logger.Disable("DoNotifyRoles");
-            TOHE.Logger.Disable("CustomRpcSender");
+            TONE.Logger.Disable("2018k");
+            TONE.Logger.Disable("Github");
+            //TONE.Logger.Disable("ReceiveRPC");
+            TONE.Logger.Disable("SendRPC");
+            TONE.Logger.Disable("SetRole");
+            TONE.Logger.Disable("Info.Role");
+            TONE.Logger.Disable("TaskState.Init");
+            //TONE.Logger.Disable("Vote");
+            //TONE.Logger.Disable("SendChat");
+            TONE.Logger.Disable("SetName");
+            //TONE.Logger.Disable("AssignRoles");
+            //TONE.Logger.Disable("RepairSystem");
+            //TONE.Logger.Disable("MurderPlayer");
+            //TONE.Logger.Disable("CheckMurder");
+            TONE.Logger.Disable("PlayerControl.RpcSetRole");
+            TONE.Logger.Disable("SyncCustomSettings");
+            //TONE.Logger.Disable("DoNotifyRoles");
+            TONE.Logger.Disable("CustomRpcSender");
         }
-        //TOHE.Logger.isDetail = true;
+        //TONE.Logger.isDetail = true;
 
         // 認証関連-初期化
         DebugKeyAuth = new HashAuth(DebugKeyHash, DebugKeySalt);
@@ -658,14 +661,13 @@ public class Main : BasePlugin
         TemplateManager.Init();
         TagManager.Init();
         //SpamManager.Init();
-        Utils.Init();
         Cloud.Init();
 
         IRandom.SetInstance(new NetRandomWrapper());
 
-        TOHE.Logger.Info($" {Application.version}", "Among Us Version");
+        TONE.Logger.Info($" {Application.version}", "Among Us Version");
 
-        var handler = TOHE.Logger.Handler("GitVersion");
+        var handler = TONE.Logger.Handler("GitVersion");
         handler.Info($"{nameof(ThisAssembly.Git.BaseTag)}: {ThisAssembly.Git.BaseTag}");
         handler.Info($"{nameof(ThisAssembly.Git.Commit)}: {ThisAssembly.Git.Commit}");
         handler.Info($"{nameof(ThisAssembly.Git.Commits)}: {ThisAssembly.Git.Commits}");
@@ -699,7 +701,7 @@ public class Main : BasePlugin
 
         // InitializeFileHash();
         FileHash = "Support_2025_09_09";
-        TOHE.Logger.Msg("========= TONE loaded! =========", "Plugin Load");
+        TONE.Logger.Msg("========= TONE loaded! =========", "Plugin Load");
     }
 }
 [Obfuscation(Exclude = true)]
@@ -721,19 +723,19 @@ public enum CustomRoles
     Viper,
 
     // Crewmate Vanilla Remakes
-    CrewmateTOHE,
-    EngineerTOHE,
-    GuardianAngelTOHE,
-    NoisemakerTOHE,
-    ScientistTOHE,
-    TrackerTOHE,
-    DetectiveTOHE,
+    CrewmateTONE,
+    EngineerTONE,
+    GuardianAngelTONE,
+    NoisemakerTONE,
+    ScientistTONE,
+    TrackerTONE,
+    DetectiveTONE,
 
     // Impostor Vanilla Remakes
-    ImpostorTOHE,
-    PhantomTOHE,
-    ShapeshifterTOHE,
-    ViperTOHE,
+    ImpostorTONE,
+    PhantomTONE,
+    ShapeshifterTONE,
+    ViperTONE,
 
     // Impostor Ghost
     Bloodmoon,
@@ -779,6 +781,7 @@ public enum CustomRoles
     Greedy,
     Hangman,
     Iceologer,
+    IdentityThief,
     Instigator,
     Kamikaze,
     KillingMachine,
@@ -876,6 +879,7 @@ public enum CustomRoles
     Monarch,
     Mortician,
     NiceGuesser,
+    NiceHacker,
     NiceMini,
     Observer,
     Oracle,
@@ -975,6 +979,7 @@ public enum CustomRoles
     Taskinator,
     Terrorist,
     Traitor,
+    TreasureHunter,
     Troller,
     Tunny,
     Vector,
@@ -1042,6 +1047,7 @@ public enum CustomRoles
     Cyber,
     Diseased,
     DoubleShot,
+    Drunkard,
     Eavesdropper,
     Egoist,
     Enchanted,
@@ -1079,6 +1085,7 @@ public enum CustomRoles
     Onbound,
     Overclocked,
     Paranoia,
+    Plunderer,
     Prohibited,
     Radar,
     Rainbow,
@@ -1182,6 +1189,7 @@ public enum CustomWinner
     TZombie = CustomRoles.TZombie,
     TCrewmate = CustomRoles.TCrewmate,
     Dreamer = CustomRoles.Dreamer,
+    TreasureHunter = CustomRoles.TreasureHunter,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners
@@ -1218,7 +1226,7 @@ public enum AdditionalWinners
 public enum SuffixModes
 {
     None = 0,
-    TOHE,
+    TONE,
     Streaming,
     Recording,
     RoomHost,

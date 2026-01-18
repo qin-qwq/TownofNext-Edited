@@ -1,4 +1,4 @@
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     class RpcPlaySound : BaseModdedRpc
     {

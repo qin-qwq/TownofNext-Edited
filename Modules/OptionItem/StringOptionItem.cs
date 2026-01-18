@@ -1,6 +1,6 @@
 using System;
 
-namespace TOHE;
+namespace TONE;
 
 public class StringOptionItem(int id, string name, int defaultValue, TabGroup tab, bool isSingleValue, string[] selections, bool vanilla, bool useGetString) : OptionItem(id, name, defaultValue, tab, isSingleValue, vanillaStr: vanilla)
 {
@@ -30,7 +30,7 @@ public class StringOptionItem(int id, string name, int defaultValue, TabGroup ta
         //For 0% or 100%
         if (Selections.Length == 2) return CurrentValue * 100;
 
-        //TOHEΓÇÖs career generation mode
+        //TONEΓÇÖs career generation mode
         if (Selections.Length == 3) return CurrentValue;
 
         //For 0% to 100% or 5% to 100%

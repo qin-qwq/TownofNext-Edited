@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Witness : RoleBase
 {
@@ -14,7 +14,7 @@ internal class Witness : RoleBase
     private const int Id = 10100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem WitnessCD;

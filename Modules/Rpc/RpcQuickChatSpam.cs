@@ -3,10 +3,10 @@ using AmongUs.QuickChat;
 using Hazel;
 using Il2CppSystem.Linq;
 using System;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Modules.Rpc
+namespace TONE.Modules.Rpc
 {
     class RpcQuickChatSpam : CustomModdedData
     {

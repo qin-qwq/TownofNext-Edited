@@ -1,9 +1,9 @@
 using Hazel;
 using System;
-using TOHE.Modules.Rpc;
+using TONE.Modules.Rpc;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 static class TargetArrow
 {

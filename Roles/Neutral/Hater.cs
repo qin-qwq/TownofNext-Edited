@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Hater : RoleBase
 {
@@ -63,7 +63,7 @@ internal class Hater : RoleBase
         if (killer == null || target == null) return false;
         if (killer.PlayerId == target.PlayerId) return true;  // Return true to allow suicides
 
-        if (target.GetCustomSubRoles().Any(addOn => addOn.IsConverted() || addOn is CustomRoles.Madmate or CustomRoles.Admired or CustomRoles.Lovers)
+        if (target.GetCustomSubRoles().Any(addOn => addOn.IsConverted() || addOn is CustomRoles.Admired or CustomRoles.Lovers)
             || IsConvertedMainRole(target.GetCustomRole()))
         {
             if (!ChooseConverted.GetBool())
@@ -78,6 +78,7 @@ internal class Hater : RoleBase
                 || (target.Is(CustomRoles.Lovers) && CanKillLovers.GetBool())
                 || ((target.Is(CustomRoles.Romantic) || target.Is(CustomRoles.RuthlessRomantic) || target.Is(CustomRoles.VengefulRomantic)
                 || Romantic.BetPlayer.ContainsValue(target.PlayerId)) && CanKillLovers.GetBool())
+                || (target.Is(CustomRoles.Cupid) && CanKillLovers.GetBool())
                 || ((target.Is(CustomRoles.Sidekick) || target.Is(CustomRoles.Jackal) || target.Is(CustomRoles.Recruit)) && CanKillSidekicks.GetBool())
                 || (target.Is(CustomRoles.Egoist) && CanKillEgoists.GetBool())
                 || ((target.Is(CustomRoles.Infected) || target.Is(CustomRoles.Infectious)) && CanKillInfected.GetBool())

@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using static TOHE.Utils;
+using static TONE.Utils;
 
-namespace TOHE;
+namespace TONE;
 
 //ÕÅé×ÇâÕàâ : https://github.com/ykundesu/SuperNewRoles/blob/master/SuperNewRoles/Mode/SuperHostRoles/BlockTool.cs
 class DisableDevice

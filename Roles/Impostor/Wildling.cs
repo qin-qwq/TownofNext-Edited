@@ -2,12 +2,12 @@ using AmongUs.GameOptions;
 using Hazel;
 using System;
 using System.Text;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using static TOHE.Options;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
+using TONE.Roles.Core;
+using static TONE.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Wildling : RoleBase
 {

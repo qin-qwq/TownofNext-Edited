@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Oiiai : IAddon
 {
@@ -188,15 +188,17 @@ public class Oiiai : IAddon
             ? role
             : roleType switch
             {
-                RoleTypes.Crewmate => CustomRoles.CrewmateTOHE,
-                RoleTypes.Scientist => CustomRoles.ScientistTOHE,
-                RoleTypes.Tracker => CustomRoles.TrackerTOHE,
-                RoleTypes.Noisemaker => CustomRoles.NoisemakerTOHE,
-                RoleTypes.Engineer => CustomRoles.EngineerTOHE,
-                RoleTypes.Impostor when role.IsCrewmate() => CustomRoles.CrewmateTOHE,
-                RoleTypes.Impostor => CustomRoles.ImpostorTOHE,
-                RoleTypes.Shapeshifter => CustomRoles.ShapeshifterTOHE,
-                RoleTypes.Phantom => CustomRoles.PhantomTOHE,
+                RoleTypes.Crewmate => CustomRoles.CrewmateTONE,
+                RoleTypes.Scientist => CustomRoles.ScientistTONE,
+                RoleTypes.Tracker => CustomRoles.TrackerTONE,
+                RoleTypes.Noisemaker => CustomRoles.NoisemakerTONE,
+                RoleTypes.Engineer => CustomRoles.EngineerTONE,
+                RoleTypes.Impostor when role.IsCrewmate() => CustomRoles.CrewmateTONE,
+                RoleTypes.Impostor => CustomRoles.ImpostorTONE,
+                RoleTypes.Shapeshifter => CustomRoles.ShapeshifterTONE,
+                RoleTypes.Phantom => CustomRoles.PhantomTONE,
+                RoleTypes.Detective => CustomRoles.DetectiveTONE,
+                RoleTypes.Viper => CustomRoles.ViperTONE,
                 _ => role,
             };
     }

@@ -1,9 +1,9 @@
 using System;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using TONE.Modules;
+using TONE.Modules.Rpc;
 using UnityEngine;
 
-namespace TOHE;
+namespace TONE;
 
 public abstract class OptionItem
 {
@@ -136,7 +136,7 @@ public abstract class OptionItem
     public OptionItem SetHidden(bool value) => Do(i => i.IsHidden = value);
     public OptionItem SetText(bool value) => Do(i => i.IsText = value);
     public OptionItem HideInFFA(CustomGameMode value = CustomGameMode.FFA) => Do(i => i.HideOptionInFFA = value);
-    public OptionItem HideInHnS(CustomGameMode value = CustomGameMode.HidenSeekTOHE) => Do(i => i.HideOptionInHnS = value);
+    public OptionItem HideInHnS(CustomGameMode value = CustomGameMode.HidenSeekTONE) => Do(i => i.HideOptionInHnS = value);
     public OptionItem HideInSpeedRun(CustomGameMode value = CustomGameMode.SpeedRun) => Do(i => i.HideOptionInSpeedRun = value);
     public OptionItem HideInTagMode(CustomGameMode value = CustomGameMode.TagMode) => Do(i => i.HideOptionInTagMode = value);
 
@@ -270,7 +270,7 @@ public abstract class OptionItem
     {
         AllValues = values;
     }
-    // This Code For Reset All TOHE Setting To Default
+    // This Code For Reset All TONE Setting To Default
     public virtual void SetValueNoRpc(int value)
     {
         int beforeValue = CurrentValue;

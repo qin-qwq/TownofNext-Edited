@@ -1,8 +1,8 @@
 using Hazel;
-using TOHE.Roles.Core;
+using TONE.Roles.Core;
 using UnityEngine;
 
-namespace TOHE.Patches;
+namespace TONE.Patches;
 
 // From: https://github.com/Rabek009/MoreGamemodes/blob/master/Patches/ClientPatch.cs
 

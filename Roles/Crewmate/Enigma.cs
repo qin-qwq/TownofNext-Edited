@@ -1,9 +1,9 @@
-using TOHE.Roles.Neutral;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Roles.Neutral;
+using static TONE.MeetingHudStartPatch;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Enigma : RoleBase
 {
@@ -11,7 +11,7 @@ internal class Enigma : RoleBase
     public override CustomRoles Role => CustomRoles.Enigma;
     private const int Id = 8100;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem EnigmaClueStage1Tasks;

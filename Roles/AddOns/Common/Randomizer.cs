@@ -1,10 +1,10 @@
 using System;
-using TOHE.Modules;
-using TOHE.Roles.AddOns.Common;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Roles.AddOns.Common;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Randomizer : IAddon
 {

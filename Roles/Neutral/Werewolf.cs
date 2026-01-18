@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Double;
-using static TOHE.Options;
+using TONE.Roles.Double;
+using static TONE.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Werewolf : RoleBase
 {

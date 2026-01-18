@@ -5,17 +5,17 @@ using Hazel;
 using InnerNet;
 using System;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Core;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Core.DraftAssign;
+using TONE.Modules;
+using TONE.Modules.ChatManager;
+using TONE.Modules.Rpc;
+using TONE.Patches;
+using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Core.DraftAssign;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE;
+namespace TONE;
 
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.CoStartGame))]
 internal class ChangeRoleSettings
@@ -44,6 +44,8 @@ internal class ChangeRoleSettings
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Noisemaker, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Phantom, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Tracker, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Detective, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Viper, 0, 0);
                 }
             }
             else if (GameStates.IsHideNSeek)
@@ -53,6 +55,8 @@ internal class ChangeRoleSettings
             }
 
             Main.PlayerStates = [];
+            RoleAssign.PrevRoleResult = RoleAssign.RoleResult;
+            RoleAssign.PrevRolePreventAttempts = [];
             RoleAssign.RoleResult = [];
             KillTimerManager.Initializate();
             AbilityUseManager.Initializate();
@@ -83,6 +87,8 @@ internal class ChangeRoleSettings
             Main.OvverideOutfit.Clear();
             Main.GameIsLoaded = false;
             Main.CurrentServerIsVanilla = GameStates.IsVanillaServer && !GameStates.IsLocalGame;
+
+            AFKDetector.ShieldedPlayers.Clear();
 
             Main.LastNotifyNames.Clear();
 
@@ -181,7 +187,7 @@ internal class ChangeRoleSettings
                     Main.LastNotifyNames[pair] = currentName;
                 }
 
-                if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard)
+                if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard && AmongUsClient.Instance.AmHost)
                 {
                     foreach (var player in Main.AllPlayerControls)
                     {
@@ -382,7 +388,7 @@ internal class StartGameHostPatch
             timer += Time.deltaTime;
         }
         thiz.SendClientReady();
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSecondsRealtime(2f);
         yield return AssignRoles();
         //ShipStatus.Instance.Begin(); // Tasks sets in IntroPatch
         yield break;
@@ -403,7 +409,7 @@ internal class StartGameHostPatch
             // Select custom Roles/Add-ons
             EAC.OriginalRoles = [];
 
-            if (Options.DraftMode.GetBool() && Options.devEnableDraft)
+            if (Options.DraftMode.GetBool())
                 DraftAssign.StartSelect();
             else
                 RoleAssign.StartSelect();
@@ -575,13 +581,13 @@ internal class StartGameHostPatch
         }
 
         Logger.Info("Others assign finished", "AssignRoleTypes");
-        yield return new WaitForSeconds(GameStates.IsLocalGame ? 1f : 2f);
+        yield return new WaitForSecondsRealtime(GameStates.IsLocalGame ? 1f : 2f);
 
         Logger.Info("Send rpc disconnected for all", "AssignRoleTypes");
         DataDisconnected.Clear();
         RpcSetDisconnected(disconnected: true);
 
-        yield return new WaitForSeconds(GameStates.IsLocalGame ? 2f : 4f);
+        yield return new WaitForSecondsRealtime(GameStates.IsLocalGame ? 2f : 4f);
 
         Logger.Info("Assign self", "AssignRoleTypes");
         SetRoleSelf();
@@ -729,7 +735,7 @@ public static class RpcSetRoleReplacer
                 foreach (var target in Main.AllPlayerControls)
                 {
                     RoleTypes targetRoleType = RoleTypes.Crewmate;
-                    var targetCustomRole = RoleAssign.RoleResult.GetValueOrDefault(target.PlayerId, CustomRoles.CrewmateTOHE);
+                    var targetCustomRole = RoleAssign.RoleResult.GetValueOrDefault(target.PlayerId, CustomRoles.CrewmateTONE);
 
                     if (targetCustomRole.GetVNRole() is CustomRoles.Noisemaker)
                         targetRoleType = RoleTypes.Noisemaker;
@@ -748,7 +754,7 @@ public static class RpcSetRoleReplacer
             {
                 var roleType = role.GetRoleTypes();
 
-                if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom)
+                if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
                 {
                     foreach (var target in Main.AllPlayerControls)
                     {
@@ -758,7 +764,7 @@ public static class RpcSetRoleReplacer
                             continue;
                         }
 
-                        var targetCustomRole = RoleAssign.RoleResult.GetValueOrDefault(target.PlayerId, CustomRoles.CrewmateTOHE);
+                        var targetCustomRole = RoleAssign.RoleResult.GetValueOrDefault(target.PlayerId, CustomRoles.CrewmateTONE);
 
                         if (targetCustomRole.GetVNRole() is CustomRoles.Noisemaker)
                         {
@@ -784,7 +790,7 @@ public static class RpcSetRoleReplacer
                             continue;
                         }
 
-                        var targetCustomRole = RoleAssign.RoleResult.GetValueOrDefault(target.PlayerId, CustomRoles.CrewmateTOHE);
+                        var targetCustomRole = RoleAssign.RoleResult.GetValueOrDefault(target.PlayerId, CustomRoles.CrewmateTONE);
 
                         if (targetCustomRole.IsDesyncRole())
                         {
@@ -913,7 +919,7 @@ public static class RpcSetRoleReplacer
         foreach (var kvp in Senders)
         {
             kvp.Value.SendMessage();
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSecondsRealtime(0.3f);
         }
         BlockSetRole = false;
     }

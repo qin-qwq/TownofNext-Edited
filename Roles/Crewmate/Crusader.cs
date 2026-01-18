@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Roles.Core;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Crusader : RoleBase
 {

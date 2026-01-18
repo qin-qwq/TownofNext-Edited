@@ -1,7 +1,7 @@
-using TOHE.Roles.AddOns.Common;
-using static TOHE.Options;
+using TONE.Roles.AddOns.Common;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Impostor;
+namespace TONE.Roles.AddOns.Impostor;
 
 public class Stealer : IAddon
 {

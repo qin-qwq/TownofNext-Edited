@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.Coven;
+using TONE.Roles.Neutral;
+using static TONE.Options;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Investigator : RoleBase
 {
@@ -15,7 +15,7 @@ internal class Investigator : RoleBase
     private const int Id = 24900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
     private static OptionItem InvestigateCooldown;

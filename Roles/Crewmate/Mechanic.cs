@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using static TOHE.Options;
-using static TOHE.Utils;
+using TONE.Modules;
+using TONE.Roles.Core;
+using static TONE.Options;
+using static TONE.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace TONE.Roles.Crewmate;
 
 internal class Mechanic : RoleBase
 {

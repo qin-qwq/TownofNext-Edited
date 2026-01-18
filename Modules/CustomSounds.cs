@@ -1,7 +1,7 @@
 using Hazel;
 using System;
 using System.IO;
-using TOHE.Modules.Rpc;
+using TONE.Modules.Rpc;
 
 #if !ANDROID
 using System.Runtime.InteropServices;
@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 #endif
 
-namespace TOHE.Modules;
+namespace TONE.Modules;
 
 public static class CustomSoundsManager
 {
@@ -54,7 +54,7 @@ public static class CustomSoundsManager
 
         if (!File.Exists(path))
         {
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("TOHE.Resources.Sounds." + sound + ".wav");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("TONE.Resources.Sounds." + sound + ".wav");
             if (stream == null)
             {
                 Logger.Warn($"Sound file missing：{sound}", "CustomSounds");

@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
 using UnityEngine;
-using static TOHE.Translator;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace TONE.Roles.Impostor;
 
 internal class Mercenary : RoleBase
 {

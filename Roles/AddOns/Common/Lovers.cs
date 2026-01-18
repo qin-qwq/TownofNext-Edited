@@ -1,10 +1,10 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Neutral;
+using TONE.Modules.Rpc;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace TONE.Roles.AddOns.Common;
 
 public class Lovers : IAddon
 {
@@ -121,6 +121,7 @@ public class Lovers : IAddon
         if (loverless == byte.MaxValue)
         {
             loverless = loverId;
+            SendRPC();
             return;
         }
 
@@ -183,7 +184,7 @@ public class Lovers : IAddon
     }
     public static void LoversSuicide(byte deathId = 0x7f, bool isExiled = false)
     {
-        if (!LoverSuicide.GetBool()) return;
+        if (!LoverSuicide.GetBool() && CustomRoles.Lovers.IsEnable()) return;
 
         foreach (var pair in loverPairs)
         {
@@ -193,7 +194,7 @@ public class Lovers : IAddon
 
             if (!p1.IsAlive() && !p2.IsAlive()) return;
 
-            if (Cupid.IsCupidLoverPair(p1, p2)) continue;
+            if (Cupid.IsCupidLoverPair(p1, p2) && Cupid.LoversNotHeartbroken.GetBool()) continue;
 
             if (hasHeartbreak[pair]) continue;
 
@@ -252,6 +253,12 @@ public class Lovers : IAddon
     public static void SendRPC()
     {
         if (!AmongUsClient.Instance.AmHost) return;
+
+        Logger.Info($"loverless: {loverless.GetPlayerName()}", "Lovers.SendRPC");
+        foreach (var pair in loverPairs)
+        {
+            Logger.Info($"{pair.Item1.GetPlayerName()} loves {pair.Item2.GetPlayerName()}", "Lovers.SendRPC");
+        }
         var msg = new RpcSetLoverPairs(PlayerControl.LocalPlayer.NetId, loverPairs.Count, loverPairs, loverless);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }

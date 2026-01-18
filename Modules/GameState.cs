@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using System;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using TONE.Modules;
+using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Utils;
+using static TONE.Utils;
 
-namespace TOHE;
+namespace TONE;
 
 public class PlayerState(byte playerId)
 {
@@ -37,6 +37,7 @@ public class PlayerState(byte playerId)
             _canUseMovingPlatform = value;
         }
     }
+    public byte? StolenId = null;
     public bool IsNecromancer { get; set; } = false;
     public (DateTime TimeStamp, byte) RealKiller = (DateTime.MinValue, byte.MaxValue);
     public List<(DateTime, CustomRoles, CustomRoles)> MainRoleLogs = [];
@@ -289,10 +290,6 @@ public class PlayerState(byte playerId)
         if (AmongUsClient.Instance.AmHost)
         {
             RPC.SendDeathReason(PlayerId, deathReason);
-            if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
-            {
-                MeetingHud.Instance.CheckForEndVoting();
-            }
         }
     }
     public bool IsSuicide => deathReason == DeathReason.Suicide;
@@ -321,7 +318,7 @@ public class PlayerState(byte playerId)
         Fall,
         Exorcised,
 
-        // TOHE
+        // TONE
         Gambled,
         Eaten,
         Sacrifice,
@@ -357,6 +354,7 @@ public class PlayerState(byte playerId)
         Expired,
         Suffocate,
         Ice,
+        AFK,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.AddOns.Crewmate;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
-using static TOHE.Options;
+using TONE.Roles.AddOns.Crewmate;
+using TONE.Roles.Double;
+using TONE.Roles.Impostor;
+using static TONE.Options;
 
-namespace TOHE.Roles.AddOns.Impostor;
+namespace TONE.Roles.AddOns.Impostor;
 
 public static class Madmate
 {

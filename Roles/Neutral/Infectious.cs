@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using static TOHE.Options;
-using static TOHE.Translator;
+using TONE.Modules;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Double;
+using static TONE.Options;
+using static TONE.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace TONE.Roles.Neutral;
 
 internal class Infectious : RoleBase
 {
