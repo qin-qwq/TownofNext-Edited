@@ -4262,7 +4262,7 @@
   "BakerTransformNoMoreBread": "Baker transforms if they do not have enough bread",
   "Cupid": "Cupid",
   "CupidInfo": "Spread the Love!",
-  "CupidInfoLong": "(中立阵营):\n丘比特可以变形选择两名玩家进行魅惑。被魅惑的玩家将成为恋人。丘比特与恋人一起获胜。根据房主设置，恋人不会因殉情而死亡。",
+  "CupidInfoLong": "(Neturals)\nCupid can use shapeshift temptation two players be the lover. Cupid and lover win together. Lover may not die in love according to the Host's settings.",
   "CupidSettings.CharmCooldown": "Charm Cooldown",
   "CupidSettings.LoversKnowCupid": "Lovers Know Who Cupid is",
   "CupidSettings.ProtectCooldown": "Protect Cooldown",
