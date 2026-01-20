@@ -789,7 +789,7 @@ class ReportDeadBodyPatch
         try
         {
             // If the player is dead, the meeting is canceled
-            if (__instance.Data.IsDead || !__instance.IsAlive()) return false;
+            if (__instance.Data.IsDead) return false;
 
             //=============================================
             //Below, check if this meeting is allowed

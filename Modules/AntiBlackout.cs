@@ -121,12 +121,12 @@ public static class AntiBlackout
 
         if (ExilePlayerId == PlayerControl.LocalPlayer.PlayerId)
         {
-            // Dead > Modded > not Impostor/Shapeshifter/Phantom/Viper
+            // Dead > Modded > not Impostor/Shapeshifter/Phantom
             dummyImp = Main.AllPlayerControls
                 .Where(pc => pc.PlayerId != PlayerControl.LocalPlayer.PlayerId)
                 .OrderByDescending(pc => !pc.IsAlive())
                 .ThenByDescending(pc => pc.IsModded())
-                .ThenByDescending(pc => pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
+                .ThenByDescending(pc => pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom)
                 .FirstOrDefault() ?? PlayerControl.LocalPlayer;
 
             Logger.Info($"Dummy Impostor is set to ({dummyImp.PlayerId}){dummyImp.Data.PlayerName}", "AntiBlackout.RevivePlayersAndSetDummyImp");
@@ -332,7 +332,7 @@ public static class AntiBlackout
                 }
                 else
                 {
-                    if (roletype is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper)
+                    if (roletype is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom)
                     {
                         changedRoleType = RoleTypes.ImpostorGhost;
                     }
