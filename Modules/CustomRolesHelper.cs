@@ -99,7 +99,7 @@ public static class CustomRolesHelper
     public static bool HasImpBasis(this CustomRoles role, bool ForDesyncRole = true)
         => role.GetVNRole() is CustomRoles.Impostor
             or CustomRoles.Shapeshifter
-            or CustomRoles.Phantom or CustomRoles.Viper
+            or CustomRoles.Phantom or CustomRoles.ViperTONE
             || (ForDesyncRole && role.GetDYRole() is RoleTypes.Impostor
                 or RoleTypes.Shapeshifter
                 or RoleTypes.Phantom or RoleTypes.Viper);
@@ -214,7 +214,6 @@ public static class CustomRolesHelper
             CustomRoles.Pelican or
             CustomRoles.Refugee or
             CustomRoles.Parasite or
-            CustomRoles.PlagueDoctor or
             CustomRoles.SerialKiller or
             CustomRoles.Werewolf or
             CustomRoles.Pickpocket or
@@ -1599,7 +1598,6 @@ public static class CustomRolesHelper
            CustomRoles.Infectious or CustomRoles.Infected => CountTypes.Infectious,
            CustomRoles.Crewpostor => CountTypes.Impostor,
            CustomRoles.Pyromaniac => CountTypes.Pyromaniac,
-           CustomRoles.PlagueDoctor => CountTypes.PlagueDoctor,
            CustomRoles.Virus => CountTypes.Virus,
            CustomRoles.Pickpocket => CountTypes.Pickpocket,
            CustomRoles.Traitor => CountTypes.Traitor,
@@ -1878,7 +1876,6 @@ public enum CountTypes
     Doppelganger,
     Bandit,
     Pelican,
-    PlagueDoctor,
     Demon,
     BloodKnight,
     Poisoner,

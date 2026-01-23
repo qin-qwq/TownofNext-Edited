@@ -1,6 +1,7 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
@@ -106,6 +107,7 @@ internal class Socialite : RoleBase
     }
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
+        if (voter.GetRoleClass().HasVoted) return true;
         if (voter == null || target == null) return true;
         if (GuestList.Contains(voter.PlayerId))
         {
@@ -113,6 +115,7 @@ internal class Socialite : RoleBase
             return false;
         }
         GuestList.Add(target.PlayerId);
+        voter.GetRoleClass().HasVoted = true;
         SendMessage(string.Format(GetString("SocialiteVoteMsg"), target.GetRealName()), voter.PlayerId, title: CustomRoles.Socialite.ToColoredString().ToUpper());
         return false;
     }

@@ -83,7 +83,7 @@ class HudManagerUpdatePatch
             if (player.IsAlive())
             {
                 // Set default
-                __instance.KillButton?.OverrideText(player.GetCustomRole().GetRoleTypes() == RoleTypes.Viper ? GetString("KillButtonText.Viper") : GetString("KillButtonText"));
+                __instance.KillButton?.OverrideText(GetString("KillButtonText"));
                 __instance.ReportButton?.OverrideText(GetString("ReportButtonText"));
                 __instance.SabotageButton?.OverrideText(GetString("SabotageButtonText"));
 

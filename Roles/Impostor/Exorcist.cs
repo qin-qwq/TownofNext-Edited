@@ -76,6 +76,11 @@ internal class Exorcist : RoleBase
         ExorcismLimitPerMeeting = ExorcismLimitMeeting.GetInt();
     }
 
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckCommand(pc, $"/ex", true);
+    }
+
     public bool CheckCommand(PlayerControl player, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;

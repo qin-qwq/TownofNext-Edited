@@ -1356,7 +1356,7 @@ public static class Utils
                 var m = Regex.Replace(txt, "^<voffset=[-]?\\d+em>", ""); // replaces the first instance of voffset, if any.
                 m += $"<voffset=-1.3em><alpha=#00>.</voffset>"; // fix text clipping OOB
                 if (m.IndexOf("\n") <= 4) m = m[(m.IndexOf("\n") + 1)..m.Length];
-                SendMessage(m, sendTo, titleW);
+                SendMessage(m, sendTo, titleW, noNumberSplit: true);
                 isfirst = false;
             }
         }
@@ -1364,7 +1364,7 @@ public static class Utils
         {
             text += $"<voffset=-1.3em><alpha=#00>.</voffset>";
             if (text.IndexOf("\n") <= 4) text = text[(text.IndexOf("\n") + 1)..text.Length];
-            SendMessage(text, sendTo, title);
+            SendMessage(text, sendTo, title, noNumberSplit: true);
         }
 
 
@@ -1389,7 +1389,7 @@ public static class Utils
         {
             if (Main.CurrentServerIsVanilla && !noNumberSplit)
             {
-                var parts = SplitByNumberLimit(text);
+                var parts = SplitByNumberLimit();
 
                 if (parts.Count > 1)
                 {
@@ -1420,7 +1420,7 @@ public static class Utils
 
         Main.MessagesToSend.Add((text.RemoveHtmlTagsTemplate(), sendTo, title, sendOption));
 
-        List<string> SplitByNumberLimit(string text)
+        List<string> SplitByNumberLimit()
         {
             List<string> result = [];
             StringBuilder sb = new();
@@ -1429,30 +1429,31 @@ public static class Utils
 
             foreach (char c in text)
             {
-                if (char.IsDigit(c))
+                if (char.IsDigit(c) && digitCount == 5)
                 {
-                    digitCount++;
+                    int lastNewline = sb.ToString().LastIndexOf('\n');
 
-                    if (digitCount > 5)
+                    if (lastNewline >= 0)
                     {
-                        int lastNewline = sb.ToString().LastIndexOf('\n');
-
-                        if (lastNewline >= 0)
-                        {
-                            result.Add(sb.ToString(0, lastNewline + 1));
-                            sb.Remove(0, lastNewline + 1);
-                        }
-                        else
-                        {
-                            result.Add(sb.ToString());
-                            sb.Clear();
-                        }
-
-                        digitCount = 1;
+                        result.Add(sb.ToString(0, lastNewline + 1));
+                        sb.Remove(0, lastNewline + 1);
                     }
+                    else
+                    {
+                        result.Add(sb.ToString());
+                        sb.Clear();
+                    }
+
+                    digitCount = 0;
+                    foreach (char r in sb.ToString())
+                        if (char.IsDigit(r))
+                            digitCount++;
                 }
 
                 sb.Append(c);
+
+                if (char.IsDigit(c))
+                    digitCount++;
             }
 
             if (sb.Length > 0)
@@ -1916,7 +1917,7 @@ public static class Utils
     private static readonly StringBuilder TargetDeathReason = new();
     private static readonly StringBuilder TargetSuffix = new();
     private static readonly StringBuilder TargetMark = new(20);
-    public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.None)
+    /*public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.Reliable)
     {
         try
         {
@@ -1956,6 +1957,28 @@ public static class Utils
             Logger.Info($" Seers: {seers} ---- Targets: {targets}", "NR");
         }
         catch (Exception e) { ThrowException(e); }
+    }*/
+    public static async void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false)
+    {
+        if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || Main.AllPlayerControls == null || SetUpRoleTextPatch.IsInIntro) return;
+        if (MeetingHud.Instance)
+        {
+            // When the meeting window is active and game is not ended
+            if (!GameEndCheckerForNormal.GameIsEnded) return;
+        }
+        else
+        {
+            // When some one press report button but NotifyRoles is not for meeting
+            if (Main.MeetingIsStarted && !isForMeeting) return;
+        }
+
+        //var caller = new System.Diagnostics.StackFrame(1, false);
+        //var callerMethod = caller.GetMethod();
+        //string callerMethodName = callerMethod.Name;
+        //string callerClassName = callerMethod.DeclaringType.FullName;
+        //Logger.Info($" Was called from: {callerClassName}.{callerMethodName}", "NotifyRoles");
+
+        await DoNotifyRoles(SpecifySeer, SpecifyTarget, isForMeeting, NoCache, ForceLoop, CamouflageIsForMeeting, MushroomMixupIsActive);
     }
     public static Task DoNotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, SendOption SendOption = SendOption.Reliable)
     {
@@ -2357,7 +2380,7 @@ public static class Utils
         return Task.CompletedTask;
     }
 
-    public static bool WriteSetNameRpcsToSender(ref CustomRpcSender sender, bool isForMeeting, bool NoCache, bool forceLoop, bool CamouflageIsForMeeting, bool guesserIsForMeeting, bool MushroomMixupIsActive, PlayerControl seer, PlayerControl[] seerList, PlayerControl[] targetList, out bool senderWasCleared, SendOption sendOption = SendOption.None)
+    public static bool WriteSetNameRpcsToSender(ref CustomRpcSender sender, bool isForMeeting, bool NoCache, bool forceLoop, bool CamouflageIsForMeeting, bool guesserIsForMeeting, bool MushroomMixupIsActive, PlayerControl seer, PlayerControl[] seerList, PlayerControl[] targetList, out bool senderWasCleared, SendOption sendOption = SendOption.Reliable)
     {
         long now = TimeStamp;
         var hasValue = false;

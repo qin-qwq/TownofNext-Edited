@@ -1973,6 +1973,7 @@ internal class ChatCommands
         text = text.Replace("着", "者").Trim().ToLower();
         return text switch
         {
+            "教父" => GetString("Godfather"),
             _ => text,
         };
     }
@@ -2190,6 +2191,10 @@ internal class ChatCommands
         if (!Blackmailer.CheckBlackmaile(player)) ChatManager.SendMessage(player, text);
 
         if (text.StartsWith("\n")) text = text[1..];
+        if (text.StartsWith("/cmd"))
+        {
+            text = "/" + text[4..].TrimStart();
+        }
         //if (!text.StartsWith("/")) return;
         string[] args = text.Split(' ');
         string subArgs = "";

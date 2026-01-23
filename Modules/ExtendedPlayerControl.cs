@@ -2022,7 +2022,8 @@ static class ExtendedPlayerControl
     public static bool UsesMeetingShapeshift(this PlayerControl player)
     {
         CustomRoles role = player.GetCustomRole();
-        if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper or CustomRoles.Balancer) return false;
+        if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper or CustomRoles.Balancer or CustomRoles.Councillor or CustomRoles.DoubleAgent
+            or CustomRoles.Exorcist) return false;
         return player.IsMeetingShapeshifterRole();
     }
     

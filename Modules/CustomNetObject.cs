@@ -164,7 +164,7 @@ namespace TONE.Modules
 
         protected void CreateNetObject(string sprite = "", Vector2 position = default, bool visible = false, NetworkedPlayerInfo.PlayerOutfit pOutfit = null)
         {
-            if (GameStates.IsEnded || !AmongUsClient.Instance.AmHost || Main.CurrentServerIsVanilla) return;
+            if (GameStates.IsEnded || !AmongUsClient.Instance.AmHost) return;
 
             if (!GameStates.InGame || !Main.IntroDestroyed)
             {

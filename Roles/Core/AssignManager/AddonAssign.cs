@@ -134,36 +134,6 @@ public static class AddonAssign
     }
     public static void AssignSubRoles(CustomRoles role, int RawCount = -1)
     {
-        /*try
-        {
-            var checkAllPlayers = Main.AllAlivePlayerControls.Where(x => CustomRolesHelper.CheckAddonConfilct(role, x));
-            var allPlayers = checkAllPlayers.ToList();
-            if (!allPlayers.Any()) return;
-            var count = Math.Clamp(RawCount, 0, allPlayers.Count);
-            if (RawCount == -1) count = Math.Clamp(role.GetCount(), 0, allPlayers.Count);
-            if (count <= 0) return;
-            for (var i = 0; i < count; i++)
-            {
-                // if the number of all players is 0
-                if (!allPlayers.Any()) 
-                {
-                    if (role == CustomRoles.Lovers && i % 2 != 0) Logger.Warn("Odd number of lovers assigned.", "AssignSubRoles:Lovers");
-                    return;
-                }
-
-                // Select player
-                var player = allPlayers.RandomElement();
-                allPlayers.Remove(player);
-
-                // Set Add-on
-                Main.PlayerStates[player.PlayerId].SetSubRole(role);
-                Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {role}", $"Assign {role}");
-            }
-        }
-        catch (Exception error)
-        {
-            Logger.Warn($"Add-On {role} get error after check addon confilct for: {error}", "AssignSubRoles");
-        }*/
         try
         {
             var allAlivePlayers = Main.AllAlivePlayerControls.ToList();
@@ -184,7 +154,19 @@ public static class AddonAssign
             var count = Math.Clamp(RawCount, 0, eligiblePlayers.Count);
         
             if (RawCount == -1) count = Math.Clamp(role.GetCount(), 0, eligiblePlayers.Count);
-        
+
+            if (role == CustomRoles.Lovers)
+            {
+                if (count % 2 != 0)
+                {
+                    count = Math.Max(0, count - 1);
+                }
+
+                var maxEven = eligiblePlayers.Count;
+                if (maxEven % 2 != 0) maxEven -= 1;
+                count = Math.Min(count, maxEven);
+            }
+
             if (count <= 0) return;
         
             for (var i = 0; i < count; i++)

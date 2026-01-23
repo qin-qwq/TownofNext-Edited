@@ -92,10 +92,10 @@ internal class TimeMaster : RoleBase
 
             foreach (var pc in Main.AllPlayerControls)
             {
-                Main.AllPlayerSpeed[pc.PlayerId] = Main.MinSpeed;
-                ReportDeadBodyPatch.CanReport[pc.PlayerId] = false;
                 originalSpeed.Remove(pc.PlayerId);
                 originalSpeed.Add(pc.PlayerId, Main.AllPlayerSpeed[pc.PlayerId]);
+                Main.AllPlayerSpeed[pc.PlayerId] = Main.MinSpeed;
+                ReportDeadBodyPatch.CanReport[pc.PlayerId] = false;
             }
 
             string notify = ColorString(Color.yellow, string.Format(GetString("TimeMasterRewindStart"), CustomRoles.TimeMaster.ToColoredString()));

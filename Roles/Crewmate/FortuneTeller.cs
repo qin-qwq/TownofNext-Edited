@@ -53,6 +53,7 @@ internal class FortuneTeller : RoleBase
     }
     public override bool CheckVote(PlayerControl player, PlayerControl target)
     {
+        if (player.GetRoleClass().HasVoted) return true;
         if (player == null || target == null) return true;
         if (didVote.Contains(player.PlayerId)) return true;
         didVote.Add(player.PlayerId);
@@ -172,6 +173,7 @@ internal class FortuneTeller : RoleBase
             }
         }
 
+        player.GetRoleClass().HasVoted = true;
         SendMessage(GetString("FortuneTellerCheck") + "\n" + msg + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()), sendOption: Hazel.SendOption.Reliable);
         SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.FortuneTeller), string.Format(GetString("VoteAbilityUsed"), GetString("FortuneTeller"))), noReplay: true);
         return false;

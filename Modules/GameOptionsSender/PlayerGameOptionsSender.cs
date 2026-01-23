@@ -131,7 +131,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             AURoleOptions.ShapeshifterDuration = 1f;
         }
 
-        if (Options.GhostCanSeeOtherVotes.GetBool() && !player.IsAlive())
+        if (Options.GhostCanSeeOtherVotes.GetBool() && player.Data.IsDead)
         {
             opt.SetBool(BoolOptionNames.AnonymousVotes, false);
         }

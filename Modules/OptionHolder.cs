@@ -2097,7 +2097,7 @@ public static class Options
         ShowMeetingReason = BooleanOptionItem.Create(60748, "ShowMeetingReason", false, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
-        UseMeetingShapeshift = BooleanOptionItem.Create(60749, "UseMeetingShapeshift", false, TabGroup.ModSettings, false)
+        UseMeetingShapeshift = BooleanOptionItem.Create(60749, "UseMeetingShapeshift", true, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
         // 其它设定

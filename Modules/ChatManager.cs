@@ -32,6 +32,10 @@ namespace TONE.Modules.ChatManager
         }
         public static bool CheckCommond(ref string msg, string command, bool exact = true)
         {
+            if (msg.StartsWith("/cmd"))
+            {
+                msg = "/" + msg[4..].TrimStart();
+            }
             var comList = command.Split('|');
             foreach (string comm in comList)
             {
@@ -137,7 +141,7 @@ namespace TONE.Modules.ChatManager
                     if (HideExileChat.GetBool())
                     {
                         Logger.Info($"Message sent in exiling screen, spamming the chat", "ChatManager");
-                        _ = new LateTask(SendPreviousMessagesToAll, 0.3f, "Spamming the chat");
+                        _ = new LateTask(() => { SendPreviousMessagesToAll(true); }, 0.3f, "Spamming the chat");
                     }
                     return;
                 }
@@ -163,9 +167,9 @@ namespace TONE.Modules.ChatManager
             var message = new RpcQuickChatSpam();
             RpcUtils.LateBroadcastReliableMessage(message);
         }
-        public static void SendPreviousMessagesToAll()
+        public static void SendPreviousMessagesToAll(bool start = false)
         {
-            if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost) return;
+            if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost || !start) return;
             //This should never function for non host
             if (Main.CurrentServerIsVanilla)
             {

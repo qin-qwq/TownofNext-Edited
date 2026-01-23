@@ -50,7 +50,7 @@ class CheckForEndVotingPatch
                 PlayerControl pc = GetPlayerById(pva.TargetPlayerId);
                 if (pc == null) continue;
 
-                if (pva.DidVote && pc.PlayerId == pva.VotedFor && pva.VotedFor < 253 && pc.IsAlive())
+                if (pva.DidVote && pc.PlayerId == pva.VotedFor && pva.VotedFor < 253 && !pc.Data.IsDead)
                 {
                     if (Madmate.MadmateSpawnMode.GetInt() == 2 && Main.MadmateNum < CustomRoles.Madmate.GetCount() && pc.CanBeMadmate())
                     {
@@ -182,7 +182,7 @@ class CheckForEndVotingPatch
                 if (voter == null || voter.Data == null || voter.Data.Disconnected) continue;
                 if (Options.VoteMode.GetBool())
                 {
-                    if (ps.VotedFor == 253 && voter.IsAlive() &&
+                    if (ps.VotedFor == 253 && !voter.Data.IsDead &&
                         !(Options.WhenSkipVoteIgnoreFirstMeeting.GetBool() && MeetingStates.FirstMeeting) && // Ignore First Meeting
                         !(Options.WhenSkipVoteIgnoreNoDeadBody.GetBool() && !MeetingStates.IsExistDeadBody) && // No Dead Body
                         !(Options.WhenSkipVoteIgnoreEmergency.GetBool() && MeetingStates.IsEmergencyMeeting) // Ignore Emergency Meeting
@@ -202,7 +202,7 @@ class CheckForEndVotingPatch
                                 break;
                         }
                     }
-                    if (ps.VotedFor == 254 && voter.IsAlive())
+                    if (ps.VotedFor == 254 && !voter.Data.IsDead)
                     {
                         switch (Options.GetWhenNonVote())
                         {
@@ -844,16 +844,19 @@ class CastVotePatch
             }
 
 
-            if (!voter.GetRoleClass().HasVoted && voter.GetRoleClass().CheckVote(voter, target) == false)
+            if (!(Options.UseMeetingShapeshift.GetBool() && voter.UsesMeetingShapeshift()))
             {
-                Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "CastVotePatch.RoleBase.CheckVote");
-                __instance.RpcClearVoteDelay(voter.GetClientId());
+                if (voter.GetRoleClass().CheckVote(voter, target) == false)
+                {
+                    Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "CastVotePatch.RoleBase.CheckVote");
+                    __instance.RpcClearVoteDelay(voter.GetClientId());
 
-                // Attempts to set thumbsdown color to the same as playerrole to signify player ability used on (only for modded client)
-                PlayerVoteArea pva = __instance.playerStates.FirstOrDefault(pva => pva.TargetPlayerId == target.PlayerId);
-                Color color = GetRoleColor(voter.GetCustomRole()).ShadeColor(0.5f);
-                pva.ThumbsDown.set_color_Injected(ref color);
-                return false;
+                    // Attempts to set thumbsdown color to the same as playerrole to signify player ability used on (only for modded client)
+                    PlayerVoteArea pva = __instance.playerStates.FirstOrDefault(pva => pva.TargetPlayerId == target.PlayerId);
+                    Color color = GetRoleColor(voter.GetCustomRole()).ShadeColor(0.5f);
+                    pva.ThumbsDown.set_color_Injected(ref color);
+                    return false;
+                }
             }
 
             switch (voter.GetCustomRole())
@@ -1343,9 +1346,12 @@ class MeetingHudStartPatch
                     {
                         if (pc.UsesMeetingShapeshift())
                         {
-                            pc.RpcSetRoleDesync(RoleTypes.Shapeshifter, pc.GetClientId());
-                            if (pc.GetCustomRole().IsImpostor())
-                                pc.RpcSetRoleDesync(RoleTypes.Crewmate, pc.GetClientId());
+                            SendMessage(GetString("SupportMeetingShapeshift"), pc.PlayerId, pc.GetCustomRole().ToColoredString().ToUpper(), noReplay: true);
+                            var aapc = Main.AllAlivePlayerControls;
+                            var sender = CustomRpcSender.Create($"RpcSetRoleDesync for meeting shapeshift ({Main.AllPlayerNames.GetValueOrDefault(pc.PlayerId, "Someone")})", SendOption.Reliable);
+                            sender.RpcSetRole(pc, RoleTypes.Shapeshifter, pc.OwnerId);
+                            if (!pc.GetCustomRole().IsImpostor()) aapc.DoIf(x => x.GetCustomRole().IsImpostor(), x => sender.RpcSetRole(x, RoleTypes.Crewmate, pc.OwnerId));
+                            sender.SendMessage();
                         }
                     }
                 }, 8f, "Set Shapeshifter Role For Meeting Use");
@@ -1362,7 +1368,7 @@ class MeetingHudStartPatch
             var seerRoleClass = seer.GetRoleClass();
 
             // if based role is Shapeshifter/Phantom and is Desync Shapeshifter/Phantom
-            if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper && seer.HasDesyncRole())
+            if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom && seer.HasDesyncRole())
             {
                 // When target is impostor, set name color as white
                 target.cosmetics.SetNameColor(Color.white);

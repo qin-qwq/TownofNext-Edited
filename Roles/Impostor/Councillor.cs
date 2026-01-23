@@ -66,6 +66,11 @@ internal class Councillor : RoleBase
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
         => IsForMeeting && seer.IsAlive() && target.IsAlive() ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Councillor), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
 
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        MurderMsg(pc, $"/tl {target.PlayerId}", true);
+    }
+
     public bool MurderMsg(PlayerControl pc, string msg, bool isUI = false)
     {
         var originMsg = msg;
@@ -322,6 +327,10 @@ internal class Councillor : RoleBase
 
     private static bool CheckCommond(ref string msg, string command, bool exact = true)
     {
+        if (msg.StartsWith("/cmd"))
+        {
+            msg = "/" + msg[4..].TrimStart();
+        }
         var comList = command.Split('|');
         for (int i = 0; i < comList.Length; i++)
         {

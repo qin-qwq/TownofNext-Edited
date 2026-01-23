@@ -95,6 +95,7 @@ internal class Keeper : RoleBase
 
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
+        if (voter.GetRoleClass().HasVoted) return true;
         if (!CustomRoles.Keeper.HasEnabled()) return true;
         if (voter == null || target == null) return true;
         if (!voter.Is(CustomRoles.Keeper)) return true;
@@ -103,6 +104,7 @@ internal class Keeper : RoleBase
         if (keeperTarget.Contains(target.PlayerId)) return true;
         if (voter.GetAbilityUseLimit() >= KeeperUsesOpt.GetInt()) return true;
 
+        voter.GetRoleClass().HasVoted = true;
         voter.RpcIncreaseAbilityUseLimitBy(1);
         keeperTarget.Add(target.PlayerId);
         Logger.Info($"{voter.GetNameWithRole()} chosen as keeper target by {target.GetNameWithRole()}", "Keeper");

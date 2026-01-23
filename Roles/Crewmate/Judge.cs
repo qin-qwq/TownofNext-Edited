@@ -302,6 +302,10 @@ internal class Judge : RoleBase
     }
     public static bool CheckCommond(ref string msg, string command, bool exact = true)
     {
+        if (msg.StartsWith("/cmd"))
+        {
+            msg = "/" + msg[4..].TrimStart();
+        }
         var comList = command.Split('|');
         foreach (var comm in comList)
         {
