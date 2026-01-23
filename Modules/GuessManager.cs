@@ -33,6 +33,10 @@ public static class GuessManager
 
     public static bool CheckCommond(ref string msg, string command, bool exact = true)
     {
+        if (msg.StartsWith("/cmd"))
+        {
+            msg = "/" + msg[4..].TrimStart();
+        }
         var comList = command.Split('|');
         foreach (string comm in comList)
         {

@@ -286,6 +286,10 @@ internal class Pirate : RoleBase
 
     public static bool CheckCommond(ref string msg, string command)
     {
+        if (msg.StartsWith("/cmd"))
+        {
+            msg = "/" + msg[4..].TrimStart();
+        }
         var comList = command.Split('|');
         for (int i = 0; i < comList.Length; i++)
         {
