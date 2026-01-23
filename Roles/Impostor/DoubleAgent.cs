@@ -121,8 +121,14 @@ internal class DoubleAgent : RoleBase
 
     public override bool CanUseKillButton(PlayerControl pc) => Main.AliveImpostorCount < 2;
 
+    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
+    {
+        CheckVote(pc, target);
+    }
+
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
+        if (voter.GetRoleClass().HasVoted) return true;
         if (voter.IsModded() || !CanBombInMeeting) return true;
 
         if (!BombIsActive)
@@ -140,6 +146,7 @@ internal class DoubleAgent : RoleBase
             CurrentBombedTime = -1;
             CurrentBombedPlayers.Add(target.PlayerId);
             BombIsActive = true;
+            voter.GetRoleClass().HasVoted = true;
             SendMessage(GetString("VoteHasReturned"), voter.PlayerId, title: ColorString(GetRoleColor(CustomRoles.DoubleAgent), string.Format(GetString("VoteAbilityUsed"), GetString("DoubleAgent"))), noReplay: true);
             return false;
         }

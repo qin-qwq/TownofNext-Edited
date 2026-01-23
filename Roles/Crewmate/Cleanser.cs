@@ -44,6 +44,7 @@ internal class Cleanser : RoleBase
     }
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
+        if (voter.GetRoleClass().HasVoted) return true;
         if (DidVote) return true;
         DidVote = true;
         if (voter.GetAbilityUseLimit() < 1) return true;
@@ -78,6 +79,7 @@ internal class Cleanser : RoleBase
         Logger.Info($"{voter.GetNameWithRole()} cleansed {target.GetNameWithRole()}", "Cleansed");
         Utils.SendMessage(string.Format(GetString("CleanserRemovedRole"), targetName), voter.PlayerId, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()));
 
+        voter.GetRoleClass().HasVoted = true;
         return false;
     }
     public override void OnReportDeadBody(PlayerControl baba, NetworkedPlayerInfo lilelam)

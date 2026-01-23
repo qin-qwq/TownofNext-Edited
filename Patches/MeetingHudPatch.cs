@@ -844,16 +844,19 @@ class CastVotePatch
             }
 
 
-            if (!voter.GetRoleClass().HasVoted && voter.GetRoleClass().CheckVote(voter, target) == false)
+            if (!(Options.UseMeetingShapeshift.GetBool() && voter.UsesMeetingShapeshift()))
             {
-                Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "CastVotePatch.RoleBase.CheckVote");
-                __instance.RpcClearVoteDelay(voter.GetClientId());
+                if (voter.GetRoleClass().CheckVote(voter, target) == false)
+                {
+                    Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "CastVotePatch.RoleBase.CheckVote");
+                    __instance.RpcClearVoteDelay(voter.GetClientId());
 
-                // Attempts to set thumbsdown color to the same as playerrole to signify player ability used on (only for modded client)
-                PlayerVoteArea pva = __instance.playerStates.FirstOrDefault(pva => pva.TargetPlayerId == target.PlayerId);
-                Color color = GetRoleColor(voter.GetCustomRole()).ShadeColor(0.5f);
-                pva.ThumbsDown.set_color_Injected(ref color);
-                return false;
+                    // Attempts to set thumbsdown color to the same as playerrole to signify player ability used on (only for modded client)
+                    PlayerVoteArea pva = __instance.playerStates.FirstOrDefault(pva => pva.TargetPlayerId == target.PlayerId);
+                    Color color = GetRoleColor(voter.GetCustomRole()).ShadeColor(0.5f);
+                    pva.ThumbsDown.set_color_Injected(ref color);
+                    return false;
+                }
             }
 
             switch (voter.GetCustomRole())
@@ -1343,9 +1346,12 @@ class MeetingHudStartPatch
                     {
                         if (pc.UsesMeetingShapeshift())
                         {
-                            pc.RpcSetRoleDesync(RoleTypes.Shapeshifter, pc.GetClientId());
-                            if (pc.GetCustomRole().IsImpostor())
-                                pc.RpcSetRoleDesync(RoleTypes.Crewmate, pc.GetClientId());
+                            SendMessage(GetString("SupportMeetingShapeshift"), pc.PlayerId, pc.GetCustomRole().ToColoredString().ToUpper(), noReplay: true);
+                            var aapc = Main.AllAlivePlayerControls;
+                            var sender = CustomRpcSender.Create($"RpcSetRoleDesync for meeting shapeshift ({Main.AllPlayerNames.GetValueOrDefault(pc.PlayerId, "Someone")})", SendOption.Reliable);
+                            sender.RpcSetRole(pc, RoleTypes.Shapeshifter, pc.OwnerId);
+                            if (!pc.GetCustomRole().IsImpostor()) aapc.DoIf(x => x.GetCustomRole().IsImpostor(), x => sender.RpcSetRole(x, RoleTypes.Crewmate, pc.OwnerId));
+                            sender.SendMessage();
                         }
                     }
                 }, 8f, "Set Shapeshifter Role For Meeting Use");

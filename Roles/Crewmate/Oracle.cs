@@ -50,6 +50,7 @@ internal class Oracle : RoleBase
     }
     public override bool CheckVote(PlayerControl player, PlayerControl target)
     {
+        if (player.GetRoleClass().HasVoted) return true;
         if (player == null || target == null) return true;
         if (DidVote.Contains(player.PlayerId)) return true;
         DidVote.Add(player.PlayerId);
@@ -142,6 +143,7 @@ internal class Oracle : RoleBase
                 msg = string.Format(GetString("OracleCheck." + text), targetName);
             }
 
+            player.GetRoleClass().HasVoted = true;
             SendMessage(GetString("OracleCheck") + "\n" + msg + "\n\n" + string.Format(GetString("OracleCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.Oracle), GetString("Oracle").ToUpper()));
             SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.Oracle), string.Format(GetString("VoteAbilityUsed"), GetString("Oracle"))), noReplay: true);
             return false;

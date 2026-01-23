@@ -19,7 +19,7 @@ internal class PlagueDoctor : RoleBase
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.PlagueDoctor);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
+    public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
     //==================================================================\\
 
     private static OptionItem OptionInfectLimit;

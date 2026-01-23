@@ -329,6 +329,7 @@ internal static class Crowded
     {
         public static void Postfix(MeetingHud __instance)
         {
+            if (Main.NormalOptions.MaxPlayers <= 15) return;
             __instance.gameObject.AddComponent<MeetingHudPagingBehaviour>().meetingHud = __instance;
         }
     }
@@ -338,6 +339,7 @@ internal static class Crowded
     {
         public static void Postfix(ShapeshifterMinigame __instance)
         {
+            if (Main.NormalOptions.MaxPlayers <= 15) return;
             __instance.gameObject.AddComponent<ShapeShifterPagingBehaviour>().shapeshifterMinigame = __instance;
         }
     }
@@ -347,6 +349,7 @@ internal static class Crowded
     {
         public static void Postfix(VitalsMinigame __instance)
         {
+            if (Main.NormalOptions.MaxPlayers <= 15) return;
             __instance.gameObject.AddComponent<VitalsPagingBehaviour>().vitalsMinigame = __instance;
         }
     }

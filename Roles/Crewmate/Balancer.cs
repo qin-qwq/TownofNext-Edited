@@ -1,6 +1,7 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 using UnityEngine;
 using static TONE.CheckForEndVotingPatch;
 using static TONE.Translator;
@@ -50,6 +51,7 @@ internal class Balancer : RoleBase
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
         if (Choose) return true;
+        if (voter.GetRoleClass().HasVoted) return true;
         if (voter.GetAbilityUseLimit() < 1) return true;
         if (voter == null || target == null) return true;
         if (voter.IsModded()) return true;

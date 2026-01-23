@@ -61,6 +61,7 @@ internal class TreasureHunter : RoleBase
 
     public static void CreateTreasure(PlayerControl pc)
     {
+        if (!pc.IsAlive()) return;
         var location = GetAllRandomSpawnLocation();
         var pcRoleClass = pc.GetRoleClass();
         TreasureHunter pcRole = pcRoleClass as TreasureHunter;
@@ -70,6 +71,7 @@ internal class TreasureHunter : RoleBase
 
     public static void GetTreasure(PlayerControl pc, bool get = true)
     {
+        if (!pc.IsAlive()) return;
         var pcRoleClass = pc.GetRoleClass();
         TreasureHunter pcRole = pcRoleClass as TreasureHunter;
         pcRole.TreasurePlace = Vector2.zero;
