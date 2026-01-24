@@ -926,7 +926,14 @@ class ReportDeadBodyPatch
 
         if (Lovers.PrivateChat.GetBool())
         {
-            _ = new LateTask(() => { ChatManager.SendPreviousMessagesToAll(true); }, Main.CurrentServerIsVanilla && !PlayerControl.LocalPlayer.IsAlive() ? 3f : 0f);
+            if (Main.CurrentServerIsVanilla)
+            {
+                _ = new LateTask(() => { ChatManager.SendPreviousMessagesToAll(); }, !PlayerControl.LocalPlayer.IsAlive() ? 3f : 0f);
+            }
+            else
+            {
+                Summoner.HideSummonCommand();
+            }
         }
 
         try

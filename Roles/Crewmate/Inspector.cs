@@ -24,7 +24,6 @@ internal class Inspector : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\
 
-    private static OptionItem TryHideMsg;
     private static OptionItem InspectCheckLimitMax;
     private static OptionItem InspectCheckLimitPerMeeting;
     private static OptionItem InspectCheckTargetKnow;
@@ -38,8 +37,6 @@ internal class Inspector : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Inspector);
-        TryHideMsg = BooleanOptionItem.Create(Id + 10, "InspectorTryHideMsg", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Inspector])
-            .SetColor(Color.green);
         InspectCheckLimitMax = IntegerOptionItem.Create(Id + 11, "MaxInspectCheckLimit", new(0, 20, 1), 5, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Inspector])
             .SetValueFormat(OptionFormat.Times);
         InspectCheckLimitPerMeeting = IntegerOptionItem.Create(Id + 12, "InspectCheckLimitPerMeeting", new(1, 20, 1), 1, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Inspector])
@@ -121,8 +118,6 @@ internal class Inspector : RoleBase
 
     public static bool InspectCheckMsg(PlayerControl pc, string msg, bool isUI = false)
     {
-        var originMsg = msg;
-
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
         if (!pc.Is(CustomRoles.Inspector)) return false;
@@ -146,16 +141,6 @@ internal class Inspector : RoleBase
         }
         else if (operate == 2)
         {
-
-            if (TryHideMsg.GetBool())
-            {
-                //if (Options.NewHideMsg.GetBool()) ChatManager.SendPreviousMessagesToAll();
-                //else TryHideMsgForCompare(); 
-                TryHideMsgForCompare();
-                ChatManager.SendPreviousMessagesToAll();
-            }
-            else if (pc.AmOwner) SendMessage(originMsg, 255, pc.GetRealName());
-
             if (!MsgToPlayerAndRole(msg, out byte targetId1, out byte targetId2, out string error))
             {
                 SendMessage(error, pc.PlayerId);
@@ -397,48 +382,6 @@ internal class Inspector : RoleBase
             }
         }
         return false;
-    }
-    private static void TryHideMsgForCompare()
-    {
-        if (Main.CurrentServerIsVanilla) return;
-        ChatUpdatePatch.DoBlockChat = true;
-        if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
-        {
-            ChatManager.SendQuickChatSpam();
-            ChatUpdatePatch.DoBlockChat = false;
-            return;
-        }
-        List<CustomRoles> roles = CustomRolesHelper.AllRoles.Where(x => x is not CustomRoles.NotAssigned).ToList();
-        var rd = IRandom.Instance;
-        string msg;
-        string[] command = ["cmp", "compare", "比较"];
-        for (int i = 0; i < 20; i++)
-        {
-            msg = "/";
-            if (rd.Next(1, 100) < 20)
-            {
-                msg += "id";
-            }
-            else
-            {
-                msg += command[rd.Next(0, command.Length - 1)];
-                msg += " ";
-                msg += rd.Next(0, 15).ToString();
-                msg += " ";
-                msg += rd.Next(0, 15).ToString();
-
-            }
-            var player = Main.AllAlivePlayerControls.RandomElement();
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
-            var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-            writer.StartMessage(-1);
-            writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-                .Write(msg)
-                .EndRpc();
-            writer.EndMessage();
-            writer.SendMessage();
-        }
-        ChatUpdatePatch.DoBlockChat = false;
     }
 
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)

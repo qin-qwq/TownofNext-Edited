@@ -25,7 +25,6 @@ internal class Pirate : RoleBase
     //==================================================================\\
 
     private static OptionItem SuccessfulDuelsToWin;
-    private static OptionItem TryHideMsg;
     private static OptionItem DuelCooldown;
 
     private static readonly Dictionary<byte, bool> DuelDone = [];
@@ -38,8 +37,6 @@ internal class Pirate : RoleBase
         SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Pirate);
         DuelCooldown = FloatOptionItem.Create(Id + 12, "DuelCooldown", new(0f, 180f, 2.5f), 22.5f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pirate])
                 .SetValueFormat(OptionFormat.Seconds);
-        TryHideMsg = BooleanOptionItem.Create(Id + 10, "PirateTryHideMsg", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pirate])
-            .SetColor(Color.green);
         SuccessfulDuelsToWin = IntegerOptionItem.Create(Id + 11, "SuccessfulDuelsToWin", new(1, 20, 1), 2, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pirate])
             .SetValueFormat(OptionFormat.Times);
     }
@@ -111,7 +108,7 @@ internal class Pirate : RoleBase
 
         DuelDone[PirateTarget] = false;
 
-        if (!Options.DisableShieldAnimations.GetBool()) killer.RpcGuardAndKill(killer);
+        if (!DisableShieldAnimations.GetBool()) killer.RpcGuardAndKill(killer);
         else killer.SetKillCooldown();
 
         return false;
@@ -179,7 +176,6 @@ internal class Pirate : RoleBase
     }
     public static bool DuelCheckMsg(PlayerControl pc, string msg, bool isUI = false)
     {
-        var originMsg = msg;
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
         if (!pc.Is(CustomRoles.Pirate) && PirateTarget != pc.PlayerId) return false;
@@ -198,16 +194,6 @@ internal class Pirate : RoleBase
 
         if (operate)
         {
-
-            if (TryHideMsg.GetBool())
-            {
-                //if (Options.NewHideMsg.GetBool()) ChatManager.SendPreviousMessagesToAll();
-                //else TryHideMsgForDuel();
-                TryHideMsgForDuel();
-                ChatManager.SendPreviousMessagesToAll();
-            }
-            else if (pc.AmOwner) SendMessage(originMsg, 255, pc.GetRealName());
-
             if (!MsgToPlayerAndRole(msg, out int rpsOption, out string error))
             {
                 SendMessage(error, pc.PlayerId);
@@ -308,48 +294,4 @@ internal class Pirate : RoleBase
         }
         return false;
     }
-
-    public static void TryHideMsgForDuel()
-    {
-        if (Main.CurrentServerIsVanilla) return;
-        ChatUpdatePatch.DoBlockChat = true;
-
-        if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
-        {
-            ChatManager.SendQuickChatSpam();
-            ChatUpdatePatch.DoBlockChat = false;
-            return;
-        }
-
-        List<CustomRoles> roles = CustomRolesHelper.AllRoles.Where(x => x is not CustomRoles.NotAssigned).ToList();
-        var rd = IRandom.Instance;
-        string msg;
-        string[] command = ["duel", "rps"];
-        for (int i = 0; i < 20; i++)
-        {
-            msg = "/";
-            if (rd.Next(1, 100) < 20)
-            {
-                msg += "id";
-            }
-            else
-            {
-                msg += command[rd.Next(0, command.Length - 1)];
-                msg += " ";
-                msg += rd.Next(0, 3).ToString();
-            }
-            var player = Main.AllAlivePlayerControls.RandomElement();
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
-            var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-            writer.StartMessage(-1);
-            writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-                .Write(msg)
-                .EndRpc();
-            writer.EndMessage();
-            writer.SendMessage();
-        }
-        ChatUpdatePatch.DoBlockChat = false;
-    }
-
-
 }

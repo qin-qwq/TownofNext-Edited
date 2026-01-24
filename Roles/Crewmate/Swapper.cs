@@ -26,7 +26,6 @@ internal class Swapper : RoleBase
     private static OptionItem SwapMax;
     private static OptionItem CanSwapSelf;
     private static OptionItem OptCanStartMeeting;
-    private static OptionItem TryHideMsg;
 
     private static readonly HashSet<byte> ResultSent = [];
     private static readonly Dictionary<byte, byte> Vote = [];
@@ -41,7 +40,6 @@ internal class Swapper : RoleBase
             .SetValueFormat(OptionFormat.Times);
         CanSwapSelf = BooleanOptionItem.Create(Id + 2, "CanSwapSelfVotes", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Swapper]);
         OptCanStartMeeting = BooleanOptionItem.Create(Id + 4, GeneralOption.CanUseMeetingButton, false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Swapper]);
-        TryHideMsg = BooleanOptionItem.Create(Id + 5, "SwapperTryHideMsg", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Swapper]);
     }
     public override void Init()
     {
@@ -65,8 +63,6 @@ internal class Swapper : RoleBase
 
     public bool SwapMsg(PlayerControl pc, string msg, bool isUI = false)
     {
-        var originMsg = msg;
-
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || _Player == null || GameStates.IsExilling) return false;
 
@@ -89,13 +85,6 @@ internal class Swapper : RoleBase
         }
         else if (operate == 2)
         {
-            if (TryHideMsg.GetBool())
-            {
-                GuessManager.TryHideMsg();
-                ChatManager.SendPreviousMessagesToAll();
-            }
-            else if (pc.AmOwner && !isUI) SendMessage(originMsg, 255, pc.GetRealName());
-
             if (!MsgToPlayerAndRole(msg, out byte targetId, out string error) && targetId != 253)
             {
                 SendMessage(error, pc.PlayerId);

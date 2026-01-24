@@ -18,7 +18,6 @@ internal class President : RoleBase
 
     private static OptionItem PresidentAbilityUses;
     private static OptionItem PresidentCanBeGuessedAfterRevealing;
-    private static OptionItem HidePresidentEndCommand;
     private static OptionItem NeutralsSeePresident;
     private static OptionItem MadmatesSeePresident;
     private static OptionItem ImpsSeePresident;
@@ -37,7 +36,6 @@ internal class President : RoleBase
         MadmatesSeePresident = BooleanOptionItem.Create(Id + 13, "MadmatesSeePresident", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.President]);
         ImpsSeePresident = BooleanOptionItem.Create(Id + 14, "ImpsSeePresident", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.President]);
         CovenSeePresident = BooleanOptionItem.Create(Id + 16, "CovenSeePresident", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.President]);
-        HidePresidentEndCommand = BooleanOptionItem.Create(Id + 15, "HidePresidentEndCommand", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.President]);
     }
     public override void Init()
     {
@@ -58,44 +56,8 @@ internal class President : RoleBase
 
     public static bool CheckReveal(byte targetId) => CheckPresidentReveal.TryGetValue(targetId, out var canBeReveal) && canBeReveal;
 
-    public static void TryHideMsgForPresident()
-    {
-        if (Main.CurrentServerIsVanilla) return;
-        ChatUpdatePatch.DoBlockChat = true;
-
-        if (ChatManager.quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
-        {
-            ChatManager.SendQuickChatSpam();
-            ChatUpdatePatch.DoBlockChat = false;
-            return;
-        }
-
-        var rd = IRandom.Instance;
-        string msg;
-        for (int i = 0; i < 20; i++)
-        {
-            msg = "/";
-            if (rd.Next(1, 100) < 20)
-                msg += "finish";
-            else
-                msg += "reveal";
-            var player = Main.AllAlivePlayerControls.RandomElement();
-            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
-            var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-            writer.StartMessage(-1);
-            writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-                .Write(msg)
-                .EndRpc();
-            writer.EndMessage();
-            writer.SendMessage();
-        }
-        ChatUpdatePatch.DoBlockChat = false;
-    }
-
     public static bool EndMsg(PlayerControl pc, string msg)
     {
-        var originMsg = msg;
-
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
         if (!pc.Is(CustomRoles.President)) return false;
@@ -114,16 +76,6 @@ internal class President : RoleBase
 
         else if (operate == 1)
         {
-
-            if (HidePresidentEndCommand.GetBool())
-            {
-                //if (Options.NewHideMsg.GetBool()) ChatManager.SendPreviousMessagesToAll();
-                //else TryHideMsgForPresident();
-                TryHideMsgForPresident();
-                ChatManager.SendPreviousMessagesToAll();
-            }
-            else if (pc.AmOwner) Utils.SendMessage(originMsg, 255, pc.GetRealName());
-
             if (pc.GetAbilityUseLimit() < 1)
             {
                 Utils.SendMessage(GetString("PresidentEndMax"), pc.PlayerId);
@@ -144,16 +96,6 @@ internal class President : RoleBase
         }
         else if (operate == 2)
         {
-
-            if (HidePresidentEndCommand.GetBool())
-            {
-                //if (Options.NewHideMsg.GetBool()) ChatManager.SendPreviousMessagesToAll();
-                //else TryHideMsgForPresident();
-                TryHideMsgForPresident();
-                ChatManager.SendPreviousMessagesToAll();
-            }
-            else if (pc.AmOwner) Utils.SendMessage(originMsg, 255, pc.GetRealName());
-
             if (RevealLimit[pc.PlayerId] < 1)
             {
                 Utils.SendMessage(GetString("PresidentRevealMax"), pc.PlayerId);

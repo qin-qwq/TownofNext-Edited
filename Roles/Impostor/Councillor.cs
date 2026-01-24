@@ -26,7 +26,6 @@ internal class Councillor : RoleBase
     private static OptionItem MurderLimitPerMeeting;
     private static OptionItem MurderLimitPerGame;
     private static OptionItem MakeEvilJudgeClear;
-    private static OptionItem TryHideMsg;
     private static OptionItem CanMurderMadmate;
     private static OptionItem CanMurderImpostor;
     private static OptionItem SuicideOnJudgeImpTeam;
@@ -50,8 +49,6 @@ internal class Councillor : RoleBase
         CanMurderImpostor = BooleanOptionItem.Create(Id + 14, "CouncillorCanMurderImpostor", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
         CanMurderTaskDoneSnitch = BooleanOptionItem.Create(Id + 16, "CouncillorCanMurderTaskDoneSnitch", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
         SuicideOnJudgeImpTeam = BooleanOptionItem.Create(Id + 17, "CouncillorSuicideOnJudgeImpTeam", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
-        TryHideMsg = BooleanOptionItem.Create(Id + 15, "CouncillorTryHideMsg", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
-            .SetColor(Color.green);
     }
     public override void Add(byte playerId)
     {
@@ -73,8 +70,6 @@ internal class Councillor : RoleBase
 
     public bool MurderMsg(PlayerControl pc, string msg, bool isUI = false)
     {
-        var originMsg = msg;
-
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || _Player == null || GameStates.IsExilling) return false;
 
@@ -97,15 +92,6 @@ internal class Councillor : RoleBase
         }
         else if (operate == 2)
         {
-            if (TryHideMsg.GetBool())
-            {
-                //if (Options.NewHideMsg.GetBool()) ChatManager.SendPreviousMessagesToAll();
-                //else GuessManager.TryHideMsg();
-                GuessManager.TryHideMsg();
-                ChatManager.SendPreviousMessagesToAll();
-            }
-            else if (pc.AmOwner) Utils.SendMessage(originMsg, 255, pc.GetRealName());
-
             if (!MsgToPlayerAndRole(msg, out byte targetId, out string error))
             {
                 Utils.SendMessage(error, pc.PlayerId);

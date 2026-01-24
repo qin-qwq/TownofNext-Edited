@@ -34,7 +34,6 @@ internal class Doomsayer : RoleBase
     private static OptionItem KillCorrectlyGuessedPlayers;
     public static OptionItem DoesNotSuicideWhenMisguessing;
     private static OptionItem MisguessRolePrevGuessRoleUntilNextMeeting;
-    private static OptionItem DoomsayerTryHideMsg;
     private static OptionItem ImpostorVision;
     private static OptionItem EasyMode;
     private static OptionItem ObserveCooldown;
@@ -77,9 +76,6 @@ internal class Doomsayer : RoleBase
 
         ImpostorVision = BooleanOptionItem.Create(Id + 25, GeneralOption.ImpostorVision, true, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-        DoomsayerTryHideMsg = BooleanOptionItem.Create(Id + 21, "DoomsayerTryHideMsg", true, TabGroup.NeutralRoles, true)
-            .SetColor(Color.green)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         EasyMode = BooleanOptionItem.Create(Id + 27, "DoomsayerEasyMode", false, TabGroup.NeutralRoles, true)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         ObserveCooldown = FloatOptionItem.Create(Id + 29, "DoomsayerObserveCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(EasyMode)
@@ -108,7 +104,6 @@ internal class Doomsayer : RoleBase
         return ProgressText.ToString();
     }
     public static bool CheckCantGuess = CantGuess;
-    public static bool NeedHideMsg(PlayerControl pc) => pc.Is(CustomRoles.Doomsayer) && DoomsayerTryHideMsg.GetBool();
 
     private void CheckCountGuess(PlayerControl doomsayer)
     {

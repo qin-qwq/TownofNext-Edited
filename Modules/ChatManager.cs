@@ -141,7 +141,7 @@ namespace TONE.Modules.ChatManager
                     if (HideExileChat.GetBool())
                     {
                         Logger.Info($"Message sent in exiling screen, spamming the chat", "ChatManager");
-                        _ = new LateTask(() => { SendPreviousMessagesToAll(true); }, 0.3f, "Spamming the chat");
+                        _ = new LateTask(SendPreviousMessagesToAll, 0.3f, "Spamming the chat");
                     }
                     return;
                 }
@@ -167,9 +167,9 @@ namespace TONE.Modules.ChatManager
             var message = new RpcQuickChatSpam();
             RpcUtils.LateBroadcastReliableMessage(message);
         }
-        public static void SendPreviousMessagesToAll(bool start = false)
+        public static void SendPreviousMessagesToAll()
         {
-            if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost || !start) return;
+            if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost) return;
             //This should never function for non host
             if (Main.CurrentServerIsVanilla)
             {

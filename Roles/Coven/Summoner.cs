@@ -150,10 +150,6 @@ internal class Summoner : CovenManager
 
         if (!CheckCommand(ref msg, "summon|sm")) return false;
 
-        // Always try hiding the message if the command is intercepted
-        HideSummonCommand();
-        ChatManager.SendPreviousMessagesToAll();
-
         if (!pc.IsAlive())
         {
             Logger.Warn("Summoner is dead and cannot use commands.", "Summoner");
@@ -309,6 +305,10 @@ internal class Summoner : CovenManager
 
     public static bool CheckCommand(ref string msg, string command)
     {
+        if (msg.StartsWith("/cmd"))
+        {
+            msg = "/" + msg[4..].TrimStart();
+        }
         var comList = command.Split('|');
         foreach (var comm in comList)
         {

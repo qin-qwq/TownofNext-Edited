@@ -15,7 +15,6 @@ public class Guesser : IAddon
     public static OptionItem CovenCanBeGuesser;
     public static OptionItem GCanGuessAdt;
     public static OptionItem GCanGuessTaskDoneSnitch;
-    public static OptionItem GTryHideMsg;
     public static OptionItem AdvancedSettings;
     public static OptionItem GImpMax;
     public static OptionItem GCrewMax;
@@ -31,8 +30,6 @@ public class Guesser : IAddon
         CovenCanBeGuesser = BooleanOptionItem.Create(Id + 16, "CovenCanBeGuesser", true, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Guesser]);
         GCanGuessAdt = BooleanOptionItem.Create(Id + 13, "GCanGuessAdt", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Guesser]);
         GCanGuessTaskDoneSnitch = BooleanOptionItem.Create(Id + 14, "GCanGuessTaskDoneSnitch", true, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Guesser]);
-        GTryHideMsg = BooleanOptionItem.Create(Id + 15, "GuesserTryHideMsg", true, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Guesser])
-            .SetColor(Color.green);
         AdvancedSettings = BooleanOptionItem.Create(Id + 17, "DoomsayerAdvancedSettings", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Guesser]);
         GImpMax = IntegerOptionItem.Create(Id + 18, "GuesserImpMax", new(1, 15, 1), 1, TabGroup.Addons, false).SetParent(AdvancedSettings);
         GCrewMax = IntegerOptionItem.Create(Id + 19, "GuesserCrewMax", new(1, 15, 1), 1, TabGroup.Addons, false).SetParent(AdvancedSettings);

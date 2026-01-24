@@ -62,14 +62,10 @@ internal class Dictator : RoleBase
             if (target == pc)
             {
                 pc.ShowInfoMessage(isUI, GetString("DictatorExpelSelf"));
-                GuessManager.TryHideMsg();
-                ChatManager.SendPreviousMessagesToAll();
                 return true;
             }
             if (!target.IsAlive())
             {
-                GuessManager.TryHideMsg();
-                ChatManager.SendPreviousMessagesToAll();
                 return true;
             }
 
@@ -77,15 +73,11 @@ internal class Dictator : RoleBase
             {
                 pc.ShowInfoMessage(isUI, GetString("ExpelSolsticer"));
                 MeetingHud.Instance.RpcClearVoteDelay(pc.GetClientId());
-                GuessManager.TryHideMsg();
-                ChatManager.SendPreviousMessagesToAll();
                 return true;
             }
             if (Balancer.Choose && !(targetid == Balancer.Target1 || targetid == Balancer.Target2))
             {
                 pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
-                GuessManager.TryHideMsg();
-                ChatManager.SendPreviousMessagesToAll();
                 return true;
             }
 

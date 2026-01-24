@@ -26,7 +26,6 @@ internal class Exorcist : RoleBase
     private static OptionItem ExorcismSacrificesToDispel;
     private static OptionItem ExorcismLimitMeeting;
     private static OptionItem ExorcismEndOnKill;
-    private static OptionItem TryHideMsg;
 
     private int ExorcismLimitPerMeeting;
     private static bool IsExorcismActive;
@@ -52,9 +51,6 @@ internal class Exorcist : RoleBase
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Exorcist]);
         ExorcismEndOnKill = BooleanOptionItem.Create(Id + 16, "ExorcismEndOnKill", true, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Exorcist]);
-        TryHideMsg = BooleanOptionItem.Create(Id + 17, "ExorcistTryHideMsg", true, TabGroup.ImpostorRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Exorcist])
-            .SetColor(Color.green);
     }
     public override void Init()
     {
@@ -97,31 +93,16 @@ internal class Exorcist : RoleBase
             {
                 if (player.PlayerId.GetAbilityUseLimit() <= 0 || ExorcismLimitPerMeeting <= 0)
                 {
-                    if (TryHideMsg.GetBool() && !player.Data.IsHost())
-                    {
-                        ChatManager.SendPreviousMessagesToAll();
-                        GuessManager.TryHideMsg();
-                    }
                     player.ShowInfoMessage(isUI, GetString("ExorcistOutOfUsages"));
                     return true;
                 }
                 if (Dispelled)
                 {
-                    if (TryHideMsg.GetBool() && !player.Data.IsHost())
-                    {
-                        ChatManager.SendPreviousMessagesToAll();
-                        GuessManager.TryHideMsg();
-                    }
                     player.ShowInfoMessage(isUI, GetString("ExorcistDispelled"));
                     return true;
                 }
                 if (IsExorcismActive || IsDelayActive)
                 {
-                    if (TryHideMsg.GetBool() && !player.Data.IsHost())
-                    {
-                        ChatManager.SendPreviousMessagesToAll();
-                        GuessManager.TryHideMsg();
-                    }
                     player.ShowInfoMessage(isUI, GetString("ExorcistActive"));
                     return true;
                 }
@@ -163,11 +144,6 @@ internal class Exorcist : RoleBase
         player.RPCPlayCustomSound("Line");
         player.RpcRemoveAbilityUse();
 
-        if (TryHideMsg.GetBool())
-        {
-            ChatManager.SendPreviousMessagesToAll();
-            GuessManager.TryHideMsg();
-        }
         ExorcistPlayer = player;
         IsDelayActive = true;
         if (ExorcismDelay.GetFloat() > 0)
