@@ -1,10 +1,12 @@
 using AmongUs.GameOptions;
+using System;
 using System.Text;
 using TMPro;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
 using UnityEngine;
+using static TONE.SabotageSystemPatch;
 using static TONE.Translator;
 
 namespace TONE;
@@ -462,5 +464,135 @@ internal static class ActionButtonSetFillUpPatch
             __instance.cooldownTimerText.text = Utils.ColorString(color, Mathf.CeilToInt(timer).ToString());
             __instance.cooldownTimerText.gameObject.SetActive(true);
         }
+    }
+}
+// Credit: EHR
+[HarmonyPatch(typeof(InfectedOverlay), nameof(InfectedOverlay.FixedUpdate))]
+internal static class SabotageMapPatch
+{
+    public static Dictionary<SystemTypes, TextMeshPro> TimerTexts = [];
+
+    public static void Postfix(InfectedOverlay __instance)
+    {
+        float perc = __instance.sabSystem.PercentCool;
+        int total = __instance.sabSystem.initialCooldown ? 10 : 30;
+        if (SabotageSystemTypeRepairDamagePatch.isCooldownModificationEnabled) total = (int)SabotageSystemTypeRepairDamagePatch.modifiedCooldownSec;
+
+        int remaining = Math.Clamp(total - (int)Math.Ceiling((1f - perc) * total) + 1, 0, total);
+
+        foreach (MapRoom mr in __instance.rooms)
+        {
+            if (mr.special == null || mr.special.transform == null) continue;
+
+            SystemTypes room = mr.room;
+
+            if (!TimerTexts.TryGetValue(room, out TextMeshPro timerText))
+            {
+                TimerTexts[room] = timerText = UnityEngine.Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, mr.special.transform, true);
+                timerText.alignment = TextAlignmentOptions.Center;
+                timerText.transform.localPosition = mr.special.transform.localPosition;
+                timerText.transform.localPosition = new(0, -0.4f, 0f);
+                timerText.overflowMode = TextOverflowModes.Overflow;
+                timerText.enableWordWrapping = false;
+                timerText.color = Color.white;
+                timerText.fontSize = timerText.fontSizeMax = timerText.fontSizeMin = 2.5f;
+                timerText.sortingOrder = 100;
+                timerText.gameObject.SetActive(true);
+            }
+
+            bool isActive = Utils.IsActive(room);
+            bool isOtherActive = TimerTexts.Keys.Any(Utils.IsActive);
+            bool doorBlock = __instance.DoorsPreventingSabotage;
+            timerText.text = $"<b><#ff{(isActive || isOtherActive || doorBlock ? "00" : "ff")}00>{(!isActive && !isOtherActive && !doorBlock ? remaining : isActive && !doorBlock ? "▶" : "⊘")}</color></b>";
+            timerText.enabled = remaining > 0 || isActive || isOtherActive || doorBlock;
+        }
+    }
+}
+
+[HarmonyPatch(typeof(MapRoom), nameof(MapRoom.DoorsUpdate))]
+internal static class MapRoomDoorsUpdatePatch
+{
+    public static Dictionary<SystemTypes, TextMeshPro> DoorTimerTexts = [];
+    private static readonly int Percent = Shader.PropertyToID("_Percent");
+
+    public static bool Prefix(MapRoom __instance)
+    {
+        if (!__instance.door || !ShipStatus.Instance) return false;
+
+        SystemTypes room = __instance.room;
+
+        float total;
+        float timer;
+
+        ISystemType system = ShipStatus.Instance.Systems[SystemTypes.Doors];
+        var doorsSystemType = system.TryCast<DoorsSystemType>();
+        var autoDoorsSystemType = system.TryCast<AutoDoorsSystemType>();
+
+        if (doorsSystemType != null)
+        {
+            if (doorsSystemType.initialCooldown > 0f)
+            {
+                total = 10f;
+                timer = doorsSystemType.initialCooldown;
+                goto Skip;
+            }
+
+            total = 30f;
+            timer = doorsSystemType.timers.TryGetValue(room, out float num) ? num : 0f;
+            goto Skip;
+        }
+
+        if (autoDoorsSystemType != null)
+        {
+            if (autoDoorsSystemType.initialCooldown > 0.0)
+            {
+                total = 10f;
+                timer = autoDoorsSystemType.initialCooldown;
+                goto Skip;
+            }
+
+            foreach (OpenableDoor door in ShipStatus.Instance.AllDoors)
+            {
+                if (door.Room == room)
+                {
+                    var autoOpenDoor = door.TryCast<AutoOpenDoor>();
+
+                    if (autoOpenDoor != null)
+                    {
+                        total = 30f;
+                        timer = autoOpenDoor.CooldownTimer;
+                        goto Skip;
+                    }
+                }
+            }
+        }
+
+        total = 0f;
+        timer = 0f;
+
+        Skip:
+
+        __instance.door.material.SetFloat(Percent, __instance.Parent.CanUseDoors ? timer / total : 1f);
+
+        if (!DoorTimerTexts.TryGetValue(room, out TextMeshPro doorTimerText))
+        {
+            DoorTimerTexts[room] = doorTimerText = UnityEngine.Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, __instance.door.transform, true);
+            doorTimerText.alignment = TextAlignmentOptions.Center;
+            doorTimerText.transform.localPosition = __instance.door.transform.localPosition;
+            doorTimerText.transform.localPosition = new(0, -0.4f, 0f);
+            doorTimerText.overflowMode = TextOverflowModes.Overflow;
+            doorTimerText.enableWordWrapping = false;
+            doorTimerText.color = Color.white;
+            doorTimerText.fontSize = doorTimerText.fontSizeMax = doorTimerText.fontSizeMin = 2.5f;
+            doorTimerText.sortingOrder = 100;
+            doorTimerText.gameObject.SetActive(true);
+        }
+
+        var remaining = (int)Math.Ceiling(timer);
+        bool canUseDoors = __instance.Parent.CanUseDoors;
+        doorTimerText.text = $"<b><#ff{(!canUseDoors ? "00" : "a5")}00a5>{(canUseDoors ? remaining : "⊘")}</color></b>";
+        doorTimerText.enabled = remaining > 0 || !canUseDoors;
+
+        return false;
     }
 }

@@ -68,7 +68,7 @@ public class Main : BasePlugin
 
     public static bool hasAccess = true;
 
-    public static readonly bool ShowUpdateButton = false;
+    public static readonly bool ShowUpdateButton = true;
 
     public static readonly bool ShowGitHubButton = false;
     public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
@@ -77,7 +77,7 @@ public class Main : BasePlugin
     public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
 
     public static readonly bool ShowWebsiteButton = false;
-    public static readonly string WebsiteInviteUrl = "https://weareten.ca/";
+    public static readonly string WebsiteInviteUrl = "https://tone2.top/";
 
     public static readonly bool ShowDonationButton = false;
     public static readonly string DonationInviteUrl = "https://weareten.ca/TONE";

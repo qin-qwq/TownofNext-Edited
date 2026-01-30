@@ -10,7 +10,6 @@ internal class IdentityThief : RoleBase
     public override CustomRoles Role => CustomRoles.IdentityThief;
     private const int Id = 34100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.IdentityThief);
-    public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\

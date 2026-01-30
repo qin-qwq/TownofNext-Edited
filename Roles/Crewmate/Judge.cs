@@ -101,7 +101,7 @@ internal class Judge : RoleBase
     }
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        TrialMsg(pc, $"/tl {target.PlayerId}", true);
+        TrialMsg(pc, $"/tl {target.PlayerId}");
     }
     public static bool TrialMsg(PlayerControl pc, string msg, bool isUI = false)
     {

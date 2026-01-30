@@ -24,6 +24,8 @@ internal class Keeper : RoleBase
     private static readonly HashSet<byte> keeperTarget = [];
     private static readonly Dictionary<byte, bool> DidVote = [];
 
+    private ShapeshiftMenuElement CNO;
+
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Keeper);
@@ -41,6 +43,7 @@ internal class Keeper : RoleBase
     {
         DidVote.Add(playerId, false);
         playerId.SetAbilityUseLimit(0);
+        CNO = null;
     }
     public override void Remove(byte playerId)
     {
@@ -90,7 +93,15 @@ internal class Keeper : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
+        if (CNO.playerControl.NetId == target.NetId) target = pc;
         CheckVote(pc, target);
+    }
+
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        CNO?.Despawn();
+        CNO = null;
+        if (_Player.IsAlive() && _Player.GetAbilityUseLimit() >= 1) new ShapeshiftMenuElement(_Player.PlayerId);
     }
 
     public override bool CheckVote(PlayerControl voter, PlayerControl target)

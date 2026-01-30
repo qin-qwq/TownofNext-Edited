@@ -2,13 +2,13 @@ using AmongUs.InnerNet.GameDataMessages;
 using Assets.CoreScripts;
 using Hazel;
 using System;
-using System.Collections;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using TONE.Modules;
 using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Core.DraftAssign;
@@ -88,6 +88,10 @@ internal class ChatCommands
         if (Summoner.SummonerCheckMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (PlayerControl.LocalPlayer.GetRoleClass() is Swapper sw && sw.SwapMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dt && dt.ExilePlayer(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (Lovers.LoversMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (ImpostorChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
         Directory.CreateDirectory(sponsorTagsFiles);
@@ -1956,6 +1960,38 @@ internal class ChatCommands
         Main.isChatCommand = false;
         canceled = true;
     Skip:
+        if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Lovers)
+        {
+            if (Lovers.LoversMsg(PlayerControl.LocalPlayer, text, false))
+            {
+                Main.isChatCommand = true;
+                canceled = true;
+            }
+        }
+        else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Imp)
+        {
+            if (ImpostorChannel(PlayerControl.LocalPlayer, text, false))
+            {
+                Main.isChatCommand = true;
+                canceled = true;
+            }
+        }
+        else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Jackal)
+        {
+            if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text, false))
+            {
+                Main.isChatCommand = true;
+                canceled = true;
+            }
+        }
+        else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Jailer)
+        {
+            if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text, false))
+            {
+                Main.isChatCommand = true;
+                canceled = true;
+            }
+        }
         if (canceled)
         {
             Logger.Info("Command Canceled", "ChatCommand");
@@ -1973,7 +2009,6 @@ internal class ChatCommands
         text = text.Replace("着", "者").Trim().ToLower();
         return text switch
         {
-            "教父" => GetString("Godfather"),
             _ => text,
         };
     }
@@ -2216,6 +2251,10 @@ internal class ChatCommands
         if (player.GetRoleClass() is Dictator dt && dt.ExilePlayer(player, text)) { canceled = true; Logger.Info($"Is Dictator command", "OnReceiveChat"); return; }
         if (Ritualist.RitualistMsgCheck(player, text)) { canceled = true; Logger.Info($"Is Ritualist command", "OnReceiveChat"); return; }
         if (Summoner.SummonerCheckMsg(player, text)) { canceled = true; Logger.Info($"Is Summoner command", "OnReceiveChat"); return; }
+        if (Lovers.LoversMsg(player, text)) { canceled = true; Logger.Info($"Is Lovers Private Chat", "OnReceiveChat"); return; }
+        if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
+        if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
+        if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
 
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
@@ -3767,6 +3806,27 @@ internal class ChatCommands
         AFKDetector.ExemptedPlayers.Add(afkId);
         Utils.SendMessage("\n", player.PlayerId, string.Format(GetString("PlayerExemptedFromAFK"), afkId.GetPlayerName()));
     }
+
+    private static bool ImpostorChannel(PlayerControl pc, string msg, bool check = true)
+    {
+        if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || pc == null) return false;
+        if (!pc.IsPlayerImpostorTeam()) return false;
+        if (!Options.EnableImpostorChannel.GetBool()) return false;
+        if (!pc.IsAlive()) return false;
+        msg = msg.ToLower().Trim();
+        if (check)
+        {
+            if (!GuessManager.CheckCommond(ref msg, "imp|伪装者", false)) return false;
+        }
+
+        if (string.IsNullOrEmpty(msg)) return false;
+
+        Main.AllAlivePlayerControls.Where(x => x.IsPlayerImpostorTeam())
+            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+
+        return true;
+    }
 }
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 class ChatUpdatePatch
@@ -3831,17 +3891,10 @@ class ChatUpdatePatch
 
             _ = new LateTask(() =>
             {
-                var mwriter = CustomRpcSender.Create("Re-killingHostAfterMessagesSent", SendOption.None);
-                mwriter.StartMessage(clientId);
-                mwriter.StartRpc(player.NetId, (byte)RpcCalls.Exiled)
-                    .EndRpc();
-                mwriter.EndMessage();
-                mwriter.SendMessage();
-
                 player.Data.IsDead = true;
                 player.Data.SendGameData();
 
-            }, 1f, "Re-killing host after message sent.");
+            }, 1f);
         }
 
         if (clientId == -1)

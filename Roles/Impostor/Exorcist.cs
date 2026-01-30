@@ -74,7 +74,7 @@ internal class Exorcist : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        CheckCommand(pc, $"/ex", true);
+        CheckCommand(pc, $"/ex");
     }
 
     public bool CheckCommand(PlayerControl player, string msg, bool isUI = false)

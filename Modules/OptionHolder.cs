@@ -583,6 +583,7 @@ public static class Options
     public static OptionItem UsePets;
     public static OptionItem PetToAssignToEveryone;
     public static OptionItem CancelPetAnimation;
+    public static OptionItem EnableImpostorChannel;
 
     // ------------ General Role Settings ------------
 
@@ -636,7 +637,6 @@ public static class Options
     public static OptionItem LoverKnowRoles;
     public static OptionItem LoverSuicide;
     public static OptionItem PrivateChat;
-    public static OptionItem PreventModdedClientSee;
     public static OptionItem ImpCanBeInLove;
     public static OptionItem CrewCanBeInLove;
     public static OptionItem NeutralCanBeInLove;
@@ -2221,6 +2221,11 @@ public static class Options
         CancelPetAnimation = BooleanOptionItem.Create(61006, "CancelPetAnimation", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+
+        EnableImpostorChannel = BooleanOptionItem.Create(61007, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 
         yield return null;
@@ -2274,11 +2279,6 @@ public static class Options
 
         PrivateChat = BooleanOptionItem.Create(id + 5, "PrivateChat", false, TabGroup.Addons, false)
         .SetParent(spawnOption)
-        .SetColor(Color.green)
-            .SetGameMode(customGameMode);
-
-        PreventModdedClientSee = BooleanOptionItem.Create(id + 6, "PreventModdedClientSee", false, TabGroup.Addons, false)
-        .SetParent(PrivateChat)
         .SetColor(Color.green)
             .SetGameMode(customGameMode);
 

@@ -251,6 +251,16 @@ internal class ChangeRoleSettings
             //Tag Mode
             TagMode.Init();
 
+            try
+            {
+                SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
+                MapRoomDoorsUpdatePatch.DoorTimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
+            }
+            catch (Exception e) { Utils.ThrowException(e); }
+            
+            SabotageMapPatch.TimerTexts = [];
+            MapRoomDoorsUpdatePatch.DoorTimerTexts = [];
+
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
             AntiBlackout.Reset();

@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using TONE.Modules;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -17,12 +18,14 @@ internal class Fury : RoleBase
     //==================================================================\\
 
     public static OptionItem KillCooldown;
-    private static OptionItem AngryCooldown;
-    private static OptionItem AngryDuration;
+    public static OptionItem AngryCooldown;
+    public static OptionItem AngryDuration;
     private static OptionItem AngryKillCooldown;
     private static OptionItem AngrySpeed;
 
-    public static readonly List<byte> PlayerToAngry = [];
+    private (bool, float) PlayerToAngry = (false, 0f);
+    private static readonly Dictionary<byte, float> tmpSpeed = [];
+    private static readonly Dictionary<byte, float> tmpKcd = [];
 
     public override void SetupCustomOption()
     {
@@ -41,17 +44,37 @@ internal class Fury : RoleBase
 
     public override void Init()
     {
-        PlayerToAngry.Clear();
+        tmpSpeed.Clear();
+        tmpKcd.Clear();
+    }
+    public override void Add(byte playerId)
+    {
+        PlayerToAngry = (false, 0f);
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = AngryCooldown.GetFloat();
+        AURoleOptions.PhantomCooldown = 1f;
     }
+
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
     public override bool OnCheckVanish(PlayerControl player)
     {
-        if (PlayerToAngry.Contains(player.PlayerId)) return false;
-        PlayerToAngry.Add(player.PlayerId);
+        if (PlayerToAngry.Item1)
+        {
+            PlayerToAngry = (false, 0f);
+            ToCalm(player, true);
+            return false;
+        }
+        if (player.HasAbilityCD()) return false;
+        PlayerToAngry = (true, AngryDuration.GetFloat());
+        ToAngry(player);
+        return false;
+    }
+
+    public void ToAngry(PlayerControl player)
+    {
+        player.RpcAddAbilityCD(includeDuration: true);
         player.SetKillCooldown(AngryKillCooldown.GetFloat());
         foreach (var target in Main.AllPlayerControls)
         {
@@ -60,22 +83,67 @@ internal class Fury : RoleBase
             target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Fury), GetString("SeerFuryInRage")));
         }
         player.MarkDirtySettings();
-        var tmpSpeed = Main.AllPlayerSpeed[player.PlayerId];
+        tmpSpeed.Remove(player.PlayerId);
+        tmpSpeed.Add(player.PlayerId, Main.AllPlayerSpeed[player.PlayerId]);
         Main.AllPlayerSpeed[player.PlayerId] = AngrySpeed.GetFloat();
-        var tmpKillCooldown = Main.AllPlayerKillCooldown[player.PlayerId];
+        tmpKcd.Remove(player.PlayerId);
+        tmpKcd.Add(player.PlayerId, Main.AllPlayerKillCooldown[player.PlayerId]);
         Main.AllPlayerKillCooldown[player.PlayerId] = AngryKillCooldown.GetFloat();
-
-        _ = new LateTask(() =>
-        {
-            PlayerToAngry.Remove(player.PlayerId);
-            Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed;
-            Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKillCooldown;
-            player.RpcResetAbilityCooldown();
-            player.Notify(GetString("FuryInCalm"), 5f);
-            player.MarkDirtySettings();
-        }, AngryDuration.GetFloat());
-        return false;
     }
+
+    public void ToCalm(PlayerControl player, bool reset = false)
+    {
+        if (reset)
+        {
+            player.RpcRemoveAbilityCD();
+            player.RpcAddAbilityCD();
+        }
+        Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed[player.PlayerId];
+        Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKcd[player.PlayerId];
+        player.Notify(GetString("FuryInCalm"), 5f);
+        player.MarkDirtySettings(); 
+    }
+
+    public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (PlayerToAngry.Item1)
+        {
+            PlayerToAngry.Item2 -= Time.fixedDeltaTime;
+            
+            if (PlayerToAngry.Item2 <= 0)
+            {
+                ToCalm(pc);
+                PlayerToAngry = (false, 0f);
+            }
+        }
+    }
+
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        if (PlayerToAngry.Item1)
+        {
+            ToCalm(_Player);
+            PlayerToAngry = (false, 0f);
+        }
+    }
+
+    public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    {
+        if (PlayerToAngry.Item1)
+        {
+            ToCalm(target);
+            PlayerToAngry = (false, 0f);
+        }
+    }
+
+    public override void OnMurderPlayerAsKiller(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    {
+        if (PlayerToAngry.Item1)
+        {
+            killer.SetKillCooldown(AngryKillCooldown.GetFloat());
+        }
+    }
+
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.AbilityButton.OverrideText(GetString("FuryVanishText"));

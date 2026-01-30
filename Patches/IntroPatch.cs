@@ -714,7 +714,9 @@ class BeginCrewmatePatch
             case CustomGameMode.TagMode:
                 __instance.TeamTitle.text = GetString("TagMode");
                 __instance.TeamTitle.color = __instance.BackgroundBar.material.color = new Color32(44, 204, 0, byte.MaxValue);
-                PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Phantom);
+                SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorShortMusic, true, 25f);
+                if (PlayerControl.LocalPlayer.Is(CustomRoles.TZombie)) PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Phantom);
+                else PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Scientist);
                 __instance.ImpostorText.gameObject.SetActive(true);
                 __instance.ImpostorText.text = GetString("TagModeInfo");
                 break;
@@ -1064,19 +1066,5 @@ class IntroCutsceneDestroyPatch
 #else
         Logger.Info("StarLight-OnDestroy", "IntroCutscene");
 #endif
-
-        _ = new LateTask(() =>
-        {
-            if (Lovers.PrivateChat.GetBool())
-            {
-                foreach (var target in Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Lovers)))
-                    if (target.IsAlive())
-                    {
-                        target.SetChatVisible(true);
-                        target.SetName(target.GetRealName(isMeeting: true));
-                        ChatUpdatePatch.DoBlockChat = false;
-                    }
-            }
-        }, 1f);
     }
 }

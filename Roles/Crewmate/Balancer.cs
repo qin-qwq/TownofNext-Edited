@@ -25,6 +25,8 @@ internal class Balancer : RoleBase
     public static bool Choose;
     public static bool Choose2;
 
+    private ShapeshiftMenuElement CNO;
+
     public override void SetupCustomOption()
     {
         Options.SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Balancer);
@@ -41,11 +43,20 @@ internal class Balancer : RoleBase
         playerId.SetAbilityUseLimit(1);
         Target1 = 253;
         Target2 = 253;
+        CNO = null;
     }
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
+        if (CNO == null) new ShapeshiftMenuElement(pc.PlayerId);
+        else if (CNO.playerControl.NetId == target.NetId) target = pc;
         CheckVote(pc, target);
+    }
+
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        CNO?.Despawn();
+        CNO = null;
     }
 
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
@@ -131,7 +142,6 @@ internal class Balancer : RoleBase
             if (!CustomWinnerHolder.CheckForConvertedWinner(Tar3.PlayerId))
             {
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Apocalypse);
-                Main.AllPlayerControls.Where(x => x.GetCustomRole().IsNA() && !x.IsAnySubRole(x => x.IsConverted())).Do(x => CustomWinnerHolder.WinnerIds.Add(x.PlayerId));
             }
             return;
         }
@@ -248,13 +258,33 @@ internal class Balancer : RoleBase
 
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
             GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
+            targetBox.name = "BalancerButton";
             targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
             SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
             renderer.sprite = CustomButton.Get("BalancerIcon");
+            if (Target1 == pva.TargetPlayerId || Target2 == pva.TargetPlayerId) renderer.color = Color.green;
             PassiveButton button = targetBox.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => BalancerOnClick(pva.TargetPlayerId/*, __instance*/)));
+        }
+    }
+    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
+    class UpdateMeetingPatch
+    {
+        public static void Postfix(MeetingHud __instance)
+        {
+            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
+                UpdateBalancerButton(__instance);
+        }
+    }
+    public static void UpdateBalancerButton(MeetingHud __instance)
+    {
+        foreach (var pva in __instance.playerStates)
+        {
+            var button = pva?.transform?.FindChild("BalancerButton")?.gameObject;
+            if (!button) continue;
+            if (Target1 == pva.TargetPlayerId || Target2 == pva.TargetPlayerId) button.GetComponent<SpriteRenderer>().color = Color.green;
+            else button.GetComponent<SpriteRenderer>().color = Color.white;
         }
     }
 }

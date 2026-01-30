@@ -65,7 +65,7 @@ internal class Councillor : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        MurderMsg(pc, $"/tl {target.PlayerId}", true);
+        MurderMsg(pc, $"/tl {target.PlayerId}");
     }
 
     public bool MurderMsg(PlayerControl pc, string msg, bool isUI = false)

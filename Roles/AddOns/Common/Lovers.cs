@@ -19,7 +19,7 @@ public class Lovers : IAddon
     public static OptionItem LoverKnowRoles;
     public static OptionItem LoverSuicide;
     public static OptionItem PrivateChat;
-    public static OptionItem PreventModdedClientSee;
+
     public void SetupCustomOption()
     {
         var spawnOption = StringOptionItem.Create(Id, "Lovers", EnumHelper.GetAllNames<RatesZeroOne>(), 0, TabGroup.Addons, false).SetColor(Utils.GetRoleColor(CustomRoles.Lovers))
@@ -46,12 +46,6 @@ public class Lovers : IAddon
 
         PrivateChat = BooleanOptionItem.Create(Id + 5, "PrivateChat", false, TabGroup.Addons, false)
         .SetParent(spawnOption)
-        .SetColor(Color.green)
-        .SetGameMode(CustomGameMode.Standard);
-
-        PreventModdedClientSee = BooleanOptionItem.Create(Id + 6, "PreventModdedClientSee", false, TabGroup.Addons, false)
-        .SetParent(PrivateChat)
-        .SetColor(Color.green)
         .SetGameMode(CustomGameMode.Standard);
 
         var impOption = BooleanOptionItem.Create(Id + 7, "ImpCanBeInLove", true, TabGroup.Addons, false)
@@ -285,11 +279,12 @@ public class Lovers : IAddon
         var alivePairs = loverPairs.Where(p => !((!p.Item1.GetPlayer().IsAlive() || !p.Item2.GetPlayer().IsAlive()) && LoverSuicide.GetBool()));
 
         if (!alivePairs.Any()) return;
+        if (loverPairs.All(p => Utils.IsSameTeammate(p.Item1.GetPlayer(), p.Item2.GetPlayer(), neu: false))) return;
         // if not (some lovers dead and lovers suicide)
         if (CustomWinnerHolder.WinnerTeam is CustomWinner.Crewmate or CustomWinner.Impostor or CustomWinner.Jackal or CustomWinner.Pelican or CustomWinner.Coven)
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Lovers);
-            foreach (var pair in alivePairs)
+            foreach (var pair in loverPairs)
             {
                 CustomWinnerHolder.WinnerIds.Add(pair.Item1);
                 CustomWinnerHolder.WinnerIds.Add(pair.Item2);
@@ -298,7 +293,8 @@ public class Lovers : IAddon
         }
     }
     public static void CheckAdditionalWin()
-    {
+    {    
+        if (loverPairs.Count(p => p.Item1.GetPlayer().IsPlayerNeutralTeam() || p.Item2.GetPlayer().IsPlayerNeutralTeam()) == 0) return;
         var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers));
 
         foreach (var lover in loverWinners)
@@ -328,6 +324,30 @@ public class Lovers : IAddon
         {
             loverless = loverId;
         }
+    }
+
+    public static bool LoversMsg(PlayerControl pc, string msg, bool check = true)
+    {
+        if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || pc == null) return false;
+        if (!pc.Is(CustomRoles.Lovers)) return false;
+        if (!PrivateChat.GetBool()) return false;
+        if (!pc.IsAlive()) return false;
+        msg = msg.ToLower().Trim();
+        if (check)
+        {
+            if (!GuessManager.CheckCommond(ref msg, "lo|恋人", false)) return false;
+        }
+
+        var player = GetLoverId(pc);
+        if (player == byte.MaxValue || !player.GetPlayer().IsAlive()) return false;
+
+        if (string.IsNullOrEmpty(msg)) return false;
+
+        Main.AllAlivePlayerControls.Where(x => x.PlayerId == player || x == pc)
+            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+
+        return true;
     }
 }
 

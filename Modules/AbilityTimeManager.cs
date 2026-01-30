@@ -77,6 +77,7 @@ public static class AbilityTimeManager
             CustomRoles.Altruist => 0,
             CustomRoles.Dreamer => (int)Dreamer.FantasyCooldown.GetFloat(),
             CustomRoles.NiceHacker => (int)NiceHacker.HackerCooldown.GetFloat(),
+            CustomRoles.Fury => (int)Fury.AngryCooldown.GetFloat(),
             _ => -10
         };
 
@@ -96,6 +97,7 @@ public static class AbilityTimeManager
             CustomRoles.Lighter => (int)Lighter.LighterSkillDuration.GetFloat(),
             CustomRoles.Dreamer => (int)Dreamer.FantasyDuration.GetFloat(),
             CustomRoles.NiceHacker => (int)NiceHacker.HackerDuration.GetFloat(),
+            CustomRoles.Fury => (int)Fury.AngryDuration.GetFloat(),
             _ => -20
         };
 

@@ -38,6 +38,10 @@ internal class Doomsayer : RoleBase
     private static OptionItem EasyMode;
     private static OptionItem ObserveCooldown;
     private static OptionItem RoleNumber;
+    private static OptionItem ImpostorRoleNumber;
+    private static OptionItem CrewmateRoleNumber;
+    private static OptionItem NeutralRoleNumber;
+    private static OptionItem CovenRoleNumber;
 
     private readonly HashSet<CustomRoles> GuessedRoles = [];
     private static readonly Dictionary<byte, int> DoomsayerTarget = [];
@@ -81,6 +85,14 @@ internal class Doomsayer : RoleBase
         ObserveCooldown = FloatOptionItem.Create(Id + 29, "DoomsayerObserveCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(EasyMode)
             .SetValueFormat(OptionFormat.Seconds);
         RoleNumber = IntegerOptionItem.Create(Id + 30, "DoomsayerObserveRoleNumber", new(1, 30, 1), 6, TabGroup.NeutralRoles, false).SetParent(EasyMode)
+            .SetValueFormat(OptionFormat.Pieces);
+        ImpostorRoleNumber = IntegerOptionItem.Create(Id + 31, "DoomsayerObserveImpostorRoleNumber", new(0, 10, 1), 2, TabGroup.NeutralRoles, false).SetParent(EasyMode)
+            .SetValueFormat(OptionFormat.Pieces);
+        CrewmateRoleNumber = IntegerOptionItem.Create(Id + 32, "DoomsayerObserveCrewmateRoleNumber", new(0, 10, 1), 2, TabGroup.NeutralRoles, false).SetParent(EasyMode)
+            .SetValueFormat(OptionFormat.Pieces);
+        NeutralRoleNumber = IntegerOptionItem.Create(Id + 33, "DoomsayerObserveNeutralRoleNumber", new(0, 10, 1), 2, TabGroup.NeutralRoles, false).SetParent(EasyMode)
+            .SetValueFormat(OptionFormat.Pieces);
+        CovenRoleNumber = IntegerOptionItem.Create(Id + 34, "DoomsayerObserveCovenRoleNumber", new(0, 10, 1), 0, TabGroup.NeutralRoles, false).SetParent(EasyMode)
             .SetValueFormat(OptionFormat.Pieces);
     }
     public override void Init()
@@ -302,16 +314,18 @@ internal class Doomsayer : RoleBase
                 if (Illusionist.IsCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate()).ToList().RandomElement();
                 else if (Illusionist.IsNonCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement();
                 else if (target.Is(CustomRoles.Narc)) targetRole = CustomRoles.Sheriff;
-                var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && !role.IsAdditionRole() && !role.IsGhostRole() && role != CustomRoles.Doomsayer).ToList();
-                var count = Math.Min(RoleNumber.GetInt() - 1, activeRoleList.Count);
-                List<CustomRoles> roleList = [targetRole];
                 var rand = IRandom.Instance;
-                for (int i = 0; i < count; i++)
+                List<CustomRoles> roleList = [];
+                ChooseRole(Custom_Team.Impostor);
+                ChooseRole(Custom_Team.Crewmate);
+                ChooseRole(Custom_Team.Neutral);
+                ChooseRole(Custom_Team.Coven);
+                for (var i = 0; i < roleList.Count - RoleNumber.GetInt() + 1; i++)
                 {
-                    int randomIndex = rand.Next(activeRoleList.Count);
-                    roleList.Add(activeRoleList[randomIndex]);
-                    activeRoleList.RemoveAt(randomIndex);
+                    int randomIndex = rand.Next(roleList.Count);
+                    roleList.RemoveAt(randomIndex);
                 }
+                roleList.Add(targetRole);
                 for (int i = roleList.Count - 1; i > 0; i--)
                 {
                     int j = rand.Next(0, i + 1);
@@ -321,7 +335,28 @@ internal class Doomsayer : RoleBase
                 var targetName = target.GetRealName();
                 if (targetIsVM) targetName = Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().GetRealName();
                 msg = string.Format(GetString("FortuneTellerCheck.Result"), target.GetRealName(), text);
-                SendMessage(GetString("FortuneTellerCheck") + "\n" + msg, pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
+                SendMessage(GetString("FortuneTellerCheck") + "\n" + msg, pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()), sendOption: Hazel.SendOption.Reliable);
+                void ChooseRole(Custom_Team team)
+                {
+                    var num = team switch
+                    {
+                       Custom_Team.Coven => CovenRoleNumber.GetInt(),
+                       Custom_Team.Crewmate => CrewmateRoleNumber.GetInt(),
+                       Custom_Team.Impostor => ImpostorRoleNumber.GetInt(),
+                       Custom_Team.Neutral => NeutralRoleNumber.GetInt(),
+                       _ => 0,
+                    };
+                    if (targetRole.GetCustomRoleTeam() == team) num--;
+                    if (num <= 0) return;
+                    var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && role.GetCustomRoleTeam() == team && !role.IsGhostRole() && role != CustomRoles.Doomsayer).ToList();
+                    var count = Math.Min(num, activeRoleList.Count);
+                    for (var i = 0; i < count; i++)
+                    {
+                        int randomIndex = rand.Next(activeRoleList.Count);
+                        roleList.Add(activeRoleList[randomIndex]);
+                        activeRoleList.RemoveAt(randomIndex);
+                    }
+                }
             }
         }
     }
@@ -329,4 +364,5 @@ internal class Doomsayer : RoleBase
     {
         DoomsayerTarget[_Player.PlayerId] = byte.MaxValue;
     }
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("prophecies");
 }

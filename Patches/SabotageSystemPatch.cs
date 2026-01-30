@@ -129,6 +129,7 @@ public class SabotageSystemPatch
 
             foreach (var pc in Main.AllAlivePlayerControls)
             {
+                ReportDeadBodyPatch.CanReport[pc.PlayerId] = false;
                 if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                 {
                     // Need for hiding player names if player is desync Impostor
@@ -186,6 +187,8 @@ public class SabotageSystemPatch
                             // Reset Ability Cooldown To Default For Living Players
                             if (pc.GetCustomRole().GetRoleTypes() != RoleTypes.Engineer)
                                 pc.RpcResetAbilityCooldown();
+
+                            ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
                         }
                     }, 1.2f, "Reset Ability Cooldown Arter Mushroom Mixup");
 
@@ -311,8 +314,8 @@ public class SabotageSystemPatch
     [HarmonyPatch(typeof(SabotageSystemType), nameof(SabotageSystemType.UpdateSystem))] // SetInitialSabotageCooldown - set sabotage cooldown in start game
     public static class SabotageSystemTypeRepairDamagePatch
     {
-        private static bool isCooldownModificationEnabled;
-        private static float modifiedCooldownSec;
+        public static bool isCooldownModificationEnabled;
+        public static float modifiedCooldownSec;
 
         public static void Initialize()
         {

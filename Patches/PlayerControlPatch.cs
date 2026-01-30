@@ -602,6 +602,15 @@ public static class CheckShapeshiftPatch
             return false;
         }
 
+        var shapeshifterRoleClass = __instance.GetRoleClass();
+        if (Options.UseMeetingShapeshift.GetBool() && GameStates.IsMeeting)
+        {
+            if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
+                shapeshifterRoleClass?.OnMeetingShapeshift(__instance, target);
+            __instance.RpcRejectShapeshift();
+            return false;
+        }
+
         // No called code if is invalid shapeshifting
         if (!CheckInvalidShapeshifting(__instance, target, shouldAnimate))
         {
@@ -614,14 +623,7 @@ public static class CheckShapeshiftPatch
 
         logger.Info($"Self:{shapeshifter.PlayerId == target.PlayerId} - Is animate:{shouldAnimate} - In Meeting:{GameStates.IsMeeting}");
 
-        var shapeshifterRoleClass = shapeshifter.GetRoleClass();
-        if (Options.UseMeetingShapeshift.GetBool() && GameStates.IsMeeting)
-        {
-            if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
-                shapeshifterRoleClass?.OnMeetingShapeshift(shapeshifter, target);
-            shapeshifter.RpcRejectShapeshift();
-            return false;
-        }
+
         if (shapeshifterRoleClass?.OnCheckShapeshift(shapeshifter, target, ref resetCooldown, ref shouldAnimate) == false)
         {
             // role need specific reject shapeshift if player use desync shapeshift
@@ -672,7 +674,7 @@ public static class CheckShapeshiftPatch
             logger.Info("Shapeshifting canceled because mushroom mixup is active");
             return false;
         }
-        if (MeetingHud.Instance && animate && !instance.UsesMeetingShapeshift())
+        if (MeetingHud.Instance && animate)
         {
             logger.Info("Cancel shapeshifting in meeting");
             return false;
@@ -924,18 +926,6 @@ class ReportDeadBodyPatch
         // Hereinafter, it is assumed that the button is confirmed to be pressed
         //=============================================
 
-        if (Lovers.PrivateChat.GetBool())
-        {
-            if (Main.CurrentServerIsVanilla)
-            {
-                _ = new LateTask(() => { ChatManager.SendPreviousMessagesToAll(); }, !PlayerControl.LocalPlayer.IsAlive() ? 3f : 0f);
-            }
-            else
-            {
-                Summoner.HideSummonCommand();
-            }
-        }
-
         try
         {
             Main.MeetingIsStarted = true;
@@ -1082,6 +1072,9 @@ class FixedUpdateInNormalGamePatch
         catch (Exception ex)
         {
             if (OnGameJoinedPatch.JoiningGame && ex is NullReferenceException) return;
+
+            var nameWithRole = __instance.GetNameWithRole();
+            if (string.IsNullOrWhiteSpace(nameWithRole)) return;
 
             Utils.ThrowException(ex);
             Logger.Error($"Error for {__instance.GetNameWithRole().RemoveHtmlTags()}: Error: {ex}", "FixedUpdateInNormalGamePatch");

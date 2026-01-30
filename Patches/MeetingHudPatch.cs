@@ -18,6 +18,32 @@ using static TONE.Utils;
 
 namespace TONE;
 
+[HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.PopulateResults))]
+class MeetingHudPopulateVotesPatch
+{
+    public static void Prefix(MeetingHud __instance)
+    {
+        PlayerVoteArea swapped1 = null;
+        PlayerVoteArea swapped2 = null;
+        foreach (var pid in Swapper.PlayerIdList)
+        {
+            if (!Swapper.Vote.TryGetValue(pid, out var tid1) || !Swapper.VoteTwo.TryGetValue(pid, out var tid2)) continue;
+            if (tid1 != 253 && tid2 != 253)
+            {
+                swapped1 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.Vote[pid]);
+                swapped2 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.VoteTwo[pid]);
+            }
+        }
+
+        var doSwap = swapped1 != null && swapped2 != null && !swapped1.AmDead && !swapped2.AmDead;
+
+        if (doSwap)
+        {
+            __instance.StartCoroutine(Effects.Slide3D(swapped1.transform, swapped1.transform.localPosition, swapped2.transform.localPosition, 1.5f));
+            __instance.StartCoroutine(Effects.Slide3D(swapped2.transform, swapped2.transform.localPosition, swapped1.transform.localPosition, 1.5f));
+        }
+    }
+}
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CheckForEndVoting))]
 class CheckForEndVotingPatch
 {
@@ -241,6 +267,9 @@ class CheckForEndVotingPatch
 
                 // Swapper swap votes
                 if (voter.GetRoleClass() is Swapper sw) sw.SwapVotes(__instance);
+
+                // Speaker swap votes
+                if (voter.GetRoleClass() is Speaker sp) sp.SwapVotes(__instance);
 
                 playerRoleClass?.AddVisualVotes(ps, ref statesList);
 
@@ -946,7 +975,6 @@ static class ExtendedMeetingHud
 
                 if (CheckForEndVotingPatch.CheckRole(ps.TargetPlayerId, CustomRoles.VoidBallot)) VoteNum = 0;
                 if (Dreamweaver.IsInsomnia(ps.TargetPlayerId)) VoteNum = 0;
-                if (Speaker.IsSpoken(ps.TargetPlayerId)) VoteNum = 0;
 
                 if (Jailer.IsTarget(ps.VotedFor) || Jailer.IsTarget(ps.TargetPlayerId)) VoteNum = 0; //jailed can't vote and can't get voted
 
@@ -1311,7 +1339,19 @@ class MeetingHudStartPatch
         //    }, 6f, "Message: Warning Broken Vents In Dleks");
         //}
 
-        if (MeetingStates.FirstMeeting) TemplateManager.SendTemplate("OnFirstMeeting", noErr: true);
+        if (MeetingStates.FirstMeeting)
+        {
+            TemplateManager.SendTemplate("OnFirstMeeting", noErr: true);
+            if (Options.EnableImpostorChannel.GetBool())
+            {
+                foreach (var pc in Main.AllAlivePlayerControls)
+                {
+                    if (pc.IsHost()) continue;
+                    if (!pc.IsPlayerImpostorTeam()) continue;
+                    SendMessage(GetString("CanUseImpostorChannel"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")}"), noReplay: true);
+                }
+            }
+        }
         if (Main.CurrentServerIsVanilla && TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese) TemplateManager.SendTemplate("OnMeetingVanilla", noErr: true);
         else TemplateManager.SendTemplate("OnMeeting", noErr: true);
 

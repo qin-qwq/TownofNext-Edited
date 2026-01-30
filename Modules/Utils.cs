@@ -1369,6 +1369,22 @@ public static class Utils
 
 
     }
+    private static string[] CachedLetterOnlyHexColors = [];
+    private static readonly Regex ColorTagRegex = new(@"<\s*(?:color\s*=\s*)?#([0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)\s*>", RegexOptions.Compiled);
+    private static readonly Dictionary<(int R, int G, int B), string> CachedColorReplacements = [];
+    private static readonly char[] HexLetters = ['a', 'b', 'c', 'd', 'e', 'f'];
+    static readonly Dictionary<string, (int r, int g, int b)> NamedColors = new()
+    {
+        { "red",    (255,   0,   0) },
+        { "orange", (255, 165,   0) },
+        { "yellow", (255, 255,   0) },
+        { "green",  (  0, 255,   0) },
+        { "blue",   (  0,   0, 255) },
+        { "purple", (128,   0, 128) },
+        { "white",  (255, 255, 255) },
+        { "grey",   (128, 128, 128) },
+        { "black",  (  0,   0,   0) }
+    };
     public static void SendMessage(string text, byte sendTo = byte.MaxValue, string title = "", bool logforChatManager = false, bool noReplay = false, bool ShouldSplit = false, SendOption sendOption = SendOption.None, bool noNumberSplit = false)
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -1380,16 +1396,19 @@ public static class Utils
             else title = "\u27a1" + title.Replace("\u2605", "") + "\u2b05";
         }
 
-        text = text.Replace("color=", string.Empty);
+        text = text.Replace("color=#", "#");
 
         if (Main.CurrentServerIsVanilla)
-            text = text.RemoveHtmlTags();
+        {
+            text = ReplaceHexColorsWithSafeColors(text);
+            text = ReplaceDigitsOutsideRichText(text);
+        }
 
         try
         {
             if (Main.CurrentServerIsVanilla && !noNumberSplit)
             {
-                var parts = SplitByNumberLimit();
+                var parts = SplitByNumberLimit(text);
 
                 if (parts.Count > 1)
                 {
@@ -1420,7 +1439,7 @@ public static class Utils
 
         Main.MessagesToSend.Add((text.RemoveHtmlTagsTemplate(), sendTo, title, sendOption));
 
-        List<string> SplitByNumberLimit()
+        static List<string> SplitByNumberLimit(string text)
         {
             List<string> result = [];
             StringBuilder sb = new();
@@ -1429,7 +1448,7 @@ public static class Utils
 
             foreach (char c in text)
             {
-                if (char.IsDigit(c) && digitCount == 5)
+                if (c is >= '0' and <= '9' && digitCount == 5)
                 {
                     int lastNewline = sb.ToString().LastIndexOf('\n');
 
@@ -1460,6 +1479,123 @@ public static class Utils
                 result.Add(sb.ToString());
 
             return result;
+        }
+        
+        static string ReplaceHexColorsWithSafeColors(string text) => ColorTagRegex.Replace(text, match =>
+        {
+            string hex = match.Groups[1].Value.ToLowerInvariant();
+            
+            string a = hex.Length == 8 ? hex[6..8] : string.Empty;
+            if (!string.IsNullOrEmpty(a)) hex = hex[..6];
+            
+            if (hex.Length != 6 || !hex.Any(char.IsDigit)) return match.Value;
+
+            int r = Convert.ToInt32(hex[..2], 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+
+            var best = FindClosestSafeColor(r, g, b);
+
+            return NamedColors.ContainsKey(best)
+                ? $"<color={best}>"
+                : $"<#{best}{a}>";
+        });
+
+        static string FindClosestSafeColor(int r, int g, int b)
+        {
+            if (CachedColorReplacements.TryGetValue((r, g, b), out string cache)) return cache;
+            
+            double bestDist = double.MaxValue;
+            string bestValue = "white";
+
+            foreach (var kvp in NamedColors)
+            {
+                (int cr, int cg, int cb) = kvp.Value;
+                double d = ColorDistance(r, g, b, cr, cg, cb);
+
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestValue = kvp.Key;
+                }
+            }
+
+            foreach (var hex in GenerateLetterOnlyHexColors())
+            {
+                int cr = Convert.ToInt32(hex[..2], 16);
+                int cg = Convert.ToInt32(hex.Substring(2, 2), 16);
+                int cb = Convert.ToInt32(hex.Substring(4, 2), 16);
+
+                double d = ColorDistance(r, g, b, cr, cg, cb);
+
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestValue = hex;
+                }
+            }
+
+            CachedColorReplacements[(r, g, b)] = bestValue;
+            if (CachedColorReplacements.Count > 4096) CachedColorReplacements.Clear();
+            return bestValue;
+        }
+
+        static double ColorDistance(int r1, int g1, int b1, int r2, int g2, int b2)
+        {
+            int dr = r1 - r2;
+            int dg = g1 - g2;
+            int db = b1 - b2;
+            return dr * dr + dg * dg + db * db;
+        }
+
+        static string[] GenerateLetterOnlyHexColors()
+        {
+            if (CachedLetterOnlyHexColors.Length > 0)
+                return CachedLetterOnlyHexColors;
+
+            CachedLetterOnlyHexColors = new string[46656];
+            int i = 0;
+
+            foreach (char r1 in HexLetters)
+                foreach (char r2 in HexLetters)
+                    foreach (char g1 in HexLetters)
+                        foreach (char g2 in HexLetters)
+                            foreach (char b1 in HexLetters)
+                                foreach (char b2 in HexLetters)
+                                    CachedLetterOnlyHexColors[i++] = $"{r1}{r2}{g1}{g2}{b1}{b2}";
+
+            return CachedLetterOnlyHexColors;
+        }
+
+        static string ReplaceDigitsOutsideRichText(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return text;
+
+            StringBuilder sb = new(text.Length);
+            bool insideTag = false;
+
+            foreach (char c in text)
+            {
+                switch (c)
+                {
+                    case '<':
+                        insideTag = true;
+                        sb.Append(c);
+                        continue;
+                    case '>':
+                        insideTag = false;
+                        sb.Append(c);
+                        continue;
+                    case >= '0' and <= '9' when !insideTag:
+                        sb.Append((char)('０' + (c - '0')));
+                        break;
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+            }
+
+            return sb.ToString();
         }
     }
     public static bool IsPlayerModerator(string friendCode)
@@ -1776,23 +1912,13 @@ public static class Utils
     }
     public static List<PlayerControl> GetPlayerListByRole(this CustomRoles role)
         => GetPlayerListByIds(Main.PlayerStates.Values.Where(x => x.MainRole == role).Select(r => r.PlayerId));
-    public static bool IsSameTeammate(this PlayerControl player, PlayerControl target, out Custom_Team team)
+    public static bool IsSameTeammate(this PlayerControl player, PlayerControl target, bool crew = true, bool imp = true, bool neu = true, bool coven = true)
     {
-        team = default;
-        if (player.IsAnySubRole(x => x.IsConverted()))
+        if ((player.IsPlayerCrewmateTeam() && target.IsPlayerCrewmateTeam() && crew) || (player.IsPlayerImpostorTeam() && target.IsPlayerImpostorTeam() && imp)
+            || (player.IsPlayerNeutralTeam() && target.IsPlayerNeutralTeam() && neu) || (player.IsPlayerCovenTeam() && target.IsPlayerCovenTeam() && coven))
         {
-            var Compare = player.GetCustomSubRoles().First(x => x.IsConverted());
-
-            if (player.Is(CustomRoles.Enchanted)) team = Custom_Team.Coven;
-            else team = player.Is(CustomRoles.Madmate) ? Custom_Team.Impostor : Custom_Team.Neutral;
-            return target.Is(Compare);
+            return true;
         }
-        else if (!target.IsAnySubRole(x => x.IsConverted()))
-        {
-            team = player.GetCustomRole().GetCustomRoleTeam();
-            return target.Is(team);
-        }
-
 
         return false;
     }
@@ -3018,17 +3144,6 @@ public static class Utils
             ventilationSystem.IsDirty = true;
             // Will be synced by ShipStatus patch, SetAllVentInteractions
         }
-
-        if (Lovers.PrivateChat.GetBool())
-        {
-            foreach (var target in Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Lovers)))
-                if (target.IsAlive())
-                {
-                    target.SetChatVisible(true);
-                    target.SetName(target.GetRealName(isMeeting: true));
-                    ChatUpdatePatch.DoBlockChat = false;
-                }
-        }
     }
     public static string ToColoredString(this CustomRoles role) => ColorString(GetRoleColor(role), GetString(role.ToString()));
     public static void ChangeInt(ref int ChangeTo, int input, int max)
@@ -3445,7 +3560,7 @@ public static class Utils
         playerControl.notRealPlayer = true;
         playerControl.NetTransform.SnapTo(position);
         AmongUsClient.Instance.NetIdCnt += 1U;
-        var sender = CustomRpcSender.Create("Utils.RpcCreateDeadBody", sendOption, true, false);
+        var sender = CustomRpcSender.Create("Utils.RpcCreateDeadBody", sendOption, true);
         MessageWriter writer = sender.stream;
         sender.StartMessage();
         writer.StartMessage(4);

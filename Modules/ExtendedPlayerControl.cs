@@ -760,6 +760,12 @@ static class ExtendedPlayerControl
         return ShipStatus.Instance.AllVents.Where(x => x != null).MinBy(x => Vector2.Distance(pos, x.transform.position));
     }
 
+    public static Vent GetFarthestVent(this PlayerControl player)
+    {
+        var pos = player.GetCustomPosition();
+        return ShipStatus.Instance.AllVents.Where(x => x != null).MaxBy(x => Vector2.Distance(pos, x.transform.position));
+    }
+
     public static List<Vent> GetVentsFromClosest(this PlayerControl player)
     {
         Vector2 playerpos = player.transform.position;

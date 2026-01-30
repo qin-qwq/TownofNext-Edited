@@ -20,6 +20,11 @@ internal class FortuneTeller : RoleBase
     //==================================================================\\
 
     private static OptionItem CheckLimitOpt;
+    private static OptionItem RoleNumber;
+    private static OptionItem ImpostorRoleNumber;
+    private static OptionItem CrewmateRoleNumber;
+    private static OptionItem NeutralRoleNumber;
+    private static OptionItem CovenRoleNumber;
     private static OptionItem AccurateCheckMode;
     private static OptionItem ShowSpecificRole;
     private static OptionItem RandomActiveRoles;
@@ -32,10 +37,20 @@ internal class FortuneTeller : RoleBase
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.FortuneTeller);
         CheckLimitOpt = IntegerOptionItem.Create(Id + 10, GeneralOption.SkillLimitTimes, new(0, 20, 1), 1, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller])
             .SetValueFormat(OptionFormat.Times);
-        RandomActiveRoles = BooleanOptionItem.Create(Id + 11, "RandomActiveRoles", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
-        AccurateCheckMode = BooleanOptionItem.Create(Id + 12, "AccurateCheckMode", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
-        ShowSpecificRole = BooleanOptionItem.Create(Id + 13, "ShowSpecificRole", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
-        FortuneTellerAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Id + 15, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller])
+        RandomActiveRoles = BooleanOptionItem.Create(Id + 11, "RandomActiveRoles", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
+        RoleNumber = IntegerOptionItem.Create(Id + 12, "CheckRoleNumber", new(1, 30, 1), 6, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
+            .SetValueFormat(OptionFormat.Pieces);
+        ImpostorRoleNumber = IntegerOptionItem.Create(Id + 13, "DoomsayerObserveImpostorRoleNumber", new(0, 10, 1), 2,TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
+            .SetValueFormat(OptionFormat.Pieces);
+        CrewmateRoleNumber = IntegerOptionItem.Create(Id + 14, "DoomsayerObserveCrewmateRoleNumber", new(0, 10, 1), 2, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
+            .SetValueFormat(OptionFormat.Pieces);
+        NeutralRoleNumber = IntegerOptionItem.Create(Id + 15, "DoomsayerObserveNeutralRoleNumber", new(0, 10, 1), 2, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
+            .SetValueFormat(OptionFormat.Pieces);
+        CovenRoleNumber = IntegerOptionItem.Create(Id + 16, "DoomsayerObserveCovenRoleNumber", new(0, 10, 1), 0, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
+            .SetValueFormat(OptionFormat.Pieces);
+        AccurateCheckMode = BooleanOptionItem.Create(Id + 17, "AccurateCheckMode", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
+        ShowSpecificRole = BooleanOptionItem.Create(Id + 18, "ShowSpecificRole", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
+        FortuneTellerAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Id + 19, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller])
             .SetValueFormat(OptionFormat.Times);
         OverrideTasksData.Create(Id + 20, TabGroup.CrewmateRoles, CustomRoles.FortuneTeller);
     }
@@ -128,16 +143,18 @@ internal class FortuneTeller : RoleBase
 
             if (Lich.IsCursed(target)) targetRole = CustomRoles.Lich;
 
-            var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && !role.IsAdditionRole() && !role.IsGhostRole()).ToList();
-            var count = Math.Min(4, activeRoleList.Count);
-            List<CustomRoles> roleList = [targetRole];
             var rand = IRandom.Instance;
-            for (int i = 0; i < count; i++)
+            List<CustomRoles> roleList = [];
+            ChooseRole(Custom_Team.Impostor);
+            ChooseRole(Custom_Team.Crewmate);
+            ChooseRole(Custom_Team.Neutral);
+            ChooseRole(Custom_Team.Coven);
+            for (var i = 0; i < roleList.Count - RoleNumber.GetInt() + 1; i++)
             {
-                int randomIndex = rand.Next(activeRoleList.Count);
-                roleList.Add(activeRoleList[randomIndex]);
-                activeRoleList.RemoveAt(randomIndex);
+                int randomIndex = rand.Next(roleList.Count);
+                roleList.RemoveAt(randomIndex);
             }
+            roleList.Add(targetRole);
             for (int i = roleList.Count - 1; i > 0; i--)
             {
                 int j = rand.Next(0, i + 1);
@@ -147,6 +164,27 @@ internal class FortuneTeller : RoleBase
             var targetName = target.GetRealName();
             if (targetIsVM) targetName = Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().GetRealName();
             msg = string.Format(GetString("FortuneTellerCheck.Result"), target.GetRealName(), text);
+            void ChooseRole(Custom_Team team)
+            {
+                var num = team switch
+                {
+                    Custom_Team.Coven => CovenRoleNumber.GetInt(),
+                    Custom_Team.Crewmate => CrewmateRoleNumber.GetInt(),
+                    Custom_Team.Impostor => ImpostorRoleNumber.GetInt(),
+                    Custom_Team.Neutral => NeutralRoleNumber.GetInt(),
+                    _ => 0,
+                };
+                if (targetRole.GetCustomRoleTeam() == team) num--;
+                if (num <= 0) return;
+                var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && role.GetCustomRoleTeam() == team && !role.IsGhostRole() && role != CustomRoles.FortuneTeller).ToList();
+                var count = Math.Min(num, activeRoleList.Count);
+                for (var i = 0; i < count; i++)
+                {
+                    int randomIndex = rand.Next(activeRoleList.Count);
+                    roleList.Add(activeRoleList[randomIndex]);
+                    activeRoleList.RemoveAt(randomIndex);
+                }
+            }
         }
         else
         {
