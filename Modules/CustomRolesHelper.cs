@@ -5,7 +5,6 @@ using TONE.Roles.AddOns.Crewmate;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
-using TONE.Roles.Core.DraftAssign;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Double;
@@ -1708,116 +1707,6 @@ public static class CustomRolesHelper
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
-
-    public static bool IsInRoleSlot(this CustomRoles role, RoleSlot slot)
-    {
-        if (!slot.Types.Any(x => role.IsRoleAssignType(x))) return false;
-
-        if (slot.Roles.Contains(role)) return true;
-
-        foreach (var bucket in slot.Buckets)
-        {
-            if (role.IsInRoleBucket(bucket)) return true;
-        }
-        return false;
-    }
-
-    /// <summary>
-    /// Whether the role is in the given role bucket
-    /// </summary>
-    public static bool IsInRoleBucket(this CustomRoles role, RoleBucket bucket)
-    {
-        var roleType = role.GetStaticRoleClass().ThisRoleType;
-
-        return bucket switch
-        {
-            RoleBucket.ImpostorKilling => roleType is Custom_RoleType.ImpostorKilling,
-            RoleBucket.ImpostorSupport => roleType is Custom_RoleType.ImpostorSupport,
-            RoleBucket.ImpostorConcealing => roleType is Custom_RoleType.ImpostorConcealing,
-            RoleBucket.ImpostorHindering => roleType is Custom_RoleType.ImpostorHindering,
-            RoleBucket.ImpostorCommon => roleType is Custom_RoleType.ImpostorSupport or Custom_RoleType.ImpostorConcealing or Custom_RoleType.ImpostorHindering,
-            RoleBucket.ImpostorRandom => roleType is Custom_RoleType.ImpostorKilling or Custom_RoleType.ImpostorSupport or Custom_RoleType.ImpostorConcealing or Custom_RoleType.ImpostorHindering,
-
-            RoleBucket.CrewmateBasic => roleType is Custom_RoleType.CrewmateBasic,
-            RoleBucket.CrewmateSupport => roleType is Custom_RoleType.CrewmateSupport,
-            RoleBucket.CrewmateKilling => roleType is Custom_RoleType.CrewmateKilling,
-            RoleBucket.CrewmatePower => roleType is Custom_RoleType.CrewmatePower,
-            RoleBucket.CrewmateInvestigative => roleType is Custom_RoleType.CrewmateInvestigative,
-            RoleBucket.CrewmateCommon => roleType is Custom_RoleType.CrewmateBasic or Custom_RoleType.CrewmateSupport or Custom_RoleType.CrewmateKilling or Custom_RoleType.CrewmateInvestigative,
-            RoleBucket.CrewmateRandom => roleType is Custom_RoleType.CrewmatePower or Custom_RoleType.CrewmateBasic or Custom_RoleType.CrewmateSupport or Custom_RoleType.CrewmateKilling or Custom_RoleType.CrewmateInvestigative,
-
-            RoleBucket.NeutralBenign => roleType is Custom_RoleType.NeutralBenign,
-            RoleBucket.NeutralEvil => roleType is Custom_RoleType.NeutralEvil,
-            RoleBucket.NeutralChaos => roleType is Custom_RoleType.NeutralChaos,
-            RoleBucket.NeutralKilling => roleType is Custom_RoleType.NeutralKilling,
-            RoleBucket.NeutralApocalypse => roleType is Custom_RoleType.NeutralApocalypse,
-            RoleBucket.NeutralCommon => roleType is Custom_RoleType.NeutralBenign or Custom_RoleType.NeutralEvil or Custom_RoleType.NeutralChaos,
-            RoleBucket.NeutralRandom => roleType is Custom_RoleType.NeutralBenign or Custom_RoleType.NeutralEvil or Custom_RoleType.NeutralChaos or Custom_RoleType.NeutralKilling or Custom_RoleType.NeutralApocalypse,
-
-            RoleBucket.CovenPower => roleType is Custom_RoleType.CovenPower,
-            RoleBucket.CovenKilling => roleType is Custom_RoleType.CovenKilling,
-            RoleBucket.CovenTrickery => roleType is Custom_RoleType.CovenTrickery,
-            RoleBucket.CovenUtility => roleType is Custom_RoleType.CovenUtility,
-            RoleBucket.CovenCommon => roleType is Custom_RoleType.CovenTrickery or Custom_RoleType.CovenUtility,
-            RoleBucket.CovenRandom => roleType is Custom_RoleType.CovenPower or Custom_RoleType.CovenKilling or Custom_RoleType.CovenTrickery or Custom_RoleType.CovenUtility,
-
-            RoleBucket.Any => true,
-            _ => false
-        };
-    }
-
-    public static List<RoleAssign.RoleAssignType> RoleAssignTypes(this RoleBucket bucket)
-    {
-        return bucket switch
-        {
-            RoleBucket.ImpostorKilling or
-            RoleBucket.ImpostorSupport or
-            RoleBucket.ImpostorConcealing or
-            RoleBucket.ImpostorHindering or
-            RoleBucket.ImpostorCommon or
-            RoleBucket.ImpostorRandom => [RoleAssign.RoleAssignType.Impostor],
-
-            RoleBucket.CrewmateBasic or
-            RoleBucket.CrewmateSupport or
-            RoleBucket.CrewmateKilling or
-            RoleBucket.CrewmatePower or
-            RoleBucket.CrewmateCommon or
-            RoleBucket.CrewmateRandom => [RoleAssign.RoleAssignType.Crewmate],
-
-            RoleBucket.NeutralBenign or
-            RoleBucket.NeutralChaos or
-            RoleBucket.NeutralEvil => [RoleAssign.RoleAssignType.NonKillingNeutral],
-            RoleBucket.NeutralKilling => [RoleAssign.RoleAssignType.NeutralKilling],
-            RoleBucket.NeutralApocalypse => [RoleAssign.RoleAssignType.NeutralApocalypse],
-            RoleBucket.NeutralCommon => [RoleAssign.RoleAssignType.NonKillingNeutral],
-            RoleBucket.NeutralRandom => [RoleAssign.RoleAssignType.NonKillingNeutral, RoleAssign.RoleAssignType.NeutralKilling, RoleAssign.RoleAssignType.NeutralApocalypse],
-
-            RoleBucket.CovenPower or
-            RoleBucket.CovenKilling or
-            RoleBucket.CovenTrickery or
-            RoleBucket.CovenUtility or
-            RoleBucket.CovenCommon or
-            RoleBucket.CovenRandom => [RoleAssign.RoleAssignType.Coven],
-
-            RoleBucket.Any => [RoleAssign.RoleAssignType.Impostor, RoleAssign.RoleAssignType.Crewmate, RoleAssign.RoleAssignType.NonKillingNeutral,
-                RoleAssign.RoleAssignType.NeutralKilling, RoleAssign.RoleAssignType.NeutralApocalypse, RoleAssign.RoleAssignType.Coven],
-            _ => []
-        };
-    }
-
-    public static bool IsRoleAssignType(this CustomRoles role, RoleAssign.RoleAssignType type)
-    {
-        return type switch
-        {
-            RoleAssign.RoleAssignType.Impostor => role.IsImpostor(),
-            RoleAssign.RoleAssignType.Crewmate => role.IsCrewmate(),
-            RoleAssign.RoleAssignType.Coven => role.IsCoven(),
-            RoleAssign.RoleAssignType.NeutralApocalypse => role.IsNA(),
-            RoleAssign.RoleAssignType.NeutralKilling => role.IsNK(),
-            RoleAssign.RoleAssignType.NonKillingNeutral => role.IsNonNK(),
-            _ => false
-        };
-    }
 }
 [Obfuscation(Exclude = true)]
 public enum Custom_Team
@@ -1903,46 +1792,4 @@ public enum CountTypes
     Shocker,
     Coven,
     Dreamer,
-}
-[Obfuscation(Exclude = true)]
-public enum RoleBucket
-{
-    Any,
-
-    // Impostors
-    ImpostorKilling,
-    ImpostorSupport,
-    ImpostorConcealing,
-    ImpostorHindering,
-    ImpostorCommon, // Common = All except Killing
-    ImpostorRandom,
-
-    // Crewmate
-    CrewmateBasic,
-    CrewmateSupport,
-    CrewmateKilling,
-    CrewmatePower,
-    CrewmateInvestigative,
-    CrewmateCommon, // Common = All except Power
-    CrewmateRandom,
-
-    // Neutral
-    NeutralBenign,
-    NeutralEvil,
-    NeutralChaos,
-    NeutralKilling,
-    NeutralApocalypse,
-    NeutralCommon, // Common = All except Killing and Apocalypse
-    NeutralRandom,
-
-    // Coven
-    CovenPower,
-    CovenKilling,
-    CovenTrickery,
-    CovenUtility,
-    CovenCommon, // Common = All except Power and Killing
-    CovenRandom,
-
-
-    None
 }

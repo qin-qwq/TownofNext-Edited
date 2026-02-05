@@ -415,10 +415,22 @@ internal class StartGameHostPatch
             // Select custom Roles/Add-ons
             EAC.OriginalRoles = [];
 
-            if (Options.DraftMode.GetBool())
-                DraftAssign.StartSelect();
-            else
-                RoleAssign.StartSelect();
+            if (Options.DraftMode.GetBool() && DraftAssign.CanStartWithDraft)
+            {
+                foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
+                {
+                    if (DraftAssign.DraftRoles[pc.PlayerId] == CustomRoles.NotAssigned && pc != null && DraftAssign.DraftPools.ContainsKey(pc.PlayerId))
+                        DraftAssign.DraftedRoles(pc, IRandom.Instance.Next(1, DraftAssign.DraftPools[pc.PlayerId].Count + 1), false);
+                }
+                foreach (var kvp in DraftAssign.DraftRoles.Where(x => x.Value != CustomRoles.NotAssigned))
+                {
+                    if (!RoleAssign.SetRoles.ContainsKey(kvp.Key))
+                    {
+                        RoleAssign.SetRoles[kvp.Key] = kvp.Value;
+                    }
+                }
+            }
+            RoleAssign.StartSelect();
             AddonAssign.StartSelect();
 
             // Set count Vanilla Roles

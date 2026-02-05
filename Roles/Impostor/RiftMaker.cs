@@ -60,7 +60,6 @@ internal class RiftMaker : RoleBase
 
     private void SendRPC(byte riftID, int operate) // Something here is throwing a null ref
     {
-        if (PlayerControl.LocalPlayer == null || _Player == null) return;
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(operate);
         if (operate == 3)

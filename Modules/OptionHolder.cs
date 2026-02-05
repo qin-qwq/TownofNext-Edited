@@ -3,7 +3,6 @@ using TONE.Modules;
 using TONE.Roles.AddOns;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
-using TONE.Roles.Core.DraftAssign;
 using UnityEngine;
 
 namespace TONE;
@@ -74,8 +73,8 @@ public static class Options
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
     public static OptionItem DraftableCount;
+    public static OptionItem DraftAffectedByRoleSpawnChances;
     //public static OptionItem BucketCount;
-    public static OptionItem DraftDeck;
 
     // 役職数・確率
     public static Dictionary<CustomRoles, int> roleCounts;
@@ -1421,14 +1420,12 @@ public static class Options
 
         DraftableCount = IntegerOptionItem.Create(61002, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetParent(DraftMode);
+            .SetParent(DraftMode)
+            .SetValueFormat(OptionFormat.Pieces);
 
-        DraftAssign.LoadRoleDecks();
-        DraftDeck = StringOptionItem.Create(61003, "DraftDeck", DraftAssign.RoleDecks.Keys.ToArray(), 0, TabGroup.ModSettings, false, useGetString: false)
+        DraftAffectedByRoleSpawnChances = BooleanOptionItem.Create(61004, "DraftAffectedByRoleSpawnChances", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode);
-
-        Logger.Info("Draft Bucket Options set up", "OptionsHolder.CoLoadOptions");
 
         Logger.Info("End of Draft Setup", "Draft Setup");
 
@@ -2210,19 +2207,19 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         // 技能设置
-        UsePets = BooleanOptionItem.Create(61004, "UsePets", false, TabGroup.ModSettings, false)
+        UsePets = BooleanOptionItem.Create(61100, "UsePets", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        PetToAssignToEveryone = StringOptionItem.Create(61005, "PetToAssign", PetToAssign, PetToAssign.Length, TabGroup.ModSettings, false)
+        PetToAssignToEveryone = StringOptionItem.Create(61101, "PetToAssign", PetToAssign, PetToAssign.Length, TabGroup.ModSettings, false)
             .SetParent(UsePets)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        CancelPetAnimation = BooleanOptionItem.Create(61006, "CancelPetAnimation", true, TabGroup.ModSettings, false)
+        CancelPetAnimation = BooleanOptionItem.Create(61102, "CancelPetAnimation", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
 
-        EnableImpostorChannel = BooleanOptionItem.Create(61007, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
+        EnableImpostorChannel = BooleanOptionItem.Create(61103, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
