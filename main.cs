@@ -54,17 +54,28 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.01.26"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginVersion = "26.02.09"; // YEAR.MMDD.VERSION.CANARYDEV
     public const string PluginDisplayVersion = "1.8.0 Alpha 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
-    /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = true; // Latest: V1.8.0 Alpha 1
-    public static readonly bool canaryRelease = false; // Latest: V1.6.0 Beta 2
-    public static readonly bool fullRelease = false; // Latest: V1.7.1
+    // Change this to change alpha/beta/full release
+    public static readonly Release RELEASE = Release.ALPHA;
+
+#pragma warning disable IDE1006 // Naming Styles
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.8.0 Alpha 1
+    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.6.0 Beta 2
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.7.1
+#pragma warning restore IDE1006 // Naming Styles
+
+    public enum Release
+    {
+        ALPHA,
+        BETA,
+        RELEASE
+    }
 
     public static bool hasAccess = true;
 
@@ -782,6 +793,7 @@ public enum CustomRoles
     Hangman,
     Iceologer,
     IdentityThief,
+    Inhibitor,
     Instigator,
     Kamikaze,
     KillingMachine,

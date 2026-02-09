@@ -29,7 +29,7 @@ internal class Jailer : RoleBase
     private static OptionItem CovenCanBeExe;
     private static OptionItem CKCanBeExe;
     private static OptionItem NotifyJailedOnMeetingOpt;
-    private static OptionItem EnableJailerChannel;
+    public static OptionItem EnableJailerChannel;
 
     private static readonly Dictionary<byte, int> JailerTarget = [];
     private static readonly Dictionary<byte, bool> JailerHasExe = [];

@@ -1,7 +1,9 @@
 using System;
 using AmongUs.Data;
 using TMPro;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
 using UnityEngine;
 
 namespace TONE;
@@ -78,16 +80,16 @@ public static class SendTargetPatch
         switch (target)
         {
             case SendTargets.Lovers:
-                return localPlayer.Is(CustomRoles.Lovers);
+                return localPlayer.Is(CustomRoles.Lovers) && Lovers.PrivateChat.GetBool();
 
             case SendTargets.Imp:
-                return localPlayer.IsPlayerImpostorTeam();
+                return localPlayer.IsPlayerImpostorTeam() && Options.EnableImpostorChannel.GetBool();
 
             case SendTargets.Jackal:
-                return localPlayer.Is(CustomRoles.Jackal) || localPlayer.Is(CustomRoles.Sidekick) || localPlayer.Is(CustomRoles.Recruit);
+                return (localPlayer.Is(CustomRoles.Jackal) || localPlayer.Is(CustomRoles.Sidekick) || localPlayer.Is(CustomRoles.Recruit)) && Jackal.EnableJackalChannel.GetBool();
 
             case SendTargets.Jailer:
-                return localPlayer.Is(CustomRoles.Jailer) || Jailer.IsTarget(localPlayer.PlayerId);
+                return (localPlayer.Is(CustomRoles.Jailer) || Jailer.IsTarget(localPlayer.PlayerId)) && Jailer.EnableJailerChannel.GetBool();
 
             default:
                 return false;

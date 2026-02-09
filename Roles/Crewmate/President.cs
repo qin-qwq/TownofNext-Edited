@@ -23,6 +23,7 @@ internal class President : RoleBase
     private static OptionItem ImpsSeePresident;
     private static OptionItem CovenSeePresident;
 
+    public static bool EndMeeting;
     private static readonly Dictionary<byte, int> RevealLimit = [];
     public static readonly Dictionary<byte, bool> CheckPresidentReveal = [];
 
@@ -41,6 +42,7 @@ internal class President : RoleBase
     {
         CheckPresidentReveal.Clear();
         RevealLimit.Clear();
+        EndMeeting = false;
     }
     public override void Add(byte playerId)
     {
@@ -90,6 +92,7 @@ internal class President : RoleBase
                 if (pva.VotedFor < 253)
                     MeetingHud.Instance.RpcClearVote(pva.TargetPlayerId);
             }
+            EndMeeting = true;
             List<MeetingHud.VoterState> statesList = [];
             MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
             MeetingHud.Instance.RpcClose();
@@ -189,4 +192,9 @@ internal class President : RoleBase
             (target.Is(CustomRoles.President) && seer.GetCustomRole().IsImpostor() && ImpsSeePresident.GetBool() && CheckPresidentReveal[target.PlayerId] == true);
 
     public override bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target) => KnowRoleTarget(seer, target);
+
+    public override void AfterMeetingTasks()
+    {
+        _ = new LateTask(() => { EndMeeting = false; }, 1f);
+    }
 }

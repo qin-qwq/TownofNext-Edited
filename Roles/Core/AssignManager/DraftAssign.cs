@@ -1,6 +1,9 @@
 using System.Text;
 using AmongUs.GameOptions;
 using TONE.Roles.Core.AssignManager;
+using TONE.Roles.Crewmate;
+using TONE.Roles.Impostor;
+using TONE.Roles.Neutral;
 using static TONE.Translator;
 
 namespace TONE.Roles.Core.DraftAssign;
@@ -141,6 +144,10 @@ public static class DraftAssign
                 AllRoles.Add(CustomRoles.CrewmateTONE);
             }
         }
+
+        if (Sunnyboy.CheckSpawn() && AllRoles.Remove(CustomRoles.Jester)) AllRoles.Add(CustomRoles.Sunnyboy);
+        if (Bard.CheckSpawn() && AllRoles.Remove(CustomRoles.Arrogance)) AllRoles.Add(CustomRoles.Bard);
+        if (Requiter.CheckSpawn() && AllRoles.Remove(CustomRoles.Knight)) AllRoles.Add(CustomRoles.Requiter);
 
         List<PlayerControl> AllPlayers = Main.AllPlayerControls.Shuffle(rd).ToList();
 

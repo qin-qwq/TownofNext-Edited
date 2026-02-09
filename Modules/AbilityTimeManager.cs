@@ -29,6 +29,7 @@ public static class AbilityTimeManager
 
     public static void RpcAddAbilityCD(this PlayerControl pc, bool rpc = true, bool includeDuration = false)
     {
+        if (!Options.UsePets.GetBool() && Utils.IsMethodOverridden(pc.GetRoleClass(), "OnPet")) return;
         if (!pc.HasAbilityCD() && pc.DefaultAbilityCD() != -10)
         {
             if (pc.AbilityDruation() != -20 && includeDuration)

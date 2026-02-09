@@ -25,8 +25,6 @@ internal class Balancer : RoleBase
     public static bool Choose;
     public static bool Choose2;
 
-    private ShapeshiftMenuElement CNO;
-
     public override void SetupCustomOption()
     {
         Options.SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Balancer);
@@ -43,20 +41,6 @@ internal class Balancer : RoleBase
         playerId.SetAbilityUseLimit(1);
         Target1 = 253;
         Target2 = 253;
-        CNO = null;
-    }
-
-    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
-    {
-        if (CNO == null) new ShapeshiftMenuElement(pc.PlayerId);
-        else if (CNO.playerControl.NetId == target.NetId) target = pc;
-        CheckVote(pc, target);
-    }
-
-    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
-    {
-        CNO?.Despawn();
-        CNO = null;
     }
 
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
@@ -116,19 +100,15 @@ internal class Balancer : RoleBase
 
         if (Target1 == deadid)
         {
-            //TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target2);
             List<MeetingHud.VoterState> statesList = [];
             MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target2.GetPlayer().Data, false);
             ConfirmEjections(Target2.GetPlayer().Data);
-            //MeetingHud.Instance.RpcClose();
         }
         if (Target2 == deadid)
         {
-            //TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target1);
             List<MeetingHud.VoterState> statesList = [];
             MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target1.GetPlayer().Data, false);
             ConfirmEjections(Target1.GetPlayer().Data);
-            //MeetingHud.Instance.RpcClose();
         }
     }
     public static void BalancerAfterMeetingTasks()

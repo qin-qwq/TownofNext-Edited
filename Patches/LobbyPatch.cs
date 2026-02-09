@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace TONE.Patches;
 
-[HarmonyPatch(typeof(LobbyBehaviour), nameof(LobbyBehaviour.Start))]
+/*[HarmonyPatch(typeof(LobbyBehaviour), nameof(LobbyBehaviour.Start))]
 public class LobbyStartPatch
 {
     private static GameObject LobbyPaintObject;
@@ -64,7 +64,7 @@ public class LobbyStartPatch
             FirstDecorationsLoad = false;
         }
     }
-}
+}*/
 // https://github.com/SuperNewRoles/SuperNewRoles/blob/master/SuperNewRoles/Patches/LobbyBehaviourPatch.cs
 [HarmonyPatch(typeof(LobbyBehaviour))]
 public class LobbyBehaviourPatch

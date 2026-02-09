@@ -2,6 +2,7 @@ using AmongUs.InnerNet.GameDataMessages;
 using Assets.CoreScripts;
 using Hazel;
 using System;
+using System.Collections;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -51,6 +52,8 @@ internal class ChatCommands
     public const string Asize = "75%"; // All Appended Addons Font-Size
 
     public static List<string> ChatHistory = [];
+
+    private static bool WaitingToSend;
 
     public static bool Prefix(ChatController __instance)
     {
@@ -1865,6 +1868,12 @@ internal class ChatCommands
                     AFKExemptCommand(PlayerControl.LocalPlayer, text, args);
                     break;
 
+                case "/spectate":
+                case "/观战":
+                    canceled = true;
+                    SpectateCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
                 default:
                     Main.isChatCommand = false;
                     break;
@@ -1915,6 +1924,22 @@ internal class ChatCommands
 
             __instance.quickChatMenu.Clear();
             __instance.quickChatField.Clear();
+        }
+
+        if (!canceled && AmongUsClient.Instance.AmHost && ChatUpdatePatch.TempReviveHostRunning)
+        {
+            if (!WaitingToSend) Main.Instance.StartCoroutine(Wait());
+            return false;
+            
+            IEnumerator Wait()
+            {
+                WaitingToSend = true;
+                while (ChatUpdatePatch.TempReviveHostRunning && AmongUsClient.Instance.AmHost) yield return null;
+                yield return new WaitForSecondsRealtime(0.5f);
+                if (GameStates.IsEnded || GameStates.IsLobby) yield break;
+                WaitingToSend = false;
+                if (HudManager.InstanceExists) HudManager.Instance.Chat.SendChat();
+            }
         }
         return !canceled;
     }
@@ -3592,11 +3617,16 @@ internal class ChatCommands
 
     private static void DraftStartCommand(PlayerControl player, string text, string[] args)
     {
-        if (!player.FriendCode.GetDevUser().IsDev)
+        if (!GameStates.IsLobby)
+        {
+            Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
+            return;
+        }
+        /*if (!player.FriendCode.GetDevUser().IsDev)
         {
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
             return;            
-        }
+        }*/
         if (Options.CurrentGameMode != CustomGameMode.Standard)
         {
             Utils.SendMessage(GetString("StartDraftWrongGameMode"), player.PlayerId);
@@ -3613,12 +3643,22 @@ internal class ChatCommands
     private static void DraftCommand(PlayerControl player, string text, string[] args)
     {
         if (args.Length < 2 || !int.TryParse(args[1], out int index)) return;
+        if (!GameStates.IsLobby)
+        {
+            Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
+            return;
+        }
         DraftAssign.DraftedRoles(player, index);
     }
 
     private static void DraftDescriptionCommand(PlayerControl player, string text, string[] args)
     {
         if (args.Length < 2 || !int.TryParse(args[1], out int index)) return;
+        if (!GameStates.IsLobby)
+        {
+            Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
+            return;
+        }
         DraftAssign.DraftDescriptionRoles(player, index);
     }
 
@@ -3653,6 +3693,29 @@ internal class ChatCommands
         Utils.SendMessage("\n", player.PlayerId, string.Format(GetString("PlayerExemptedFromAFK"), afkId.GetPlayerName()));
     }
 
+    private static void SpectateCommand(PlayerControl player, string text, string[] args)
+    {
+        if (args.Length < 2 || !int.TryParse(args[1], out int index)) return;
+        if (!GameStates.IsLobby)
+        {
+            Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
+            return;
+        }
+        var pc = Utils.GetPlayerById((byte)index);
+        if (!RoleAssign.SetRoles.ContainsKey((byte)index) || RoleAssign.SetRoles[(byte)index] != CustomRoles.GM)
+        {
+            RoleAssign.SetRoles[(byte)index] = CustomRoles.GM;
+            Utils.SendMessage(GetString("PlayerJoinSpectateList"), player.PlayerId);
+            if (pc.FriendCode.GetDevUser().IsDev) Utils.SendMessage(GetString("YouJoinSpectateList"), pc.PlayerId);
+        }
+        else
+        {
+            RoleAssign.SetRoles.Remove((byte)index);
+            Utils.SendMessage(GetString("PlayerDeleteFromSpectateList"), player.PlayerId);
+            if (pc.FriendCode.GetDevUser().IsDev) Utils.SendMessage(GetString("YouDeleteFromSpectateList"), pc.PlayerId);
+        }
+    }
+
     private static bool ImpostorChannel(PlayerControl pc, string msg, bool check = true)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -3679,6 +3742,7 @@ class ChatUpdatePatch
 {
     public static bool DoBlockChat = false;
     public static ChatController Instance;
+    public static bool TempReviveHostRunning = false;
     public static void Postfix(ChatController __instance)
     {
         if (!AmongUsClient.Instance.AmHost || Main.MessagesToSend.Count == 0 || (Main.MessagesToSend[0].Item2 == byte.MaxValue && Main.MessageWait.Value > __instance.timeSinceLastMessage)) return;
@@ -3730,16 +3794,20 @@ class ChatUpdatePatch
 
         //__instance.freeChatField.textArea.characterLimit = 999;
 
-        if (player.AmOwner && !player.IsAlive())
+        if (player.AmOwner && !player.IsAlive() && !TempReviveHostRunning)
         {
             player.Data.IsDead = false;
             player.Data.SendGameData();
+            TempReviveHostRunning = true;
 
             _ = new LateTask(() =>
             {
-                player.Data.IsDead = true;
-                player.Data.SendGameData();
-
+                if (!GameStates.IsEnded && !GameStates.IsLobby)
+                {
+                    player.Data.IsDead = true;
+                    player.Data.SendGameData();
+                }
+                TempReviveHostRunning = false;
             }, 1f);
         }
 

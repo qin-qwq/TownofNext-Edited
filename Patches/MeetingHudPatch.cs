@@ -25,14 +25,11 @@ class MeetingHudPopulateVotesPatch
     {
         PlayerVoteArea swapped1 = null;
         PlayerVoteArea swapped2 = null;
-        foreach (var pid in Swapper.PlayerIdList)
+
+        if (Swapper.Vote.Item1 != 253 && Swapper.Vote.Item2 != 253 && Swapper.Vote.Item1 != Swapper.Vote.Item2)
         {
-            if (!Swapper.Vote.TryGetValue(pid, out var tid1) || !Swapper.VoteTwo.TryGetValue(pid, out var tid2)) continue;
-            if (tid1 != 253 && tid2 != 253)
-            {
-                swapped1 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.Vote[pid]);
-                swapped2 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.VoteTwo[pid]);
-            }
+            swapped1 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.Vote.Item1);
+            swapped2 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.Vote.Item2);
         }
 
         var doSwap = swapped1 != null && swapped2 != null && !swapped1.AmDead && !swapped2.AmDead;

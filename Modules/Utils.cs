@@ -2421,7 +2421,7 @@ public static class Utils
                                     if (Options.PassiveNeutralsCanGuess.GetBool() && seer.GetCustomRole().IsNonNK() && !seer.Is(CustomRoles.Doomsayer))
                                         TargetPlayerName = GetTragetId;
 
-                                    if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven())
+                                    if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven() && !seer.Is(CustomRoles.Ritualist))
                                         TargetPlayerName = GetTragetId;
                                 }
                             }
@@ -2430,7 +2430,7 @@ public static class Utils
                                 if (seer.IsAlive() && target.IsAlive())
                                 {
                                     if (seer.Is(CustomRoles.NiceGuesser) || seer.Is(CustomRoles.EvilGuesser) ||
-                                        (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout)))
+                                        (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Ritualist)))
                                         TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
                                 }
                             }
@@ -2814,7 +2814,7 @@ public static class Utils
                                         if (Options.PassiveNeutralsCanGuess.GetBool() && seer.GetCustomRole().IsNonNK() && !seer.Is(CustomRoles.Doomsayer))
                                             TargetPlayerName = GetTragetId;
 
-                                        if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven())
+                                        if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven() && !seer.Is(CustomRoles.Ritualist))
                                             TargetPlayerName = GetTragetId;
                                     }
                                 }
@@ -2823,7 +2823,7 @@ public static class Utils
                                     if (seer.IsAlive() && target.IsAlive())
                                     {
                                         if (seer.Is(CustomRoles.NiceGuesser) || seer.Is(CustomRoles.EvilGuesser) ||
-                                            (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout)))
+                                            (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Ritualist)))
                                             TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
                                     }
                                 }
@@ -3087,6 +3087,12 @@ public static class Utils
             if (Main.CurrentServerIsVanilla && !PlayerControl.LocalPlayer.IsAlive())
                 PlayerControl.LocalPlayer.RpcMakeInvisible();
 
+            if (ChatManager.NeedHide)
+            {
+                ChatManager.SendPreviousMessagesToAll();
+                ChatManager.NeedHide = false;
+            }
+
             foreach (var playerState in Main.PlayerStates.Values.ToArray())
             {
                 if (playerState.RoleClass == null) continue;
@@ -3206,7 +3212,7 @@ public static class Utils
         foreach (char c in t) bc += Encoding.GetEncoding("UTF-8").GetByteCount(c.ToString()) == 1 ? 1 : 2;
         return t?.PadRight(Mathf.Max(num - (bc - t.Length), 0));
     }
-    public static void DumpLog()
+    public static void DumpLog(bool open = true)
     {
         string f = $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/TONE-logs/";
         string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
@@ -3214,6 +3220,8 @@ public static class Utils
         if (!Directory.Exists(f)) Directory.CreateDirectory(f);
         FileInfo file = new(@$"{Environment.CurrentDirectory}/BepInEx/LogOutput.log");
         file.CopyTo(@filename);
+
+        if (!open) return;
 
         if (PlayerControl.LocalPlayer != null)
             HudManager.Instance?.Chat?.AddChat(PlayerControl.LocalPlayer, string.Format(GetString("Message.DumpfileSaved"), $"TONE - v{Main.PluginVersion}-{t}.log"));

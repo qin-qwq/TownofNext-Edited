@@ -16,11 +16,13 @@ namespace TONE.Modules.ChatManager
         private static readonly Dictionary<byte, string> LastSystemChatMsg = [];
         private const int maxHistorySize = 20;
         public static List<string> ChatSentBySystem = [];
+        public static bool NeedHide;
         public static QuickChatSpamMode quickChatSpamMode => (QuickChatSpamMode)UseQuickChatSpamCheat.GetInt();
         public static void ResetHistory()
         {
             chatHistory.Clear();
             LastSystemChatMsg.Clear();
+            NeedHide = false;
         }
         public static void ClearLastSysMsg()
         {
@@ -173,6 +175,11 @@ namespace TONE.Modules.ChatManager
             //This should never function for non host
             if (Main.CurrentServerIsVanilla)
             {
+                if (GameStates.IsExilling)
+                {
+                    NeedHide = true;
+                    return;
+                }
                 var pc = PlayerControl.LocalPlayer;
 
                 var title = "​";

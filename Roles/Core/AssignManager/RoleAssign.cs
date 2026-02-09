@@ -99,6 +99,12 @@ public class RoleAssign
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
                         continue;
                     }
+                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                        continue;                        
+                    }
                     RoleResult[pc.PlayerId] = CustomRoles.Killer;
                 }
                 return;
@@ -116,6 +122,12 @@ public class RoleAssign
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
                         continue;
+                    }
+                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                        continue;                        
                     }
                     RoleResult[pc.PlayerId] = CustomRoles.Runner;
                 }
@@ -137,6 +149,12 @@ public class RoleAssign
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
                         continue;
+                    }
+                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                        continue;                        
                     }
                     else if (ZombieNum > 0)
                     {
@@ -321,6 +339,13 @@ public class RoleAssign
                 RoleResult[PlayerControl.LocalPlayer.PlayerId] = CustomRoles.GM;
                 SetRoles.Remove(PlayerControl.LocalPlayer.PlayerId);
                 AllPlayers.Remove(PlayerControl.LocalPlayer);
+            }
+            else if (SetRoles.TryGetValue(player.PlayerId, out var role) && role == CustomRoles.GM)
+            {
+                RoleResult[player.PlayerId] = CustomRoles.GM;
+                SetRoles.Remove(player.PlayerId);
+                AllPlayers.Remove(player);
+                Logger.Info($"Assign Game Master due to tag for [{player.PlayerId}]{player.GetRealName()}", "SetRoles");                     
             }
         }
 
