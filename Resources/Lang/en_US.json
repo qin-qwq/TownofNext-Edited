@@ -4214,7 +4214,7 @@
   "DraftSelection": "Role: {0} selected",
   "DraftAffectedByRoleSpawnChances": "职业概率影响轮抽选角",
   "DraftNotEnoughRoles": "没有足够的职业用于轮抽选角",
-  "Message.DraftModeDisabled": "<color=#ff1919><size=150%><b>错误</b></size></color>\n<color=#ff1919>请在设置启用<b>轮抽选角</b></color>",
+  "Message.DraftModeDisabled": "<color=#ff1919><size=150%><b>ERROR</b></size></color>\n\n<color=#ff1919>Please enable <b>Draft Mode</b> in the Settings</color>",
   "CovenLeaderRetrainConvertsHelpers": "Retraining Converts Helpers if Coven Leader is Converted",
   "HarvesterSettings.CanSwapRecruiting": "Can swap recruiting addons",
   "HarvesterSettings.CanStealRecruiting": "Can steal recruiting addons",
