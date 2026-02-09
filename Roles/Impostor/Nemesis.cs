@@ -91,7 +91,7 @@ internal class Nemesis : RoleBase
         {
             bool canSeeRoles = PreventSeeRolesBeforeSkillUsedUp.GetBool();
             string text = GetString("PlayerIdList");
-            foreach (var npc in Main.AllAlivePlayerControls)
+            foreach (var npc in Main.EnumerateAlivePlayerControls())
                 text += $"\n{npc.PlayerId} → " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
             Utils.SendMessage(text, pc.PlayerId);
             return true;
@@ -200,7 +200,7 @@ internal class Nemesis : RoleBase
 
         //  Number of Living Impostors excluding Nemesis
         int LivingImpostorsNum = 0;
-        foreach (var player in Main.AllAlivePlayerControls)
+        foreach (var player in Main.EnumerateAlivePlayerControls())
         {
             var role = player.GetCustomRole();
             if (role != CustomRoles.Nemesis && role.IsImpostor() && !player.Is(CustomRoles.Narc)) LivingImpostorsNum++;

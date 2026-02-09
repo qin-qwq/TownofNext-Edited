@@ -127,7 +127,7 @@ public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
     }
     public static void GiveNecronomicon()
     {
-        var pcList = Main.AllAlivePlayerControls.Where(pc => pc.IsPlayerCoven() && pc.IsAlive()).ToList();
+        var pcList = Main.EnumerateAlivePlayerControls().Where(pc => pc.IsPlayerCoven() && pc.IsAlive()).ToList();
         if (pcList.Any())
         {
             byte rp = pcList.RandomElement().PlayerId;

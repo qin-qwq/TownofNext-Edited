@@ -136,7 +136,7 @@ public static class AddonAssign
     {
         try
         {
-            var allAlivePlayers = Main.AllAlivePlayerControls.ToList();
+            var allAlivePlayers = Main.EnumerateAlivePlayerControls().ToList();
             if (!allAlivePlayers.Any()) return;
         
             var eligiblePlayers = new List<PlayerControl>();
@@ -215,7 +215,7 @@ public static class AddonAssign
     {
         if (!Guesser.AdvancedSettings.GetBool() || !CustomRoles.Guesser.IsEnable()) return;
         var random = IRandom.Instance;
-        List<PlayerControl> AllPlayers = Main.AllPlayerControls.Shuffle(random).ToList();
+        List<PlayerControl> AllPlayers = Main.EnumeratePlayerControls().Shuffle(random).ToList();
         var ImpNum = Guesser.GImpMax.GetInt();
         var CrewNum = Guesser.GCrewMax.GetInt();
         var NeuNum = Guesser.GNeuMax.GetInt();

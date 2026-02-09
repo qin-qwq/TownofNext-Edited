@@ -817,7 +817,7 @@ internal static class RPC
                 return;
             }
         }
-        else if (!Main.AllPlayerControls.Any(pc => pc.IsNonHostModdedClient()))
+        else if (!Main.EnumeratePlayerControls().Any(pc => pc.IsNonHostModdedClient()))
         {
             return;
         }
@@ -846,7 +846,7 @@ internal static class RPC
                 return;
             }
         }
-        else if (!Main.AllPlayerControls.Any(pc => pc.IsNonHostModdedClient()))
+        else if (!Main.EnumeratePlayerControls().Any(pc => pc.IsNonHostModdedClient()))
         {
             return;
         }
@@ -1077,7 +1077,7 @@ internal static class RPC
         try
         {
             target = targetClientId < 0 ? "All" : AmongUsClient.Instance.GetClient(targetClientId).PlayerName;
-            from = Main.AllPlayerControls.FirstOrDefault(c => c.NetId == targetNetId)?.GetRealName(clientData: true);
+            from = Main.EnumeratePlayerControls().FirstOrDefault(c => c.NetId == targetNetId)?.GetRealName(clientData: true);
         }
         catch { }
 

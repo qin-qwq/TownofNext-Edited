@@ -306,7 +306,7 @@ public static class CustomRpcSenderExtensions
             case false when Main.LastNotifyNames[(player.PlayerId, seer.PlayerId)] == name:
                 return;
             case true:
-                Main.AllPlayerControls.Do(x => Main.LastNotifyNames[(player.PlayerId, x.PlayerId)] = name);
+                Main.EnumeratePlayerControls().Do(x => Main.LastNotifyNames[(player.PlayerId, x.PlayerId)] = name);
                 break;
             default:
                 Main.LastNotifyNames[(player.PlayerId, seer.PlayerId)] = name;

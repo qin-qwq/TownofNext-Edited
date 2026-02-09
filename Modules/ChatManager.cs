@@ -249,7 +249,7 @@ namespace TONE.Modules.ChatManager
                 }
                 else
                 {
-                    var firstAlivePlayer = Main.AllAlivePlayerControls.OrderBy(x => x.PlayerId).FirstOrDefault();
+                    var firstAlivePlayer = Main.EnumerateAlivePlayerControls().OrderBy(x => x.PlayerId).FirstOrDefault();
                     if (firstAlivePlayer == null) firstAlivePlayer = PlayerControl.LocalPlayer;
 
                     var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";

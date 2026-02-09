@@ -48,7 +48,7 @@ internal class TimeAssassin : RoleBase
             player.Notify(ColorString(GetRoleColor(CustomRoles.TimeAssassin), GetString("TimeStopError")));
             return false;
         }
-        foreach (var target in Main.AllAlivePlayerControls.Where(x => !x.Is(CustomRoles.TimeAssassin)))
+        foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => !x.Is(CustomRoles.TimeAssassin)))
         {
             player.Notify(GetString("TimeStopStart"));
             TimeStop = true;

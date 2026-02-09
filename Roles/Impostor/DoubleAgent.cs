@@ -106,7 +106,7 @@ internal class DoubleAgent : RoleBase
                 return;
             }
 
-            var bastion = Main.AllPlayerControls.FirstOrDefault(p => pc.Is(CustomRoles.Bastion));
+            var bastion = Main.EnumeratePlayerControls().FirstOrDefault(p => pc.Is(CustomRoles.Bastion));
             if (bastion.GetRoleClass() is Bastion bastionClass && bastionClass.BombedVents.Contains(vent.Id))
             {
                 bastionClass.BombedVents.Remove(vent.Id);
@@ -266,7 +266,7 @@ internal class DoubleAgent : RoleBase
     {
         if (player.inVent) player.MyPhysics.RpcBootFromVent(player.GetPlayerVentId());
 
-        foreach (PlayerControl target in Main.AllAlivePlayerControls) // Get players in radius of bomb that are not in a vent.
+        foreach (PlayerControl target in Main.EnumerateAlivePlayerControls()) // Get players in radius of bomb that are not in a vent.
         {
             if (GetDistance(player.GetCustomPosition(), target.GetCustomPosition()) <= ExplosionRadius.GetFloat() && !(player.IsTransformedNeutralApocalypse() || target.IsTransformedNeutralApocalypse()))
             {

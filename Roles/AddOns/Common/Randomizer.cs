@@ -117,7 +117,7 @@ public class Randomizer : IAddon
             Logger.Info($"{killer.GetNameWithRole()} 击杀了萧暮触发随机复仇 => {target.GetNameWithRole()}", "Randomizer");
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Randomizer), GetString("YouKillRandomizer4")));
             {
-                var pcList = Main.AllAlivePlayerControls.Where(x => x.PlayerId != target.PlayerId && target.RpcCheckAndMurder(x, true)).ToList();
+                var pcList = Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != target.PlayerId && target.RpcCheckAndMurder(x, true)).ToList();
                 var pc = pcList[IRandom.Instance.Next(0, pcList.Count)];
                 if (!pc.IsTransformedNeutralApocalypse())
                 {

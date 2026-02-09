@@ -79,7 +79,7 @@ public class Rebirth : IAddon
     {
         NewExiledPlayer = default;
         if (!pc.Is(CustomRoles.Rebirth)) return false;
-        List<PlayerControl> list = [.. Main.AllAlivePlayerControls];
+        List<PlayerControl> list = [.. Main.EnumerateAlivePlayerControls()];
         if (OnlyVoted.GetBool())
         {
             list = [.. VotedCount[pc.PlayerId].Select(x => GetPlayerById(x))];

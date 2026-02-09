@@ -76,7 +76,7 @@ internal class Fury : RoleBase
     {
         player.RpcAddAbilityCD(includeDuration: true);
         player.SetKillCooldown(AngryKillCooldown.GetFloat());
-        foreach (var target in Main.AllPlayerControls)
+        foreach (var target in Main.EnumeratePlayerControls())
         {
             if (!target.IsModded()) target.KillFlash();
             RPC.PlaySoundRPC(Sounds.ImpTransform, target.PlayerId);

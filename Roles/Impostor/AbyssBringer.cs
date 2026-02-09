@@ -78,7 +78,7 @@ internal class AbyssBringer : RoleBase
 
     public override bool OnCheckVanish(PlayerControl shapeshifter)
     {
-        if (!Main.AllAlivePlayerControls.Where(x => x.PlayerId != shapeshifter.PlayerId).Any())
+        if (!Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != shapeshifter.PlayerId).Any())
         {
             return false;
         }
@@ -147,7 +147,7 @@ internal class AbyssBringer : RoleBase
 
         if (MeetingHud.Instance || Main.LastMeetingEnded + 2 > nowTime) return;
 
-        var nearestPlayer = Main.AllAlivePlayerControls.Where(x => x != abyss).MinBy(x => Vector2.Distance(x.GetCustomPosition(), blackHole.Position));
+        var nearestPlayer = Main.EnumerateAlivePlayerControls().Where(x => x != abyss).MinBy(x => Vector2.Distance(x.GetCustomPosition(), blackHole.Position));
         if (nearestPlayer != null)
         {
             var pos = nearestPlayer.GetCustomPosition();

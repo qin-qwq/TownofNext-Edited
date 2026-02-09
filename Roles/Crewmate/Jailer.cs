@@ -223,12 +223,12 @@ internal class Jailer : RoleBase
 
         if (pc.Is(CustomRoles.Jailer))
         {
-            Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
                 .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")}"), sendTo: x.PlayerId, noReplay: true));
         }
         else
         {
-            Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
                 .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));            
         }
 

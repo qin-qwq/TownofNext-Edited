@@ -336,11 +336,11 @@ class CheckMurderPatch
                         break;
 
                     case CustomRoles.Cyber when killer.PlayerId != target.PlayerId:
-                        foreach (var pc in Main.AllAlivePlayerControls.Where(x => x.PlayerId != target.PlayerId).ToArray())
+                        foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != target.PlayerId).ToArray())
                         {
                             if (target.Is(CustomRoles.Cyber))
                             {
-                                if (Main.AllAlivePlayerControls.Any(x =>
+                                if (Main.EnumerateAlivePlayerControls().Any(x =>
                                     x.PlayerId != killer.PlayerId &&
                                     x.PlayerId != target.PlayerId &&
                                     Utils.GetDistance(x.transform.position, target.transform.position) < 2f))
@@ -984,7 +984,7 @@ class ReportDeadBodyPatch
             Logger.SendInGame($"Error: {error}");
         }
 
-        foreach (var pc in Main.AllPlayerControls)
+        foreach (var pc in Main.EnumeratePlayerControls())
         {
             pc.RpcRemoveAbilityCD();
             if (!Main.OvverideOutfit.ContainsKey(pc.PlayerId))
@@ -1661,7 +1661,7 @@ class CoEnterVentPatch
 
 
         playerRoleClass?.OnCoEnterVent(instance, id);
-        if (Options.DisableVenting1v1.GetBool() && Main.AllAlivePlayerControls.Length <= 2)
+        if (Options.DisableVenting1v1.GetBool() && Main.AllAlivePlayerControls.Count <= 2)
         {
             var pc = instance?.myPlayer;
             _ = new LateTask(() =>
@@ -1856,7 +1856,7 @@ class PlayerControlCompleteTaskPatch
                             break;
 
                         case CustomRoles.Madmate when taskState.IsTaskFinished && player.Is(CustomRoles.Snitch):
-                            foreach (var impostor in Main.AllAlivePlayerControls.Where(pc => pc.Is(Custom_Team.Impostor) && !Main.PlayerStates[pc.PlayerId].IsNecromancer).ToArray())
+                            foreach (var impostor in Main.EnumerateAlivePlayerControls().Where(pc => pc.Is(Custom_Team.Impostor) && !Main.PlayerStates[pc.PlayerId].IsNecromancer).ToArray())
                             {
                                 NameColorManager.Add(impostor.PlayerId, player.PlayerId, "#ff1919");
                             }
@@ -1934,7 +1934,7 @@ class PlayerControlCheckNamePatch
             }
 
             var sender = CustomRpcSender.Create("LobbyTagsSender", SendOption.Reliable);
-            foreach (var player in Main.AllPlayerControls)
+            foreach (var player in Main.EnumeratePlayerControls())
             {
                 if (player == null || player.PlayerId == __instance.PlayerId || player.Data == null || player.Data.Disconnected) continue;
 
@@ -2115,7 +2115,7 @@ class PlayerControlSetRolePatch
             var targetIsKiller = target.Is(Custom_Team.Impostor) || target.HasDesyncRole();
             GhostRoles.Clear();
 
-            foreach (var seer in Main.AllPlayerControls)
+            foreach (var seer in Main.EnumeratePlayerControls())
             {
                 var self = seer.PlayerId == target.PlayerId;
                 var seerIsKiller = seer.Is(Custom_Team.Impostor) || seer.HasDesyncRole();
@@ -2138,7 +2138,7 @@ class PlayerControlSetRolePatch
             {
                 roleType = RoleTypes.GuardianAngel;
                 __instance.RpcSetRoleDesync(RoleTypes.GuardianAngel, __instance.GetClientId());
-                foreach (var seer in Main.AllPlayerControls)
+                foreach (var seer in Main.EnumeratePlayerControls())
                 {
                     if (seer.PlayerId == __instance.PlayerId) continue;
                     __instance.RpcSetRoleDesync(RoleTypes.CrewmateGhost, seer.GetClientId());

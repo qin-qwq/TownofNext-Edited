@@ -127,7 +127,7 @@ internal class Summoner : CovenManager
     public override bool OnCheckStartMeeting(PlayerControl reporter)
     {
         if (!NoMeetingWhileSummoned.GetBool()) return true; // Skip if the option is disabled
-        if (Main.AllPlayerControls.Any(player => player.Is(CustomRoles.Summoned)))
+        if (Main.EnumeratePlayerControls().Any(player => player.Is(CustomRoles.Summoned)))
         {
             reporter.Notify(ColorString(GetRoleColor(CustomRoles.Summoner), GetString("Summoner.NoMeetingWhileSummoned")), 20f);
             return false; // Prevent starting the meeting
@@ -164,7 +164,7 @@ internal class Summoner : CovenManager
             return true;
         }
 
-        PlayerControl targetPlayer = Main.AllPlayerControls.FirstOrDefault(player => player.PlayerId == targetId);
+        PlayerControl targetPlayer = Main.EnumeratePlayerControls().FirstOrDefault(player => player.PlayerId == targetId);
 
         if (targetPlayer == null)
         {
@@ -284,7 +284,7 @@ internal class Summoner : CovenManager
             string decoyMessage = decoyCommands[random.Next(0, decoyCommands.Length)];
 
 
-            var randomPlayer = Main.AllAlivePlayerControls.RandomElement();
+            var randomPlayer = Main.EnumerateAlivePlayerControls().RandomElement();
 
             // Add the decoy message to the chat
             DestroyableSingleton<HudManager>.Instance.Chat.AddChat(randomPlayer, decoyMessage);
@@ -388,7 +388,7 @@ internal class Summoner : CovenManager
 
         foreach (var summonedId in SummonedPlayerIds.ToList())
         {
-            // PlayerControl summonedPlayer = Main.AllPlayerControls.FirstOrDefault(p => p.PlayerId == summonedId);
+            // PlayerControl summonedPlayer = Main.EnumeratePlayerControls().FirstOrDefault(p => p.PlayerId == summonedId);
             PlayerControl summonedPlayer = GetPlayerById(summonedId);
             if (summonedPlayer != null && summonedPlayer.Is(CustomRoles.Summoned))
             {
@@ -640,7 +640,7 @@ internal class Summoned : RoleBase
                     KillSummonedPlayer(player); // Kill the player                    
                     Summoner.SummonedHealth.Remove(playerId); // Remove them from the timer list
                     Summoner.LastUpdateTimes.Remove(playerId); // Remove the timestamp entry
-                    foreach (var pc in Main.AllPlayerControls)
+                    foreach (var pc in Main.EnumeratePlayerControls())
                     {
                         if (pc.GetRoleClass() is Summoner summonerInstance)
                         {
@@ -670,7 +670,7 @@ internal class Summoned : RoleBase
     {
         if (Summoner.SummonedHealth.TryGetValue(playerId, out var timeRemaining) && timeRemaining > 0)
         {
-            var player = Main.AllPlayerControls.FirstOrDefault(p => p.PlayerId == playerId);
+            var player = Main.EnumeratePlayerControls().FirstOrDefault(p => p.PlayerId == playerId);
             if (player != null)
             {
                 player.Notify(ColorString(GetRoleColor(CustomRoles.Summoned), $"Time Remaining: {timeRemaining}s"));
@@ -725,7 +725,7 @@ internal class Summoned : RoleBase
     }
     public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
-        foreach (var pc in Main.AllPlayerControls)
+        foreach (var pc in Main.EnumeratePlayerControls())
         {
             if (pc.GetRoleClass() is Summoner summonerInstance)
             {

@@ -91,7 +91,7 @@ internal class TimeMaster : RoleBase
             long now = TimeStamp;
             int length = TimeMasterSkillDuration2.GetInt();
 
-            foreach (var pc in Main.AllPlayerControls)
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
                 originalSpeed.Remove(pc.PlayerId);
                 originalSpeed.Add(pc.PlayerId, Main.AllPlayerSpeed[pc.PlayerId]);
@@ -101,7 +101,7 @@ internal class TimeMaster : RoleBase
 
             string notify = ColorString(Color.yellow, string.Format(GetString("TimeMasterRewindStart"), CustomRoles.TimeMaster.ToColoredString()));
 
-            foreach (PlayerControl player in Main.AllPlayerControls)
+            foreach (PlayerControl player in Main.EnumeratePlayerControls())
             {
                 if (player.inVent || player.MyPhysics?.Animations?.IsPlayingEnterVentAnimation() == true) player.MyPhysics?.RpcExitVent(player.GetClosestVent().Id);
                 player.ReactorFlash(flashDuration: length * delay + 0.55f);
@@ -139,7 +139,7 @@ internal class TimeMaster : RoleBase
                 }
             }
 
-            foreach (var pc in Main.AllPlayerControls)
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
                 Main.AllPlayerSpeed[pc.PlayerId] = Main.AllPlayerSpeed[pc.PlayerId] - Main.MinSpeed + originalSpeed[pc.PlayerId];
                 ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
@@ -155,7 +155,7 @@ internal class TimeMaster : RoleBase
         long now = TimeStamp;
         if (BackTrack.ContainsKey(now)) return;
 
-        BackTrack[now] = Main.AllAlivePlayerControls.Where(x => !x.inVent && !x.onLadder && !x.inMovingPlat).ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
+        BackTrack[now] = Main.EnumerateAlivePlayerControls().Where(x => !x.inVent && !x.onLadder && !x.inMovingPlat).ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
 
         if (!lowLoad && TimeMasterInProtect.TryGetValue(player.PlayerId, out var vtime) && vtime + TimeMasterSkillDuration.GetInt() < nowTime)
         {

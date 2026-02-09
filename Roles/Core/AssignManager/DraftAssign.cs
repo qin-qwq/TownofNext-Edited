@@ -13,7 +13,7 @@ public static class DraftAssign
     public static List<CustomRoles> AllRoles = [];
     public static Dictionary<byte, List<CustomRoles>> DraftPools = [];
     public static Dictionary<byte, CustomRoles> DraftRoles = [];
-    public static bool CanStartWithDraft => DraftPools.Values.Count >= Main.AllAlivePlayerControls.Length && Main.AllAlivePlayerControls.All(x => x.PlayerId < DraftPools.Values.Count && DraftPools[x.PlayerId] != null && DraftPools[x.PlayerId].Any());
+    public static bool CanStartWithDraft => DraftPools.Values.Count >= Main.AllAlivePlayerControls.Count && Main.EnumerateAlivePlayerControls().All(x => x.PlayerId < DraftPools.Values.Count && DraftPools[x.PlayerId] != null && DraftPools[x.PlayerId].Any());
 
     public static void GetNeutralCounts(int NKmaxOpt, int NKminOpt, int NNKmaxOpt, int NNKminOpt, int NAmaxOpt, int NAminOpt, ref int ResultNKnum, ref int ResultNNKnum, ref int ResultNAnum)
     {
@@ -75,7 +75,7 @@ public static class DraftAssign
     public static void Reset()
     {
         AllRoles = [];
-        foreach (var pc in Main.AllAlivePlayerControls)
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             DraftPools[pc.PlayerId] = [];
             DraftRoles[pc.PlayerId] = CustomRoles.NotAssigned;
@@ -88,7 +88,7 @@ public static class DraftAssign
 
         var rd = IRandom.Instance;
         int draftCount = Options.DraftableCount.GetInt();
-        int playerCount = Main.AllAlivePlayerControls.Length;
+        int playerCount = Main.AllAlivePlayerControls.Count;
         int optImpNum = 0;
         int optNonNeutralKillingNum = 0;
         int optNeutralKillingNum = 0;
@@ -149,7 +149,7 @@ public static class DraftAssign
         if (Bard.CheckSpawn() && AllRoles.Remove(CustomRoles.Arrogance)) AllRoles.Add(CustomRoles.Bard);
         if (Requiter.CheckSpawn() && AllRoles.Remove(CustomRoles.Knight)) AllRoles.Add(CustomRoles.Requiter);
 
-        List<PlayerControl> AllPlayers = Main.AllPlayerControls.Shuffle(rd).ToList();
+        List<PlayerControl> AllPlayers = Main.EnumeratePlayerControls().Shuffle(rd).ToList();
 
         foreach (var pc in AllPlayers)
         {

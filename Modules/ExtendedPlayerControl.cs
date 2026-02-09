@@ -193,7 +193,7 @@ static class ExtendedPlayerControl
             // Desync role to normal role
             case (true, false):
                 {
-                    foreach (var seer in Main.AllPlayerControls)
+                    foreach (var seer in Main.EnumeratePlayerControls())
                     {
                         var seerClientId = seer.GetClientId();
                         if (seerClientId == -1) continue;
@@ -238,7 +238,7 @@ static class ExtendedPlayerControl
             // Normal role to desync role
             case (false, true):
                 {
-                    foreach (var seer in Main.AllPlayerControls)
+                    foreach (var seer in Main.EnumeratePlayerControls())
                     {
                         var seerClientId = seer.GetClientId();
                         if (seerClientId == -1) continue;
@@ -288,7 +288,7 @@ static class ExtendedPlayerControl
             default:
                 {
                     var playerIsDesync = player.HasDesyncRole();
-                    foreach (var seer in Main.AllPlayerControls)
+                    foreach (var seer in Main.EnumeratePlayerControls())
                     {
                         var seerClientId = seer.GetClientId();
                         if (seerClientId == -1) continue;
@@ -332,7 +332,7 @@ static class ExtendedPlayerControl
         var customRole = player.GetCustomRole();
         player.RpcSetRole(roleType, canOverrideRole: true);
 
-        foreach (var seer in Main.AllPlayerControls)
+        foreach (var seer in Main.EnumeratePlayerControls())
         {
             RpcSetRoleReplacer.RoleMap[(seer.PlayerId, player.PlayerId)] = (roleType, customRole);
         }
@@ -437,7 +437,7 @@ static class ExtendedPlayerControl
     }
     public static void RpcSetNameEx(this PlayerControl player, string name)
     {
-        foreach (var seer in Main.AllPlayerControls)
+        foreach (var seer in Main.EnumeratePlayerControls())
         {
             Main.LastNotifyNames[(player.PlayerId, seer.PlayerId)] = name;
         }
@@ -705,7 +705,7 @@ static class ExtendedPlayerControl
     public static void RpcSpecificRejectShapeshift(this PlayerControl player, PlayerControl target, bool shouldAnimate)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        foreach (var seer in Main.AllPlayerControls)
+        foreach (var seer in Main.EnumeratePlayerControls())
         {
             if (seer != player)
             {
@@ -925,7 +925,7 @@ static class ExtendedPlayerControl
 
     public static void RpcTeleportAllPlayers(Vector2 location)
     {
-        foreach (var pc in Main.AllAlivePlayerControls)
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             pc.RpcTeleport(location);
         }
@@ -2094,7 +2094,7 @@ static class ExtendedPlayerControl
     {
         if (!AmongUsClient.Instance.AmHost) return;
  
-        foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+        foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
         {
             if (pc == player || pc.AmOwner) continue;
             CustomRpcSender sender = CustomRpcSender.Create($"SnapTo Freeze ({player.GetNameWithRole()})", SendOption.Reliable);
@@ -2119,7 +2119,7 @@ static class ExtendedPlayerControl
     {
         if (pc == null || !AmongUsClient.Instance.AmHost || pc.IsModded()) return;
 
-        if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent || pc.inMovingPlat || pc.onLadder || !Main.AllPlayerControls.FindFirst(x => !x.IsAlive(), out var dummyGhost))
+        if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent || pc.inMovingPlat || pc.onLadder || !Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive(), out var dummyGhost))
         {
             if (BlackScreenWaitingPlayers.Add(pc.PlayerId))
                 Main.Instance.StartCoroutine(Wait());
@@ -2130,7 +2130,7 @@ static class ExtendedPlayerControl
             {
                 Logger.Warn($"FixBlackScreen was called for {pc.GetNameWithRole()}, but the conditions are not met to execute this code right now, waiting until it becomes possible to do so", "FixBlackScreen");
 
-                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId) && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || Main.AllPlayerControls.All(x => x.IsAlive())))
+                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId) && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || Main.EnumeratePlayerControls().All(x => x.IsAlive())))
                     yield return null;
 
                 if (CancelBlackScreenFix.Remove(pc.PlayerId))

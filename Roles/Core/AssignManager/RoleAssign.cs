@@ -86,7 +86,7 @@ public class RoleAssign
         switch (Options.CurrentGameMode)
         {
             case CustomGameMode.FFA:
-                foreach (PlayerControl pc in Main.AllPlayerControls)
+                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {
                     if (Main.EnableGM.Value && pc.IsHost())
                     {
@@ -110,7 +110,7 @@ public class RoleAssign
                 return;
 
             case CustomGameMode.SpeedRun:
-                foreach (PlayerControl pc in Main.AllPlayerControls)
+                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {
                     if (Main.EnableGM.Value && pc.IsHost())
                     {
@@ -135,7 +135,7 @@ public class RoleAssign
 
             case CustomGameMode.TagMode:
                 var random = IRandom.Instance;
-                List<PlayerControl> AllPlayers2 = Main.AllPlayerControls.Shuffle(random).ToList();
+                List<PlayerControl> AllPlayers2 = Main.EnumeratePlayerControls().Shuffle(random).ToList();
                 var ZombieNum = TagMode.ZombieMaximun.GetInt();
                 foreach (PlayerControl pc in AllPlayers2)
                 {
@@ -169,7 +169,7 @@ public class RoleAssign
         }
 
         var rd = IRandom.Instance;
-        int playerCount = Main.AllAlivePlayerControls.Length;
+        int playerCount = Main.AllAlivePlayerControls.Count;
         int optImpNum = 0;
         int optNonNeutralKillingNum = 0;
         int optNeutralKillingNum = 0;
@@ -312,7 +312,7 @@ public class RoleAssign
         Logger.Info(string.Join(", ", Roles[RoleAssignType.Crewmate].Select(x => x.Role.ToString())), "Selected-Crew-Roles");
         Logger.Msg("======================================================", "SelectedRoles");
 
-        var AllPlayers = Main.AllPlayerControls.ToList();
+        var AllPlayers = Main.EnumeratePlayerControls().ToList();
 
         // Players on the EAC banned list will be assigned as GM when opening rooms
         if (BanManager.CheckEACList(PlayerControl.LocalPlayer.FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid()))
@@ -323,7 +323,7 @@ public class RoleAssign
             AllPlayers.Remove(PlayerControl.LocalPlayer);
         }
 
-        foreach (var player in Main.AllPlayerControls)
+        foreach (var player in Main.EnumeratePlayerControls())
         {
             if (player == null) continue;
 

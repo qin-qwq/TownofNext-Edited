@@ -45,7 +45,7 @@ public static class Utils
     {
         if (!AmongUsClient.Instance.AmHost) return;
         SendMessage(GetString("NotifyGameEnding"), 255);
-        /*foreach (var player in Main.AllPlayerControls.Where(x => x.GetClient() != null && !x.Data.Disconnected))
+        /*foreach (var player in Main.EnumeratePlayerControls().Where(x => x.GetClient() != null && !x.Data.Disconnected))
         {
             var writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SendChat, SendOption.None, player.OwnerId);
             writer.Write(GetString("NotifyGameEnding"));
@@ -211,7 +211,7 @@ public static class Utils
     {
         if (!target.Data.IsDead || GameStates.IsMeeting) return;
 
-        foreach (var seer in Main.AllPlayerControls)
+        foreach (var seer in Main.EnumeratePlayerControls())
         {
             if (KillFlashCheck(killer, target, seer))
             {
@@ -311,7 +311,7 @@ public static class Utils
     }
     public static string GetRoleMode(CustomRoles role, bool parentheses = true)
     {
-        if (Options.HideGameSettings.GetBool() && Main.AllPlayerControls.Length > 1)
+        if (Options.HideGameSettings.GetBool() && Main.AllPlayerControls.Count > 1)
             return string.Empty;
 
         string mode = GetChance(role.GetMode());
@@ -1900,7 +1900,7 @@ public static class Utils
     {
         if (obfuscated)
             PlayerId = Main.PlayerStates.FirstOrDefault(ps => ps.Value.StolenId == PlayerId).Value?.PlayerId ?? PlayerId;
-        return Main.AllPlayerControls.FirstOrDefault(pc => pc.PlayerId == PlayerId) ?? null;
+        return Main.EnumeratePlayerControls().FirstOrDefault(pc => pc.PlayerId == PlayerId) ?? null;
     }
     public static PlayerControl GetPlayer(this byte id) => GetPlayerById(id);
     public static string GetPlayerName(this byte id) => GetPlayer(id).GetRealName();
@@ -1955,7 +1955,7 @@ public static class Utils
     {
         var count = 0;
 
-        PlayerControl[] aapc = Main.AllAlivePlayerControls;
+        var aapc = Main.EnumerateAlivePlayerControls();
 
         foreach (PlayerControl seer in aapc)
         {
@@ -2050,7 +2050,7 @@ public static class Utils
             if (!AmongUsClient.Instance.AmHost) return;
             if (!SetUpRoleTextPatch.IsInIntro && ((SpecifySeer != null && SpecifySeer.IsModded() && (Options.CurrentGameMode == CustomGameMode.Standard || SpecifySeer.IsHost())) || (GameStates.IsMeeting && !isForMeeting) || GameStates.IsLobby)) return;
 
-            PlayerControl[] apc = Main.AllPlayerControls;
+            PlayerControl[] apc = Main.EnumeratePlayerControls();
             PlayerControl[] seerList = SpecifySeer != null ? [SpecifySeer] : apc;
             PlayerControl[] targetList = SpecifyTarget != null ? [SpecifyTarget] : apc;
 
@@ -2086,7 +2086,7 @@ public static class Utils
     }*/
     public static async void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false)
     {
-        if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || Main.AllPlayerControls == null || SetUpRoleTextPatch.IsInIntro) return;
+        if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || Main.EnumeratePlayerControls() == null || SetUpRoleTextPatch.IsInIntro) return;
         if (MeetingHud.Instance)
         {
             // When the meeting window is active and game is not ended
@@ -2108,7 +2108,7 @@ public static class Utils
     }
     public static Task DoNotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, SendOption SendOption = SendOption.Reliable)
     {
-        if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || Main.AllPlayerControls == null || SetUpRoleTextPatch.IsInIntro) return Task.CompletedTask;
+        if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || Main.EnumeratePlayerControls() == null || SetUpRoleTextPatch.IsInIntro) return Task.CompletedTask;
         if (MeetingHud.Instance)
         {
             // When the meeting window is active and game is not ended
@@ -2122,13 +2122,13 @@ public static class Utils
 
         //var logger = Logger.Handler("DoNotifyRoles");
 
-        PlayerControl[] seerList = SpecifySeer != null
+        var seerList = SpecifySeer != null
             ? ([SpecifySeer])
-            : Main.AllPlayerControls;
+            : Main.EnumeratePlayerControls();
 
-        PlayerControl[] targetList = SpecifyTarget != null
+        var targetList = SpecifyTarget != null
             ? ([SpecifyTarget])
-            : Main.AllPlayerControls;
+            : Main.EnumeratePlayerControls();
 
         if (!MushroomMixupIsActive)
         {
@@ -2295,8 +2295,8 @@ public static class Utils
 
             // Start run loop for target only when condition is "true"
             if (seer.Data.IsDead || !seer.IsAlive()
-                || seerList.Length == 1
-                || targetList.Length == 1
+                || seerList.Count() == 1
+                || targetList.Count() == 1
                 || MushroomMixupIsActive
                 || NoCache
                 || ForceLoop)
@@ -2970,7 +2970,7 @@ public static class Utils
     {
         bool shouldPerformVentInteractions = false;
 
-        foreach (var pc in Main.AllPlayerControls)
+        foreach (var pc in Main.EnumeratePlayerControls())
         {
             if (VentSystemDeterioratePatch.BlockVentInteraction(pc))
             {
@@ -3113,7 +3113,7 @@ public static class Utils
             }
 
             //Set kill timer
-            foreach (var player in Main.AllAlivePlayerControls)
+            foreach (var player in Main.EnumerateAlivePlayerControls())
             {
                 player.SetKillTimer();
 
@@ -3197,7 +3197,7 @@ public static class Utils
 
         string name = "invalid";
         var player = GetPlayerById(num);
-        var playerCount = Main.AllPlayerControls.Length;
+        var playerCount = Main.AllPlayerControls.Count;
         if (num < playerCount && player != null) name = player?.GetNameWithRole();
         if (num == 252) name = "Dead";
         if (num == 253) name = "Skip";
@@ -3490,7 +3490,7 @@ public static class Utils
     {
         Dictionary<string, int> playerRooms = [];
 
-        foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+        foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
         {
             if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId)) return null;
 

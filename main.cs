@@ -54,8 +54,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.02.09"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.8.0 Alpha 1";
+    public const string PluginVersion = "26.02.10"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.8.0 Alpha 2";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
@@ -246,44 +246,25 @@ public class Main : BasePlugin
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static readonly HashSet<byte> Invisible = [];
 
-    public static PlayerControl[] AllPlayerControls
+    public static IReadOnlyList<PlayerControl> AllPlayerControls => [.. EnumeratePlayerControls()];
+    public static IReadOnlyList<PlayerControl> AllAlivePlayerControls => [.. EnumerateAlivePlayerControls()];
+
+    public static IEnumerable<PlayerControl> EnumeratePlayerControls()
     {
-        get
+        foreach (var pc in PlayerControl.AllPlayerControls)
         {
-            int count = PlayerControl.AllPlayerControls.Count;
-            var result = new PlayerControl[count];
-            int i = 0;
-            foreach (var pc in PlayerControl.AllPlayerControls)
-            {
-                if (pc == null || pc.PlayerId == 255) continue;
-                result[i++] = pc;
-            }
-
-            if (i == 0) return [];
-
-            Array.Resize(ref result, i);
-            return result;
+            if (pc == null || pc.PlayerId >= 254) continue;
+            yield return pc;
         }
     }
 
-    public static PlayerControl[] AllAlivePlayerControls
+    public static IEnumerable<PlayerControl> EnumerateAlivePlayerControls()
     {
-        get
-        {
-            int count = PlayerControl.AllPlayerControls.Count;
-            var result = new PlayerControl[count];
-            int i = 0;
-            foreach (var pc in PlayerControl.AllPlayerControls)
-            {
-                if (pc == null || pc.PlayerId == 255 || !pc.IsAlive() || pc.Data.Disconnected || Pelican.IsEaten(pc.PlayerId)) continue;
-                result[i++] = pc;
-            }
-
-            if (i == 0) return [];
-
-            Array.Resize(ref result, i);
-            return result;
-        }
+        return EnumeratePlayerControls()
+            .Where(pc => pc.IsAlive()
+                        && pc.Data != null
+                        && (!pc.Data.Disconnected || !IntroDestroyed)
+                        && !Pelican.IsEaten(pc.PlayerId));
     }
 
     public static Main Instance;

@@ -79,7 +79,7 @@ internal class Blaster : RoleBase
         _ = new LateTask(() =>
         {
             if (!GameStates.IsInTask) return;
-            foreach (var player in Main.AllAlivePlayerControls)
+            foreach (var player in Main.EnumerateAlivePlayerControls())
             {
                 foreach (var pos in BombPosition[pc.PlayerId].ToArray())
                 {

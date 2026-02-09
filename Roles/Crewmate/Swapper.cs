@@ -358,7 +358,7 @@ internal class Swapper : RoleBase
 
             if (AmongUsClient.Instance.AmHost)
             {
-                foreach (var pc in Main.AllAlivePlayerControls.ToArray())
+                foreach (var pc in Main.EnumerateAlivePlayerControls().ToArray())
                 {
                     if (!pc.Is(CustomRoles.Swapper) || !pc.IsAlive()) continue;
 

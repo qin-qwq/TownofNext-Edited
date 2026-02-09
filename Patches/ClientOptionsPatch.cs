@@ -99,7 +99,7 @@ public static class OptionsMenuBehaviourStartPatch
                 HorseMode.UpdateToggle();
                 LongMode.UpdateToggle();
 
-                foreach (PlayerControl pc in Main.AllPlayerControls)
+                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {
                     pc.MyPhysics.SetBodyType(pc.BodyType);
                     if (pc.BodyType == PlayerBodyTypes.Normal) pc.cosmetics.currentBodySprite.BodySprite.transform.localScale = new(0.5f, 0.5f, 1f);
@@ -117,7 +117,7 @@ public static class OptionsMenuBehaviourStartPatch
                 HorseMode.UpdateToggle();
                 LongMode.UpdateToggle();
 
-                foreach (PlayerControl pc in Main.AllPlayerControls)
+                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {
                     pc.MyPhysics.SetBodyType(pc.BodyType);
                     if (pc.BodyType == PlayerBodyTypes.Normal) pc.cosmetics.currentBodySprite.BodySprite.transform.localScale = new(0.5f, 0.5f, 1f);

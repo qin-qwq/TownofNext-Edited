@@ -145,7 +145,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 4: // 引力石板 - 将所有玩家拉向自己位置
                 player.RpcGuardAndKill();
-                foreach (var target in Main.AllAlivePlayerControls)
+                foreach (var target in Main.EnumerateAlivePlayerControls())
                 {
                     target.RpcTeleport(player.GetCustomPosition());
                     target.RPCPlayCustomSound("Teleport");
@@ -153,7 +153,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 5: // 寒冰宝珠 - 冻结附近玩家
                 player.RpcGuardAndKill();
-                foreach (var target in Main.AllAlivePlayerControls)
+                foreach (var target in Main.EnumerateAlivePlayerControls())
                 {
                     var pos = player.transform.position;
                     var dis = Utils.GetDistance(pos, target.transform.position);
@@ -173,7 +173,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 6: // 战争号角 - 所有玩家移动速度提升
                 player.RpcGuardAndKill();
-                foreach (var target in Main.AllAlivePlayerControls)
+                foreach (var target in Main.EnumerateAlivePlayerControls())
                 {
                     var tmpSpeed = Main.AllPlayerSpeed[target.PlayerId];
                     Main.AllPlayerSpeed[target.PlayerId] = BugleSpeed.GetFloat();
@@ -189,7 +189,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 7: // 智慧卷轴 - 帮一名玩家完成一个任务
                 player.RpcGuardAndKill();
-                var randomPlayer = Main.AllAlivePlayerControls.Where(pc => player.PlayerId != pc.PlayerId && pc.Is(Custom_Team.Crewmate) && Utils.HasTasks(pc.Data, false)).ToList().RandomElement();
+                var randomPlayer = Main.EnumerateAlivePlayerControls().Where(pc => player.PlayerId != pc.PlayerId && pc.Is(Custom_Team.Crewmate) && Utils.HasTasks(pc.Data, false)).ToList().RandomElement();
 
                 if (randomPlayer == null)
                 {
@@ -208,7 +208,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 8: // 能量水晶 - 恢复所有船员的技能使用次数
                 player.RpcGuardAndKill();
-                foreach (var target in Main.AllPlayerControls.Where(x => x.IsPlayerCrewmateTeam()))
+                foreach (var target in Main.EnumeratePlayerControls().Where(x => x.IsPlayerCrewmateTeam()))
                     target.RpcIncreaseAbilityUseLimitBy(1);
                 break;
             case 9: // 激励圣物 - 会议投票时获得额外投票权
@@ -225,12 +225,12 @@ internal class Archaeologist : RoleBase
                 player.RpcGuardAndKill();
                 player.RpcMurderPlayer(player);
                 player.SetDeathReason(PlayerState.DeathReason.Sacrifice);
-                foreach (var target in Main.AllAlivePlayerControls.Where(x => x.IsPlayerImpostorTeam() || x.IsPlayerNeutralTeam() || x.IsPlayerCovenTeam()))
+                foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam() || x.IsPlayerNeutralTeam() || x.IsPlayerCovenTeam()))
                 {
                     target.Notify(GetString("AnAncienCurseAffectsYou"));
                     target.SetKillCooldown(CurseKillCooldown.GetFloat(), forceAnime: true);
                 }
-                foreach (var target in Main.AllAlivePlayerControls.Where(x => x.IsPlayerCrewmateTeam()))
+                foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerCrewmateTeam()))
                 {
                     CustomRoles addon = addons.RandomElement();
                     target.Notify(GetString("AnAncienBlessingsAffectsYou"));
@@ -252,7 +252,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 13: // 真理石板 - 揭示一名玩家的真实身份
                 player.RpcGuardAndKill();
-                var pcList = Main.AllAlivePlayerControls.Where(pc => pc.PlayerId != player.PlayerId && !pc.GetCustomRole().IsRevealingRole(pc)).ToList();
+                var pcList = Main.EnumerateAlivePlayerControls().Where(pc => pc.PlayerId != player.PlayerId && !pc.GetCustomRole().IsRevealingRole(pc)).ToList();
 
                 PlayerControl rp = pcList.RandomElement();
                 if (pcList.Any() && !SlateRoles.Contains(rp.PlayerId))
@@ -262,7 +262,7 @@ internal class Archaeologist : RoleBase
                 break;
             case 14: // 时光沙漏 - 重置所有玩家的击杀/技能冷却时间
                 player.RpcGuardAndKill();
-                foreach (var target in Main.AllAlivePlayerControls) target.SetKillCooldown();
+                foreach (var target in Main.EnumerateAlivePlayerControls()) target.SetKillCooldown();
                 break;
             case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
                 player.RpcGuardAndKill();
@@ -349,7 +349,7 @@ internal class Archaeologist : RoleBase
     {
         if (LifeConnection)
         {
-            var pcList = Main.AllAlivePlayerControls.Where(pc => pc.PlayerId != target.PlayerId && !Pelican.IsEaten(pc.PlayerId) && !Guardian.CannotBeKilled(pc) && !Medic.IsProtected(pc.PlayerId)
+            var pcList = Main.EnumerateAlivePlayerControls().Where(pc => pc.PlayerId != target.PlayerId && !Pelican.IsEaten(pc.PlayerId) && !Guardian.CannotBeKilled(pc) && !Medic.IsProtected(pc.PlayerId)
             && !pc.Is(CustomRoles.Pestilence) && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)).ToList();
 
             if (pcList.Any())

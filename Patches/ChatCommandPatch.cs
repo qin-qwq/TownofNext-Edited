@@ -518,7 +518,7 @@ internal class ChatCommands
                     switch (Options.CurrentGameMode)
                     {
                         case CustomGameMode.Standard:
-                            var allAlivePlayers = Main.AllAlivePlayerControls;
+                            var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                             int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                             int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
                             int neutralnum = allAlivePlayers.Count(pc => pc.GetCustomRole().IsNK());
@@ -799,7 +799,7 @@ internal class ChatCommands
                 case "/玩家编号列表":
                     canceled = true;
                     string msgText1 = GetString("PlayerIdList");
-                    foreach (var pc in Main.AllPlayerControls)
+                    foreach (var pc in Main.EnumeratePlayerControls())
                     {
                         if (pc == null) continue;
                         msgText1 += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
@@ -1274,7 +1274,7 @@ internal class ChatCommands
                         Utils.SendMessage(GetString("Message.CanNotUseInLobby"), PlayerControl.LocalPlayer.PlayerId);
                         break;
                     }
-                    foreach (var pc in Main.AllPlayerControls)
+                    foreach (var pc in Main.EnumeratePlayerControls())
                     {
                         if (pc.IsAlive()) continue;
                         pc.SetName(pc.GetRealName(isMeeting: true));
@@ -1290,7 +1290,7 @@ internal class ChatCommands
                 case "/玩家编号":
                     canceled = true;
                     string msgText = GetString("PlayerIdList");
-                    foreach (var pc in Main.AllPlayerControls)
+                    foreach (var pc in Main.EnumeratePlayerControls())
                     {
                         if (pc == null) continue;
                         msgText += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
@@ -1433,7 +1433,7 @@ internal class ChatCommands
 
                             yield break;
                         }
-                        bool playervoted = (Main.AllPlayerControls.Length - 1) > Pollvotes.Values.Sum();
+                        bool playervoted = (Main.AllPlayerControls.Count - 1) > Pollvotes.Values.Sum();
 
 
                         while (playervoted && Polltimer > 0f)
@@ -1446,7 +1446,7 @@ internal class ChatCommands
 
                                 yield break;
                             }
-                            playervoted = (Main.AllPlayerControls.Length - 1) > Pollvotes.Values.Sum();
+                            playervoted = (Main.AllPlayerControls.Count - 1) > Pollvotes.Values.Sum();
                             Polltimer -= Time.deltaTime;
                             yield return null;
                         }
@@ -1510,7 +1510,7 @@ internal class ChatCommands
                     }
 
 
-                    if (Main.AllPlayerControls.Length < 3)
+                    if (Main.AllPlayerControls.Count < 3)
                     {
                         Utils.SendMessage(GetString("Poll.MissingPlayers"), PlayerControl.LocalPlayer.PlayerId);
                         break;
@@ -2525,7 +2525,7 @@ internal class ChatCommands
                 switch (Options.CurrentGameMode)
                 {
                     case CustomGameMode.Standard:
-                        var allAlivePlayers = Main.AllAlivePlayerControls;
+                        var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                         int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                         int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
                         int apocnum = allAlivePlayers.Count(pc => pc.GetCustomRole().IsNA());
@@ -2679,7 +2679,7 @@ internal class ChatCommands
                     && !Options.EnableVoteCommand.GetBool()) break;
 
                 string msgText = GetString("PlayerIdList");
-                foreach (var pc in Main.AllPlayerControls)
+                foreach (var pc in Main.EnumeratePlayerControls())
                 {
                     if (pc == null) continue;
                     msgText += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
@@ -2706,7 +2706,7 @@ internal class ChatCommands
                     break;
                 }
                 string msgText1 = GetString("PlayerIdList");
-                foreach (var pc in Main.AllPlayerControls)
+                foreach (var pc in Main.EnumeratePlayerControls())
                 {
                     if (pc == null) continue;
                     msgText1 += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName();
@@ -3098,7 +3098,7 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("Message.CanNotUseInLobby"), player.PlayerId);
                     break;
                 }
-                foreach (var pc in Main.AllPlayerControls)
+                foreach (var pc in Main.EnumeratePlayerControls())
                 {
                     if (pc.IsAlive()) continue;
 
@@ -3676,7 +3676,7 @@ internal class ChatCommands
 
         pc.FixBlackScreen();
 
-        if (Main.AllPlayerControls.All(x => x.IsAlive()))
+        if (Main.EnumeratePlayerControls().All(x => x.IsAlive()))
             Logger.SendInGame(GetString("FixBlackScreenWaitForDead"));
     }
 
@@ -3731,7 +3731,7 @@ internal class ChatCommands
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.AllAlivePlayerControls.Where(x => x.IsPlayerImpostorTeam())
+        Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam())
             .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
 
         return true;
@@ -3761,8 +3761,8 @@ class ChatUpdatePatch
         var player = PlayerControl.LocalPlayer;
         if ((GameStates.IsInGame || player.Data.IsDead) && !Main.CurrentServerIsVanilla)
         {
-            player = Main.AllAlivePlayerControls.ToArray().OrderBy(x => x.PlayerId).FirstOrDefault()
-                     ?? Main.AllPlayerControls.ToArray().OrderBy(x => x.PlayerId).FirstOrDefault()
+            player = Main.EnumerateAlivePlayerControls().ToArray().OrderBy(x => x.PlayerId).FirstOrDefault()
+                     ?? Main.EnumeratePlayerControls().ToArray().OrderBy(x => x.PlayerId).FirstOrDefault()
                      ?? player;
         }
         //Logger.Info($"player is null? {player == null}", "ChatUpdatePatch");

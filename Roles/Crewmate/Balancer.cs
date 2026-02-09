@@ -118,7 +118,7 @@ internal class Balancer : RoleBase
         var Tar2 = GetPlayerById(Target2);
         if (CustomRoles.Death.RoleExist() && !Tar1.Is(CustomRoles.Death) && !Tar2.Is(CustomRoles.Death))
         {
-            foreach (var Tar3 in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Death)))
+            foreach (var Tar3 in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Death)))
             if (!CustomWinnerHolder.CheckForConvertedWinner(Tar3.PlayerId))
             {
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Apocalypse);

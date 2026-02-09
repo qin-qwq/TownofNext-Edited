@@ -127,7 +127,7 @@ public class SabotageSystemPatch
         {
             Logger.Info($" IsActive", "MushroomMixupSabotageSystem.UpdateSystem.Postfix");
 
-            foreach (var pc in Main.AllAlivePlayerControls)
+            foreach (var pc in Main.EnumerateAlivePlayerControls())
             {
                 ReportDeadBodyPatch.CanReport[pc.PlayerId] = false;
                 if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
@@ -179,7 +179,7 @@ public class SabotageSystemPatch
                     _ = new LateTask(() =>
                     {
                         // After MushroomMixup sabotage, shapeshift cooldown sets to 0
-                        foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+                        foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
                         {
                             // Do Unshift, because mushroom mixup revert all shapeshifted players
                             pc.DoUnShiftState(true);
@@ -192,7 +192,7 @@ public class SabotageSystemPatch
                         }
                     }, 1.2f, "Reset Ability Cooldown Arter Mushroom Mixup");
 
-                    foreach (var pc in Main.AllAlivePlayerControls)
+                    foreach (var pc in Main.EnumerateAlivePlayerControls())
                     {
                         if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                         {
@@ -278,7 +278,7 @@ public class SabotageSystemPatch
 
             if (GameStates.IsInTask)
             {
-                foreach (var pc in Main.AllAlivePlayerControls)
+                foreach (var pc in Main.EnumerateAlivePlayerControls())
                     if (pc.Is(CustomRoles.Mare))
                         Utils.NotifyRoles(SpecifyTarget: pc);
             }
@@ -301,7 +301,7 @@ public class SabotageSystemPatch
 
             if (GameStates.IsInTask)
             {
-                foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+                foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
                     if (pc.Is(CustomRoles.Mare))
                         Utils.NotifyRoles(SpecifyTarget: pc);
             }

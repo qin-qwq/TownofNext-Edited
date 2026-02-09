@@ -90,7 +90,7 @@ internal class Inhibitor : RoleBase
     }
     public override void AfterMeetingTasks()
     {
-        foreach (var target in Main.AllAlivePlayerControls)
+        foreach (var target in Main.EnumerateAlivePlayerControls())
         {
             if (!InhibitList.Contains(target.PlayerId)) continue;
             target.RpcRemoveAbilityUse();

@@ -117,7 +117,7 @@ internal class Merchant : RoleBase
         CustomRoles addon = addons.RandomElement();
 
         List<PlayerControl> AllAlivePlayer =
-            Main.AllAlivePlayerControls.Where(x =>
+            Main.EnumerateAlivePlayerControls().Where(x =>
                 x.PlayerId != player.PlayerId
                 &&
                 (!x.Is(CustomRoles.Stubborn))

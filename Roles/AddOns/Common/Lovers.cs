@@ -11,7 +11,7 @@ public class Lovers : IAddon
     public CustomRoles Role => CustomRoles.Lovers;
     private const int Id = 23600;
     public AddonTypes Type => AddonTypes.Misc;
-    private static readonly List<(byte, byte)> loverPairs = [];
+    public static readonly List<(byte, byte)> loverPairs = [];
     private static readonly Dictionary<(byte, byte), bool> hasHeartbreak = [];
     public static byte loverless = byte.MaxValue;
     public static bool IsEnable => loverPairs.Any();
@@ -344,7 +344,7 @@ public class Lovers : IAddon
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.AllAlivePlayerControls.Where(x => x.PlayerId == player || x == pc)
+        Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId == player || x == pc)
             .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
 
         return true;

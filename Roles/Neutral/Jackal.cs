@@ -167,7 +167,7 @@ internal class Jackal : RoleBase
 
         if (ResetKillCooldownWhenSbGetKilled.GetBool() && !killer.Is(CustomRoles.Sidekick) && !killer.Is(CustomRoles.Jackal) && !target.Is(CustomRoles.Sidekick) && !target.Is(CustomRoles.Jackal) && !GameStates.IsMeeting)
         {
-            Main.AllAlivePlayerControls
+            Main.EnumerateAlivePlayerControls()
                 .Where(x => !target.Is(CustomRoles.Jackal) && x.Is(CustomRoles.Jackal))
                 .Do(x => x.SetKillCooldown(ResetKillCooldownOn.GetFloat()));
         }
@@ -376,7 +376,7 @@ internal class Jackal : RoleBase
                 if (GameStates.IsMeeting)
                 {
                     Utils.SendMessage(string.Format(GetString("Jackal_OnBecomeNewJackalMeeting"), _Player.GetRealName(true)), newJackal.PlayerId);
-                    foreach (var player in Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
+                    foreach (var player in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
                     {
                         if (player.PlayerId == newJackal.PlayerId) continue;
                         Utils.SendMessage(string.Format(GetString("Jackal_OnNewJackalSelectedMeeting"), _Player.GetRealName(true), newJackal.GetRealName(true)), player.PlayerId);
@@ -387,7 +387,7 @@ internal class Jackal : RoleBase
                 newJackal.ResetKillCooldown();
                 newJackal.SetKillCooldown(forceAnime: true);
 
-                foreach (var player in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
+                foreach (var player in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
                 {
                     player.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), string.Format(GetString("Jackal_OnNewJackalSelected"), newJackal.GetRealName())));
                 }
@@ -404,7 +404,7 @@ internal class Jackal : RoleBase
         else
         {
             Logger.Info("Opps, Jackal boss is dead!", "Jackal");
-            foreach (var player in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
+            foreach (var player in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
             {
                 player.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), GetString("Jackal_BossIsDead")));
             }
@@ -469,7 +469,7 @@ internal class Jackal : RoleBase
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Jackal) || x.Is(CustomRoles.Sidekick) || x.Is(CustomRoles.Recruit))
+        Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jackal) || x.Is(CustomRoles.Sidekick) || x.Is(CustomRoles.Recruit))
             .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), $"{GetString("MessageFromJackal")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
 
         return true;

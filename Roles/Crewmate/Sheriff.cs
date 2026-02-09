@@ -186,7 +186,7 @@ internal class Sheriff : RoleBase
     }
     public void DeputyBecomeSheriff()
     {
-        foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Deputy) && !x.IsAnySubRole(x => x.IsConverted())))
+        foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Deputy) && !x.IsAnySubRole(x => x.IsConverted())))
         {
             target.GetRoleClass()?.OnRemove(target.PlayerId);
             target.RpcSetCustomRole(CustomRoles.Sheriff);
