@@ -13,7 +13,6 @@ public static class DraftAssign
     public static List<CustomRoles> AllRoles = [];
     public static Dictionary<byte, List<CustomRoles>> DraftPools = [];
     public static Dictionary<byte, CustomRoles> DraftRoles = [];
-    public static bool CanStartWithDraft => DraftPools.Values.Count >= Main.AllAlivePlayerControls.Count && Main.EnumerateAlivePlayerControls().All(x => x.PlayerId < DraftPools.Values.Count && DraftPools[x.PlayerId] != null && DraftPools[x.PlayerId].Any());
 
     public static void GetNeutralCounts(int NKmaxOpt, int NKminOpt, int NNKmaxOpt, int NNKminOpt, int NAmaxOpt, int NAminOpt, ref int ResultNKnum, ref int ResultNNKnum, ref int ResultNAnum)
     {
@@ -75,6 +74,8 @@ public static class DraftAssign
     public static void Reset()
     {
         AllRoles = [];
+        DraftPools.Clear();
+        DraftRoles.Clear();
         foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             DraftPools[pc.PlayerId] = [];
@@ -312,6 +313,7 @@ public static class DraftAssign
             case CustomRoles.EvilMini:
             case CustomRoles.Runner:
             case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
+            case CustomRoles.Mini:
                 return true;
         }
         return false;

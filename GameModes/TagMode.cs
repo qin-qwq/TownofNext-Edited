@@ -47,7 +47,7 @@ public static class TagMode
 
     public static void SetupCustomOption()
     {
-        TextOptionItem.Create(10000035, "MenuTitle.TagMode", TabGroup.ModSettings)
+        TextOptionItem.Create(10000037, "MenuTitle.TagMode", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.TagMode)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
 

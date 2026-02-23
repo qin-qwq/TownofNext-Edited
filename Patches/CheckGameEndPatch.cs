@@ -119,8 +119,9 @@ class GameEndCheckerForNormal
                 switch (WinnerTeam)
                 {
                     case CustomWinner.Crewmate:
-                        if ((pc.Is(Custom_Team.Crewmate) && (countType == CountTypes.Crew || pc.Is(CustomRoles.Soulless)) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
-                            || pc.Is(CustomRoles.Admired) || pc.Is(CustomRoles.Narc)
+                        if (((pc.Is(Custom_Team.Crewmate) && (countType == CountTypes.Crew || pc.Is(CustomRoles.Soulless)) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
+                            || pc.Is(CustomRoles.Admired) || pc.Is(CustomRoles.Narc))
+                            && !pc.Is(CustomRoles.Lovers)
                            )
                         {
                             // When admired neutral win, set end game reason "HumansByVote"
@@ -132,16 +133,18 @@ class GameEndCheckerForNormal
                         }
                         break;
                     case CustomWinner.Impostor:
-                        if (((pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && (countType == CountTypes.Impostor || pc.Is(CustomRoles.Soulless)) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
-                            || pc.Is(CustomRoles.Madmate)
+                        if ((((pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && (countType == CountTypes.Impostor || pc.Is(CustomRoles.Soulless)) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
+                            || pc.Is(CustomRoles.Madmate))
+                            && !pc.Is(CustomRoles.Lovers)
                             )
                         {
                             WinnerIds.Add(pc.PlayerId);
                         }
                         break;
                     case CustomWinner.Coven:
-                        if (((pc.Is(Custom_Team.Coven) || pc.Is(CustomRoles.Enchanted) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && (countType == CountTypes.Coven || pc.Is(CustomRoles.Soulless)))
+                        if ((((pc.Is(Custom_Team.Coven) || pc.Is(CustomRoles.Enchanted) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && (countType == CountTypes.Coven || pc.Is(CustomRoles.Soulless)))
                             || (pc.Is(CustomRoles.Enchanted) || (Summoner.CheckWinCondition(pc.PlayerId) && CustomRoles.Summoner.RoleExist(true))))
+                            && !pc.Is(CustomRoles.Lovers))
                         {
                             WinnerIds.Add(pc.PlayerId);
                         }
@@ -194,6 +197,12 @@ class GameEndCheckerForNormal
                         break;
                     case CustomWinner.Spiritcaller:
                         if (pc.Is(CustomRoles.EvilSpirit))
+                        {
+                            WinnerIds.Add(pc.PlayerId);
+                        }
+                        break;
+                    case CustomWinner.Lovers:
+                        if (pc.Is(CustomRoles.Lovers))
                         {
                             WinnerIds.Add(pc.PlayerId);
                         }
@@ -507,7 +516,19 @@ class GameEndCheckerForNormal
                     //Lovers follow winner
                     if (WinnerTeam is not CustomWinner.Lovers)
                     {
-                        Lovers.CheckAdditionalWin();
+                        if (((Lovers.loverPairs.All(p => p.Item1.GetPlayer().IsPlayerCrewmateTeam() && p.Item2.GetPlayer().IsPlayerCrewmateTeam()) && WinnerTeam is CustomWinner.Crewmate)
+                        || (Lovers.loverPairs.All(p => p.Item1.GetPlayer().IsPlayerImpostorTeam() && p.Item2.GetPlayer().IsPlayerImpostorTeam()) && WinnerTeam is CustomWinner.Impostor)
+                        || (Lovers.loverPairs.All(p => p.Item1.GetPlayer().IsPlayerCovenTeam() && p.Item2.GetPlayer().IsPlayerCovenTeam()) && WinnerTeam is CustomWinner.Coven))
+                        && CustomRoles.Lovers.RoleExist(true))
+                        {
+                            foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)))
+                            {
+                                WinnerIds.Add(pc.PlayerId);
+                                AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
+                                break;
+                            }
+                        }
+                        if (Lovers.loverPairs.Count(p => p.Item1.GetPlayer().IsPlayerNeutralTeam() || p.Item2.GetPlayer().IsPlayerNeutralTeam()) != 0) Lovers.CheckAdditionalWin();
                         // var loverArray = Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)).ToArray();
 
                         // foreach (var lover in loverArray)
@@ -702,14 +723,17 @@ class GameEndCheckerForNormal
                 return true;
             }
 
-            else if (Main.AllAlivePlayerControls.Count == 2 && Lovers.AreLovers(Main.AllAlivePlayerControls[0], Main.AllAlivePlayerControls[1])) // if lover is alive lover wins
+            else if (Main.AllAlivePlayerControls.Count == 2 && Lovers.AreLovers(Main.AllAlivePlayerControls[0], Main.AllAlivePlayerControls[1])
+            && !Utils.IsSameTeammate(Main.AllAlivePlayerControls[0], Main.AllAlivePlayerControls[1], neu: false)) // if lover is alive lover wins
             {
                 reason = GameOverReason.ImpostorsByKill;
                 ResetAndSetWinner(CustomWinner.Lovers);
                 return true;
             }
 
-            else if (Main.AllAlivePlayerControls.Count == 3 && Cupid.IsPolycule([.. Main.AllAlivePlayerControls])) // Cupid & Lovers win
+            else if (Main.AllAlivePlayerControls.Count == 3 && Cupid.IsPolycule([.. Main.AllAlivePlayerControls])
+            && !Lovers.loverPairs.Where(x => x.Item1.GetPlayer().IsAlive() && x.Item2.GetPlayer().IsAlive())
+                .All(p => Utils.IsSameTeammate(p.Item1.GetPlayer(), p.Item2.GetPlayer(), neu: false))) // Cupid & Lovers win
             {
                 reason = GameOverReason.ImpostorsByKill;
                 ResetAndSetWinner(CustomWinner.Lovers);

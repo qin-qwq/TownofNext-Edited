@@ -32,7 +32,7 @@ internal class SchrodingersCat : RoleBase
 
         target.GetRoleClass()?.OnRemove(target.PlayerId);
         target.RpcSetCustomRole(role);
-        target.RpcSetRoleDesync(role.GetRoleTypes(), target.GetClientId());
+        target.RpcChangeRoleBasis(role);
         target.GetRoleClass()?.OnAdd(target.PlayerId);
         if (killer.Is(CustomRoles.Narc)) target.RpcSetCustomRole(CustomRoles.Narc);
 

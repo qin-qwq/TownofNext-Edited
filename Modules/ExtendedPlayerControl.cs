@@ -249,8 +249,8 @@ static class ExtendedPlayerControl
                             remeberRoleType = player.IsHost() ? RoleTypes.Crewmate : RoleTypes.Impostor;
 
                             // For Desync Shapeshifter
-                            if (newDesyncRole is RoleTypes.Shapeshifter)
-                                remeberRoleType = RoleTypes.Shapeshifter;
+                            if (newDesyncRole is RoleTypes.Shapeshifter or RoleTypes.Phantom)
+                                remeberRoleType = newDesyncRole;
                         }
                         else
                         {
@@ -2114,7 +2114,6 @@ static class ExtendedPlayerControl
         player.Visible = false;
     }
 
-    // Credit to EHR
     public static void FixBlackScreen(this PlayerControl pc)
     {
         if (pc == null || !AmongUsClient.Instance.AmHost || pc.IsModded()) return;
@@ -2162,78 +2161,44 @@ static class ExtendedPlayerControl
             }
         }
 
-        SystemTypes systemtype = (MapNames)Utils.GetActiveMapId() switch
-        {
-            MapNames.Polus => SystemTypes.Laboratory,
-            MapNames.Airship => SystemTypes.HeliSabotage,
-            _ => SystemTypes.Reactor
-        };
-
-        var sender = CustomRpcSender.Create($"Fix Black Screen For {pc.GetNameWithRole()}", SendOption.Reliable);
-
-        sender.RpcDesyncRepairSystem(pc, systemtype, 128);
-
-        int targetClientId = pc.OwnerId;
+        int ownerId = pc.OwnerId;
         var ghostPos = dummyGhost.GetCustomPosition();
         var pcPos = pc.GetCustomPosition();
         var timer = Math.Max(Main.AllPlayerKillCooldown[pc.PlayerId], 0.1f);
+        var murderPos = GetBlackRoomPosition();
 
         if (pc.IsAlive())
         {
-            // CheckInvalidMovementPatch.ExemptedPlayers.UnionWith([pc.PlayerId, dummyGhost.PlayerId]);
+            ReportDeadBodyPatch.CanReport[pc.PlayerId] = false;
             AFKDetector.TempIgnoredPlayers.UnionWith([pc.PlayerId, dummyGhost.PlayerId]);
             _ = new LateTask(() => AFKDetector.TempIgnoredPlayers.ExceptWith([pc.PlayerId, dummyGhost.PlayerId]), 3f);
+            pc.RpcTeleport(murderPos);
+            dummyGhost.RpcTeleport(murderPos);
+            var message = new RpcMurderPlayer(pc.NetId, dummyGhost.NetId, MurderResultFlags.Succeeded);
+            RpcUtils.LateSpecificSendMessage(message, ownerId);
 
-            var murderPos = Pelican.GetBlackRoomPSForPelican();
-
-            sender.TP(pc, murderPos, noCheckState: true);
-
-            sender.AutoStartRpc(pc.NetId, 12, targetClientId);
-            sender.WriteNetObject(dummyGhost);
-            sender.Write((int)MurderResultFlags.Succeeded);
-            sender.EndRpc();
-
-            dummyGhost.NetTransform.SnapTo(murderPos, (ushort)(dummyGhost.NetTransform.lastSequenceId + 328));
-            dummyGhost.NetTransform.SetDirtyBit(uint.MaxValue);
-
-            sender.AutoStartRpc(dummyGhost.NetTransform.NetId, 21);
-            sender.WriteVector2(murderPos);
-            sender.Write((ushort)(dummyGhost.NetTransform.lastSequenceId + 8));
-            sender.EndRpc();
+            pc.ReactorFlash(0.2f);            
         }
         else
         {
-            sender.AutoStartRpc(pc.NetId, 12, targetClientId);
-            sender.WriteNetObject(pc);
-            sender.Write((int)MurderResultFlags.Succeeded);
-            sender.EndRpc();
-        }
+            pc.RpcTeleport(murderPos);
+            var message = new RpcMurderPlayer(pc.NetId, pc.NetId, MurderResultFlags.Succeeded);
+            RpcUtils.LateSpecificSendMessage(message, ownerId);
 
-        sender.SendMessage();
+            pc.ReactorFlash(0.2f);                
+        }
 
         _ = new LateTask(() =>
         {
-            sender = CustomRpcSender.Create($"Fix Black Screen For {pc.GetNameWithRole()} (2)", SendOption.Reliable);
-
-            sender.RpcDesyncRepairSystem(pc, systemtype, 16);
-            if (systemtype == SystemTypes.HeliSabotage) sender.RpcDesyncRepairSystem(pc, systemtype, 17);
-
             if (pc.IsAlive())
             {
-                sender.TP(pc, pcPos, noCheckState: true);
+                ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
+                pc.RpcTeleport(pcPos);
+                dummyGhost.RpcTeleport(ghostPos);
                 pc.SetKillCooldown(timer);
                 pc.Notify(GetString("BlackScreenFixCompleteNotify"));
-
-                dummyGhost.NetTransform.SnapTo(ghostPos, (ushort)(dummyGhost.NetTransform.lastSequenceId + 328));
-                dummyGhost.NetTransform.SetDirtyBit(uint.MaxValue);
-
-                sender.AutoStartRpc(dummyGhost.NetTransform.NetId, 21);
-                sender.WriteVector2(ghostPos);
-                sender.Write((ushort)(dummyGhost.NetTransform.lastSequenceId + 8));
-                sender.EndRpc();
             }
-
-            sender.SendMessage();
+            else pc.RpcTeleport(pcPos);
         }, 1f + (AmongUsClient.Instance.Ping / 1000f));
     }
 

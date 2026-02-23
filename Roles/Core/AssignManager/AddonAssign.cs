@@ -25,11 +25,6 @@ public static class AddonAssign
                 return true;
         }
 
-        /*else if (Options.IsActiveDleks) // Dleks
-        {
-            if (role is CustomRoles.Nimble or CustomRoles.Burst or CustomRoles.Circumvent) continue;
-        }*/
-
         return false;
     }
 

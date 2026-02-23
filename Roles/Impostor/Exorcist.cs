@@ -89,6 +89,10 @@ internal class Exorcist : RoleBase
         var commands = new[] { "exorcise", "exorcism", "ex" };
         foreach (var cmd in commands)
         {
+            if (msg.StartsWith("/cmd"))
+            {
+                msg = "/" + msg[4..].TrimStart();
+            }
             if (msg.StartsWith("/" + cmd))
             {
                 if (player.PlayerId.GetAbilityUseLimit() <= 0 || ExorcismLimitPerMeeting <= 0)

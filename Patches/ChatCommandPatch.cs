@@ -244,8 +244,10 @@ internal class ChatCommands
                 case "/apocalypseinfo":
                 case "/灾厄中立职业介绍":
                 case "/灾厄中立介绍":
+                case "/灾厄中立":
                 case "/灾厄类中立职业介绍":
                 case "/灾厄类中立介绍":
+                case "/灾厄类中立":
                     canceled = true;
                     Utils.SendMessage(GetString("Message.ApocalypseInfo"), PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Apocalypse), GetString("ApocalypseInfoTitle")));
                     break;
@@ -254,6 +256,7 @@ internal class ChatCommands
                 case "/covinfo":
                 case "/巫师阵营职业介绍":
                 case "/巫师阵营介绍":
+                case "/巫师阵营":
                 case "/巫师介绍":
                     canceled = true;
                     Utils.SendMessage(GetString("Message.CovenInfo"), PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), GetString("CovenInfoTitle")));
@@ -662,7 +665,7 @@ internal class ChatCommands
                     if (GameStates.IsInGame)
                     {
                         var lp = PlayerControl.LocalPlayer;
-                        var Des = lp.PetActivatedAbility() ? lp.GetRoleInfo(true) + $"<size=50%>{GetString("SupportsPetMessage")}</size>" : lp.GetRoleInfo(true);
+                        var Des = lp.PetActivatedAbility() ? lp.GetRoleInfo(true) + $"<size=70%>{GetString("SupportsPetMessage")}</size>" : lp.GetRoleInfo(true);
                         var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                         var Conf = new StringBuilder();
                         var Sub = new StringBuilder();
@@ -2138,7 +2141,7 @@ internal class ChatCommands
         }
 
 
-        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=50%>{GetString("SupportsPetMessage")}</size>" 
+        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=70%>{GetString("SupportsPetMessage")}</size>" 
            : result.GetInfoLong();
         var title = "▲" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
@@ -2243,7 +2246,7 @@ internal class ChatCommands
                 var role = player.GetCustomRole();
                 if (GameStates.IsInGame)
                 {
-                    var Des = player.PetActivatedAbility() ? player.GetRoleInfo(true) + $"<size=50%>{GetString("SupportsPetMessage")}</size>" : player.GetRoleInfo(true);
+                    var Des = player.PetActivatedAbility() ? player.GetRoleInfo(true) + $"<size=70%>{GetString("SupportsPetMessage")}</size>" : player.GetRoleInfo(true);
                     var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                     var Conf = new StringBuilder();
                     var Sub = new StringBuilder();
@@ -2358,8 +2361,10 @@ internal class ChatCommands
             case "/apocalypseinfo":
             case "/灾厄中立职业介绍":
             case "/灾厄中立介绍":
+            case "/灾厄中立":
             case "/灾厄类中立职业介绍":
             case "/灾厄类中立介绍":
+            case "/灾厄类中立":
                 Utils.SendMessage(GetString("Message.ApocalypseInfo"), player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Apocalypse), GetString("ApocalypseInfoTitle")));
                 break;
 
@@ -3612,7 +3617,17 @@ internal class ChatCommands
 
     private static void DeckCommand(PlayerControl player, string text, string[] args)
     {
-        return;
+        if (GameStates.IsLobby)
+        {
+            Utils.SendMessage(GetString("Message.CanNotUseInLobby"), player.PlayerId);
+            return;
+        }
+        if (!Options.EnableGameTimeLimit.GetBool())
+        {
+            Utils.SendMessage(GetString("Message.GameTimeLimitDisabled"), player.PlayerId);
+            return;            
+        }
+        Utils.SendMessage(string.Format(GetString("ShowGameTime"), (int)(Options.GameTimeLimit.GetFloat() - Main.GameTimer)), player.PlayerId);
     }
 
     private static void DraftStartCommand(PlayerControl player, string text, string[] args)
@@ -3622,11 +3637,11 @@ internal class ChatCommands
             Utils.SendMessage(GetString("Message.OnlyCanUseInLobby"), player.PlayerId);
             return;
         }
-        /*if (!player.FriendCode.GetDevUser().IsDev)
+        if (!player.IsHost() && !player.FriendCode.GetDevUser().IsDev && !Utils.IsPlayerModerator(player.FriendCode))
         {
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
             return;            
-        }*/
+        }
         if (Options.CurrentGameMode != CustomGameMode.Standard)
         {
             Utils.SendMessage(GetString("StartDraftWrongGameMode"), player.PlayerId);
@@ -3720,7 +3735,7 @@ internal class ChatCommands
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null) return false;
-        if (!pc.IsPlayerImpostorTeam()) return false;
+        if (!pc.IsPlayerImpostorTeam() || !pc.GetCustomRole().IsImpostor()) return false;
         if (!Options.EnableImpostorChannel.GetBool()) return false;
         if (!pc.IsAlive()) return false;
         msg = msg.ToLower().Trim();
@@ -3731,7 +3746,13 @@ internal class ChatCommands
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam())
+        if (CustomRoles.Narc.RoleExist(true))
+        {
+            Utils.SendMessage(GetString("NarcInterference"), pc.PlayerId, noReplay: true);
+            return true;
+        }
+
+        Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam() && x.GetCustomRole().IsImpostor())
             .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
 
         return true;

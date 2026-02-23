@@ -184,7 +184,11 @@ internal class Sheriff : RoleBase
 
         DeputyBecomeSheriff();
     }
-    public void DeputyBecomeSheriff()
+    public static void OnSheriffLeft()
+    {
+        if (Deputy.DeputyCanBecomeSheriff.GetBool()) DeputyBecomeSheriff();        
+    }
+    public static void DeputyBecomeSheriff()
     {
         foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Deputy) && !x.IsAnySubRole(x => x.IsConverted())))
         {

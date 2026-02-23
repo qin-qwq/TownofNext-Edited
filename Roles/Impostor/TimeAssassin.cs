@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
 using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
@@ -20,6 +21,7 @@ internal class TimeAssassin : RoleBase
     private static OptionItem TimeAssassinSkillDuration;
 
     public static bool TimeStop;
+    public static HashSet<PlayerControl> PelicanList = [];
 
     public override void SetupCustomOption()
     {
@@ -33,6 +35,7 @@ internal class TimeAssassin : RoleBase
     public override void Init()
     {
         TimeStop = false;
+        PelicanList.Clear();
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -63,11 +66,13 @@ internal class TimeAssassin : RoleBase
                 player.Notify(GetString("TimeStopEnd"));
                 TimeStop = false;
                 player.RpcResetAbilityCooldown();
-                Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + tmpSpeed;
+                if (PelicanList.Contains(target)) Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + Pelican.originalSpeed[target.PlayerId];
+                else Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + tmpSpeed;
                 Main.PlayerStates[target.PlayerId].IsBlackOut = false;
                 RPC.PlaySoundRPC(Sounds.TaskComplete, target.PlayerId);
                 ReportDeadBodyPatch.CanReport[target.PlayerId] = true;
                 MarkEveryoneDirtySettings();
+                PelicanList.Clear();
             }, TimeAssassinSkillDuration.GetFloat(), "TimeAssassin Stop Time");
         }
         return false;

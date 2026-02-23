@@ -100,7 +100,7 @@ internal class Jailer : RoleBase
     {
         if (killer == null || target == null) return false;
 
-        if (JailerTarget[killer.PlayerId] != byte.MaxValue)
+        if (JailerTarget.TryGetValue(killer.PlayerId, out var pc) && pc != byte.MaxValue)
         {
             killer.Notify(GetString("JailerTargetAlreadySelected"));
             return false;

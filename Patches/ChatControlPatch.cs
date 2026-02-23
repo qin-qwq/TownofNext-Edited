@@ -83,7 +83,7 @@ public static class SendTargetPatch
                 return localPlayer.Is(CustomRoles.Lovers) && Lovers.PrivateChat.GetBool();
 
             case SendTargets.Imp:
-                return localPlayer.IsPlayerImpostorTeam() && Options.EnableImpostorChannel.GetBool();
+                return localPlayer.IsPlayerImpostorTeam() && localPlayer.GetCustomRole().IsImpostor() && Options.EnableImpostorChannel.GetBool();
 
             case SendTargets.Jackal:
                 return (localPlayer.Is(CustomRoles.Jackal) || localPlayer.Is(CustomRoles.Sidekick) || localPlayer.Is(CustomRoles.Recruit)) && Jackal.EnableJackalChannel.GetBool();

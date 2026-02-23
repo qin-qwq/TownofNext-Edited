@@ -293,8 +293,7 @@ public class Lovers : IAddon
         }
     }
     public static void CheckAdditionalWin()
-    {    
-        if (loverPairs.Count(p => p.Item1.GetPlayer().IsPlayerNeutralTeam() || p.Item2.GetPlayer().IsPlayerNeutralTeam()) == 0) return;
+    {
         var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers));
 
         foreach (var lover in loverWinners)
@@ -315,15 +314,7 @@ public class Lovers : IAddon
         var pair = loverPairs.First(x => x.Item1 == playerId || x.Item2 == loverId);
         loverPairs.Remove(pair);
 
-        if (loverless != byte.MaxValue)
-        {
-            loverPairs.Add((loverId, loverless));
-            loverless = byte.MaxValue;
-        }
-        else
-        {
-            loverless = loverId;
-        }
+        Main.PlayerStates[loverId].RemoveSubRole(CustomRoles.Lovers);
     }
 
     public static bool LoversMsg(PlayerControl pc, string msg, bool check = true)

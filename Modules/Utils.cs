@@ -752,7 +752,7 @@ public static class Utils
     {
         try
         {
-            if (seer != seen || !seer.HasAbilityCD()) return string.Empty;
+            if (seer != seen || !seer.HasAbilityCD() || !seer.IsAlive()) return string.Empty;
             return string.Format(GetString("CDPT"), seer.RemainingCD());
         }
         catch
@@ -935,8 +935,7 @@ public static class Utils
                     if (mode.Contains("100")) mode = GetString("RoleOn");
                     else mode = GetString("RoleRate");
                 }
-                var roleDisplay = Main.CurrentServerIsVanilla ? ColorString(GetRoleColor(role), $"{GetRoleName(role)}") + $": {mode}" :
-                    ColorString(GetRoleColor(role), $"{GetRoleName(role)}") + $": {mode} x{role.GetCount()}";
+                var roleDisplay = ColorString(GetRoleColor(role), $"{GetRoleName(role)}") + $": {mode} x{role.GetCount()}";
                 if (role.IsAdditionRole()) addonsb.Add(roleDisplay);
                 else if (role.IsCrewmate()) crewsb.Add(roleDisplay);
                 else if (role.IsImpostor() || role.IsMadmate()) impsb.Add(roleDisplay);
@@ -2048,11 +2047,11 @@ public static class Utils
         try
         {
             if (!AmongUsClient.Instance.AmHost) return;
-            if (!SetUpRoleTextPatch.IsInIntro && ((SpecifySeer != null && SpecifySeer.IsModded() && (Options.CurrentGameMode == CustomGameMode.Standard || SpecifySeer.IsHost())) || (GameStates.IsMeeting && !isForMeeting) || GameStates.IsLobby)) return;
+            if (!SetUpRoleTextPatch.IsInIntro && ((SpecifySeer && SpecifySeer.IsModded() && (Options.CurrentGameMode == CustomGameMode.Standard || SpecifySeer.IsHost())) || (GameStates.IsMeeting && !isForMeeting) || GameStates.IsLobby)) return;
 
-            PlayerControl[] apc = Main.EnumeratePlayerControls();
-            PlayerControl[] seerList = SpecifySeer != null ? [SpecifySeer] : apc;
-            PlayerControl[] targetList = SpecifyTarget != null ? [SpecifyTarget] : apc;
+            var apc = Main.EnumeratePlayerControls();
+            var seerList = SpecifySeer ? [SpecifySeer] : apc;
+            var targetList = SpecifyTarget ? [SpecifyTarget] : apc;
 
             var sender = CustomRpcSender.Create("NotifyRoles", SendOption);
             var hasValue = false;
@@ -2074,8 +2073,8 @@ public static class Utils
 
             if (Options.CurrentGameMode != CustomGameMode.Standard) return;
 
-            string seers = seerList.Length == apc.Length ? "Everyone" : string.Join(", ", seerList.Select(x => x.GetRealName()));
-            string targets = targetList.Length == apc.Length ? "Everyone" : string.Join(", ", targetList.Select(x => x.GetRealName()));
+            string seers = seerList.Count() == apc.Count() ? "Everyone" : string.Join(", ", seerList.Select(x => x.GetRealName()));
+            string targets = targetList.Count() == apc.Count() ? "Everyone" : string.Join(", ", targetList.Select(x => x.GetRealName()));
 
             if (seers.Length == 0) seers = "\u2205";
             if (targets.Length == 0) targets = "\u2205";
@@ -2506,7 +2505,7 @@ public static class Utils
         return Task.CompletedTask;
     }
 
-    public static bool WriteSetNameRpcsToSender(ref CustomRpcSender sender, bool isForMeeting, bool NoCache, bool forceLoop, bool CamouflageIsForMeeting, bool guesserIsForMeeting, bool MushroomMixupIsActive, PlayerControl seer, PlayerControl[] seerList, PlayerControl[] targetList, out bool senderWasCleared, SendOption sendOption = SendOption.Reliable)
+    public static bool WriteSetNameRpcsToSender(ref CustomRpcSender sender, bool isForMeeting, bool NoCache, bool forceLoop, bool CamouflageIsForMeeting, bool guesserIsForMeeting, bool MushroomMixupIsActive, PlayerControl seer, IEnumerable<PlayerControl> seerList, IEnumerable<PlayerControl> targetList, out bool senderWasCleared, SendOption sendOption = SendOption.Reliable)
     {
         long now = TimeStamp;
         var hasValue = false;
@@ -2514,7 +2513,7 @@ public static class Utils
 
         try
         {
-            if (seer == null || seer.Data.Disconnected || (seer.IsModded() && (seer.IsHost() || Options.CurrentGameMode == CustomGameMode.Standard)) || (!SetUpRoleTextPatch.IsInIntro && GameStates.IsLobby))
+            if (!seer || seer.Data.Disconnected || (seer.IsModded() && (seer.IsHost() || Options.CurrentGameMode == CustomGameMode.Standard)) || (!SetUpRoleTextPatch.IsInIntro && GameStates.IsLobby))
                 return false;
 
             sender ??= CustomRpcSender.Create("NotifyRoles", sendOption);
@@ -2668,16 +2667,16 @@ public static class Utils
                 if (!isForMeeting) SelfName += "\r\n";
 
                 SelfName = SelfName.Trim().Replace("color=", "").Replace("<#ffffff><#ffffff>", "<#ffffff>");
-                if (SelfName.EndsWith("</size>")) SelfName = SelfName.Remove(SelfName.Length - 7);
-                if (SelfName.EndsWith("</color>")) SelfName = SelfName.Remove(SelfName.Length - 8);
+                if (SelfName.EndsWith("</size>")) SelfName = SelfName[..^7];
+                if (SelfName.EndsWith("</color>")) SelfName = SelfName[..^8];
 
                 sender.RpcSetName(seer, SelfName, seer);
                 hasValue = true;
             }
 
             if (seer.Data.IsDead || !seer.IsAlive()
-                    || seerList.Length == 1
-                    || targetList.Length == 1
+                    || seerList.Count() == 1
+                    || targetList.Count() == 1
                     || MushroomMixupIsActive
                     || NoCache
                     || forceLoop)
@@ -3095,6 +3094,7 @@ public static class Utils
 
             foreach (var playerState in Main.PlayerStates.Values.ToArray())
             {
+                if (!playerState.Player) continue;
                 if (playerState.RoleClass == null) continue;
                 if (Balancer.Choose2)
                 {

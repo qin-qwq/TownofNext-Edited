@@ -261,6 +261,8 @@ internal class ChangeRoleSettings
             SabotageMapPatch.TimerTexts = [];
             MapRoomDoorsUpdatePatch.DoorTimerTexts = [];
 
+            Main.GameEndDueToTimer = false;
+
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
             AntiBlackout.Reset();
@@ -415,11 +417,11 @@ internal class StartGameHostPatch
             // Select custom Roles/Add-ons
             EAC.OriginalRoles = [];
 
-            if (Options.DraftMode.GetBool() && DraftAssign.CanStartWithDraft)
+            if (Options.DraftMode.GetBool())
             {
                 foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
                 {
-                    if (DraftAssign.DraftRoles[pc.PlayerId] == CustomRoles.NotAssigned && pc != null && DraftAssign.DraftPools.ContainsKey(pc.PlayerId))
+                    if (pc != null && DraftAssign.DraftPools.ContainsKey(pc.PlayerId) && DraftAssign.DraftRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.NotAssigned)
                         DraftAssign.DraftedRoles(pc, IRandom.Instance.Next(1, DraftAssign.DraftPools[pc.PlayerId].Count + 1), false);
                 }
                 foreach (var kvp in DraftAssign.DraftRoles.Where(x => x.Value != CustomRoles.NotAssigned))

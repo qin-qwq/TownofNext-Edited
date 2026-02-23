@@ -90,7 +90,7 @@ public static class AFKDetector
                     data.CurrentPhase = Data.Phase.Warning;
                     data.Timer = 15f;
                     Utils.NotifyRoles(SpecifyTarget: pc);
-                    if (pc.IsAlive() && !MeetingStates.FirstMeeting && !Main.CurrentServerIsVanilla) pc.FixBlackScreen();
+                    if (pc.IsAlive() && !MeetingStates.FirstMeeting) pc.FixBlackScreen();
                     break;
                 case Data.Phase.Warning:
                     data.CurrentPhase = Data.Phase.Consequence;

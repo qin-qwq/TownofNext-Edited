@@ -964,7 +964,6 @@ class IntroCutsceneDestroyPatch
                 foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
                 {
                     pc.RpcResetAbilityCooldown();
-                    pc.RpcAddAbilityCD();
 
                     if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode is not CustomGameMode.FFA or CustomGameMode.TagMode)
                     {
@@ -997,6 +996,7 @@ class IntroCutsceneDestroyPatch
 
             foreach (var player in Main.EnumeratePlayerControls())
             {
+                player.RpcAddAbilityCD();
                 if (player.Is(CustomRoles.GM) && !AntiBlackout.IsCached)
                 {
                     player.RpcExile();
@@ -1043,6 +1043,11 @@ class IntroCutsceneDestroyPatch
             Utils.CheckAndSetVentInteractions();
 
             if (AFKDetector.ActivateOnStart.GetBool()) _ = new LateTask(() => Main.EnumerateAlivePlayerControls().Do(AFKDetector.RecordPosition), 1f);
+
+            _ = new LateTask(() =>
+            {
+                Main.GameTimer = 0f;
+            }, 1f);
 
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
             {

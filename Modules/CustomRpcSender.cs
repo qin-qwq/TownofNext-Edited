@@ -300,6 +300,8 @@ public static class CustomRpcSenderExtensions
 
         name = name.Replace("color=", string.Empty);
 
+        var saw = seerIsNull ? "Everyone" : seer.GetRealName(); // Ternary operators can't be used inside of $ strings
+
         switch (seerIsNull)
         {
             case true when Main.LastNotifyNames.Where(x => x.Key.Item1 == player.PlayerId).All(x => x.Value == name):

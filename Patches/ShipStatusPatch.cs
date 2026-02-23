@@ -234,7 +234,7 @@ class StartPatch
                 __instance.transform.FindChild("Helloween")?.gameObject.SetActive(true);
                 break;
             case MapNames.Polus when Main.EnableCustomDecorations.Value:
-                var Dropship = GameObject.Find("Dropship/panel_fuel");
+                /*var Dropship = GameObject.Find("Dropship/panel_fuel");
                 if (Dropship != null)
                 {
                     var Decorations = UnityEngine.Object.Instantiate(Dropship, GameObject.Find("Dropship")?.transform);
@@ -246,7 +246,7 @@ class StartPatch
                     Decorations.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TONE.Resources.Images.Dropship-Decorations.png", 100f);
                     Decorations.transform.SetSiblingIndex(1);
                     Decorations.transform.localPosition = new(0.0709f, 0.73f);
-                }
+                }*/
                 break;
         }
     }

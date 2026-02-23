@@ -116,6 +116,7 @@ internal partial class Pyrophoric : RoleBase
                 re.RpcExileV2();
                 re.SetRealKiller(_Player);
                 Main.PlayerStates[re.PlayerId].SetDead();
+                MurderPlayerPatch.AfterPlayerDeathTasks(_Player, re, inMeeting: false, fromRole: true);
                 Revenge = false;
             }
         }
@@ -140,6 +141,7 @@ internal partial class Pyrophoric : RoleBase
         if (target.IsDisconnected()) return;
         if (!PyrophoricCanKill.GetBool()) return;
         if (!InPyrophoric) return;
+        if (killer == target || !killer || !target) return;
 
         killer.RpcMurderPlayer(killer);
         killer.SetDeathReason(PlayerState.DeathReason.Torched);

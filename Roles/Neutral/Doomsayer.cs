@@ -294,7 +294,7 @@ internal class Doomsayer : RoleBase
     }
     public override void OnMeetingHudStart(PlayerControl pc)
     {
-        if (Balancer.Choose) return;
+        if (Balancer.Choose || !pc.IsAlive()) return;
         if (DoomsayerTarget[pc.PlayerId] != byte.MaxValue)
         {
             foreach (var targetId in DoomsayerTarget.Values)
@@ -320,10 +320,13 @@ internal class Doomsayer : RoleBase
                 ChooseRole(Custom_Team.Crewmate);
                 ChooseRole(Custom_Team.Neutral);
                 ChooseRole(Custom_Team.Coven);
-                for (var i = 0; i < roleList.Count - RoleNumber.GetInt() + 1; i++)
+                if (roleList.Count - RoleNumber.GetInt() + 1 > 0)
                 {
-                    int randomIndex = rand.Next(roleList.Count);
-                    roleList.RemoveAt(randomIndex);
+                    var removeRole = roleList.Shuffle().Take(roleList.Count - RoleNumber.GetInt() + 1);
+                    foreach (var role in removeRole)
+                    {
+                        roleList.Remove(role);
+                    }
                 }
                 roleList.Add(targetRole);
                 for (int i = roleList.Count - 1; i > 0; i--)
@@ -348,7 +351,8 @@ internal class Doomsayer : RoleBase
                     };
                     if (targetRole.GetCustomRoleTeam() == team) num--;
                     if (num <= 0) return;
-                    var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && role.GetCustomRoleTeam() == team && !role.IsGhostRole() && role != CustomRoles.Doomsayer).ToList();
+                    var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && role.GetCustomRoleTeam() == team && !role.IsGhostRole() && role != CustomRoles.Doomsayer
+                    && role != CustomRoles.GM).ToList();
                     var count = Math.Min(num, activeRoleList.Count);
                     for (var i = 0; i < count; i++)
                     {

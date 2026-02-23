@@ -46,8 +46,8 @@ internal class Jackal : RoleBase
     private static OptionItem CanRecruitNeutral;
     private static OptionItem CanRecruitCoven;
 
-    private bool hasConverted;
-    private byte ConvertedPlayerId;
+    private static readonly Dictionary<byte, bool> hasConverted = [];
+    private static readonly Dictionary<byte, byte> ConvertedPlayerId = [];
 
     [Obfuscation(Exclude = true)]
     private enum SidekickAssignModeSelectList
@@ -113,8 +113,8 @@ internal class Jackal : RoleBase
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(SidekickRecruitLimitOpt.GetInt());
-        hasConverted = false;
-        ConvertedPlayerId = byte.MaxValue;
+        hasConverted[playerId] = false;
+        ConvertedPlayerId[playerId] = byte.MaxValue;
 
         if (!Playerids.Contains(playerId))
             Playerids.Add(playerId);
@@ -237,7 +237,7 @@ internal class Jackal : RoleBase
                 killer.ResetKillCooldown();
                 killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
 
-                ConvertedPlayerId = target.PlayerId;
+                ConvertedPlayerId[killer.PlayerId] = target.PlayerId;
                 break;
             case 2: // Only Recruit
                 if (!target.CanBeRecruitedBy(killer))
@@ -268,7 +268,7 @@ internal class Jackal : RoleBase
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
 
-                ConvertedPlayerId = target.PlayerId;
+                ConvertedPlayerId[killer.PlayerId] = target.PlayerId;
                 break;
             case 0: // SideKick when failed Recruit
                 if (TargetCanBeSidekick)
@@ -318,7 +318,7 @@ internal class Jackal : RoleBase
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
 
-                ConvertedPlayerId = target.PlayerId;
+                ConvertedPlayerId[killer.PlayerId] = target.PlayerId;
                 break;
         }
 
@@ -340,27 +340,41 @@ internal class Jackal : RoleBase
 	{
 		if (lowLoad) return;
 		if (player.IsAlive()) return;
-		if (hasConverted) return;
-		var ConvertedPlayer = Utils.GetPlayerById(ConvertedPlayerId);
-		if (ConvertedPlayerId == byte.MaxValue || !ConvertedPlayer.IsAlive())
+		if (hasConverted[player.PlayerId]) return;
+		var ConvertedPlayer = Utils.GetPlayerById(ConvertedPlayerId[player.PlayerId]);
+		if (ConvertedPlayerId[player.PlayerId] == byte.MaxValue || !ConvertedPlayer.IsAlive())
 		{
 			Logger.Info("Jackal dead, but no alive sidekick can be assigned!", "Jackal");
-			hasConverted = true;
+			hasConverted[player.PlayerId] = true;
 			return;
 		}
 
-		SidekickBecomeJackal();
+		SidekickBecomeJackal(player);
 	}
 
-    public void SidekickBecomeJackal()
+    public static void OnJackalLeft(PlayerControl player)
     {
-        if (hasConverted) return;
+        var ConvertedPlayer = Utils.GetPlayerById(ConvertedPlayerId[player.PlayerId]);
+		if (ConvertedPlayerId[player.PlayerId] == byte.MaxValue || !ConvertedPlayer.IsAlive())
+		{
+			Logger.Info("Jackal dead, but no alive sidekick can be assigned!", "Jackal");
+			hasConverted[player.PlayerId] = true;
+		}
+        else if (!hasConverted[player.PlayerId])
+        {
+            SidekickBecomeJackal(player);
+        }
+    }
+
+    public static void SidekickBecomeJackal(PlayerControl player)
+    {
+        if (hasConverted[player.PlayerId]) return;
 
         if (SidekickTurnIntoJackal.GetBool())
         {
             Logger.Info("Starting Jackal Death Assign.", "Jackal");
 
-            var newJackal = Utils.GetPlayerById(ConvertedPlayerId);
+            var newJackal = Utils.GetPlayerById(ConvertedPlayerId[player.PlayerId]);
             if (newJackal.IsAlive())
             {
                 Logger.Info($"Assigned new Jackal {newJackal.GetNameWithRole()}", "Jackal");
@@ -375,11 +389,11 @@ internal class Jackal : RoleBase
 
                 if (GameStates.IsMeeting)
                 {
-                    Utils.SendMessage(string.Format(GetString("Jackal_OnBecomeNewJackalMeeting"), _Player.GetRealName(true)), newJackal.PlayerId);
-                    foreach (var player in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
+                    Utils.SendMessage(string.Format(GetString("Jackal_OnBecomeNewJackalMeeting"), player.GetRealName(true)), newJackal.PlayerId);
+                    foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
                     {
-                        if (player.PlayerId == newJackal.PlayerId) continue;
-                        Utils.SendMessage(string.Format(GetString("Jackal_OnNewJackalSelectedMeeting"), _Player.GetRealName(true), newJackal.GetRealName(true)), player.PlayerId);
+                        if (pc.PlayerId == newJackal.PlayerId) continue;
+                        Utils.SendMessage(string.Format(GetString("Jackal_OnNewJackalSelectedMeeting"), player.GetRealName(true), newJackal.GetRealName(true)), pc.PlayerId);
                     }
                 }
 
@@ -387,36 +401,36 @@ internal class Jackal : RoleBase
                 newJackal.ResetKillCooldown();
                 newJackal.SetKillCooldown(forceAnime: true);
 
-                foreach (var player in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
+                foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
                 {
-                    player.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), string.Format(GetString("Jackal_OnNewJackalSelected"), newJackal.GetRealName())));
+                    pc.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), string.Format(GetString("Jackal_OnNewJackalSelected"), newJackal.GetRealName())));
                 }
                 Utils.NotifyRoles(SpecifyTarget: newJackal);
 
-                hasConverted = true;
+                hasConverted[player.PlayerId] = true;
             }
             else
             {
                 Logger.Info($"Selected alive Sidekick [{newJackal.PlayerId}]{newJackal.GetNameWithRole()} is dead? wtf", "Jackal");
-                hasConverted = true;
+                hasConverted[player.PlayerId] = true;
             }
         }
         else
         {
             Logger.Info("Opps, Jackal boss is dead!", "Jackal");
-            foreach (var player in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
+            foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Recruit) || x.Is(CustomRoles.Sidekick)))
             {
-                player.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), GetString("Jackal_BossIsDead")));
+                pc.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), GetString("Jackal_BossIsDead")));
             }
-            hasConverted = true;
+            hasConverted[player.PlayerId] = true;
         }
     }
 
     public override void AfterMeetingTasks()
     {
-        if (_Player && !_Player.IsAlive() && !hasConverted)
+        if (_Player && !_Player.IsAlive() && !hasConverted[_Player.PlayerId])
         {
-            SidekickBecomeJackal();
+            SidekickBecomeJackal(_Player);
         }
     }
 
