@@ -663,7 +663,12 @@ public static class CustomRolesHelper
                 break;
 
             case CustomRoles.Guesser:
-                if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && !Guesser.CrewCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsNeutral() && !Guesser.NeutralCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsImpostor() && !Guesser.ImpCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsCoven() && !Guesser.CovenCanBeGuesser.GetBool())))
+                if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool()) 
+                || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool()) 
+                || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool()) 
+                || (pc.GetCustomRole().IsCoven() && Options.CovenCanGuess.GetBool())
+                || (pc.GetCustomRole().IsNA() && Options.NeutralApocalypseCanGuess.GetBool())
+                || (pc.GetCustomRole().IsNonNK() && Options.PassiveNeutralsCanGuess.GetBool())))
                     return false;
                 if (pc.Is(CustomRoles.EvilGuesser)
                     || pc.Is(CustomRoles.NiceGuesser)
@@ -673,6 +678,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Nemesis)
                     || pc.Is(CustomRoles.Councillor)
                     || pc.Is(CustomRoles.GuardianAngelTONE)
+                    || pc.Is(CustomRoles.Retributionist)
                     || pc.Is(CustomRoles.PunchingBag))
                     return false;
                 if ((pc.Is(CustomRoles.Specter) && !Specter.CanGuess.GetBool())

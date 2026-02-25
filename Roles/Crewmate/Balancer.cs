@@ -86,6 +86,11 @@ internal class Balancer : RoleBase
         if (Choose) return;
         if (voter.GetAbilityUseLimit() < 1) return;
         if (voter == null || target == null) return;
+        if (!voter.IsAlive())
+        {
+            SendMessage(GetString("BalancerDead"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+            return;
+        }
         if (Target1 != 253)
         {
             Target2 = target.PlayerId;

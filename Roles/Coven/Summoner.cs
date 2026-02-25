@@ -688,11 +688,10 @@ internal class Summoned : RoleBase
         player.SetDeathReason(PlayerState.DeathReason.Expired);
 
         var playerState = Main.PlayerStates[player.PlayerId];
-        playerState.IsDead = true;
-
 
         // Use RpcExileV2 to remove the player without leaving a body
         player.RpcExileV2();
+        playerState.IsDead = true;
         /*
         player.RpcTeleport(ExtendedPlayerControl.GetBlackRoomPosition());
         player.RpcMurderPlayer(player);

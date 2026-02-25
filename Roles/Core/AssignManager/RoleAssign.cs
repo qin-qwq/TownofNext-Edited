@@ -218,6 +218,8 @@ public class RoleAssign
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
                 case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
+                case CustomRoles.NiceGuesser when Options.GuesserMode.GetBool() && Options.CrewmatesCanGuess.GetBool():
+                case CustomRoles.EvilGuesser when Options.GuesserMode.GetBool() && Options.ImpostorsCanGuess.GetBool():
                     continue;
             }
 

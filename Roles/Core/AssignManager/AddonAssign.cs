@@ -219,7 +219,12 @@ public static class AddonAssign
         foreach (PlayerControl pc in AllPlayers)
         {
             if (pc == null) continue;
-            if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && !Guesser.CrewCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsNeutral() && !Guesser.NeutralCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsImpostor() && !Guesser.ImpCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsCoven() && !Guesser.CovenCanBeGuesser.GetBool())))
+            if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool()) 
+            || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool()) 
+            || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool()) 
+            || (pc.GetCustomRole().IsCoven() && Options.CovenCanGuess.GetBool())
+            || (pc.GetCustomRole().IsNA() && Options.NeutralApocalypseCanGuess.GetBool())
+            || (pc.GetCustomRole().IsNonNK() && Options.PassiveNeutralsCanGuess.GetBool())))
                 continue;
             if (pc.Is(CustomRoles.EvilGuesser)
                     || pc.Is(CustomRoles.NiceGuesser)
@@ -230,6 +235,7 @@ public static class AddonAssign
                     || pc.Is(CustomRoles.Councillor)
                     || pc.Is(CustomRoles.GuardianAngelTONE)
                     || pc.Is(CustomRoles.GM)
+                    || pc.Is(CustomRoles.Retributionist)
                     || (pc.HasSubRole() && pc.GetCustomSubRoles().Count >= Options.NoLimitAddonsNumMax.GetInt())
                     || pc.Is(CustomRoles.PunchingBag))
                 continue;

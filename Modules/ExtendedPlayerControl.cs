@@ -13,6 +13,7 @@ using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
@@ -365,6 +366,11 @@ static class ExtendedPlayerControl
     }
     public static void RpcExile(this PlayerControl player)
     {
+        if (Main.CurrentServerIsVanilla)
+        {
+            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
+            return;
+        }
         player.Exiled();
         var message = new RpcExiled(player.NetId);
         RpcUtils.LateBroadcastReliableMessage(message);
@@ -383,6 +389,11 @@ static class ExtendedPlayerControl
     }
     public static void RpcExileV2(this PlayerControl player)
     {
+        if (Main.CurrentServerIsVanilla)
+        {
+            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
+            return;
+        }
         if (player.Is(CustomRoles.Susceptible))
         {
             Susceptible.CallEnabledAndChange(player);
@@ -1931,8 +1942,15 @@ static class ExtendedPlayerControl
 
             var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);
             sender.StartMessage(pc.OwnerId);
-            sender.StartRpc(player.NetId, RpcCalls.Exiled)
-                .EndRpc();
+            if (Main.CurrentServerIsVanilla)
+            {
+                player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
+            }
+            else
+            {
+                sender.StartRpc(player.NetId, RpcCalls.Exiled)
+                    .EndRpc();
+            }
             RoleTypes role = Utils.GetRoleMap(pc.PlayerId, player.PlayerId).RoleType;
             sender.StartRpc(player.NetId, RpcCalls.SetRole)
                 .Write((ushort)role)
@@ -2214,5 +2232,14 @@ static class ExtendedPlayerControl
         writer.EndMessage();
         AmongUsClient.Instance.SendOrDisconnect(writer);
         writer.Recycle();
+    }
+
+    public static RoleTypes GetGhostRoleBasis(this PlayerControl player)
+    {
+        if (GhostRoleAssign.GhostGetPreviousRole.TryGetValue(player.PlayerId, out var role) && role.IsGhostRole())
+            return RoleTypes.GuardianAngel;
+        else if (player.GetCustomRole().IsImpostor())
+            return RoleTypes.ImpostorGhost;
+        else return RoleTypes.CrewmateGhost;
     }
 }

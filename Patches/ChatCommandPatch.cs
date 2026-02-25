@@ -1034,11 +1034,11 @@ internal class ChatCommands
                     var player = Utils.GetPlayerById(id);
                     if (player != null)
                     {
-                        player.Data.IsDead = true;
                         player.SetDeathReason(PlayerState.DeathReason.etc);
                         player.SetRealKiller(PlayerControl.LocalPlayer);
                         Main.PlayerStates[player.PlayerId].SetDead();
                         player.RpcExileV2();
+                        player.Data.IsDead = true;
                         MurderPlayerPatch.AfterPlayerDeathTasks(PlayerControl.LocalPlayer, player, GameStates.IsMeeting);
 
                         if (player.IsHost()) Utils.SendMessage(GetString("HostKillSelfByCommand"), title: $"<color=#ff0000>{GetString("DefaultSystemMessageTitle")}</color>");
@@ -3589,11 +3589,11 @@ internal class ChatCommands
                 var target = Utils.GetPlayerById(id);
                 if (target != null)
                 {
-                    target.Data.IsDead = true;
                     target.SetDeathReason(PlayerState.DeathReason.etc);
                     target.SetRealKiller(player);
                     Main.PlayerStates[target.PlayerId].SetDead();
                     target.RpcExileV2();
+                    target.Data.IsDead = true;
                     MurderPlayerPatch.AfterPlayerDeathTasks(target, target, GameStates.IsMeeting);
                     Utils.SendMessage(string.Format(GetString("Message.ExecutedNonHost"), target.Data.PlayerName, player.Data.PlayerName));
                 }

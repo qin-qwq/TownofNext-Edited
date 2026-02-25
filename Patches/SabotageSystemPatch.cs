@@ -129,13 +129,14 @@ public class SabotageSystemPatch
 
             foreach (var pc in Main.EnumerateAlivePlayerControls())
             {
-                ReportDeadBodyPatch.CanReport[pc.PlayerId] = false;
                 if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                 {
                     // Need for hiding player names if player is desync Impostor
                     Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: true, MushroomMixupIsActive: true);
                 }
             }
+
+            ReportDeadBodyPatch.CanReport.SetAllValues(false);
         }
     }
     [HarmonyPatch(typeof(MushroomMixupSabotageSystem), nameof(MushroomMixupSabotageSystem.Deteriorate))]
@@ -186,9 +187,11 @@ public class SabotageSystemPatch
 
                             // Reset Ability Cooldown To Default For Living Players
                             if (pc.GetCustomRole().GetRoleTypes() != RoleTypes.Engineer)
+                            {
                                 pc.RpcResetAbilityCooldown();
+                            }
 
-                            ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
+                            ReportDeadBodyPatch.CanReport.SetAllValues(true);
                         }
                     }, 1.2f, "Reset Ability Cooldown Arter Mushroom Mixup");
 
