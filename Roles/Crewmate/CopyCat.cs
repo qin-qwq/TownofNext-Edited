@@ -160,7 +160,8 @@ internal class CopyCat : RoleBase
                 CustomRoles.PlagueBearer => CustomRoles.Socialite, // 瘟疫使者 => 社交达人
                 CustomRoles.Demon => CustomRoles.Spy, // 玩家 => 间谍
                 CustomRoles.Maverick => CustomRoles.Vigilante, // 独行者 => 义务警员
-                CustomRoles.EvilHacker => CustomRoles.NiceHacker, // 邪恶黑客 => 正义黑客
+                CustomRoles.EvilHacker or CustomRoles.Glitch => CustomRoles.NiceHacker, // 邪恶黑客，混沌 => 正义黑客
+                CustomRoles.Inhibitor => CustomRoles.Catalyst, // 抑制者 => 催化者
                 _ => role
             };
         }

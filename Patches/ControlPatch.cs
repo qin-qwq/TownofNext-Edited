@@ -173,7 +173,7 @@ internal class ControllerManagerUpdatePatch
             }
 
             // Show chat
-            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift) && !Lovers.PreventModdedClientSee.GetBool())
+            if (GetKeysDown(KeyCode.Return, KeyCode.C, KeyCode.LeftShift))
             {
                 HudManager.Instance.Chat.SetVisible(true);
             }
@@ -242,7 +242,7 @@ internal class ControllerManagerUpdatePatch
             // Force start game       
             if (Input.GetKeyDown(KeyCode.LeftShift) && GameStates.IsCountDown && !HudManager.Instance.Chat.IsOpenOrOpening)
             {
-                var invalidColor = Main.AllPlayerControls.Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId).ToArray();
+                var invalidColor = Main.EnumeratePlayerControls().Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId).ToArray();
                 if (invalidColor.Any())
                 {
                     GameStartManager.Instance.ResetStartState(); //Hope this works
@@ -286,11 +286,11 @@ internal class ControllerManagerUpdatePatch
             // Host kill self
             if (GetKeysDown(KeyCode.LeftControl, KeyCode.LeftShift, KeyCode.E, KeyCode.Return) && GameStates.IsInGame)
             {
-                PlayerControl.LocalPlayer.Data.IsDead = true;
                 PlayerControl.LocalPlayer.SetDeathReason(PlayerState.DeathReason.etc);
                 PlayerControl.LocalPlayer.SetRealKiller(PlayerControl.LocalPlayer);
                 Main.PlayerStates[PlayerControl.LocalPlayer.PlayerId].SetDead();
                 PlayerControl.LocalPlayer.RpcExileV2();
+                PlayerControl.LocalPlayer.Data.IsDead = true;
                 MurderPlayerPatch.AfterPlayerDeathTasks(PlayerControl.LocalPlayer, PlayerControl.LocalPlayer, GameStates.IsMeeting);
 
                 Utils.SendMessage(GetString("HostKillSelfByCommand"), title: $"<color=#ff0000>{GetString("DefaultSystemMessageTitle")}</color>");

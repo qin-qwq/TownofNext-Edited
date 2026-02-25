@@ -139,7 +139,7 @@ internal class ChangeRoleSettings
 
             if (AmongUsClient.Instance.AmHost)
             {
-                var invalidColor = Main.AllPlayerControls.Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId);
+                var invalidColor = Main.EnumeratePlayerControls().Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId);
                 if (invalidColor.Any())
                 {
                     StringBuilder sb = new();
@@ -153,7 +153,7 @@ internal class ChangeRoleSettings
                 }
             }
 
-            foreach (var pc in Main.AllPlayerControls)
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
                 var outfit = pc.Data.DefaultOutfit;
                 var colorId = pc.Data.DefaultOutfit.ColorId;
@@ -177,7 +177,7 @@ internal class ChangeRoleSettings
                     }
                 }
 
-                foreach (var target in Main.AllPlayerControls)
+                foreach (var target in Main.EnumeratePlayerControls())
                 {
                     var pair = (target.PlayerId, pc.PlayerId);
                     Main.LastNotifyNames[pair] = currentName;
@@ -185,7 +185,7 @@ internal class ChangeRoleSettings
 
                 if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard && AmongUsClient.Instance.AmHost)
                 {
-                    foreach (var player in Main.AllPlayerControls)
+                    foreach (var player in Main.EnumeratePlayerControls())
                     {
                         if (player.Is(CustomRoles.GM)) continue;
 
@@ -250,6 +250,18 @@ internal class ChangeRoleSettings
 
             //Tag Mode
             TagMode.Init();
+
+            try
+            {
+                SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
+                MapRoomDoorsUpdatePatch.DoorTimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
+            }
+            catch (Exception e) { Utils.ThrowException(e); }
+            
+            SabotageMapPatch.TimerTexts = [];
+            MapRoomDoorsUpdatePatch.DoorTimerTexts = [];
+
+            Main.GameEndDueToTimer = false;
 
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
@@ -406,9 +418,21 @@ internal class StartGameHostPatch
             EAC.OriginalRoles = [];
 
             if (Options.DraftMode.GetBool())
-                DraftAssign.StartSelect();
-            else
-                RoleAssign.StartSelect();
+            {
+                foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
+                {
+                    if (pc != null && DraftAssign.DraftPools.ContainsKey(pc.PlayerId) && DraftAssign.DraftRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.NotAssigned)
+                        DraftAssign.DraftedRoles(pc, IRandom.Instance.Next(1, DraftAssign.DraftPools[pc.PlayerId].Count + 1), false);
+                }
+                foreach (var kvp in DraftAssign.DraftRoles.Where(x => x.Value != CustomRoles.NotAssigned))
+                {
+                    if (!RoleAssign.SetRoles.ContainsKey(kvp.Key))
+                    {
+                        RoleAssign.SetRoles[kvp.Key] = kvp.Value;
+                    }
+                }
+            }
+            RoleAssign.StartSelect();
             AddonAssign.StartSelect();
 
             // Set count Vanilla Roles
@@ -659,7 +683,7 @@ internal class SelectRolesPatch
                 Main.PlayerStates[PlayerControl.LocalPlayer.PlayerId].SetDead();
             }
 
-            foreach (var player in Main.AllPlayerControls)
+            foreach (var player in Main.EnumeratePlayerControls())
             {
                 if (!player.IsDisconnected() && TagManager.AssignGameMaster(player.FriendCode))
                 {
@@ -728,7 +752,7 @@ public static class RpcSetRoleReplacer
             {
                 var BaseRole = role.GetVNRole();
 
-                foreach (var target in Main.AllPlayerControls)
+                foreach (var target in Main.EnumeratePlayerControls())
                 {
                     RoleTypes targetRoleType = RoleTypes.Crewmate;
                     var targetCustomRole = RoleAssign.RoleResult.GetValueOrDefault(target.PlayerId, CustomRoles.CrewmateTONE);
@@ -752,7 +776,7 @@ public static class RpcSetRoleReplacer
 
                 if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom)
                 {
-                    foreach (var target in Main.AllPlayerControls)
+                    foreach (var target in Main.EnumeratePlayerControls())
                     {
                         if (target.PlayerId == player.PlayerId)
                         {
@@ -778,7 +802,7 @@ public static class RpcSetRoleReplacer
                 }
                 else
                 {
-                    foreach (var target in Main.AllPlayerControls)
+                    foreach (var target in Main.EnumeratePlayerControls())
                     {
                         if (target.PlayerId == player.PlayerId)
                         {
@@ -808,7 +832,7 @@ public static class RpcSetRoleReplacer
 
     public static void MakeDesyncSenders()
     {
-        foreach (var player in Main.AllPlayerControls)
+        foreach (var player in Main.EnumeratePlayerControls())
         {
             if (player.AmOwner)
             {

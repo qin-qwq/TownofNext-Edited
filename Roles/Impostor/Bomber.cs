@@ -65,7 +65,7 @@ internal class Bomber : RoleBase
         if (AmongUsClient.Instance.AmHost)
             _ = new Explosion(5f, 0.5f, shapeshifter.GetCustomPosition());
 
-        foreach (var target in Main.AllPlayerControls)
+        foreach (var target in Main.EnumeratePlayerControls())
         {
             if (!target.IsModded()) target.KillFlash();
             if (target.PlayerId == shapeshifter.PlayerId) continue;
@@ -86,7 +86,7 @@ internal class Bomber : RoleBase
         {
             _ = new LateTask(() =>
             {
-                var totalAlive = Main.AllAlivePlayerControls.Length;
+                var totalAlive = Main.AllAlivePlayerControls.Count;
                 if (totalAlive > 0 && !GameStates.IsEnded)
                 {
                     shapeshifter.SetDeathReason(PlayerState.DeathReason.Bombed);

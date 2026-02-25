@@ -1,6 +1,5 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
-using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -31,8 +30,7 @@ internal class Catalyst : RoleBase
             .SetValueFormat(OptionFormat.Times);
     }
     public override void Init()
-    {
-    }
+    { }
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(CatalyzeMax.GetInt());

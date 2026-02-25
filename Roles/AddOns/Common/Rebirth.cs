@@ -70,7 +70,7 @@ public class Rebirth : IAddon
             && !x.Is(CustomRoles.Lovers) 
             && !x.Is(CustomRoles.Romantic) 
             && !x.Is(CustomRoles.Doppelganger) 
-            && !x.GetCustomRole().IsImpostor() 
+            && !x.Is(CustomRoles.ChiefOfPolice) 
             && !x.Is(CustomRoles.Solsticer) 
             && !x.Is(CustomRoles.NiceMini);
     }
@@ -79,7 +79,7 @@ public class Rebirth : IAddon
     {
         NewExiledPlayer = default;
         if (!pc.Is(CustomRoles.Rebirth)) return false;
-        List<PlayerControl> list = [.. Main.AllAlivePlayerControls];
+        List<PlayerControl> list = [.. Main.EnumerateAlivePlayerControls()];
         if (OnlyVoted.GetBool())
         {
             list = [.. VotedCount[pc.PlayerId].Select(x => GetPlayerById(x))];

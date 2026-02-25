@@ -22,7 +22,7 @@ public static class GuessManager
     public static string GetFormatString()
     {
         string text = GetString("PlayerIdList");
-        foreach (var pc in Main.AllAlivePlayerControls.OrderBy(x => x.GetVisiblePlayerId()))
+        foreach (var pc in Main.EnumerateAlivePlayerControls().OrderBy(x => x.GetVisiblePlayerId()))
         {
             string id = pc.GetVisiblePlayerId().ToString();
             string name = pc.GetRealName();
@@ -456,8 +456,8 @@ public static class GuessManager
             // DEATH STUFF //
             GameEndCheckerForNormal.ShouldNotCheck = true;
             var amOwner = pc.AmOwner;
-            pc.Data.IsDead = true;
             pc.RpcExileV2();
+            pc.Data.IsDead = true;
             Main.PlayerStates[pc.PlayerId].SetDead();
             var meetingHud = MeetingHud.Instance;
             var hudManager = DestroyableSingleton<HudManager>.Instance;

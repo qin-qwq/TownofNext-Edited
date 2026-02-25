@@ -60,6 +60,7 @@ public static class AbilityUseManager
                 or CustomRoles.Keeper or CustomRoles.Collector or CustomRoles.Doomsayer or CustomRoles.Maverick
                 or CustomRoles.Pirate or CustomRoles.Pixie or CustomRoles.PunchingBag or CustomRoles.Seeker
                 or CustomRoles.Taskinator or CustomRoles.Vector or CustomRoles.Vulture or CustomRoles.Transporter
+                or CustomRoles.TreasureHunter or CustomRoles.Pyrophoric
                     => false,
 
             _ => true

@@ -16,6 +16,14 @@ internal class Miner : RoleBase
     //==================================================================\\
 
     private static OptionItem MinerSSCD;
+    private static OptionItem MinerMode;
+
+    [Obfuscation(Exclude = true)]
+    private enum MinerModeSelectList
+    {
+        Closest,
+        Farthest,
+    }
 
     public override void SetupCustomOption()
     {
@@ -23,6 +31,8 @@ internal class Miner : RoleBase
         MinerSSCD = FloatOptionItem.Create(Id + 3, GeneralOption.AbilityCooldown, new(1f, 180f, 1f), 15f, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Miner])
             .SetValueFormat(OptionFormat.Seconds);
+        MinerMode = StringOptionItem.Create(Id + 4, "MinerMode", EnumHelper.GetAllNames<MinerModeSelectList>(), 0, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Miner])
+                .SetHidden(false);
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
@@ -35,8 +45,16 @@ internal class Miner : RoleBase
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Retreat");
     public override bool OnCheckVanish(PlayerControl player)
     {
-        Vector2 closestVentPosition = player.GetClosestVent().transform.position;
-        player.RpcTeleport(closestVentPosition);
+        if (MinerMode.GetInt() == 0)
+        {
+            Vector2 closestVentPosition = player.GetClosestVent().transform.position;
+            player.RpcTeleport(closestVentPosition);
+        }
+        else
+        {
+            Vector2 farthestVentPosition = player.GetFarthestVent().transform.position;
+            player.RpcTeleport(farthestVentPosition);
+        }
         return false;
     }
 }

@@ -3,7 +3,6 @@ using TONE.Modules;
 using TONE.Roles.AddOns;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
-using TONE.Roles.Core.DraftAssign;
 using UnityEngine;
 
 namespace TONE;
@@ -74,8 +73,8 @@ public static class Options
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
     public static OptionItem DraftableCount;
+    public static OptionItem DraftAffectedByRoleSpawnChances;
     //public static OptionItem BucketCount;
-    public static OptionItem DraftDeck;
 
     // 役職数・確率
     public static Dictionary<CustomRoles, int> roleCounts;
@@ -145,8 +144,10 @@ public static class Options
     ];
     public static readonly string[] PetToAssign =
     [
+        "pet_Lava",
         "pet_GoosePet",
         "pet_Pusheen",
+        "pet_stardew_junimo",
         "pet_RANDOM_FOR_EVERYONE"
     ];
     [Obfuscation(Exclude = true)]
@@ -583,6 +584,9 @@ public static class Options
     public static OptionItem UsePets;
     public static OptionItem PetToAssignToEveryone;
     public static OptionItem CancelPetAnimation;
+    public static OptionItem EnableImpostorChannel;
+    public static OptionItem EnableGameTimeLimit;
+    public static OptionItem GameTimeLimit;
 
     // ------------ General Role Settings ------------
 
@@ -631,22 +635,7 @@ public static class Options
     public static OptionItem NoLimitAddonsNumMax;
     public static OptionItem RemoveIncompatibleAddOnsMidGame;
 
-    // Add-Ons settings 
-    public static OptionItem LoverSpawnChances;
-    public static OptionItem LoverKnowRoles;
-    public static OptionItem LoverSuicide;
-    public static OptionItem PrivateChat;
-    public static OptionItem PreventModdedClientSee;
-    public static OptionItem ImpCanBeInLove;
-    public static OptionItem CrewCanBeInLove;
-    public static OptionItem NeutralCanBeInLove;
-    public static OptionItem CovenCanBeInLove;
-
-    // Experimental Roles
-
-    //public static OptionItem SpeedBoosterUpSpeed;
-    //public static OptionItem SpeedBoosterTimes;
-
+    public static OptionItem DumpLogAfterGameEnd;
 
     public static VoteMode GetWhenSkipVote() => (VoteMode)WhenSkipVote.GetValue();
     public static VoteMode GetWhenNonVote() => (VoteMode)WhenNonVote.GetValue();
@@ -747,7 +736,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 34100 last id for roles/add-ons (Next use 34200)
+        // 34200 last id for roles/add-ons (Next use 34300)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -1318,6 +1307,8 @@ public static class Options
         LowLoadMode = BooleanOptionItem.Create(60230, "LowLoadMode", true, TabGroup.SystemSettings, false)
             .SetHeader(true)
             .SetColor(Color.green);
+        DumpLogAfterGameEnd = BooleanOptionItem.Create(19327, "DumpLogAfterGameEnd", true, TabGroup.SystemSettings, false)
+            .SetColor(Color.yellow);
         EndWhenPlayerBug = BooleanOptionItem.Create(60240, "EndWhenPlayerBug", true, TabGroup.SystemSettings, false)
             .SetColor(Color.blue);
         HideExileChat = BooleanOptionItem.Create(60292, "HideExileChat", true, TabGroup.SystemSettings, false)
@@ -1421,14 +1412,12 @@ public static class Options
 
         DraftableCount = IntegerOptionItem.Create(61002, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetParent(DraftMode);
+            .SetParent(DraftMode)
+            .SetValueFormat(OptionFormat.Pieces);
 
-        DraftAssign.LoadRoleDecks();
-        DraftDeck = StringOptionItem.Create(61003, "DraftDeck", DraftAssign.RoleDecks.Keys.ToArray(), 0, TabGroup.ModSettings, false, useGetString: false)
+        DraftAffectedByRoleSpawnChances = BooleanOptionItem.Create(61004, "DraftAffectedByRoleSpawnChances", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode);
-
-        Logger.Info("Draft Bucket Options set up", "OptionsHolder.CoLoadOptions");
 
         Logger.Info("End of Draft Setup", "Draft Setup");
 
@@ -2210,16 +2199,31 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         // 技能设置
-        UsePets = BooleanOptionItem.Create(61004, "UsePets", false, TabGroup.ModSettings, false)
+        UsePets = BooleanOptionItem.Create(61100, "UsePets", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        PetToAssignToEveryone = StringOptionItem.Create(61005, "PetToAssign", PetToAssign, PetToAssign.Length, TabGroup.ModSettings, false)
+        PetToAssignToEveryone = StringOptionItem.Create(61101, "PetToAssign", PetToAssign, PetToAssign.Length, TabGroup.ModSettings, false)
             .SetParent(UsePets)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        CancelPetAnimation = BooleanOptionItem.Create(61006, "CancelPetAnimation", true, TabGroup.ModSettings, false)
+        CancelPetAnimation = BooleanOptionItem.Create(61102, "CancelPetAnimation", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+
+        EnableImpostorChannel = BooleanOptionItem.Create(61103, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+
+        EnableGameTimeLimit = BooleanOptionItem.Create(19329, "EnableGameTimeLimit", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetHeader(true)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        GameTimeLimit = FloatOptionItem.Create(19330, "GameTimeLimit", new(60f, 3600f, 60f), 900f, TabGroup.ModSettings, false)
+            .SetParent(EnableGameTimeLimit)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 
@@ -2248,61 +2252,6 @@ public static class Options
         {
             CustomGhostRoleCounts.Add(role, countOption);
         }
-
-        CustomRoleSpawnChances.Add(role, spawnOption);
-        CustomRoleCounts.Add(role, countOption);
-    }
-    private static void SetupLoversRoleOptionsToggle(int id, CustomGameMode customGameMode = CustomGameMode.Standard)
-    {
-        var role = CustomRoles.Lovers;
-        var spawnOption = StringOptionItem.Create(id, role.ToString(), EnumHelper.GetAllNames<RatesZeroOne>(), 0, TabGroup.Addons, false).SetColor(Utils.GetRoleColor(role))
-            .SetHeader(true)
-            .SetGameMode(customGameMode) as StringOptionItem;
-
-        LoverSpawnChances = IntegerOptionItem.Create(id + 2, "LoverSpawnChances", new(0, 100, 5), 50, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-            .SetValueFormat(OptionFormat.Percent)
-            .SetGameMode(customGameMode);
-
-        LoverKnowRoles = BooleanOptionItem.Create(id + 4, "LoverKnowRoles", true, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-            .SetGameMode(customGameMode);
-
-        LoverSuicide = BooleanOptionItem.Create(id + 3, "LoverSuicide", true, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-            .SetGameMode(customGameMode);
-
-        PrivateChat = BooleanOptionItem.Create(id + 5, "PrivateChat", false, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-        .SetColor(Color.green)
-            .SetGameMode(customGameMode);
-
-        PreventModdedClientSee = BooleanOptionItem.Create(id + 6, "PreventModdedClientSee", false, TabGroup.Addons, false)
-        .SetParent(PrivateChat)
-        .SetColor(Color.green)
-            .SetGameMode(customGameMode);
-
-        ImpCanBeInLove = BooleanOptionItem.Create(id + 7, "ImpCanBeInLove", true, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-            .SetGameMode(customGameMode);
-
-        CrewCanBeInLove = BooleanOptionItem.Create(id + 8, "CrewCanBeInLove", true, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-            .SetGameMode(customGameMode);
-
-        NeutralCanBeInLove = BooleanOptionItem.Create(id + 9, "NeutralCanBeInLove", true, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-            .SetGameMode(customGameMode);
-
-        CovenCanBeInLove = BooleanOptionItem.Create(id + 10, "CovenCanBeInLove", true, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-            .SetGameMode(customGameMode);
-
-
-        var countOption = IntegerOptionItem.Create(id + 1, "NumberOfLovers", new(2, 2, 1), 2, TabGroup.Addons, false)
-            .SetParent(spawnOption)
-            .SetHidden(true)
-            .SetGameMode(customGameMode);
 
         CustomRoleSpawnChances.Add(role, spawnOption);
         CustomRoleCounts.Add(role, countOption);

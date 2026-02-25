@@ -157,7 +157,7 @@ internal class Sniper : RoleBase
 
         snipePos -= dir;
 
-        foreach (var target in Main.AllAlivePlayerControls)
+        foreach (var target in Main.EnumerateAlivePlayerControls())
         {
             if (target.PlayerId == sniper.PlayerId) continue;
             var target_pos = target.transform.position - snipePos;
@@ -201,7 +201,7 @@ internal class Sniper : RoleBase
         phantom.RPCPlayCustomSound("AWP");
 
         var validTargets = new List<PlayerControl>();
-        foreach (var target in Main.AllAlivePlayerControls)
+        foreach (var target in Main.EnumerateAlivePlayerControls())
         {
             if (target.PlayerId == phantom.PlayerId) continue;
 
@@ -360,7 +360,7 @@ internal class Sniper : RoleBase
         FinishSniper = false;
         if (UsePhantomBasis.GetBool())
         {
-            foreach (var pc in Main.AllPlayerControls)
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
                 LocateArrow.RemoveAllTarget(pc.PlayerId);
             }

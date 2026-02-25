@@ -43,11 +43,6 @@ internal class Balancer : RoleBase
         Target2 = 253;
     }
 
-    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
-    {
-        CheckVote(pc, target);
-    }
-
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
         if (Choose) return true;
@@ -86,6 +81,46 @@ internal class Balancer : RoleBase
         return false;
     }
 
+    public static void BalancerMsg(PlayerControl voter, PlayerControl target)
+    {
+        if (Choose) return;
+        if (voter.GetAbilityUseLimit() < 1) return;
+        if (voter == null || target == null) return;
+        if (!voter.IsAlive())
+        {
+            SendMessage(GetString("BalancerDead"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+            return;
+        }
+        if (Target1 != 253)
+        {
+            Target2 = target.PlayerId;
+            if (Target1 == Target2)
+            {
+                SendMessage(GetString("Choose1=2"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+                Target1 = 253;
+                Target2 = 253;
+                return;
+            }
+            var Tar1 = GetPlayerById(Target1);
+            if (!Tar1.IsAlive())
+            {
+                Target1 = 253;
+                Target2 = 253;
+                SendMessage(string.Format(GetString("Choose1IsDead"), target.GetRealName()), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+                return;
+            }
+            voter.RpcRemoveAbilityUse();
+            List<MeetingHud.VoterState> statesList = [];
+            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+            MeetingHud.Instance.RpcClose();
+            Choose = true;
+            Choose2 = true;
+            return;
+        }
+        Target1 = target.PlayerId;
+        SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+    }
+
     public override void OnMeetingHudStart(PlayerControl pc)
     {
         var Tar1 = GetPlayerById(Target1);
@@ -105,19 +140,15 @@ internal class Balancer : RoleBase
 
         if (Target1 == deadid)
         {
-            //TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target2);
             List<MeetingHud.VoterState> statesList = [];
             MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target2.GetPlayer().Data, false);
             ConfirmEjections(Target2.GetPlayer().Data);
-            //MeetingHud.Instance.RpcClose();
         }
         if (Target2 == deadid)
         {
-            //TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, Target1);
             List<MeetingHud.VoterState> statesList = [];
             MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target1.GetPlayer().Data, false);
             ConfirmEjections(Target1.GetPlayer().Data);
-            //MeetingHud.Instance.RpcClose();
         }
     }
     public static void BalancerAfterMeetingTasks()
@@ -127,11 +158,10 @@ internal class Balancer : RoleBase
         var Tar2 = GetPlayerById(Target2);
         if (CustomRoles.Death.RoleExist() && !Tar1.Is(CustomRoles.Death) && !Tar2.Is(CustomRoles.Death))
         {
-            foreach (var Tar3 in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Death)))
+            foreach (var Tar3 in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Death)))
             if (!CustomWinnerHolder.CheckForConvertedWinner(Tar3.PlayerId))
             {
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Apocalypse);
-                Main.AllPlayerControls.Where(x => x.GetCustomRole().IsNA() && !x.IsAnySubRole(x => x.IsConverted())).Do(x => CustomWinnerHolder.WinnerIds.Add(x.PlayerId));
             }
             return;
         }
@@ -156,36 +186,7 @@ internal class Balancer : RoleBase
         byte targetId = reader.ReadByte();
         var target = GetPlayerById(targetId);
 
-        if (Target1 != 253)
-        {
-            Target2 = targetId;
-            if (Target1 == Target2)
-            {
-                SendMessage(GetString("Choose1=2"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
-                Target1 = 253;
-                Target2 = 253;
-                return;
-            }
-            var Tar1 = GetPlayerById(Target1);
-            if (!Tar1.IsAlive())
-            {
-                Target1 = 253;
-                Target2 = 253;
-                SendMessage(string.Format(GetString("Choose1IsDead"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
-                return;
-            }
-            pc.RpcRemoveAbilityUse();
-
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
-
-            Choose = true;
-            Choose2 = true;
-            return;
-        }
-        Target1 = targetId;
-        SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+        BalancerMsg(pc, target);
     }
 
     private static void BalancerOnClick(byte targetId /*, MeetingHud __instance*/)
@@ -193,41 +194,8 @@ internal class Balancer : RoleBase
         Logger.Msg($"Click: ID {targetId}", "Balancer UI");
         var target = targetId.GetPlayer();
         if (target == null || !target.IsAlive() || !GameStates.IsVoting || PlayerControl.LocalPlayer.GetAbilityUseLimit() < 1) return;
-        if (!AmongUsClient.Instance.AmHost)
-        {
-            SendRPC(targetId);
-            return;
-        }
-        if (Target1 != 253)
-        {
-            Target2 = targetId;
-            if (Target1 == Target2)
-            {
-                SendMessage(GetString("Choose1=2"), PlayerControl.LocalPlayer.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
-                Target1 = 253;
-                Target2 = 253;
-                return;
-            }
-            var Tar1 = GetPlayerById(Target1);
-            if (!Tar1.IsAlive())
-            {
-                Target1 = 253;
-                Target2 = 253;
-                SendMessage(string.Format(GetString("Choose1IsDead"), target.GetRealName()), PlayerControl.LocalPlayer.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
-                return;
-            }
-            PlayerControl.LocalPlayer.RpcRemoveAbilityUse();
-
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
-
-            Choose = true;
-            Choose2 = true;
-            return;
-        }
-        Target1 = targetId;
-        SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), PlayerControl.LocalPlayer.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+        if (AmongUsClient.Instance.AmHost) BalancerMsg(PlayerControl.LocalPlayer, target);
+        else SendRPC(targetId);
     }
 
     [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
@@ -248,13 +216,33 @@ internal class Balancer : RoleBase
 
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
             GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
+            targetBox.name = "BalancerButton";
             targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
             SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
             renderer.sprite = CustomButton.Get("BalancerIcon");
+            if (Target1 == pva.TargetPlayerId || Target2 == pva.TargetPlayerId) renderer.color = Color.green;
             PassiveButton button = targetBox.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => BalancerOnClick(pva.TargetPlayerId/*, __instance*/)));
+        }
+    }
+    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
+    class UpdateMeetingPatch
+    {
+        public static void Postfix(MeetingHud __instance)
+        {
+            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0 && !Choose)
+                UpdateBalancerButton(__instance);
+        }
+    }
+    public static void UpdateBalancerButton(MeetingHud __instance)
+    {
+        foreach (var pva in __instance.playerStates)
+        {
+            var button = pva?.transform?.FindChild("BalancerButton")?.gameObject;
+            if (!button) continue;
+            if (Target1 == pva.TargetPlayerId || Target2 == pva.TargetPlayerId) button.GetComponent<SpriteRenderer>().color = Color.green;
+            else button.GetComponent<SpriteRenderer>().color = Color.white;
         }
     }
 }

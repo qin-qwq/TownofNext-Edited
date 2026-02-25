@@ -47,7 +47,7 @@ public class Bait : IAddon
     {
         if (MeetingStates.FirstMeeting && CustomRoles.Bait.RoleExist() && BaitNotification.GetBool())
         {
-            foreach (var pc in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Bait) && !BaitAlive.Contains(x.PlayerId)).ToArray())
+            foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Bait) && !BaitAlive.Contains(x.PlayerId)).ToArray())
             {
                 BaitAlive.Add(pc.PlayerId);
             }
@@ -64,36 +64,32 @@ public class Bait : IAddon
     }
     public static void BaitAfterDeathTasks(PlayerControl killer, PlayerControl target)
     {
-        if (killer.PlayerId == target.PlayerId)
+        _ = new LateTask(() =>
         {
-            if (target.GetRealKiller() != null)
+            var realkiller = target.GetRealKiller();
+
+            if (realkiller.PlayerId == target.PlayerId || !realkiller.IsAlive() || realkiller == null) return;
+
+            if (realkiller.Is(CustomRoles.KillingMachine)
+                || realkiller.Is(CustomRoles.Swooper)
+                || realkiller.Is(CustomRoles.Cleaner)
+                || realkiller.Is(CustomRoles.Swift)
+                || (DisableReportWhenCC.GetBool() && Utils.IsActive(SystemTypes.Comms) && Camouflage.IsActive && !BaitCanBeReportedUnderAllConditions.GetBool())
+                || (realkiller.Is(CustomRoles.Oblivious) && Oblivious.ObliviousBaitImmune.GetBool()))
+                return;
+
             {
-                if (!target.GetRealKiller().IsAlive()) return;
-                killer = target.GetRealKiller();
+                realkiller.RPCPlayCustomSound("Congrats");
+                target.RPCPlayCustomSound("Congrats");
+                float delay;
+                if (BaitDelayMax.GetFloat() < BaitDelayMin.GetFloat()) delay = 0f;
+                else delay = IRandom.Instance.Next((int)BaitDelayMin.GetFloat(), (int)BaitDelayMax.GetFloat() + 1);
+                delay = Math.Max(delay, 0.15f);
+                if (delay > 0.15f && BaitDelayNotify.GetBool()) realkiller.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Bait), string.Format(GetString("KillBaitNotify"), (int)delay)), delay);
+                Logger.Info($"{realkiller.GetNameWithRole()} 击杀诱饵 => {target.GetNameWithRole()}", "MurderPlayer");
+                _ = new LateTask(() => { if (GameStates.IsInTask && GameStates.IsInGame) realkiller?.CmdReportDeadBody(target.Data); }, delay, "Bait Self Report");
             }
-        }
-
-        if (killer.PlayerId == target.PlayerId) return;
-
-        if (killer.Is(CustomRoles.KillingMachine)
-            || killer.Is(CustomRoles.Swooper)
-            || killer.Is(CustomRoles.Cleaner)
-            || killer.Is(CustomRoles.Swift)
-            || (DisableReportWhenCC.GetBool() && Utils.IsActive(SystemTypes.Comms) && Camouflage.IsActive && !BaitCanBeReportedUnderAllConditions.GetBool())
-            || (killer.Is(CustomRoles.Oblivious) && Oblivious.ObliviousBaitImmune.GetBool()))
-            return;
-
-        {
-            killer.RPCPlayCustomSound("Congrats");
-            target.RPCPlayCustomSound("Congrats");
-            float delay;
-            if (BaitDelayMax.GetFloat() < BaitDelayMin.GetFloat()) delay = 0f;
-            else delay = IRandom.Instance.Next((int)BaitDelayMin.GetFloat(), (int)BaitDelayMax.GetFloat() + 1);
-            delay = Math.Max(delay, 0.15f);
-            if (delay > 0.15f && BaitDelayNotify.GetBool()) killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Bait), string.Format(GetString("KillBaitNotify"), (int)delay)), delay);
-            Logger.Info($"{killer.GetNameWithRole()} 击杀诱饵 => {target.GetNameWithRole()}", "MurderPlayer");
-            _ = new LateTask(() => { if (GameStates.IsInTask && GameStates.IsInGame) killer?.CmdReportDeadBody(target.Data); }, delay, "Bait Self Report");
-        }
+        }, 0.01f);
     }
 }
 

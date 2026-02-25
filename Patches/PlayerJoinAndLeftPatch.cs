@@ -12,6 +12,7 @@ using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Core.DraftAssign;
 using TONE.Roles.Crewmate;
+using TONE.Roles.Neutral;
 using static TONE.Translator;
 
 namespace TONE;
@@ -46,6 +47,7 @@ class OnGameJoinedPatch
         Main.AllClientRealNames.Clear();
         FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
         Utils.GetRegionName(ServerManager.Instance.CurrentRegion ?? null);
+        Main.GameTimer = 0f;
 
         if (AmongUsClient.Instance.AmHost) // Execute the following only on the Host
         {
@@ -64,9 +66,9 @@ class OnGameJoinedPatch
 
             GameStartManagerPatch.GameStartManagerUpdatePatch.exitTimer = -1;
             Main.DoBlockNameChange = false;
-            DraftAssign.Reset();
             RoleAssign.SetRoles = [];
             AddonAssign.SetAddOns = [];
+            DraftAssign.Reset();
             GhostRoleAssign.forceRole = [];
             EAC.DeNum = new();
             Main.AllPlayerNames.Clear();
@@ -402,6 +404,16 @@ class OnPlayerLeftPatch
                     //     Main.LoversPlayers.Remove(lovers);
                     //     Main.PlayerStates[lovers.PlayerId].RemoveSubRole(CustomRoles.Lovers);
                     // }
+                }
+
+                if (data.Character.Is(CustomRoles.Jackal) && !data.Character.Data.IsDead)
+                {
+                    Jackal.OnJackalLeft(data.Character);
+                }
+
+                if (data.Character.Is(CustomRoles.Sheriff) && !data.Character.Data.IsDead)
+                {
+                    Sheriff.OnSheriffLeft();
                 }
 
                 Spiritualist.RemoveTarget(data.Character.PlayerId);

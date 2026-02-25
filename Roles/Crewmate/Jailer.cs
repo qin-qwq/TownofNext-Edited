@@ -29,6 +29,7 @@ internal class Jailer : RoleBase
     private static OptionItem CovenCanBeExe;
     private static OptionItem CKCanBeExe;
     private static OptionItem NotifyJailedOnMeetingOpt;
+    public static OptionItem EnableJailerChannel;
 
     private static readonly Dictionary<byte, int> JailerTarget = [];
     private static readonly Dictionary<byte, bool> JailerHasExe = [];
@@ -49,6 +50,7 @@ internal class Jailer : RoleBase
         CovenCanBeExe = BooleanOptionItem.Create(Id + 19, "JailerCovenCanBeExe", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jailer]);
         CKCanBeExe = BooleanOptionItem.Create(Id + 16, "JailerCKCanBeExe", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jailer]);
         NotifyJailedOnMeetingOpt = BooleanOptionItem.Create(Id + 18, "notifyJailedOnMeeting", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jailer]);
+        EnableJailerChannel = BooleanOptionItem.Create(Id + 20, "EnableJailerChannel", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jailer]);
     }
 
     public override void Init()
@@ -98,7 +100,7 @@ internal class Jailer : RoleBase
     {
         if (killer == null || target == null) return false;
 
-        if (JailerTarget[killer.PlayerId] != byte.MaxValue)
+        if (JailerTarget.TryGetValue(killer.PlayerId, out var pc) && pc != byte.MaxValue)
         {
             killer.Notify(GetString("JailerTargetAlreadySelected"));
             return false;
@@ -203,4 +205,33 @@ internal class Jailer : RoleBase
         hud.KillButton.OverrideText(GetString("JailorKillButtonText"));
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("penitentiary");
+
+    public static bool JailerChannel(PlayerControl pc, string msg, bool check = true)
+    {
+        if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || pc == null) return false;
+        if (!pc.Is(CustomRoles.Jailer) && !IsTarget(pc.PlayerId)) return false;
+        if (!EnableJailerChannel.GetBool()) return false;
+        if (!pc.IsAlive()) return false;
+        msg = msg.ToLower().Trim();
+        if (check)
+        {
+            if (!GuessManager.CheckCommond(ref msg, "ji|狱警", false)) return false;
+        }
+
+        if (string.IsNullOrEmpty(msg)) return false;
+
+        if (pc.Is(CustomRoles.Jailer))
+        {
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
+                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")}"), sendTo: x.PlayerId, noReplay: true));
+        }
+        else
+        {
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
+                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));            
+        }
+
+        return true;
+    }
 }

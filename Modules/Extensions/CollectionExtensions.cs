@@ -27,6 +27,18 @@ public static class CollectionExtensions
         return default;
     }
     /// <summary>
+    ///     Sets the value for all existing keys in a dictionary to a specific value
+    /// </summary>
+    /// <param name="dictionary"></param>
+    /// <param name="value"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    public static void SetAllValues<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
+    {
+        foreach (TKey key in dictionary.Keys.ToArray())
+            dictionary[key] = value;
+    }
+    /// <summary>
     /// Returns a random element from a collection
     /// </summary>
     /// <param name="collection">The collection</param>
@@ -200,4 +212,61 @@ public static class CollectionExtensions
     /// </summary>
     public static byte First(this HashSet<byte> source)
         => source.ToArray().First();
+
+    #region Partition
+
+    /// <summary>
+    ///     Partitions a collection into a specified number of parts
+    /// </summary>
+    /// <param name="collection">The collection to partition</param>
+    /// <param name="parts">The number of parts to partition the collection into</param>
+    /// <typeparam name="T">The type of the elements in the collection</typeparam>
+    /// <returns>A collection of collections, each containing a part of the original collection</returns>
+    public static IEnumerable<IEnumerable<T>> Partition<T>(this IEnumerable<T> collection, int parts)
+    {
+        List<T> list = collection.ToList();
+        int length = list.Count;
+        if (parts <= 0 || length == 0) yield break;
+
+        if (parts > length) parts = length;
+
+        int size = length / parts;
+        int remainder = length % parts;
+        var index = 0;
+
+        for (var i = 0; i < parts; i++)
+        {
+            int partSize = size + (i < remainder ? 1 : 0);
+            yield return list.Skip(index).Take(partSize);
+            index += partSize;
+        }
+    }
+
+    /// <summary>
+    ///     Partitions a list into a specified number of parts
+    /// </summary>
+    /// <param name="collection">The list to partition</param>
+    /// <param name="parts">The number of parts to partition the list into</param>
+    /// <typeparam name="T">The type of the elements in the list</typeparam>
+    /// <returns>A list of lists, each containing a part of the original list</returns>
+    public static IEnumerable<IEnumerable<T>> Partition<T>(this IList<T> collection, int parts)
+    {
+        int length = collection.Count;
+        if (parts <= 0 || length == 0) yield break;
+
+        if (parts > length) parts = length;
+
+        int size = length / parts;
+        int remainder = length % parts;
+        var index = 0;
+
+        for (var i = 0; i < parts; i++)
+        {
+            int partSize = size + (i < remainder ? 1 : 0);
+            yield return collection.Skip(index).Take(partSize);
+            index += partSize;
+        }
+    }
+
+    #endregion
 }

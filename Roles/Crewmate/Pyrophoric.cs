@@ -108,7 +108,7 @@ internal partial class Pyrophoric : RoleBase
     {
         if (Revenge)
         {
-            var pcList = Main.AllAlivePlayerControls.Where(pc => !Medic.IsProtected(pc.PlayerId) && !pc.GetCustomRole().IsTNA() && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)).ToList();
+            var pcList = Main.EnumerateAlivePlayerControls().Where(pc => !Medic.IsProtected(pc.PlayerId) && !pc.GetCustomRole().IsTNA() && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)).ToList();
             if (pcList.Any())
             {
                 PlayerControl re = pcList.RandomElement();
@@ -116,6 +116,7 @@ internal partial class Pyrophoric : RoleBase
                 re.RpcExileV2();
                 re.SetRealKiller(_Player);
                 Main.PlayerStates[re.PlayerId].SetDead();
+                MurderPlayerPatch.AfterPlayerDeathTasks(_Player, re, inMeeting: false, fromRole: true);
                 Revenge = false;
             }
         }
@@ -140,6 +141,7 @@ internal partial class Pyrophoric : RoleBase
         if (target.IsDisconnected()) return;
         if (!PyrophoricCanKill.GetBool()) return;
         if (!InPyrophoric) return;
+        if (killer == target || !killer || !target) return;
 
         killer.RpcMurderPlayer(killer);
         killer.SetDeathReason(PlayerState.DeathReason.Torched);

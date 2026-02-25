@@ -102,7 +102,6 @@ internal class Dreamer : RoleBase
             if (SkillTime.Item2 <= 0)
             {
                 pc.RevertFreeze(RealPosition);
-                pc.RpcResetAbilityCooldown();
                 SkillTime = (false, 0f);
                 pc.MarkDirtySettings();
             }

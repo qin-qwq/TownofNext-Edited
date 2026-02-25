@@ -75,7 +75,7 @@ public static class InGameRoleInfoMenu
 
         settings.Append("</size>");
         if (settings.Length > 0) addons.Append($"{settings}\n\n");
-        if (player.PetActivatedAbility()) sb.Append($"<size=50%>{GetString("SupportsPetMessage")}</size>");
+        if (player.PetActivatedAbility()) sb.Append($"<size=70%>{GetString("SupportsPetMessage")}</size>");
 
         string searchStr = GetString(role.ToString());
         sb.Replace(searchStr, role.ToColoredString());

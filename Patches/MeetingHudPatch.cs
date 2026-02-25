@@ -18,6 +18,29 @@ using static TONE.Utils;
 
 namespace TONE;
 
+[HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.PopulateResults))]
+class MeetingHudPopulateVotesPatch
+{
+    public static void Prefix(MeetingHud __instance)
+    {
+        PlayerVoteArea swapped1 = null;
+        PlayerVoteArea swapped2 = null;
+
+        if (Swapper.Vote.Item1 != 253 && Swapper.Vote.Item2 != 253 && Swapper.Vote.Item1 != Swapper.Vote.Item2)
+        {
+            swapped1 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.Vote.Item1);
+            swapped2 = CheckForEndVotingPatch.GetPlayerVoteArea(Swapper.Vote.Item2);
+        }
+
+        var doSwap = swapped1 != null && swapped2 != null && !swapped1.AmDead && !swapped2.AmDead;
+
+        if (doSwap)
+        {
+            __instance.StartCoroutine(Effects.Slide3D(swapped1.transform, swapped1.transform.localPosition, swapped2.transform.localPosition, 1.5f));
+            __instance.StartCoroutine(Effects.Slide3D(swapped2.transform, swapped2.transform.localPosition, swapped1.transform.localPosition, 1.5f));
+        }
+    }
+}
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CheckForEndVoting))]
 class CheckForEndVotingPatch
 {
@@ -241,6 +264,9 @@ class CheckForEndVotingPatch
 
                 // Swapper swap votes
                 if (voter.GetRoleClass() is Swapper sw) sw.SwapVotes(__instance);
+
+                // Speaker swap votes
+                if (voter.GetRoleClass() is Speaker sp) sp.SwapVotes(__instance);
 
                 playerRoleClass?.AddVisualVotes(ps, ref statesList);
 
@@ -506,7 +532,7 @@ class CheckForEndVotingPatch
             goto EndOfSession;
         }
 
-        foreach (var pc in Main.AllAlivePlayerControls)
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             var pc_role = pc.GetCustomRole();
             if (pc_role.IsImpostorTeamV3() && !pc.Is(CustomRoles.Narc) && pc != exiledPlayer.Object)
@@ -642,7 +668,7 @@ class CheckForEndVotingPatch
     }
     public static bool CheckRole(byte id, CustomRoles role)
     {
-        var player = Main.AllPlayerControls.FirstOrDefault(pc => pc.PlayerId == id);
+        var player = Main.EnumeratePlayerControls().FirstOrDefault(pc => pc.PlayerId == id);
         return player != null && player.Is(role);
     }
     public static PlayerVoteArea GetPlayerVoteArea(byte playerId)
@@ -690,7 +716,7 @@ class CheckForEndVotingPatch
     {
         if (deathReason == PlayerState.DeathReason.Vote)
         {
-            foreach (var player in Main.AllPlayerControls)
+            foreach (var player in Main.EnumeratePlayerControls())
             {
                 player.GetRoleClass()?.OnCheckForEndVoting(deathReason, playerIds);
             }
@@ -723,7 +749,7 @@ class CheckForEndVotingPatch
     private static PlayerControl PickRevengeTarget(PlayerControl exiledplayer)
     {
         List<PlayerControl> TargetList = [];
-        foreach (var candidate in Main.AllAlivePlayerControls)
+        foreach (var candidate in Main.EnumerateAlivePlayerControls())
         {
             if (candidate.PlayerId == exiledplayer.PlayerId || Main.AfterMeetingDeathPlayers.ContainsKey(candidate.PlayerId)) continue;
         }
@@ -946,7 +972,6 @@ static class ExtendedMeetingHud
 
                 if (CheckForEndVotingPatch.CheckRole(ps.TargetPlayerId, CustomRoles.VoidBallot)) VoteNum = 0;
                 if (Dreamweaver.IsInsomnia(ps.TargetPlayerId)) VoteNum = 0;
-                if (Speaker.IsSpoken(ps.TargetPlayerId)) VoteNum = 0;
 
                 if (Jailer.IsTarget(ps.VotedFor) || Jailer.IsTarget(ps.TargetPlayerId)) VoteNum = 0; //jailed can't vote and can't get voted
 
@@ -996,10 +1021,10 @@ class MeetingHudStartPatch
 
         // Description in first meeting
         if (Options.SendRoleDescriptionFirstMeeting.GetBool() && MeetingStates.FirstMeeting)
-            foreach (var pc in Main.AllAlivePlayerControls.Where(x => !x.IsModded()).ToArray())
+            foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => !x.IsModded()).ToArray())
             {
                 var role = pc.GetCustomRole();
-                var Des = pc.PetActivatedAbility() ? pc.GetRoleInfo(true) + $"<size=50%>{GetString("SupportsPetMessage")}</size>" : pc.GetRoleInfo(true);
+                var Des = pc.PetActivatedAbility() ? pc.GetRoleInfo(true) + $"<size=70%>{GetString("SupportsPetMessage")}</size>" : pc.GetRoleInfo(true);
                 var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                 var Conf = new StringBuilder();
                 var Sub = new StringBuilder();
@@ -1077,7 +1102,7 @@ class MeetingHudStartPatch
         }
 
         string MimicMsg = "";
-        foreach (var pc in Main.AllPlayerControls)
+        foreach (var pc in Main.EnumeratePlayerControls())
         {
             pc?.GetRoleClass()?.OnMeetingHudStart(pc);
             Main.PlayerStates.Do(plr => plr.Value.RoleClass.OnOthersMeetingHudStart(pc));
@@ -1098,7 +1123,7 @@ class MeetingHudStartPatch
 
             // Check Mimic kill
             if (pc.Is(CustomRoles.Mimic) && !pc.IsAlive())
-                Main.AllAlivePlayerControls.Where(x => x.GetRealKiller()?.PlayerId == pc.PlayerId).Do(x => MimicMsg += $"\n{x.GetNameWithRole(true)}");
+                Main.EnumerateAlivePlayerControls().Where(x => x.GetRealKiller()?.PlayerId == pc.PlayerId).Do(x => MimicMsg += $"\n{x.GetNameWithRole(true)}");
         }
 
         if (Rat.IsEnable)
@@ -1112,7 +1137,7 @@ class MeetingHudStartPatch
         {
             MimicMsg = GetString("MimicDeadMsg") + "\n" + MimicMsg;
 
-            var isImpostorTeamList = Main.AllPlayerControls.Where(x => x.GetCustomRole().IsImpostorTeam()).ToArray();
+            var isImpostorTeamList = Main.EnumeratePlayerControls().Where(x => x.GetCustomRole().IsImpostorTeam()).ToArray();
             foreach (var imp in isImpostorTeamList)
             {
                 AddMsg(MimicMsg, imp.PlayerId, ColorString(GetRoleColor(CustomRoles.Mimic), GetString("Mimic").ToUpper()));
@@ -1144,7 +1169,7 @@ class MeetingHudStartPatch
         Logger.Info("------------Opening of the session------------", "Phase");
         ChatUpdatePatch.DoBlockChat = true;
         GameStates.AlreadyDied |= !IsAllAlive;
-        Main.AllPlayerControls.Do(x => ReportDeadBodyPatch.WaitReport[x.PlayerId].Clear());
+        Main.EnumeratePlayerControls().Do(x => ReportDeadBodyPatch.WaitReport[x.PlayerId].Clear());
         MeetingStates.MeetingCalled = true;
 
         CheckForEndVotingPatch.TempExiledPlayer = null;
@@ -1311,7 +1336,19 @@ class MeetingHudStartPatch
         //    }, 6f, "Message: Warning Broken Vents In Dleks");
         //}
 
-        if (MeetingStates.FirstMeeting) TemplateManager.SendTemplate("OnFirstMeeting", noErr: true);
+        if (MeetingStates.FirstMeeting)
+        {
+            TemplateManager.SendTemplate("OnFirstMeeting", noErr: true);
+            if (Options.EnableImpostorChannel.GetBool())
+            {
+                foreach (var pc in Main.EnumerateAlivePlayerControls())
+                {
+                    if (pc.IsHost()) continue;
+                    if (!pc.IsPlayerImpostorTeam()) continue;
+                    SendMessage(GetString("CanUseImpostorChannel"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")}"), noReplay: true);
+                }
+            }
+        }
         if (Main.CurrentServerIsVanilla && TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese) TemplateManager.SendTemplate("OnMeetingVanilla", noErr: true);
         else TemplateManager.SendTemplate("OnMeeting", noErr: true);
 
@@ -1329,7 +1366,7 @@ class MeetingHudStartPatch
         {
             _ = new LateTask(() =>
             {
-                foreach (var pc in Main.AllPlayerControls)
+                foreach (var pc in Main.EnumeratePlayerControls())
                 {
                     pc.RpcSetNameEx(pc.GetRealName(isMeeting: true));
                 }
@@ -1342,12 +1379,12 @@ class MeetingHudStartPatch
                 {
                     if (!MeetingHud.Instance || MeetingHud.Instance.state is MeetingHud.VoteStates.Results or MeetingHud.VoteStates.Proceeding) return;
 
-                    foreach (var pc in Main.AllAlivePlayerControls)
+                    foreach (var pc in Main.EnumerateAlivePlayerControls())
                     {
                         if (pc.UsesMeetingShapeshift())
                         {
                             SendMessage(GetString("SupportMeetingShapeshift"), pc.PlayerId, pc.GetCustomRole().ToColoredString().ToUpper(), noReplay: true);
-                            var aapc = Main.AllAlivePlayerControls;
+                            var aapc = Main.EnumerateAlivePlayerControls();
                             var sender = CustomRpcSender.Create($"RpcSetRoleDesync for meeting shapeshift ({Main.AllPlayerNames.GetValueOrDefault(pc.PlayerId, "Someone")})", SendOption.Reliable);
                             sender.RpcSetRole(pc, RoleTypes.Shapeshifter, pc.OwnerId);
                             if (!pc.GetCustomRole().IsImpostor()) aapc.DoIf(x => x.GetCustomRole().IsImpostor(), x => sender.RpcSetRole(x, RoleTypes.Crewmate, pc.OwnerId));
@@ -1564,7 +1601,7 @@ class MeetingHudOnDestroyPatch
             Main.LastVotedPlayerInfo = null;
             if (Options.UseMeetingShapeshift.GetBool())
             {
-                var pc = Main.AllAlivePlayerControls;
+                var pc = Main.EnumerateAlivePlayerControls();
                 pc.DoIf(x => x.UsesMeetingShapeshift() && x.IsHost(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
                 if (!AntiBlackout.SkipTasks)
                 {

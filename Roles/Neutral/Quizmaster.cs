@@ -228,8 +228,8 @@ internal class Quizmaster : RoleBase
 
                 new CountQuestion { Stage = 2, Question = "MeetingPassed", QuizmasterQuestionType = QuizmasterQuestionType.MeetingCountQuestion },
                 new SetAnswersQuestion { Stage = 2, Question = "HowManyFactions", Answer = "4", PossibleAnswers = { "1", "2", "3", "4", "5" }, QuizmasterQuestionType = QuizmasterQuestionType.FactionQuestion },
-                new SetAnswersQuestion { Stage = 2, Question = GetString("QuizmasterQuestions.FactionOfRole").Replace("{QMRole}", randomRoleWithAddon.ToString()), HasQuestionTranslation = false, Answer = CustomRolesHelper.GetCustomRoleTeam(randomRoleWithAddon).ToString(), PossibleAnswers = { "Crewmate", "Impostor", "Neutral", "Coven", "Addon" }, QuizmasterQuestionType = QuizmasterQuestionType.RoleFactionQuestion },
-                new SetAnswersQuestion { Stage = 2, Question = GetString("QuizmasterQuestions.BasisOfRole").Replace("{QMRole}", randomRole.ToString()), HasQuestionTranslation = false, Answer = CustomRolesHelper.GetRoleTypes(randomRole).ToString(), PossibleAnswers = { "Crewmate", "Impostor", "Shapeshifter", "Scientist", "Engineer", "GuardianAngel", "Phantom" }, QuizmasterQuestionType = QuizmasterQuestionType.RoleBasisQuestion },
+                new SetAnswersQuestion { Stage = 2, Question = GetString("QuizmasterQuestions.FactionOfRole").Replace("{QMRole}", randomRoleWithAddon.ToColoredString()), HasQuestionTranslation = false, Answer = CustomRolesHelper.GetCustomRoleTeam(randomRoleWithAddon).ToString(), PossibleAnswers = { "Crewmate", "Impostor", "Neutral", "Coven", "Addon" }, QuizmasterQuestionType = QuizmasterQuestionType.RoleFactionQuestion },
+                new SetAnswersQuestion { Stage = 2, Question = GetString("QuizmasterQuestions.BasisOfRole").Replace("{QMRole}", randomRole.ToColoredString()), HasQuestionTranslation = false, Answer = CustomRolesHelper.GetRoleTypes(randomRole).ToString(), PossibleAnswers = { "Crewmate", "Impostor", "Shapeshifter", "Scientist", "Engineer", "GuardianAngel", "Phantom" }, QuizmasterQuestionType = QuizmasterQuestionType.RoleBasisQuestion },
 
                 new SetAnswersQuestion { Stage = 3, Question = "FactionRemovedName", Answer = "None", PossibleAnswers = { "Sabotuer", "Sorcerers", "Coven", "Killer", "None" }, QuizmasterQuestionType = QuizmasterQuestionType.RemovedFactionQuestion },
                 // ^ I added Coven back so this question no longer applies :) - Marg
@@ -374,8 +374,8 @@ internal class Quizmaster : RoleBase
         if (!plrToKill.IsAlive() || plrToKill.IsTransformedNeutralApocalypse()) return;
         plrToKill.SetDeathReason(PlayerState.DeathReason.WrongAnswer);
         Main.PlayerStates[plrToKill.PlayerId].SetDead();
-        plrToKill.Data.IsDead = true;
         plrToKill.RpcExileV2();
+        plrToKill.Data.IsDead = true;
         plrToKill.SetRealKiller(Player);
         ResetMarkedPlayer(true);
     }
@@ -384,7 +384,7 @@ internal class Quizmaster : RoleBase
     {
         if (Player == null || target == null) return;
         lastReportedColor = thisReportedColor;
-        foreach (var plr in Main.AllPlayerControls)
+        foreach (var plr in Main.EnumeratePlayerControls())
         {
             if (plr.PlayerId != Player.PlayerId && target.PlayerId != plr.PlayerId)
             {
@@ -401,7 +401,7 @@ internal class Quizmaster : RoleBase
         if (Player == null) return;
         lastReportedColor = thisReportedColor;
         KillPlayer(target);
-        foreach (var plr in Main.AllPlayerControls)
+        foreach (var plr in Main.EnumeratePlayerControls())
         {
             if (plr.PlayerId != Player.PlayerId && target.PlayerId != plr.PlayerId)
             {
@@ -479,7 +479,7 @@ class PlrColorQuestion : QuizQuestionBase
     {
         Answers = [];
 
-        foreach (PlayerControl plr in Main.AllPlayerControls)
+        foreach (PlayerControl plr in Main.EnumeratePlayerControls())
         {
             if (!PossibleAnswers.Contains(plr.Data.GetPlayerColorString()))
                 PossibleAnswers.Add(plr.Data.GetPlayerColorString());
@@ -549,10 +549,10 @@ class DeathReasonQuestion : QuizQuestionBase
             PossibleAnswers.Add(GetString("QuizmasterAnswers.Coven"));
         }
 
-        chosenPlayer = Main.AllPlayerControls[rnd.Next(Main.AllPlayerControls.Length)];
+        chosenPlayer = Main.AllPlayerControls[rnd.Next(Main.AllPlayerControls.Count)];
 
 
-        foreach (PlayerControl plr in Main.AllPlayerControls)
+        foreach (PlayerControl plr in Main.EnumeratePlayerControls())
         {
             if (QuizmasterQuestionType == QuizmasterQuestionType.PlrDeathReasonQuestion)
             {

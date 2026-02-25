@@ -2,6 +2,7 @@ using Hazel;
 using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.Crewmate;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -156,7 +157,7 @@ internal class Witch : RoleBase
 
         return false;
     }
-    public override void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
+    /*public override void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
     {
         foreach (var id in exileIds)
         {
@@ -164,7 +165,7 @@ internal class Witch : RoleBase
                 SpelledPlayer[id].Clear();
         }
         var spelledIdList = new List<byte>();
-        foreach (var pc in Main.AllAlivePlayerControls)
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             var dic = SpelledPlayer.Where(x => x.Value.Contains(pc.PlayerId));
             if (!dic.Any()) continue;
@@ -190,6 +191,29 @@ internal class Witch : RoleBase
     }
     public override void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
+        if (!Balancer.Choose) RemoveSpelledPlayer();
+    }*/
+    public override void AfterMeetingTasks()
+    {
+        if (!_Player.IsAlive() || President.EndMeeting)
+            SpelledPlayer[_Player.PlayerId].Clear();
+
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
+        {
+            var dic = SpelledPlayer.Where(x => x.Value.Contains(pc.PlayerId));
+            if (!dic.Any()) continue;
+            if (pc.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool()) continue;
+            var whichId = dic.FirstOrDefault().Key;
+            var witch = Utils.GetPlayerById(whichId);
+            if (witch != null && witch.IsAlive())
+            {
+                pc.RpcExileV2();
+                pc.SetRealKiller(witch);
+                pc.SetDeathReason(PlayerState.DeathReason.Spell);
+                Main.PlayerStates[pc.PlayerId].SetDead();
+                MurderPlayerPatch.AfterPlayerDeathTasks(witch, pc, inMeeting: false, fromRole: true);
+            }
+        }
         RemoveSpelledPlayer();
     }
     public override void OnEnterVent(PlayerControl pc, Vent vent)

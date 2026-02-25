@@ -104,8 +104,8 @@ internal class Altruist : RoleBase
             //AllRevivedPlayerId.Add(deadPlayerId);
 
             _Player.SetDeathReason(PlayerState.DeathReason.Sacrificed);
-            _Player.Data.IsDead = true;
             _Player.RpcExileV2();
+            _Player.Data.IsDead = true;
             Main.PlayerStates[_Player.PlayerId].SetDead();
 
             deadPlayer.RpcTeleport(deadBodyObject.transform.position);
@@ -113,7 +113,7 @@ internal class Altruist : RoleBase
 
             if (ImpostorsCanGetsAlert.GetBool() || NeutralKillersCanGetsAlert.GetBool())
             {
-                foreach (var pc in Main.AllAlivePlayerControls)
+                foreach (var pc in Main.EnumerateAlivePlayerControls())
                 {
                     if (pc.GetCustomRole().IsCrewmate()) continue;
 
@@ -195,7 +195,7 @@ internal class Altruist : RoleBase
     {
         if (!(ImpostorsCanGetsArrow.GetBool() || NeutralKillersCanGetsArrow.GetBool() || CovenCanGetsArrow.GetBool()) || RevivedPlayerId == byte.MaxValue) return;
 
-        foreach (var pc in Main.AllAlivePlayerControls)
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             if (ImpostorsCanGetsArrow.GetBool() && pc.Is(Custom_Team.Impostor))
             {

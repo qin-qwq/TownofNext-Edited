@@ -88,11 +88,6 @@ internal class Keeper : RoleBase
         }
     }
 
-    public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
-    {
-        CheckVote(pc, target);
-    }
-
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {
         if (voter.GetRoleClass().HasVoted) return true;

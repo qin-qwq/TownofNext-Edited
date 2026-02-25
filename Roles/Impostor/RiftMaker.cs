@@ -55,12 +55,11 @@ internal class RiftMaker : RoleBase
         TPCooldown = TPCooldownOpt.GetFloat();
     }
 
-    public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(Translator.GetString("RiftMakerButtonText"));
+    public override void SetAbilityButtonText(HudManager hud, byte id) => hud.AbilityButton.OverrideText(GetString("RiftMakerButtonText"));
     // public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Create Rift");
 
     private void SendRPC(byte riftID, int operate) // Something here is throwing a null ref
     {
-        if (PlayerControl.LocalPlayer == null || _Player == null) return;
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(operate);
         if (operate == 3)

@@ -287,9 +287,20 @@ public class PlayerState(byte playerId)
         Logger.Msg($"Player {PlayerId} was dead, activated from: {callerClassName}.{callerMethodName}", "PlayerState.SetDead()");
 
         IsDead = true;
-        if (AmongUsClient.Instance.AmHost)
+        try
         {
-            RPC.SendDeathReason(PlayerId, deathReason);
+            if (AmongUsClient.Instance.AmHost)
+            {
+                RPC.SendDeathReason(PlayerId, deathReason);
+                if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                {
+                    MeetingHud.Instance.CheckForEndVoting();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e.StackTrace, "SetDead()");
         }
     }
     public bool IsSuicide => deathReason == DeathReason.Suicide;

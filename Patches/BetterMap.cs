@@ -51,7 +51,7 @@ public class MapBehaviourPatch
         // 创建新图标
         if (Options.CurrentGameMode == CustomGameMode.TagMode)
         {
-            foreach (var pc in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
+            foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
             {
                 if (!pc.AmOwner && pc != null)
                 {
@@ -62,7 +62,7 @@ public class MapBehaviourPatch
             }
             return;
         }
-        foreach (var pc in Main.AllAlivePlayerControls)
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             if (!pc.AmOwner && pc != null)
             {

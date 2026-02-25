@@ -86,7 +86,7 @@ public class RoleAssign
         switch (Options.CurrentGameMode)
         {
             case CustomGameMode.FFA:
-                foreach (PlayerControl pc in Main.AllPlayerControls)
+                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {
                     if (Main.EnableGM.Value && pc.IsHost())
                     {
@@ -98,13 +98,19 @@ public class RoleAssign
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
                         continue;
+                    }
+                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                        continue;                        
                     }
                     RoleResult[pc.PlayerId] = CustomRoles.Killer;
                 }
                 return;
 
             case CustomGameMode.SpeedRun:
-                foreach (PlayerControl pc in Main.AllPlayerControls)
+                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {
                     if (Main.EnableGM.Value && pc.IsHost())
                     {
@@ -116,6 +122,12 @@ public class RoleAssign
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
                         continue;
+                    }
+                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                        continue;                        
                     }
                     RoleResult[pc.PlayerId] = CustomRoles.Runner;
                 }
@@ -123,7 +135,7 @@ public class RoleAssign
 
             case CustomGameMode.TagMode:
                 var random = IRandom.Instance;
-                List<PlayerControl> AllPlayers2 = Main.AllPlayerControls.Shuffle(random).ToList();
+                List<PlayerControl> AllPlayers2 = Main.EnumeratePlayerControls().Shuffle(random).ToList();
                 var ZombieNum = TagMode.ZombieMaximun.GetInt();
                 foreach (PlayerControl pc in AllPlayers2)
                 {
@@ -138,6 +150,12 @@ public class RoleAssign
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
                         continue;
                     }
+                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+                    {
+                        RoleResult[pc.PlayerId] = CustomRoles.GM;
+                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                        continue;                        
+                    }
                     else if (ZombieNum > 0)
                     {
                         RoleResult[pc.PlayerId] = CustomRoles.TZombie;
@@ -151,7 +169,7 @@ public class RoleAssign
         }
 
         var rd = IRandom.Instance;
-        int playerCount = Main.AllAlivePlayerControls.Length;
+        int playerCount = Main.AllAlivePlayerControls.Count;
         int optImpNum = 0;
         int optNonNeutralKillingNum = 0;
         int optNeutralKillingNum = 0;
@@ -200,6 +218,8 @@ public class RoleAssign
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
                 case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
+                case CustomRoles.NiceGuesser when Options.GuesserMode.GetBool() && Options.CrewmatesCanGuess.GetBool():
+                case CustomRoles.EvilGuesser when Options.GuesserMode.GetBool() && Options.ImpostorsCanGuess.GetBool():
                     continue;
             }
 
@@ -294,7 +314,7 @@ public class RoleAssign
         Logger.Info(string.Join(", ", Roles[RoleAssignType.Crewmate].Select(x => x.Role.ToString())), "Selected-Crew-Roles");
         Logger.Msg("======================================================", "SelectedRoles");
 
-        var AllPlayers = Main.AllPlayerControls.ToList();
+        var AllPlayers = Main.EnumeratePlayerControls().ToList();
 
         // Players on the EAC banned list will be assigned as GM when opening rooms
         if (BanManager.CheckEACList(PlayerControl.LocalPlayer.FriendCode, PlayerControl.LocalPlayer.GetClient().GetHashedPuid()))
@@ -305,7 +325,7 @@ public class RoleAssign
             AllPlayers.Remove(PlayerControl.LocalPlayer);
         }
 
-        foreach (var player in Main.AllPlayerControls)
+        foreach (var player in Main.EnumeratePlayerControls())
         {
             if (player == null) continue;
 
@@ -321,6 +341,13 @@ public class RoleAssign
                 RoleResult[PlayerControl.LocalPlayer.PlayerId] = CustomRoles.GM;
                 SetRoles.Remove(PlayerControl.LocalPlayer.PlayerId);
                 AllPlayers.Remove(PlayerControl.LocalPlayer);
+            }
+            else if (SetRoles.TryGetValue(player.PlayerId, out var role) && role == CustomRoles.GM)
+            {
+                RoleResult[player.PlayerId] = CustomRoles.GM;
+                SetRoles.Remove(player.PlayerId);
+                AllPlayers.Remove(player);
+                Logger.Info($"Assign Game Master due to tag for [{player.PlayerId}]{player.GetRealName()}", "SetRoles");                     
             }
         }
 
@@ -1018,12 +1045,6 @@ public class RoleAssign
         if (Sunnyboy.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Jester)) FinalRolesList.Add(CustomRoles.Sunnyboy);
         if (Bard.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Arrogance)) FinalRolesList.Add(CustomRoles.Bard);
         if (Requiter.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Knight)) FinalRolesList.Add(CustomRoles.Requiter);
-
-        if (Romantic.HasEnabled)
-        {
-            if (FinalRolesList.Contains(CustomRoles.Romantic) && FinalRolesList.Contains(CustomRoles.Lovers))
-                FinalRolesList.Remove(CustomRoles.Lovers);
-        }
 
         // if roles are very few, add vanilla сrewmate roles
         if (AllPlayers.Count > FinalRolesList.Count)

@@ -29,6 +29,7 @@ public static class AbilityTimeManager
 
     public static void RpcAddAbilityCD(this PlayerControl pc, bool rpc = true, bool includeDuration = false)
     {
+        if (!Options.UsePets.GetBool() && Utils.IsMethodOverridden(pc.GetRoleClass(), "OnPet")) return;
         if (!pc.HasAbilityCD() && pc.DefaultAbilityCD() != -10)
         {
             if (pc.AbilityDruation() != -20 && includeDuration)
@@ -77,6 +78,7 @@ public static class AbilityTimeManager
             CustomRoles.Altruist => 0,
             CustomRoles.Dreamer => (int)Dreamer.FantasyCooldown.GetFloat(),
             CustomRoles.NiceHacker => (int)NiceHacker.HackerCooldown.GetFloat(),
+            CustomRoles.Fury => (int)Fury.AngryCooldown.GetFloat(),
             _ => -10
         };
 
@@ -96,6 +98,7 @@ public static class AbilityTimeManager
             CustomRoles.Lighter => (int)Lighter.LighterSkillDuration.GetFloat(),
             CustomRoles.Dreamer => (int)Dreamer.FantasyDuration.GetFloat(),
             CustomRoles.NiceHacker => (int)NiceHacker.HackerDuration.GetFloat(),
+            CustomRoles.Fury => (int)Fury.AngryDuration.GetFloat(),
             _ => -20
         };
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using TONE.Modules;
 using TONE.Roles.Core;
+using TONE.Roles.Impostor;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -80,7 +81,7 @@ internal class TimeMaster : RoleBase
             else hud.PetButton.OverrideText(GetString("TimeMasterPetButtonText"));
         }
     }
-    private static IEnumerator Rewind()
+    private static IEnumerator Rewind(PlayerControl target)
     {
         try
         {
@@ -90,7 +91,7 @@ internal class TimeMaster : RoleBase
             long now = TimeStamp;
             int length = TimeMasterSkillDuration2.GetInt();
 
-            foreach (var pc in Main.AllPlayerControls)
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
                 originalSpeed.Remove(pc.PlayerId);
                 originalSpeed.Add(pc.PlayerId, Main.AllPlayerSpeed[pc.PlayerId]);
@@ -100,7 +101,7 @@ internal class TimeMaster : RoleBase
 
             string notify = ColorString(Color.yellow, string.Format(GetString("TimeMasterRewindStart"), CustomRoles.TimeMaster.ToColoredString()));
 
-            foreach (PlayerControl player in Main.AllPlayerControls)
+            foreach (PlayerControl player in Main.EnumeratePlayerControls())
             {
                 if (player.inVent || player.MyPhysics?.Animations?.IsPlayingEnterVentAnimation() == true) player.MyPhysics?.RpcExitVent(player.GetClosestVent().Id);
                 player.ReactorFlash(flashDuration: length * delay + 0.55f);
@@ -131,13 +132,14 @@ internal class TimeMaster : RoleBase
 
                 if (ps.RealKiller.TimeStamp.AddSeconds(length) >= DateTime.Now)
                 {
+                    if (target.Is(CustomRoles.Madmate) && !ps.Player.IsPlayerImpostorTeam()) continue;
                     ps.Player.RpcRevive();
                     ps.Player.RpcTeleport(deadBody.TruePosition);
                     ps.Player.Notify(ColorString(Color.yellow, GetString("RevivedByTimeMaster")));
                 }
             }
 
-            foreach (var pc in Main.AllPlayerControls)
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
                 Main.AllPlayerSpeed[pc.PlayerId] = Main.AllPlayerSpeed[pc.PlayerId] - Main.MinSpeed + originalSpeed[pc.PlayerId];
                 ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
@@ -153,7 +155,7 @@ internal class TimeMaster : RoleBase
         long now = TimeStamp;
         if (BackTrack.ContainsKey(now)) return;
 
-        BackTrack[now] = Main.AllAlivePlayerControls.Where(x => !x.inVent && !x.onLadder && !x.inMovingPlat).ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
+        BackTrack[now] = Main.EnumerateAlivePlayerControls().Where(x => !x.inVent && !x.onLadder && !x.inMovingPlat).ToDictionary(x => x.PlayerId, x => x.GetCustomPosition());
 
         if (!lowLoad && TimeMasterInProtect.TryGetValue(player.PlayerId, out var vtime) && vtime + TimeMasterSkillDuration.GetInt() < nowTime)
         {
@@ -165,6 +167,7 @@ internal class TimeMaster : RoleBase
     }
     public override void OnPet(PlayerControl pc)
     {
+        if (TimeAssassin.TimeStop) return;
         if (!TimeMasterUsePetRewind.GetBool())
         {
             OnEnterVent(pc, null);
@@ -175,7 +178,7 @@ internal class TimeMaster : RoleBase
             {
                 pc.RpcRemoveAbilityUse();
 
-                Main.Instance.StartCoroutine(Rewind());
+                Main.Instance.StartCoroutine(Rewind(pc));
             }
             else
             {
@@ -188,7 +191,7 @@ internal class TimeMaster : RoleBase
         if (TimeMasterInProtect.ContainsKey(target.PlayerId) && killer.PlayerId != target.PlayerId)
             if (TimeMasterInProtect[target.PlayerId] + TimeMasterSkillDuration.GetInt() >= GetTimeStamp(DateTime.UtcNow) && !killer.Is(CustomRoles.Pestilence))
             {
-                Main.Instance.StartCoroutine(Rewind());
+                Main.Instance.StartCoroutine(Rewind(target));
                 killer.SetKillCooldown(target: target, forceAnime: true);
                 return false;
             }
@@ -196,6 +199,7 @@ internal class TimeMaster : RoleBase
     }
     public override void OnEnterVent(PlayerControl pc, Vent currentVent)
     {
+        if (TimeAssassin.TimeStop) return;
         if (pc.GetAbilityUseLimit() >= 1)
         {
             pc.RpcRemoveAbilityUse();

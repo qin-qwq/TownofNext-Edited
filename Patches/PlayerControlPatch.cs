@@ -336,11 +336,11 @@ class CheckMurderPatch
                         break;
 
                     case CustomRoles.Cyber when killer.PlayerId != target.PlayerId:
-                        foreach (var pc in Main.AllAlivePlayerControls.Where(x => x.PlayerId != target.PlayerId).ToArray())
+                        foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != target.PlayerId).ToArray())
                         {
                             if (target.Is(CustomRoles.Cyber))
                             {
-                                if (Main.AllAlivePlayerControls.Any(x =>
+                                if (Main.EnumerateAlivePlayerControls().Any(x =>
                                     x.PlayerId != killer.PlayerId &&
                                     x.PlayerId != target.PlayerId &&
                                     Utils.GetDistance(x.transform.position, target.transform.position) < 2f))
@@ -602,6 +602,15 @@ public static class CheckShapeshiftPatch
             return false;
         }
 
+        var shapeshifterRoleClass = __instance.GetRoleClass();
+        if (Options.UseMeetingShapeshift.GetBool() && GameStates.IsMeeting)
+        {
+            if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
+                shapeshifterRoleClass?.OnMeetingShapeshift(__instance, target);
+            __instance.RpcRejectShapeshift();
+            return false;
+        }
+
         // No called code if is invalid shapeshifting
         if (!CheckInvalidShapeshifting(__instance, target, shouldAnimate))
         {
@@ -614,14 +623,7 @@ public static class CheckShapeshiftPatch
 
         logger.Info($"Self:{shapeshifter.PlayerId == target.PlayerId} - Is animate:{shouldAnimate} - In Meeting:{GameStates.IsMeeting}");
 
-        var shapeshifterRoleClass = shapeshifter.GetRoleClass();
-        if (Options.UseMeetingShapeshift.GetBool() && GameStates.IsMeeting)
-        {
-            if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
-                shapeshifterRoleClass?.OnMeetingShapeshift(shapeshifter, target);
-            shapeshifter.RpcRejectShapeshift();
-            return false;
-        }
+
         if (shapeshifterRoleClass?.OnCheckShapeshift(shapeshifter, target, ref resetCooldown, ref shouldAnimate) == false)
         {
             // role need specific reject shapeshift if player use desync shapeshift
@@ -672,7 +674,7 @@ public static class CheckShapeshiftPatch
             logger.Info("Shapeshifting canceled because mushroom mixup is active");
             return false;
         }
-        if (MeetingHud.Instance && animate && !instance.UsesMeetingShapeshift())
+        if (MeetingHud.Instance && animate)
         {
             logger.Info("Cancel shapeshifting in meeting");
             return false;
@@ -924,18 +926,6 @@ class ReportDeadBodyPatch
         // Hereinafter, it is assumed that the button is confirmed to be pressed
         //=============================================
 
-        if (Lovers.PrivateChat.GetBool())
-        {
-            if (Main.CurrentServerIsVanilla)
-            {
-                _ = new LateTask(() => { ChatManager.SendPreviousMessagesToAll(); }, !PlayerControl.LocalPlayer.IsAlive() ? 3f : 0f);
-            }
-            else
-            {
-                Summoner.HideSummonCommand();
-            }
-        }
-
         try
         {
             Main.MeetingIsStarted = true;
@@ -994,7 +984,7 @@ class ReportDeadBodyPatch
             Logger.SendInGame($"Error: {error}");
         }
 
-        foreach (var pc in Main.AllPlayerControls)
+        foreach (var pc in Main.EnumeratePlayerControls())
         {
             pc.RpcRemoveAbilityCD();
             if (!Main.OvverideOutfit.ContainsKey(pc.PlayerId))
@@ -1083,7 +1073,10 @@ class FixedUpdateInNormalGamePatch
         {
             if (OnGameJoinedPatch.JoiningGame && ex is NullReferenceException) return;
 
-            Utils.ThrowException(ex);
+            var nameWithRole = __instance.GetNameWithRole();
+            if (string.IsNullOrWhiteSpace(nameWithRole)) return;
+
+            //Utils.ThrowException(ex);
             Logger.Error($"Error for {__instance.GetNameWithRole().RemoveHtmlTags()}: Error: {ex}", "FixedUpdateInNormalGamePatch");
         }
     }
@@ -1293,6 +1286,17 @@ class FixedUpdateInNormalGamePatch
 
                         if (!player.IsModded() && player.RemainingCD() <= 60)
                             Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false);
+                    }
+                    if (playerAmOwner && Options.EnableGameTimeLimit.GetBool())
+                    {
+                        Main.GameTimer += Time.fixedDeltaTime;
+                        
+                        if (Main.GameTimer > Options.GameTimeLimit.GetInt() && Options.CurrentGameMode == CustomGameMode.Standard)
+                        {
+                            Main.GameTimer = 0f;
+                            Main.GameEndDueToTimer = true;
+                            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.None);
+                        }
                     }
                     CustomRoleManager.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
 
@@ -1668,7 +1672,7 @@ class CoEnterVentPatch
 
 
         playerRoleClass?.OnCoEnterVent(instance, id);
-        if (Options.DisableVenting1v1.GetBool() && Main.AllAlivePlayerControls.Length <= 2)
+        if (Options.DisableVenting1v1.GetBool() && Main.AllAlivePlayerControls.Count <= 2)
         {
             var pc = instance?.myPlayer;
             _ = new LateTask(() =>
@@ -1863,7 +1867,7 @@ class PlayerControlCompleteTaskPatch
                             break;
 
                         case CustomRoles.Madmate when taskState.IsTaskFinished && player.Is(CustomRoles.Snitch):
-                            foreach (var impostor in Main.AllAlivePlayerControls.Where(pc => pc.Is(Custom_Team.Impostor) && !Main.PlayerStates[pc.PlayerId].IsNecromancer).ToArray())
+                            foreach (var impostor in Main.EnumerateAlivePlayerControls().Where(pc => pc.Is(Custom_Team.Impostor) && !Main.PlayerStates[pc.PlayerId].IsNecromancer).ToArray())
                             {
                                 NameColorManager.Add(impostor.PlayerId, player.PlayerId, "#ff1919");
                             }
@@ -1941,7 +1945,7 @@ class PlayerControlCheckNamePatch
             }
 
             var sender = CustomRpcSender.Create("LobbyTagsSender", SendOption.Reliable);
-            foreach (var player in Main.AllPlayerControls)
+            foreach (var player in Main.EnumeratePlayerControls())
             {
                 if (player == null || player.PlayerId == __instance.PlayerId || player.Data == null || player.Data.Disconnected) continue;
 
@@ -2122,7 +2126,7 @@ class PlayerControlSetRolePatch
             var targetIsKiller = target.Is(Custom_Team.Impostor) || target.HasDesyncRole();
             GhostRoles.Clear();
 
-            foreach (var seer in Main.AllPlayerControls)
+            foreach (var seer in Main.EnumeratePlayerControls())
             {
                 var self = seer.PlayerId == target.PlayerId;
                 var seerIsKiller = seer.Is(Custom_Team.Impostor) || seer.HasDesyncRole();
@@ -2145,7 +2149,7 @@ class PlayerControlSetRolePatch
             {
                 roleType = RoleTypes.GuardianAngel;
                 __instance.RpcSetRoleDesync(RoleTypes.GuardianAngel, __instance.GetClientId());
-                foreach (var seer in Main.AllPlayerControls)
+                foreach (var seer in Main.EnumeratePlayerControls())
                 {
                     if (seer.PlayerId == __instance.PlayerId) continue;
                     __instance.RpcSetRoleDesync(RoleTypes.CrewmateGhost, seer.GetClientId());

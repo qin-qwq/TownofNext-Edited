@@ -127,7 +127,7 @@ public class SabotageSystemPatch
         {
             Logger.Info($" IsActive", "MushroomMixupSabotageSystem.UpdateSystem.Postfix");
 
-            foreach (var pc in Main.AllAlivePlayerControls)
+            foreach (var pc in Main.EnumerateAlivePlayerControls())
             {
                 if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                 {
@@ -135,6 +135,8 @@ public class SabotageSystemPatch
                     Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: true, MushroomMixupIsActive: true);
                 }
             }
+
+            ReportDeadBodyPatch.CanReport.SetAllValues(false);
         }
     }
     [HarmonyPatch(typeof(MushroomMixupSabotageSystem), nameof(MushroomMixupSabotageSystem.Deteriorate))]
@@ -178,18 +180,22 @@ public class SabotageSystemPatch
                     _ = new LateTask(() =>
                     {
                         // After MushroomMixup sabotage, shapeshift cooldown sets to 0
-                        foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+                        foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
                         {
                             // Do Unshift, because mushroom mixup revert all shapeshifted players
                             pc.DoUnShiftState(true);
 
                             // Reset Ability Cooldown To Default For Living Players
                             if (pc.GetCustomRole().GetRoleTypes() != RoleTypes.Engineer)
+                            {
                                 pc.RpcResetAbilityCooldown();
+                            }
+
+                            ReportDeadBodyPatch.CanReport.SetAllValues(true);
                         }
                     }, 1.2f, "Reset Ability Cooldown Arter Mushroom Mixup");
 
-                    foreach (var pc in Main.AllAlivePlayerControls)
+                    foreach (var pc in Main.EnumerateAlivePlayerControls())
                     {
                         if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                         {
@@ -275,7 +281,7 @@ public class SabotageSystemPatch
 
             if (GameStates.IsInTask)
             {
-                foreach (var pc in Main.AllAlivePlayerControls)
+                foreach (var pc in Main.EnumerateAlivePlayerControls())
                     if (pc.Is(CustomRoles.Mare))
                         Utils.NotifyRoles(SpecifyTarget: pc);
             }
@@ -298,7 +304,7 @@ public class SabotageSystemPatch
 
             if (GameStates.IsInTask)
             {
-                foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+                foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
                     if (pc.Is(CustomRoles.Mare))
                         Utils.NotifyRoles(SpecifyTarget: pc);
             }
@@ -311,8 +317,8 @@ public class SabotageSystemPatch
     [HarmonyPatch(typeof(SabotageSystemType), nameof(SabotageSystemType.UpdateSystem))] // SetInitialSabotageCooldown - set sabotage cooldown in start game
     public static class SabotageSystemTypeRepairDamagePatch
     {
-        private static bool isCooldownModificationEnabled;
-        private static float modifiedCooldownSec;
+        public static bool isCooldownModificationEnabled;
+        public static float modifiedCooldownSec;
 
         public static void Initialize()
         {

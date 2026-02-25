@@ -47,7 +47,7 @@ public static class TagMode
 
     public static void SetupCustomOption()
     {
-        TextOptionItem.Create(10000035, "MenuTitle.TagMode", TabGroup.ModSettings)
+        TextOptionItem.Create(10000037, "MenuTitle.TagMode", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.TagMode)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
 
@@ -189,7 +189,7 @@ class TagModeGameEndPredicate : GameEndPredicate
             reason = GameOverReason.ImpostorDisconnect;
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TCrewmate);
             CustomWinnerHolder.WinnerIds.Clear();
-            Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
@@ -198,7 +198,7 @@ class TagModeGameEndPredicate : GameEndPredicate
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TZombie);
             CustomWinnerHolder.WinnerIds.Clear();
-            Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
@@ -208,7 +208,7 @@ class TagModeGameEndPredicate : GameEndPredicate
             reason = GameOverReason.CrewmatesByTask;
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TCrewmate);
             CustomWinnerHolder.WinnerIds.Clear();
-            Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
@@ -425,20 +425,20 @@ public class TCrewmate : RoleBase
         else if (Power == 3)
         {
             player.Notify(GetString("YouDetect"));
-            foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
+            foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
                 TargetArrow.Add(player.PlayerId, target.PlayerId);
             DetectState = (true, TagMode.CrewmateDetectTime.GetFloat());
         }
         else if (Power == 4)
         {
             player.Notify(GetString("ZapZombie"));
-            foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
+            foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
                 target.Notify(GetString("YouZap"));
             TagMode.Zap = true;
             _ = new LateTask(() =>
             {
                 TagMode.Zap = false;
-                foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
+                foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
                     target.Notify(GetString("ZapFinished"));
             }, TagMode.CrewmateZapTime.GetFloat(), "Zap Finished");
         }
@@ -487,7 +487,7 @@ public class TCrewmate : RoleBase
             if (DetectState.Item2 <= 0)
             {
                 DetectState = (false, 0f);
-                foreach (var target in Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.TZombie)))
+                foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
                     TargetArrow.Remove(player.PlayerId, target.PlayerId);
                 changed = true;
             }

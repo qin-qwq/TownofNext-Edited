@@ -257,7 +257,7 @@ public static class SpeedRun
         RpcSyncSpeedRunStates(target.PlayerId);
         if (!SpeedRun_ArrowPlayers.GetBool()) return;
 
-        var list = Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Runner));
+        var list = Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Runner));
         if (list.Count() <= SpeedRun_ArrowPlayersPlayerLiving.GetInt())
         {
             foreach (var seer in list)
@@ -375,7 +375,7 @@ class SpeedRunGameEndPredicate : GameEndPredicate
         if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Runner)) <= 1)
         {
             CustomWinnerHolder.WinnerIds.Clear();
-            Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Runner)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Runner)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
@@ -384,7 +384,7 @@ class SpeedRunGameEndPredicate : GameEndPredicate
         {
             reason = GameOverReason.CrewmatesByTask;
             CustomWinnerHolder.WinnerIds.Clear();
-            Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Runner)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Runner)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
@@ -630,7 +630,7 @@ public class Runner : RoleBase
         if (target != null && seer.PlayerId != target.PlayerId) return "";
         if (!seer.IsAlive() || !SpeedRun.SpeedRun_ArrowPlayers.GetBool()) return "";
 
-        var listing = Main.AllAlivePlayerControls.Where(x => x.Is(CustomRoles.Runner));
+        var listing = Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Runner));
 
         if (listing.Count() > SpeedRun.SpeedRun_ArrowPlayersPlayerLiving.GetInt()) return "";
 

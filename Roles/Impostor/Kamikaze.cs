@@ -106,7 +106,7 @@ internal class Kamikaze : RoleBase
         if (_Player == null || !exileIds.Contains(_Player.PlayerId)) return;
         var deathList = new List<byte>();
         var death = _Player;
-        foreach (var pc in Main.AllAlivePlayerControls)
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
             if (KamikazedList.Contains(pc.PlayerId))
             {

@@ -39,7 +39,7 @@ internal class Brave : RoleBase
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
-        if (Main.AllAlivePlayerControls.Length <= ShieldPlayerThreshold.GetInt())
+        if (Main.AllAlivePlayerControls.Count <= ShieldPlayerThreshold.GetInt())
         {
             killer.SetKillCooldown();
             killer.Notify(string.Format(GetString("TargetIsBrave"), target.GetRealName()));
@@ -48,6 +48,6 @@ internal class Brave : RoleBase
         return true;
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
-    public override bool CanUseKillButton(PlayerControl pc) => Main.AllAlivePlayerControls.Length <= SwordPlayerThreshold.GetInt();
-    public override bool KillFlashCheck(PlayerControl killer, PlayerControl target, PlayerControl seer) => Main.AllAlivePlayerControls.Length <= HeartPlayerThreshold.GetInt() && killer.PlayerId != seer.PlayerId;
+    public override bool CanUseKillButton(PlayerControl pc) => Main.AllAlivePlayerControls.Count <= SwordPlayerThreshold.GetInt();
+    public override bool KillFlashCheck(PlayerControl killer, PlayerControl target, PlayerControl seer) => Main.AllAlivePlayerControls.Count <= HeartPlayerThreshold.GetInt() && killer.PlayerId != seer.PlayerId;
 }

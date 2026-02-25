@@ -67,7 +67,7 @@ public static class PhantomRolePatch
         if (!CheckTrigger(phantom))
             return false;
 
-        foreach (var target in Main.AllPlayerControls)
+        foreach (var target in Main.EnumeratePlayerControls())
         {
             if (!target.IsAlive() || phantom == target || target.AmOwner || !(target.HasDesyncRole() || Main.PlayerStates[target.PlayerId].IsNecromancer || phantom.HasDesyncRole())) continue;
 
@@ -147,7 +147,7 @@ public static class PhantomRolePatch
             phantom.MyPhysics.RpcBootFromVent(Main.LastEnteredVent[phantom.PlayerId].Id);
         }
 
-        foreach (var target in Main.AllPlayerControls)
+        foreach (var target in Main.EnumeratePlayerControls())
         {
             if (!target.IsAlive() || phantom == target || target.AmOwner || !(target.HasDesyncRole() || Main.PlayerStates[target.PlayerId].IsNecromancer || phantom.HasDesyncRole())) continue;
 

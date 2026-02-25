@@ -29,7 +29,7 @@ internal class Pelican : RoleBase
     private static OptionItem CanVent;
 
     private static readonly Dictionary<byte, HashSet<byte>> eatenList = [];
-    private static readonly Dictionary<byte, float> originalSpeed = [];
+    public static readonly Dictionary<byte, float> originalSpeed = [];
     public static Dictionary<byte, Vector2> PelicanLastPosition = [];
 
     private static int Count = 0;
@@ -89,7 +89,7 @@ internal class Pelican : RoleBase
         eatenList[playerId] = list;
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
-    public override bool CanUseKillButton(PlayerControl pc) => true;
+    public override bool CanUseKillButton(PlayerControl pc) => !TimeAssassin.TimeStop;
     public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
 
     private static bool IsEaten(PlayerControl pc, byte id) => eatenList.TryGetValue(pc.PlayerId, out var list) && list.Contains(id);
@@ -246,8 +246,12 @@ internal class Pelican : RoleBase
 
                 target.RpcTeleport(teleportPosition);
 
-                Main.AllPlayerSpeed[tar] = Main.AllPlayerSpeed[tar] - 0.5f + originalSpeed[tar];
-                ReportDeadBodyPatch.CanReport[tar] = true;
+                if (!TimeAssassin.TimeStop)
+                {
+                    Main.AllPlayerSpeed[tar] = Main.AllPlayerSpeed[tar] - 0.5f + originalSpeed[tar];
+                    ReportDeadBodyPatch.CanReport[tar] = true;
+                }
+                else TimeAssassin.PelicanList.Add(target);
 
                 target.SyncSettings();
 

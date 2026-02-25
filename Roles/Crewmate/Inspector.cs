@@ -215,32 +215,16 @@ internal class Inspector : RoleBase
                 }
                 else
                 {
-                    if
-                    (
-                        (
-                        (target1.IsPlayerCoven() || target1.Is(CustomRoles.Enchanted) || Illusionist.IsNonCovIllusioned(target1.PlayerId)) && !Lich.IsCursed(target1)
-                        &&
-                        (target2.IsPlayerCoven() || target2.Is(CustomRoles.Enchanted) || Illusionist.IsNonCovIllusioned(target2.PlayerId)) && !Lich.IsCursed(target2)
-                        )
-                        ||
-                        (
-                        (Illusionist.IsCovIllusioned(target1.PlayerId) || (target1.GetCustomRole().IsCrewmateTeamV2() && (target1.GetCustomSubRoles().All(role => role.IsCrewmateTeamV2()) || target1.GetCustomSubRoles().Count == 0)) || target1.Is(CustomRoles.Admired)) && !Lich.IsCursed(target1)
-                        &&
-                        (Illusionist.IsCovIllusioned(target2.PlayerId) || (target2.GetCustomRole().IsCrewmateTeamV2() && (target2.GetCustomSubRoles().All(role => role.IsCrewmateTeamV2()) || target2.GetCustomSubRoles().Count == 0)) || target2.Is(CustomRoles.Admired)) && !Lich.IsCursed(target2)
-                        )
-                        ||
-                        (
-                        (target1.GetCustomRole().IsImpostorTeamV2() || target1.IsAnySubRole(role => role.IsImpostorTeamV2())) && !target1.Is(CustomRoles.Admired) && !Lich.IsCursed(target1)
-                        &&
-                        (target2.GetCustomRole().IsImpostorTeamV2() || target2.IsAnySubRole(role => role.IsImpostorTeamV2())) && !target2.Is(CustomRoles.Admired) && !Lich.IsCursed(target2)
-                        )
-                        ||
-                        (
-                        (target1.GetCustomRole().IsNeutralTeamV2() || target1.IsAnySubRole(role => role.IsNeutralTeamV2()) || Lich.IsCursed(target1)) && !target1.Is(CustomRoles.Admired)
-                        &&
-                        (target2.GetCustomRole().IsNeutralTeamV2() || target2.IsAnySubRole(role => role.IsNeutralTeamV2()) || Lich.IsCursed(target2)) && !target2.Is(CustomRoles.Admired)
-                        )
-                    )
+                    if ((Utils.IsSameTeammate(target1, target2) && !Lich.IsCursed(target1) && !Lich.IsCursed(target2) && !Illusionist.IsCovIllusioned(target1.PlayerId) && !Illusionist.IsCovIllusioned(target2.PlayerId) && !Illusionist.IsNonCovIllusioned(target1.PlayerId) && !Illusionist.IsNonCovIllusioned(target2.PlayerId))
+                    || (Lich.IsCursed(target1) && Lich.IsCursed(target2))
+                    || (Illusionist.IsCovIllusioned(target1.PlayerId) && Illusionist.IsCovIllusioned(target2.PlayerId))
+                    || (Illusionist.IsNonCovIllusioned(target1.PlayerId) && Illusionist.IsNonCovIllusioned(target2.PlayerId))
+                    || (target1.IsPlayerNeutralTeam() && Lich.IsCursed(target2))
+                    || (Lich.IsCursed(target1) && target2.IsPlayerNeutralTeam())
+                    || (target1.IsPlayerCrewmateTeam() && Illusionist.IsCovIllusioned(target2.PlayerId))
+                    || (Illusionist.IsCovIllusioned(target1.PlayerId) && target2.IsPlayerCrewmateTeam())
+                    || (target1.IsPlayerCovenTeam() && Illusionist.IsNonCovIllusioned(target2.PlayerId))
+                    || (Illusionist.IsNonCovIllusioned(target1.PlayerId) && target2.IsPlayerCovenTeam()))
                     {
                         _ = new LateTask(() =>
                         {

@@ -54,21 +54,32 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.01.25"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.7.1";
+    public const string PluginVersion = "26.02.25"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.8.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
-    /******************* Change one of the three variables to true before making a release. *******************/
-    public static readonly bool devRelease = false; // Latest: V1.8.0 Alpha 1
-    public static readonly bool canaryRelease = false; // Latest: V1.6.0 Beta 2
-    public static readonly bool fullRelease = true; // Latest: V1.7.1
+    // Change this to change alpha/beta/full release
+    public static readonly Release RELEASE = Release.RELEASE;
+
+#pragma warning disable IDE1006 // Naming Styles
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.8.0 Alpha 2
+    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.8.0 Beta 2
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.8.0
+#pragma warning restore IDE1006 // Naming Styles
+
+    public enum Release
+    {
+        ALPHA,
+        BETA,
+        RELEASE
+    }
 
     public static bool hasAccess = true;
 
-    public static readonly bool ShowUpdateButton = false;
+    public static readonly bool ShowUpdateButton = true;
 
     public static readonly bool ShowGitHubButton = false;
     public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
@@ -77,7 +88,7 @@ public class Main : BasePlugin
     public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
 
     public static readonly bool ShowWebsiteButton = false;
-    public static readonly string WebsiteInviteUrl = "https://weareten.ca/";
+    public static readonly string WebsiteInviteUrl = "https://tone2.top/";
 
     public static readonly bool ShowDonationButton = false;
     public static readonly string DonationInviteUrl = "https://weareten.ca/TONE";
@@ -202,6 +213,9 @@ public class Main : BasePlugin
     // public static bool isLoversDead = true;
     // public static readonly HashSet<PlayerControl> LoversPlayers = [];
 
+    public static float GameTimer;
+    public static bool GameEndDueToTimer;
+
     public static bool DoBlockNameChange = false;
     public static int updateTime;
     public const float MinSpeed = 0.0001f;
@@ -235,44 +249,25 @@ public class Main : BasePlugin
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static readonly HashSet<byte> Invisible = [];
 
-    public static PlayerControl[] AllPlayerControls
+    public static IReadOnlyList<PlayerControl> AllPlayerControls => [.. EnumeratePlayerControls()];
+    public static IReadOnlyList<PlayerControl> AllAlivePlayerControls => [.. EnumerateAlivePlayerControls()];
+
+    public static IEnumerable<PlayerControl> EnumeratePlayerControls()
     {
-        get
+        foreach (var pc in PlayerControl.AllPlayerControls)
         {
-            int count = PlayerControl.AllPlayerControls.Count;
-            var result = new PlayerControl[count];
-            int i = 0;
-            foreach (var pc in PlayerControl.AllPlayerControls)
-            {
-                if (pc == null || pc.PlayerId == 255) continue;
-                result[i++] = pc;
-            }
-
-            if (i == 0) return [];
-
-            Array.Resize(ref result, i);
-            return result;
+            if (pc == null || pc.PlayerId >= 254) continue;
+            yield return pc;
         }
     }
 
-    public static PlayerControl[] AllAlivePlayerControls
+    public static IEnumerable<PlayerControl> EnumerateAlivePlayerControls()
     {
-        get
-        {
-            int count = PlayerControl.AllPlayerControls.Count;
-            var result = new PlayerControl[count];
-            int i = 0;
-            foreach (var pc in PlayerControl.AllPlayerControls)
-            {
-                if (pc == null || pc.PlayerId == 255 || !pc.IsAlive() || pc.Data.Disconnected || Pelican.IsEaten(pc.PlayerId)) continue;
-                result[i++] = pc;
-            }
-
-            if (i == 0) return [];
-
-            Array.Resize(ref result, i);
-            return result;
-        }
+        return EnumeratePlayerControls()
+            .Where(pc => pc.IsAlive()
+                        && pc.Data != null
+                        && (!pc.Data.Disconnected || !IntroDestroyed)
+                        && !Pelican.IsEaten(pc.PlayerId));
     }
 
     public static Main Instance;
@@ -782,6 +777,7 @@ public enum CustomRoles
     Hangman,
     Iceologer,
     IdentityThief,
+    Inhibitor,
     Instigator,
     Kamikaze,
     KillingMachine,
