@@ -3365,7 +3365,7 @@
   "EnigmaClueRole2": "The Killer is a Neutral!",
   "EnigmaClueRole3": "The Killer is a Crewmate!",
   "EnigmaClueRole4": "The Killer's Role is {0}!",
-  "EnigmaClueRole5": "The Killer is a Coven member!",
+  "EnigmaClueRole5": "带刀玩家是巫师！",
   "EnigmaClueLevel1": "The Killer's Level is above 50!",
   "EnigmaClueLevel2": "The Killer's Level is below 50!",
   "EnigmaClueLevel3": "The Killer's Level is between {0} and {1}!",
@@ -3931,7 +3931,7 @@
   "OnPlayerJoinMsgTitle": "【 ★ {0} Welcome！★ 】",
   "Pyrophoric": "Pyrophoric",
   "PyrophoricInfo": "Burn yourself and improve your vision",
-  "PyrophoricInfoLong": "(Crewmates):\nAs the Pyrophoric, You can set yourself on fire by entering the vents and increase your vision, but you will die from burning out after setting up meetings.\nDepending on the host settings, you can burn the killer if you are killed while spontaneously combusting, and evicted can take revenge on a random player.",
+  "PyrophoricInfoLong": "(船员阵营):\n自燃者可以通过进入通风管道来点燃自己，并提高视野，不过设定轮会议后就会因燃尽而亡。\n根据房主设置，自燃者自燃时被非特殊击杀可以烧死凶手，被驱逐可以复仇一名随机玩家。",
   "PyrophoricSkillCooldown": "Pyrophoric Cooldown",
   "PyrophoricVision": "Pyrophoric Vision",
   "PyrophoricKilledMeetings": "Burned out and died needed meetings",
@@ -4044,6 +4044,7 @@
   "Choose1IsDead": "A player you selected died, please choose again",
   "SpecialMeeting": "Now is the meeting of the Balancers,you can only vote for <b>{0}</b> or <b>{1}</b>",
   "SpecialMeeting2": "Now is the meeting of the Balancers, you can't choose people outside the meeting",
+  "BalancerDead": "很抱歉，死亡后不能召开天平会议",
   "Brave": "Brave",
   "BraveInfo": "Defeat the King!",
   "BraveInfoLong": "(Crewmate)\nThe Brave can with the number of people on the field to unlock the seer ability,shield and killing ability",
@@ -4412,9 +4413,10 @@
   "PlayerDeleteFromSpectateList": "Player successful delete from spectator list",
   "YouJoinSpectateList": "You have joined the spectator list",
   "YouDeleteFromSpectateList": "You have left the spectator list",
-  "AttemptedToFixBlackScreen": "Try to fix black screen",
   "ShowGameTime": "The game will end in <b>{0}</b> second",
   "EnableGameTimeLimit": "Enable Game Time Limit",
   "GameTimeLimit": "Game Time Limit",
-  "Message.GameTimeLimitDisabled": "<color=#ff1919><size=150%><b> Error </b></size></color>\n<color=#ff1919> Please enable this feature in the settings <b> Game time limit </b></color>"
+  "Message.GameTimeLimitDisabled": "<color=#ff1919><size=150%><b> Error </b></size></color>\n<color=#ff1919> Please enable this feature in the settings <b> Game time limit </b></color>",
+  "NarcInterference": "警局特工干扰了内鬼阵营频道！",
+  "GameTimerEnded": "游戏时间结束"
 }
