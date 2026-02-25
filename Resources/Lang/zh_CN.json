@@ -3365,7 +3365,7 @@
   "EnigmaClueRole2": "带刀玩家是中立！",
   "EnigmaClueRole3": "带刀玩家是船员！",
   "EnigmaClueRole4": "带刀玩家的身份是【{0}】！",
-  "EnigmaClueRole5": "凶手是巫师阵营成员！",
+  "EnigmaClueRole5": "带刀玩家是巫师！",
   "EnigmaClueLevel1": "带刀玩家的游戏等级大于50！",
   "EnigmaClueLevel2": "带刀玩家的游戏等级小于50！",
   "EnigmaClueLevel3": "带刀玩家的等级在 {0} ~ {1} 之间！",
@@ -3931,7 +3931,7 @@
   "OnPlayerJoinMsgTitle": "【 ★ {0} 您好！★ 】",
   "Pyrophoric": "自燃者",
   "PyrophoricInfo": "燃烧自己，提高视野",
-  "PyrophoricInfoLong": "(船员阵营):\n自燃者可以通过进入通风管道来点燃自己，并提高视野，不过设定轮会议后就会因燃尽而亡。\n根据房主设置，自燃者自燃时被击杀可以烧死凶手，被驱逐可以复仇一名随机玩家。",
+  "PyrophoricInfoLong": "(船员阵营):\n自燃者可以通过进入通风管道来点燃自己，并提高视野，不过设定轮会议后就会因燃尽而亡。\n根据房主设置，自燃者自燃时被非特殊击杀可以烧死凶手，被驱逐可以复仇一名随机玩家。",
   "PyrophoricSkillCooldown": "自燃冷却时间",
   "PyrophoricVision": "自燃视野",
   "PyrophoricKilledMeetings": "燃尽而亡需要的会议数",
@@ -4044,6 +4044,7 @@
   "Choose1IsDead": "你选择的某一名玩家死了，请重新选择",
   "SpecialMeeting": "现在是大神官的天平会议，你只能投票给<b>{0}</b>或<b>{1}</b>",
   "SpecialMeeting2": "现在是大神官的天平会议，你不能选择会议外的人",
+  "BalancerDead": "很抱歉，死亡后不能召开天平会议",
   "Brave": "勇者",
   "BraveInfo": "打败魔王！",
   "BraveInfoLong": "(船员阵营):\n勇者可以随着场上人数的减少解锁灵媒，护盾，击杀能力",
@@ -4412,9 +4413,10 @@
   "PlayerDeleteFromSpectateList": "玩家成功移除观战名单",
   "YouJoinSpectateList": "你加入了观战名单",
   "YouDeleteFromSpectateList": "你离开了观战名单",
-  "AttemptedToFixBlackScreen": "尝试修复黑屏",
   "ShowGameTime": "距离游戏结束还剩 <b>{0}</b> 秒",
   "EnableGameTimeLimit": "启用游戏时间限制",
   "GameTimeLimit": "游戏时间限制",
-  "Message.GameTimeLimitDisabled": "<color=#ff1919><size=150%><b>错误</b></size></color>\n<color=#ff1919>请在设置启用<b>游戏时间限制</b></color>"
+  "Message.GameTimeLimitDisabled": "<color=#ff1919><size=150%><b>错误</b></size></color>\n<color=#ff1919>请在设置启用<b>游戏时间限制</b></color>",
+  "NarcInterference": "警局特工干扰了内鬼阵营频道！",
+  "GameTimerEnded": "游戏时间结束"
 }
