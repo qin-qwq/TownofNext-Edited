@@ -2422,6 +2422,9 @@ public static class Utils
 
                                     if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven() && !seer.Is(CustomRoles.Ritualist))
                                         TargetPlayerName = GetTragetId;
+
+                                    if (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Ritualist))
+                                        TargetPlayerName = GetTragetId;
                                 }
                             }
                             else // Guesser Mode is Off ID

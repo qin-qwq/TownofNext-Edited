@@ -55,19 +55,19 @@ public class Main : BasePlugin
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
     public const string PluginVersion = "26.02.26"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.9.0 Alpha 1";
+    public const string PluginDisplayVersion = "1.8.1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
         ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.ALPHA;
+    public static readonly Release RELEASE = Release.RELEASE;
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 1
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.8.0 Beta 2
-    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.8.0
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.8.1
 #pragma warning restore IDE1006 // Naming Styles
 
     public enum Release
