@@ -74,6 +74,7 @@ public class Bait : IAddon
                 || realkiller.Is(CustomRoles.Swooper)
                 || realkiller.Is(CustomRoles.Cleaner)
                 || realkiller.Is(CustomRoles.Swift)
+                || realkiller.Is(CustomRoles.Scavenger)
                 || (DisableReportWhenCC.GetBool() && Utils.IsActive(SystemTypes.Comms) && Camouflage.IsActive && !BaitCanBeReportedUnderAllConditions.GetBool())
                 || (realkiller.Is(CustomRoles.Oblivious) && Oblivious.ObliviousBaitImmune.GetBool()))
                 return;

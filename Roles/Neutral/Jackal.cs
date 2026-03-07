@@ -209,7 +209,7 @@ internal class Jackal : RoleBase
                 Logger.Info($"Jackal {killer.GetNameWithRole()} assigned {role} to {target.GetNameWithRole()}", "Jackal");
 
                 // Remove other team converted roles first
-                foreach (var x in target.GetCustomSubRoles())
+                foreach (var x in target.GetCustomSubRoles().ToList())
                 {
                     if (x.IsBetrayalAddonV2() && x != addon)
                     {
@@ -274,7 +274,7 @@ internal class Jackal : RoleBase
                 if (TargetCanBeSidekick)
                 {
                     // Remove other team converted roles first
-                    foreach (var x in target.GetCustomSubRoles())
+                    foreach (var x in target.GetCustomSubRoles().ToList())
                     {
                         if (x.IsBetrayalAddonV2() && x != addon)
                         {

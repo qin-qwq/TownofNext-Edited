@@ -1344,7 +1344,7 @@ class MeetingHudStartPatch
                 foreach (var pc in Main.EnumerateAlivePlayerControls())
                 {
                     if (pc.IsHost()) continue;
-                    if (!pc.IsPlayerImpostorTeam()) continue;
+                    if (!pc.IsPlayerImpostorTeam() || !pc.GetCustomRole().IsImpostor()) continue;
                     SendMessage(GetString("CanUseImpostorChannel"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")}"), noReplay: true);
                 }
             }

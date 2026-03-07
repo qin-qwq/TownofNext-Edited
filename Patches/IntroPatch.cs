@@ -88,15 +88,13 @@ public class SetUpRoleTextPatch
     public static bool IsInIntro = false;
 
 #if !ANDROID
-    public static void Postfix(IntroCutscene._ShowRole_d__41 __instance, ref bool __result)
+    public static void Prefix(IntroCutscene._ShowRole_d__41 __instance, ref bool __result)
 #else
-    public static void Postfix(IntroCutscene._ShowRole_d__40 __instance, ref bool __result)
+    public static void Prefix(IntroCutscene._ShowRole_d__40 __instance, ref bool __result)
 #endif
     {
-#if !ANDROID
-        if (__instance.__1__state == 1 && __result) // while wait for 2.5s
-#else
-#endif
+        Logger.Info($"IntroCutScene.CoShowRole {__instance.__1__state} + {__result}", "IntroCutScene.CoShowRole.Prefix");
+        if (__instance.__1__state == 0) // RoleName displayed here
         {
             IntroCutscene introCutscene = __instance.__4__this;
 
@@ -887,15 +885,10 @@ class BeginImpostorPatch
     }
 }
 
-#if !ANDROID
-[HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.OnDestroy))]
-#else 
-[HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.StartSFX))]
-[HarmonyPatch(typeof(FungleShipStatus), nameof(FungleShipStatus.StartSFX))]
-#endif
+[HarmonyPatch(typeof(HudManager), nameof(HudManager.OnGameStart))]
 class IntroCutsceneDestroyPatch
 {
-    public static void Prefix()
+    public static void Postfix()
     {
         if (AmongUsClient.Instance.AmHost && !AmongUsClient.Instance.IsGameOver)
         {
@@ -933,9 +926,7 @@ class IntroCutsceneDestroyPatch
                 }
             }
         }
-    }
-    public static void Postfix()
-    {
+
         if (!GameStates.IsInGame) return;
 
         Main.IntroDestroyed = true;
@@ -1004,7 +995,6 @@ class IntroCutsceneDestroyPatch
                 }
             }
 
-
             if (GhostRoleAssign.forceRole.Any()) // Incase user has /up access
             {
                 // Needs to be delayed for the game to load it properly
@@ -1066,10 +1056,6 @@ class IntroCutsceneDestroyPatch
         }
         catch { }
 
-#if !ANDROID
         Logger.Info("OnDestroy", "IntroCutscene");
-#else
-        Logger.Info("StarLight-OnDestroy", "IntroCutscene");
-#endif
     }
 }

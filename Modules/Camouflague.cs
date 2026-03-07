@@ -154,6 +154,7 @@ public static class Camouflage
             foreach (var pc in Main.EnumeratePlayerControls())
             {
                 RpcSetSkin(pc);
+                if (Options.UsePets.GetBool()) pc.RpcSetPet(PetsPatch.GetPetId());
 
                 if (!IsCamouflage && !pc.IsAlive())
                 {

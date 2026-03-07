@@ -584,7 +584,7 @@ static class ExtendedPlayerControl
     }
     public static void SetKillCooldown(this PlayerControl player, float time = -1f, PlayerControl target = null, bool forceAnime = false)
     {
-        if (player == null) return;
+        if (!player) return;
 
         if (!player.HasImpKillButton(considerVanillaShift: true)) return;
         if (player.HasImpKillButton(false) && !player.CanUseKillButton()) return;
@@ -595,7 +595,7 @@ static class ExtendedPlayerControl
         }
 
         player.SetKillTimer(CD: time);
-        if (target == null) target = player;
+        if (!target) target = player;
 
         Logger.Info($"SetKillCooldown for [{player.PlayerId}]{player.GetRealName()} => [{target.PlayerId}]{target.GetRealName()}, forceAnime: {forceAnime}", "SetKillCooldown");
 
@@ -615,7 +615,6 @@ static class ExtendedPlayerControl
         }
         else if (forceAnime || !player.IsModded())
         {
-            player.SyncSettings();
             if (player.AmOwner)
             {
                 time = (Main.AllPlayerKillCooldown[player.PlayerId] /= 2);
@@ -632,6 +631,7 @@ static class ExtendedPlayerControl
             }
             else
             {
+                player.SyncSettings();
                 player.RpcGuardAndKill(target, fromSetKCD: true);
             }
         }
@@ -667,13 +667,13 @@ static class ExtendedPlayerControl
     {
         if (player == null) return;
         if (!player.CanUseKillButton()) return;
-        player.SyncSettings();
         player.SetKillTimer(CD: time);
         if (target == null) target = player;
         if (time >= 0f) Main.AllPlayerKillCooldown[player.PlayerId] = time * 2;
         else Main.AllPlayerKillCooldown[player.PlayerId] *= 2;
         if (forceAnime || !player.IsModded())
         {
+            player.SyncSettings();
             player.RpcGuardAndKill(target, fromSetKCD: true);
         }
         else
@@ -2134,7 +2134,15 @@ static class ExtendedPlayerControl
 
     public static void FixBlackScreen(this PlayerControl pc)
     {
-        if (pc == null || !AmongUsClient.Instance.AmHost || pc.IsModded()) return;
+        if (!pc || !AmongUsClient.Instance.AmHost) return;
+
+        if (MeetingStates.FirstMeeting)
+        {
+            pc.RpcSetRoleDesync(pc.GetCustomRole().GetRoleTypes(), pc.GetClientId());
+            return;
+        }
+
+        if (pc.IsModded()) return;
 
         if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent || pc.inMovingPlat || pc.onLadder || !Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive(), out var dummyGhost))
         {

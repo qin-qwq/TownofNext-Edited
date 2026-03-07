@@ -419,11 +419,6 @@ internal class StartGameHostPatch
 
             if (Options.DraftMode.GetBool())
             {
-                foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
-                {
-                    if (pc != null && DraftAssign.DraftPools.ContainsKey(pc.PlayerId) && DraftAssign.DraftRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.NotAssigned)
-                        DraftAssign.DraftedRoles(pc, IRandom.Instance.Next(1, DraftAssign.DraftPools[pc.PlayerId].Count + 1), false);
-                }
                 foreach (var kvp in DraftAssign.DraftRoles.Where(x => x.Value != CustomRoles.NotAssigned))
                 {
                     if (!RoleAssign.SetRoles.ContainsKey(kvp.Key))

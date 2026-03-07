@@ -2171,6 +2171,7 @@ internal class ChatCommands
         if (text.StartsWith("\n")) text = text[1..];
         if (text.StartsWith("/cmd"))
         {
+            canceled = true;
             text = "/" + text[4..].TrimStart();
         }
         //if (!text.StartsWith("/")) return;

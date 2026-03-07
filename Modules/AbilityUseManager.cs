@@ -40,7 +40,7 @@ public static class AbilityUseManager
         AbilityUseLimit[playerId] = limit;
 
         var player = playerId.GetPlayer();
-        if (AmongUsClient.Instance.AmHost && player.IsNonHostModdedClient() && rpc)
+        if (AmongUsClient.Instance.AmHost && rpc)
         {
             var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncAbilityUseLimit, SendOption.Reliable);
             writer.Write(playerId);

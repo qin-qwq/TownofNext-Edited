@@ -860,7 +860,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(CovenCanVent);
         CovenManager.RunSetUpVentOptions(260032);
-        CovenCanSabotage = BooleanOptionItem.Create(60033, "CovenCanSabotage", true, TabGroup.CovenRoles, false)
+        CovenCanSabotage = BooleanOptionItem.Create(60033, "CovenCanSabotage", false, TabGroup.CovenRoles, false)
             .SetGameMode(CustomGameMode.Standard);
         CovenSabotageMode = StringOptionItem.Create(60134, "CovenSabotageMode", EnumHelper.GetAllNames<CovenManager.SabotageOptionList>(), 0, TabGroup.CovenRoles, false)
             .SetGameMode(CustomGameMode.Standard)
