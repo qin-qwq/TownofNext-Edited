@@ -49,9 +49,7 @@ internal class Hangman : RoleBase
         {
             RPC.PlaySoundRPC(Sounds.KillSound, killer.PlayerId);
             target.SetDeathReason(PlayerState.DeathReason.LossOfHead);
-            target.RpcExileV2();
-            Main.PlayerStates[target.PlayerId].SetDead();
-            target.Data.IsDead = true;
+            target.RpcExileV3();
             target.SetRealKiller(killer);
 
             killer.SetKillCooldown();

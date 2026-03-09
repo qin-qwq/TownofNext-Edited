@@ -169,11 +169,9 @@ internal class AbyssBringer : RoleBase
                 SendConsumedRPC(id, blackHole);
                 Notify();
 
-                nearestPlayer.RpcExileV2();
+                nearestPlayer.RpcExileV3();
                 nearestPlayer.SetRealKiller(_Player);
                 nearestPlayer.SetDeathReason(PlayerState.DeathReason.Consumed);
-                Main.PlayerStates[nearestPlayer.PlayerId].SetDead();
-                MurderPlayerPatch.AfterPlayerDeathTasks(_Player, nearestPlayer, inMeeting: false, fromRole: true);
 
                 if (despawnMode == DespawnMode.After1PlayerEaten)
                 {

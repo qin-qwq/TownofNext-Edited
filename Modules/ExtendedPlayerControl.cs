@@ -369,11 +369,13 @@ static class ExtendedPlayerControl
         if (Main.CurrentServerIsVanilla)
         {
             player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-            return;
         }
-        player.Exiled();
-        var message = new RpcExiled(player.NetId);
-        RpcUtils.LateBroadcastReliableMessage(message);
+        else
+        {
+            player.Exiled();
+            var message = new RpcExiled(player.NetId);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
     }
     public static void RpcExileDesync(this PlayerControl player, PlayerControl seer)
     {
@@ -389,19 +391,43 @@ static class ExtendedPlayerControl
     }
     public static void RpcExileV2(this PlayerControl player)
     {
-        if (Main.CurrentServerIsVanilla)
-        {
-            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-            return;
-        }
         if (player.Is(CustomRoles.Susceptible))
         {
             Susceptible.CallEnabledAndChange(player);
         }
-        player.Exiled();
+        if (Main.CurrentServerIsVanilla)
+        {
+            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
+        }
+        else
+        {
+            player.Exiled();
+            var message = new RpcExiled(player.NetId);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
+    }
+    public static void RpcExileV3(this PlayerControl player)
+    {
+        Main.PlayerStates[player.PlayerId].SetDead();
 
-        var message = new RpcExiled(player.NetId);
-        RpcUtils.LateBroadcastReliableMessage(message);
+        if (player.Is(CustomRoles.Susceptible))
+        {
+            Susceptible.CallEnabledAndChange(player);
+        }
+
+        if (Main.CurrentServerIsVanilla)
+        {
+            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
+        }
+        else
+        {
+            player.Exiled();
+            var message = new RpcExiled(player.NetId);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
+
+        player.Data.IsDead = true;
+        MurderPlayerPatch.AfterPlayerDeathTasks(player, player, GameStates.IsMeeting, true);
     }
     public static void RpcCastVote(this PlayerControl player, byte suspectIdx)
     {

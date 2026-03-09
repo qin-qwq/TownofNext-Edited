@@ -288,10 +288,7 @@ internal class ControllerManagerUpdatePatch
             {
                 PlayerControl.LocalPlayer.SetDeathReason(PlayerState.DeathReason.etc);
                 PlayerControl.LocalPlayer.SetRealKiller(PlayerControl.LocalPlayer);
-                Main.PlayerStates[PlayerControl.LocalPlayer.PlayerId].SetDead();
-                PlayerControl.LocalPlayer.RpcExileV2();
-                PlayerControl.LocalPlayer.Data.IsDead = true;
-                MurderPlayerPatch.AfterPlayerDeathTasks(PlayerControl.LocalPlayer, PlayerControl.LocalPlayer, GameStates.IsMeeting);
+                PlayerControl.LocalPlayer.RpcExileV3();
 
                 Utils.SendMessage(GetString("HostKillSelfByCommand"), title: $"<color=#ff0000>{GetString("DefaultSystemMessageTitle")}</color>");
             }

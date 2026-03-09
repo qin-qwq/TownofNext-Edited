@@ -292,11 +292,9 @@ internal class MoonDancer : CovenManager
                 if (killer == null || target == null) continue;
                 Main.AllPlayerSpeed[tar] = Main.AllPlayerSpeed[tar] - 0.5f + originalSpeed[tar];
                 ReportDeadBodyPatch.CanReport[tar] = true;
-                target.RpcExileV2();
+                target.RpcExileV3();
                 target.SetRealKiller(killer);
                 tar.SetDeathReason(PlayerState.DeathReason.BlastedOff);
-                Main.PlayerStates[tar].SetDead();
-                MurderPlayerPatch.AfterPlayerDeathTasks(killer, target, true);
                 Logger.Info($"{killer.GetRealName()} Blasted Off {target.GetRealName()}", "MoonDancer");
             }
             BlastedOffList[pc.Key].Clear();
@@ -311,7 +309,7 @@ internal class MoonDancer : CovenManager
         {
             var pc = GetPlayerById(bl);
             pc.SetRealKiller(moonDancer);
-            pc.RpcExileV2();
+            pc.RpcExileV3();
             pc.SetDeathReason(PlayerState.DeathReason.BlastedOff);
         }
     }

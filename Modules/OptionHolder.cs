@@ -43,7 +43,9 @@ public static class Options
     private static readonly string[] presets =
     [
         Main.Preset1.Value, Main.Preset2.Value, Main.Preset3.Value,
-        Main.Preset4.Value, Main.Preset5.Value
+        Main.Preset4.Value, Main.Preset5.Value, Main.Preset6.Value,
+        Main.Preset7.Value, Main.Preset8.Value, Main.Preset9.Value,
+        Main.Preset10.Value
     ];
 
     // Custom Game Mode
@@ -557,8 +559,6 @@ public static class Options
     public static OptionItem DisableCollectShells;
 
     public static OptionItem OverrideMedbayScan_OnVisualOff;
-    public static OptionItem OverrideMedbayScan_MinPlayer;
-    public static OptionItem OverrideMedbayScan_MaxPlayer;
 
     // Guesser Mode
     public static OptionItem GuesserMode;
@@ -584,6 +584,7 @@ public static class Options
     public static OptionItem UsePets;
     public static OptionItem PetToAssignToEveryone;
     public static OptionItem CancelPetAnimation;
+    public static OptionItem CantUseAbilityDuringDiscussionTime;
     public static OptionItem EnableImpostorChannel;
     public static OptionItem EnableGameTimeLimit;
     public static OptionItem GameTimeLimit;
@@ -2013,12 +2014,6 @@ public static class Options
         OverrideMedbayScan_OnVisualOff = BooleanOptionItem.Create(60671, "OverrideMedbayScan_OnVisualOff", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(239, 89, 175, byte.MaxValue));
-        OverrideMedbayScan_MinPlayer = IntegerOptionItem.Create(60672, "OverrideMedbayScan_MinPlayer", new(1, 15, 1), 1, TabGroup.ModSettings, false)
-            .SetParent(OverrideMedbayScan_OnVisualOff)
-            .SetValueFormat(OptionFormat.Players);
-        OverrideMedbayScan_MaxPlayer = IntegerOptionItem.Create(60673, "OverrideMedbayScan_MaxPlayer", new(1, 100, 1), 3, TabGroup.ModSettings, false)
-            .SetParent(OverrideMedbayScan_OnVisualOff)
-            .SetValueFormat(OptionFormat.Players);
 
         // Meeting Settings
         TextOptionItem.Create(10000034, "MenuTitle.Meeting", TabGroup.ModSettings)
@@ -2210,8 +2205,11 @@ public static class Options
         CancelPetAnimation = BooleanOptionItem.Create(61102, "CancelPetAnimation", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        CantUseAbilityDuringDiscussionTime = BooleanOptionItem.Create(61103, "CantUseAbilityDuringDiscussionTime", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
 
-        EnableImpostorChannel = BooleanOptionItem.Create(61103, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
+        EnableImpostorChannel = BooleanOptionItem.Create(61104, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));

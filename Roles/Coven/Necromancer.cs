@@ -287,10 +287,8 @@ internal class Necromancer : CovenManager
         if (GameStates.IsMeeting && player.IsAlive())
         {
             player.SetDeathReason(PlayerState.DeathReason.Kill);
-            player.RpcExileV2();
-            player.Data.IsDead = true;
+            player.RpcExileV3();
             player.Data.MarkDirty();
-            Main.PlayerStates[player.PlayerId].SetDead();
             player.SetRealKiller(killer);
             Killer = null;
             return;

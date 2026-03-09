@@ -146,6 +146,11 @@ internal class Inspector : RoleBase
                 SendMessage(error, pc.PlayerId);
                 return true;
             }
+            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            {
+                pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
+                return true;
+            }
             var target1 = GetPlayerById(targetId1);
             // Voodoo Master Check 1
             bool target1IsVM = false;

@@ -434,11 +434,9 @@ internal class Famine : RoleBase
                 var target = tar.GetPlayer();
                 var killer = pc.Key.GetPlayer();
                 if (killer == null || target == null) continue;
-                target.RpcExileV2();
+                target.RpcExileV3();
                 target.SetRealKiller(killer);
                 tar.SetDeathReason(PlayerState.DeathReason.Starved);
-                Main.PlayerStates[tar].SetDead();
-                MurderPlayerPatch.AfterPlayerDeathTasks(killer, target, true);
                 Logger.Info($"{killer.GetRealName()} has starved {target.GetRealName()}", "Famine");
             }
         }

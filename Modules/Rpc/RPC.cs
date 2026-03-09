@@ -349,10 +349,10 @@ internal class RPCHandlerPatch
                     // Set Value Options
                     option.SetValue(reader.ReadPackedInt32(), false);
 
-                    // Set Preset 5 for modded non-host players
-                    if (startAmount == 0 && option.Name == "Preset" && option.CurrentValue != 4)
+                    // Set Preset 10 for modded non-host players
+                    if (startAmount == 0 && option.Name == "Preset" && option.CurrentValue != 9)
                     {
-                        option.SetValue(4); // 4 => Preset 5
+                        option.SetValue(9); // 9 => Preset 10
                     }
                 }
 

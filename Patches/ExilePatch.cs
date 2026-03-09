@@ -168,7 +168,7 @@ class ExileControllerWrapUpPatch
                     exiled != null && // Exiled is not null
                     exiled.Object != null) //exiled.Object is not null
                 {
-                    exiled.Object.RpcExileV2();
+                    exiled.Object.RpcExileV3();
                 }
             }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
 
@@ -186,16 +186,13 @@ class ExileControllerWrapUpPatch
                     Logger.Info($"{player?.GetNameWithRole().RemoveHtmlTags()} died with {x.Value}", "AfterMeetingDeath");
 
                     state.deathReason = x.Value;
-                    state.SetDead();
-                    player?.RpcExileV2();
+                    player?.RpcExileV3();
 
                     // Just to be sure
                     _ = new LateTask(() => player?.RpcExile(), 0.5f, "Extra Exile to be Sure");
 
                     if (x.Value == PlayerState.DeathReason.Suicide)
                         player?.SetRealKiller(player, true);
-
-                    MurderPlayerPatch.AfterPlayerDeathTasks(player, player, true);
                 });
 
                 Main.AfterMeetingDeathPlayers.Clear();

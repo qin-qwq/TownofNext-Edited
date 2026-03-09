@@ -122,10 +122,8 @@ internal class Agitater : RoleBase
         if (target == null || killer == null) return;
 
         CurrentBombedPlayer.SetDeathReason(PlayerState.DeathReason.Bombed);
-        Main.PlayerStates[CurrentBombedPlayer].SetDead();
-        target.RpcExileV2();
+        target.RpcExileV3();
         target.SetRealKiller(killer);
-        MurderPlayerPatch.AfterPlayerDeathTasks(killer, target, true);
         ResetBomb();
         Logger.Info($"{killer.GetRealName()} bombed {target.GetRealName()} on report", "Agitater");
     }

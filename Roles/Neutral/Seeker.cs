@@ -100,7 +100,7 @@ internal class Seeker : RoleBase
             {
                 // No target for Seeker to find, normally this wont happen, Seeker already loses the game.
                 player.SetDeathReason(PlayerState.DeathReason.Suicide);
-                player.RpcExileV2();
+                player.RpcExileV3();
                 player.SetRealKiller(player);
             }
             return;

@@ -102,6 +102,11 @@ internal class Ritualist : CovenManager
                 pc.ShowInfoMessage(isUI, error);
                 return true;
             }
+            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            {
+                pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
+                return true;
+            }
             if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
             {
                 pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));

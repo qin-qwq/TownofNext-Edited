@@ -123,5 +123,5 @@ public static class OptionSaver
     }
 
     /// <summary>Raise the number here when making incompatible changes to the format of an option (e.g., changing the number of presets)</summary>
-    public static readonly int Version = 1;
+    public static readonly int Version = 2;
 }

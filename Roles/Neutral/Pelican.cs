@@ -181,11 +181,9 @@ internal class Pelican : RoleBase
                 Main.AllPlayerSpeed[tar] = Main.AllPlayerSpeed[tar] - 0.5f + originalSpeed[tar];
                 ReportDeadBodyPatch.CanReport[tar] = true;
                 if (target.IsTransformedNeutralApocalypse()) continue;
-                target.RpcExileV2();
+                target.RpcExileV3();
                 target.SetRealKiller(killer);
                 tar.SetDeathReason(PlayerState.DeathReason.Eaten);
-                Main.PlayerStates[target.PlayerId].SetDead();
-                MurderPlayerPatch.AfterPlayerDeathTasks(killer, target, true);
                 Logger.Info($"{killer.GetRealName()} 消化了 {target.GetRealName()}", "Pelican");
             }
             eatenList[pc.Key].Clear();

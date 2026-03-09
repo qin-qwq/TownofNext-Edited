@@ -1517,9 +1517,7 @@ class MeetingHudUpdatePatch
                 {
                     player.SetDeathReason(PlayerState.DeathReason.Execution);
                     player.SetRealKiller(PlayerControl.LocalPlayer);
-                    player.RpcExileV2();
-                    Main.PlayerStates[player.PlayerId].SetDead();
-                    MurderPlayerPatch.AfterPlayerDeathTasks(PlayerControl.LocalPlayer, player, GameStates.IsMeeting);
+                    player.RpcExileV3();
                     SendMessage(string.Format(GetString("Message.Executed"), player.Data.PlayerName));
                     Logger.Info($"{player.GetNameWithRole()} was executed", "Execution");
                     __instance.CheckForEndVoting();

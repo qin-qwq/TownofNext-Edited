@@ -327,7 +327,7 @@ public abstract class OptionItem
         public int BeforeValue { get; set; } = beforeValue;
     }
 
-    public const int NumPresets = 5;
+    public const int NumPresets = 10;
     public const int PresetId = 0;
 }
 [Obfuscation(Exclude = true)]
