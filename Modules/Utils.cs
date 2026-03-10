@@ -460,6 +460,23 @@ public static class Utils
         _ = ColorUtility.TryParseHtmlString(hexColor, out Color c);
         return c;
     }
+    public static Color GetTabColor(this TabGroup tab)
+    {
+        string htmlcolor = tab switch
+        {
+            TabGroup.SystemSettings => Main.ModColor,
+            TabGroup.ModSettings => "#59ef83",
+            TabGroup.ImpostorRoles => "#f74631",
+            TabGroup.CrewmateRoles => "#8cffff",
+            TabGroup.NeutralRoles => "#7f8c8d",
+            TabGroup.CovenRoles => "#ac42f2",
+            TabGroup.Addons => "#ff9ace",
+            _ => "#ffffff",
+        };
+
+        _ = ColorUtility.TryParseHtmlString(htmlcolor, out Color c);
+        return c;
+    }
     public static string GetRoleColorCode(CustomRoles role)
     {
         if (!Main.roleColors.TryGetValue(role, out var hexColor)) hexColor = "#ffffff";
@@ -1065,17 +1082,6 @@ public static class Utils
         {
             SendSpesificMessage(EndGamePatch.MainRoleLog, PlayerId);
         }
-    }
-    public static string GetTeamMark(CustomRoles role, int sizePer)
-    {
-        string text = "　";
-        if (role.IsAdditionRole()) text = "<color=#ff9ace>Ⓐ</color>";
-        else if (role.IsImpostor()) text = "<color=#ff1919>Ⓘ</color>";
-        else if (role.IsCrewmate()) text = "<color=#8cffff>Ⓒ</color>";
-        else if (role.IsNeutral()) text = "<color=#7f8c8d>Ⓝ</color>";
-        else if (role.IsCoven()) text = "<color=#ac42f2>Ⓒ</color>";
-
-        return $"<size={sizePer}%>{text}</size>";
     }
     public static void ShowLastResult(byte PlayerId = byte.MaxValue)
     {

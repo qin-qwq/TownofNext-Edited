@@ -4317,7 +4317,6 @@
   "SupportsPetMessage": "\n\n<color=#FFD4F8>★ 该职业支持通过宠物按钮发动技能，并代替了管道，变形，消失，击杀触发技能</color>",
   "Command.sicons": "<color=#ffab1b>★ - 该职业支持通过宠物按钮发动技能，只在可以使用宠物释放技能设置开启时分配</color>\n<color=#FFD4F8>★ - 该职业支持通过宠物按钮发动技能，但正常分配</color>",
   "Command.siconinfo": "→ 显示设置中图标的含义",
-  "Warning.UsePetsIsNotEnabled": "警告：<color=#FFD4F8><b>可以使用宠物释放技能</b></color>没有启用！",
   "CDPT": "<color=#00ffa5>技能冷却时间：</color> <color=#ffffff><b>{0}</b>秒</color>",
   "AbilityOnCooldown": "<color=#ffff00>技能还在冷却！</color>",
   "MenuTitle.Ability": "★ 技能相关设定 ★",
@@ -4423,5 +4422,7 @@
   "NarcInterference": "警局特工干扰了内鬼阵营频道！",
   "GameTimerEnded": "游戏时间结束",
   "CantUseAbilityDuringDiscussionTime": "不能在讨论时间使用技能（不包括猜测）",
-  "UseAbilityDuringDiscussion": "很抱歉，你不能在讨论时间使用技能"
+  "UseAbilityDuringDiscussion": "很抱歉，你不能在讨论时间使用技能",
+  "LobbyViewSettings_ShowOnlyEnabledRolesButtonText": "显示启用职业",
+  "LobbyViewSettings_ShowAlldRolesButtonText": "显示所有职业"
 }

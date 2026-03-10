@@ -687,7 +687,6 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<CustomModdedData>();
 
         ClassInjector.RegisterTypeInIl2Cpp<ErrorText>();
-        ClassInjector.RegisterTypeInIl2Cpp<OptionShower>();
         ClassInjector.RegisterTypeInIl2Cpp<MeetingHudPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();

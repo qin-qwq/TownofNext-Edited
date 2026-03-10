@@ -13,9 +13,8 @@ public enum CustomGameMode
 {
     Standard = 0x01,
     FFA = 0x02,
-
-    SpeedRun = 0x04,
-    TagMode = 0x05,
+    SpeedRun = 0x03,
+    TagMode = 0x04,
 
     HidenSeekTONE = 0x08, // HidenSeekTONE must be after other game modes
     All = int.MaxValue
@@ -1476,27 +1475,38 @@ public static class Options
             .SetColor(Color.yellow)
             .SetHeader(true);
         CrewmatesCanGuess = BooleanOptionItem.Create(60681, "CrewmatesCanGuess", false, TabGroup.ModSettings, false)
-            .SetParent(GuesserMode);
+            .SetParent(GuesserMode)
+            .SetGameMode(CustomGameMode.Standard);
         CrewCanGuessCrew = BooleanOptionItem.Create(60686, "CrewCanGuessCrew", true, TabGroup.ModSettings, false)
-            .SetParent(CrewmatesCanGuess);
+            .SetParent(CrewmatesCanGuess)
+            .SetGameMode(CustomGameMode.Standard);
         ImpostorsCanGuess = BooleanOptionItem.Create(60682, "ImpostorsCanGuess", false, TabGroup.ModSettings, false)
-            .SetParent(GuesserMode);
+            .SetParent(GuesserMode)
+            .SetGameMode(CustomGameMode.Standard);
         ImpCanGuessImp = BooleanOptionItem.Create(60687, "ImpCanGuessImp", true, TabGroup.ModSettings, false)
-            .SetParent(ImpostorsCanGuess);
+            .SetParent(ImpostorsCanGuess)
+            .SetGameMode(CustomGameMode.Standard);
         NeutralKillersCanGuess = BooleanOptionItem.Create(60683, "NeutralKillersCanGuess", false, TabGroup.ModSettings, false)
-            .SetParent(GuesserMode);
+            .SetParent(GuesserMode)
+            .SetGameMode(CustomGameMode.Standard);
         NeutralApocalypseCanGuess = BooleanOptionItem.Create(60690, "NeutralApocalypseCanGuess", false, TabGroup.ModSettings, false)
-            .SetParent(GuesserMode);
+            .SetParent(GuesserMode)
+            .SetGameMode(CustomGameMode.Standard);
         ApocCanGuessApoc = BooleanOptionItem.Create(60691, "ApocCanGuessApoc", false, TabGroup.ModSettings, false)
-            .SetParent(NeutralApocalypseCanGuess);
+            .SetParent(NeutralApocalypseCanGuess)
+            .SetGameMode(CustomGameMode.Standard);
         PassiveNeutralsCanGuess = BooleanOptionItem.Create(60684, "PassiveNeutralsCanGuess", false, TabGroup.ModSettings, false)
-            .SetParent(GuesserMode);
+            .SetParent(GuesserMode)
+            .SetGameMode(CustomGameMode.Standard);
         CovenCanGuess = BooleanOptionItem.Create(60693, "CovenCanGuess", false, TabGroup.ModSettings, false)
-            .SetParent(GuesserMode);
+            .SetParent(GuesserMode)
+            .SetGameMode(CustomGameMode.Standard);
         CovenCanGuessCoven = BooleanOptionItem.Create(60692, "CovenCanGuessCoven", false, TabGroup.ModSettings, false)
-            .SetParent(CovenCanGuess);
+            .SetParent(CovenCanGuess)
+            .SetGameMode(CustomGameMode.Standard);
         CanGuessAddons = BooleanOptionItem.Create(60685, "CanGuessAddons", true, TabGroup.ModSettings, false)
-            .SetParent(GuesserMode);
+            .SetParent(GuesserMode)
+            .SetGameMode(CustomGameMode.Standard);
 
         ShowOnlyEnabledRolesInGuesserUI = BooleanOptionItem.Create(60689, "ShowOnlyEnabledRolesInGuesserUI", true, TabGroup.ModSettings, false)
             .SetHeader(true)
@@ -1728,8 +1738,8 @@ public static class Options
 
         // Disable
         TextOptionItem.Create(10000027, "MenuTitle.Disable", TabGroup.ModSettings)
-            .SetColor(new Color32(255, 153, 153, byte.MaxValue))
-            .HideInHnS();
+            .SetColor(new Color32(255, 153, 153, byte.MaxValue));
+            //.HideInHnS();
 
         DisableShieldAnimations = BooleanOptionItem.Create(60560, "DisableShieldAnimations", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
@@ -2011,7 +2021,7 @@ public static class Options
         DisableActivateWeatherNodes = BooleanOptionItem.Create(60670, "DisableActivateWeatherNodes", false, TabGroup.ModSettings, false)
             .SetParent(DisableOtherTasks);
 
-        OverrideMedbayScan_OnVisualOff = BooleanOptionItem.Create(60671, "OverrideMedbayScan_OnVisualOff", false, TabGroup.ModSettings, false)
+        OverrideMedbayScan_OnVisualOff = BooleanOptionItem.Create(60671, "OverrideMedbayScan_OnVisualOff", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(239, 89, 175, byte.MaxValue));
 
@@ -2237,7 +2247,8 @@ public static class Options
 
     public static void SetupRoleOptions(int id, TabGroup tab, CustomRoles role, CustomGameMode customGameMode = CustomGameMode.Standard, bool zeroOne = false)
     {
-        var spawnOption = StringOptionItem.Create(id, role.ToString(), zeroOne ? EnumHelper.GetAllNames<RatesZeroOne>() : EnumHelper.GetAllNames<SpawnChance>(), 0, tab, false).SetColor(Utils.GetRoleColor(role))
+        var spawnOption = StringOptionItem.Create(id, role.ToString(), zeroOne ? EnumHelper.GetAllNames<RatesZeroOne>() : EnumHelper.GetAllNames<SpawnChance>(), 0, tab, false)
+            .SetColor(Utils.GetRoleColor(role))
             .SetHeader(true)
             .SetGameMode(customGameMode) as StringOptionItem;
 

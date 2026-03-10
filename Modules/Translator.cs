@@ -485,4 +485,14 @@ public static class Translator
             item.Value.Where(x => x.Contains("<INVALID:".ToLower())).ToList().ForEach(x => item.Value.Remove(x));
         }
     }
+
+    public static bool LangHasSensitiveOutlineText()
+    {
+        return TranslationController.InstanceExists && TranslationController.Instance.currentLanguage.languageID is
+                SupportedLangs.Russian or
+                SupportedLangs.Korean or
+                SupportedLangs.Japanese or
+                SupportedLangs.SChinese or
+                SupportedLangs.TChinese;
+    }
 }

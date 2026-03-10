@@ -314,6 +314,7 @@ public class GameSettingMenuPatch
 
             Result.Do(x => x.SetHidden(true));
 
+            settingsTab.scrollBar.ScrollToTop();
             GameOptionsMenuPatch.ReCreateSettings(settingsTab);
             textField.Clear();
         }

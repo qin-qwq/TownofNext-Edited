@@ -1,5 +1,6 @@
 using System;
 using TONE.Modules;
+using TONE.Patches;
 using TONE.Modules.Rpc;
 using UnityEngine;
 
@@ -191,14 +192,15 @@ public abstract class OptionItem
     public virtual int GetValue() => IsSingleValue ? SingleValue : AllValues[CurrentPreset];
 
     // Deprecated IsHidden function
-    public virtual bool IsHiddenOn(CustomGameMode mode)
+    public virtual bool IsHiddenOn(CustomGameMode mode, bool forLobbyView = false, bool checkCollapsedSection = true)
     {
+        if (forLobbyView) mode = LobbyViewSettingsPanePatch.LastGameModeSelected;
         return IsHidden || this.Parent?.IsHiddenOn(Options.CurrentGameMode) == true
             || (HideOptionInFFA != CustomGameMode.All && HideOptionInFFA == mode)
             || (HideOptionInHnS != CustomGameMode.All && HideOptionInHnS == mode)
             || (HideOptionInSpeedRun != CustomGameMode.All && HideOptionInSpeedRun == mode)
             || (HideOptionInTagMode != CustomGameMode.All && HideOptionInTagMode == mode)
-            || (Header is { CollapsesSection: true })
+            || (checkCollapsedSection && Header is { CollapsesSection: true })
             || (GameMode != CustomGameMode.All && GameMode != mode);
     }
     public string ApplyFormat(string value)

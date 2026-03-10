@@ -112,6 +112,14 @@ public class GameStartManagerPatch
                 if (AURoleOptions.GuardianAngelCooldown == 0f)
                     AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
             }
+
+            if (!HudManager.InstanceExists) return;
+
+            if (__instance.LobbyInfoPane.gameObject.activeSelf)
+            {
+                var lobbyViewSettingsPane = __instance.LobbyInfoPane.LobbyViewSettingsPane;
+                lobbyViewSettingsPane.scrollBar.enabled = !HudManager.Instance.Chat.IsOpenOrOpening;
+            }
         }
     }
 

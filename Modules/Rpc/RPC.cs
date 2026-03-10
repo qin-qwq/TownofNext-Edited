@@ -320,9 +320,6 @@ internal class RPCHandlerPatch
                         optionItem.SetValue(value, false);
                     }
 
-                    // Reset pages in OptionShower
-                    OptionShower.GetText();
-
                     return;
                 }
 
@@ -355,9 +352,6 @@ internal class RPCHandlerPatch
                         option.SetValue(9); // 9 => Preset 10
                     }
                 }
-
-                // Reset pages in OptionShower
-                OptionShower.GetText();
                 break;
 
             case CustomRPC.RemoveSubRole:
