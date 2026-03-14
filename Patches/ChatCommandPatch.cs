@@ -1833,6 +1833,7 @@ internal class ChatCommands
                     Logger.Info("Game Starting", "ChatCommand");
                     break;
                 case "/deck":
+                case "/timelimit":
                     canceled = true;
                     DeckCommand(PlayerControl.LocalPlayer, text, args);
                     break;
@@ -3552,6 +3553,7 @@ internal class ChatCommands
                 GameManager.Instance.LogicFlow.CheckEndCriteria();
                 break;
             case "/deck":
+            case "/timelimit":
                 DeckCommand(player, text, args);
                 break;
             case "/ds":

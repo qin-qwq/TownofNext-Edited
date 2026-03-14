@@ -48,7 +48,6 @@ internal class ChangeRoleSettings
             }
             else if (GameStates.IsHideNSeek)
             {
-                Main.HideNSeekOptions.NumImpostors = Options.NumImpostorsHnS.GetInt();
                 Main.AliveImpostorCount = Main.HideNSeekOptions.NumImpostors;
             }
 
@@ -670,24 +669,48 @@ internal class SelectRolesPatch
 
         if (GameStates.IsHideNSeek)
         {
-            if (Main.EnableGM.Value)
+            var ImpostorNum = Options.NumImpostorsHnS.GetInt();
+            var Impostor = new List<PlayerControl>();
+
+            if (Main.HideNSeekOptions.ImpostorPlayerID != -1)
             {
-                PlayerControl.LocalPlayer.RpcSetCustomRole(CustomRoles.GM);
-                PlayerControl.LocalPlayer.RpcSetRole(RoleTypes.Crewmate, false);
-                PlayerControl.LocalPlayer.Data.IsDead = true;
-                Main.PlayerStates[PlayerControl.LocalPlayer.PlayerId].SetDead();
+                var player = Utils.GetPlayerById(Main.HideNSeekOptions.ImpostorPlayerID);
+                if (player) Impostor.Add(player);
             }
 
-            foreach (var player in Main.EnumeratePlayerControls())
+            var Player = Main.EnumeratePlayerControls().Shuffle(IRandom.Instance).ToList();
+            foreach (var player in Player)
             {
-                if (!player.IsDisconnected() && TagManager.AssignGameMaster(player.FriendCode))
+                if (Main.EnableGM.Value && player.IsHost())
+                {
+                    player.RpcSetCustomRole(CustomRoles.GM);
+                    player.RpcSetRole(RoleTypes.Crewmate, false);
+                    player.Data.IsDead = true;
+                    Main.PlayerStates[player.PlayerId].SetDead();
+                    continue;
+                }
+                else if (!player.IsDisconnected() && TagManager.AssignGameMaster(player.FriendCode))
                 {
                     Logger.Info($"Setting GM role for [{player.PlayerId}]{player.GetRealName()}", "SelectRolesPatch.HnS");
                     player.RpcSetCustomRole(CustomRoles.GM);
                     player.RpcSetRole(RoleTypes.Crewmate, false);
                     player.Data.IsDead = true;
                     Main.PlayerStates[player.PlayerId].SetDead();
+                    continue;
                 }
+                else if (Impostor.Contains(player))
+                {
+                    player.RpcSetRole(RoleTypes.Impostor);
+                    ImpostorNum--;
+                    continue;
+                }
+                else if (ImpostorNum > 0)
+                {
+                    player.RpcSetRole(RoleTypes.Impostor);
+                    ImpostorNum--;
+                    continue;
+                }
+                player.RpcSetRole(RoleTypes.Engineer);
             }
 
             EAC.OriginalRoles = [];

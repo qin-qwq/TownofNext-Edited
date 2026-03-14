@@ -282,7 +282,7 @@ class TaskPanelBehaviourPatch
 
         if (GameStates.IsHideNSeek)
         {
-            __instance.open = false;
+            //__instance.open = false;
             return;
         }
 

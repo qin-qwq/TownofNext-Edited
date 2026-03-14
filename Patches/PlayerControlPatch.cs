@@ -938,8 +938,6 @@ class ReportDeadBodyPatch
             Logger.Info($"target.Object is null? - {target?.Object == null}", "AfterReportTasks");
             Logger.Info($"target.PlayerId is - {target?.PlayerId}", "AfterReportTasks");
 
-            CustomNetObject.OnMeetingTasks();
-
             foreach (var playerStates in Main.PlayerStates.Values.ToArray())
             {
                 try
@@ -968,6 +966,8 @@ class ReportDeadBodyPatch
                 }
             }
             Rebirth.OnReportDeadBody();
+
+            CustomNetObject.OnMeetingTasks();
 
             // Alchemist & Bloodlust
             Alchemist.OnReportDeadBodyGlobal();

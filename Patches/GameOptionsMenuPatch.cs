@@ -727,6 +727,7 @@ public static class StringOptionPatch
             item.SetValue(__instance.GetInt(), true, true, true);
 
             string name = item.GetName();
+            string name1 = name;
 
             if (item is PresetOptionItem || (item is StringOptionItem && item.Name == "GameMode"))
             {

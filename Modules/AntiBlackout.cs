@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Impostor;
 
 namespace TONE;
 
@@ -397,15 +398,22 @@ public static class AntiBlackout
         foreach (var seer in Main.EnumeratePlayerControls())
         {
             seer.RpcResetAbilityCooldown();
-            seer.RpcAddAbilityCD();
-            if (seer.GetRoleClass() is not DefaultSetup)
+        }
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
+        {
+            pc.RpcAddAbilityCD();
+            if (pc.GetRoleClass() is not DefaultSetup)
             {
-                if (seer.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
+                if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
                 {
-                    seer.ResetKillCooldown();
-                    if (Main.AllPlayerKillCooldown.TryGetValue(seer.PlayerId, out var killTimer) && killTimer > 0f)
+                    pc.ResetKillCooldown();
+                    if (pc.Is(CustomRoles.Saboteur) && Utils.AnySabotageIsActive())
                     {
-                        seer.SetKillCooldown(killTimer);
+                        pc.SetKillCooldown(Saboteur.SaboteurMinCD.GetFloat());
+                    }
+                    else if (Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var killTimer) && killTimer > 0f)
+                    {
+                        pc.SetKillCooldown(killTimer);
                     }
                 }
             }

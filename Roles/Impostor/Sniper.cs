@@ -230,6 +230,7 @@ internal class Sniper : RoleBase
 
             selectedTarget.RpcMurderPlayer(selectedTarget);
             selectedTarget.SetRealKiller(phantom);
+            selectedTarget.SetDeathReason(PlayerState.DeathReason.Sniped);
 
             Logger.Info($"{selectedTarget?.Data?.PlayerName} 被 {phantom?.Data?.PlayerName} 狙击", "Sniper");
         }
@@ -295,6 +296,7 @@ internal class Sniper : RoleBase
             var snipedTarget = targets.OrderBy(c => c.Value).First().Key;
             snipeTarget[sniperId] = snipedTarget.PlayerId;
             snipedTarget.CheckMurder(snipedTarget);
+            snipedTarget.SetDeathReason(PlayerState.DeathReason.Sniped);
 
             if (!Options.DisableShieldAnimations.GetBool())
                 sniper.RpcGuardAndKill();

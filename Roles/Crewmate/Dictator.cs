@@ -169,7 +169,7 @@ internal class Dictator : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dictator)
+            if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dictator && PlayerControl.LocalPlayer.IsAlive())
                 if (ChangeCommandToExpel.GetBool())
                     dictator.CreateDictatorButton(__instance);
         }

@@ -2216,7 +2216,7 @@ static class ExtendedPlayerControl
         int ownerId = pc.OwnerId;
         var ghostPos = dummyGhost.GetCustomPosition();
         var pcPos = pc.GetCustomPosition();
-        var timer = Math.Max(Main.AllPlayerKillCooldown[pc.PlayerId], 0.1f);
+        var timer = pc.GetKillTimer();
         var murderPos = GetBlackRoomPosition();
 
         if (pc.IsAlive())
@@ -2229,7 +2229,7 @@ static class ExtendedPlayerControl
             var message = new RpcMurderPlayer(pc.NetId, dummyGhost.NetId, MurderResultFlags.Succeeded);
             RpcUtils.LateSpecificSendMessage(message, ownerId);
 
-            pc.ReactorFlash(0.2f);            
+            pc.ReactorFlash(0.2f);
         }
         else
         {
@@ -2237,7 +2237,7 @@ static class ExtendedPlayerControl
             var message = new RpcMurderPlayer(pc.NetId, pc.NetId, MurderResultFlags.Succeeded);
             RpcUtils.LateSpecificSendMessage(message, ownerId);
 
-            pc.ReactorFlash(0.2f);                
+            pc.ReactorFlash(0.2f);
         }
 
         _ = new LateTask(() =>

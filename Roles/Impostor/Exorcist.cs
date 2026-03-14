@@ -193,7 +193,7 @@ internal class Exorcist : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Exorcist exorcist)
+            if (PlayerControl.LocalPlayer.GetRoleClass() is Exorcist exorcist && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
                 exorcist.CreateExorcistButton(__instance);
         }
     }

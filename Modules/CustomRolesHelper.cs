@@ -1616,6 +1616,7 @@ public static class CustomRolesHelper
            CustomRoles.Solsticer => CountTypes.None,
            CustomRoles.Revenant => CountTypes.None,
            CustomRoles.Dreamer => CountTypes.Dreamer,
+           CustomRoles.Logos => CountTypes.Logos,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1676,6 +1677,7 @@ public static class CustomRolesHelper
             CustomRoles.Shocker => CustomWinner.Shocker,
             CustomRoles.Dreamer => CustomWinner.Dreamer,
             CustomRoles.TreasureHunter => CustomWinner.TreasureHunter,
+            CustomRoles.Logos => CustomWinner.Logos,
             _ => throw new NotImplementedException()
 
         };
@@ -1710,6 +1712,7 @@ public static class CustomRolesHelper
             CountTypes.RuthlessRomantic => CustomRoles.RuthlessRomantic,
             CountTypes.Shocker => CustomRoles.Shocker,
             CountTypes.Dreamer => CustomRoles.Dreamer,
+            CountTypes.Logos => CustomRoles.Logos,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1798,4 +1801,5 @@ public enum CountTypes
     Shocker,
     Coven,
     Dreamer,
+    Logos,
 }

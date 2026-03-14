@@ -138,7 +138,7 @@ internal partial class Pyrophoric : RoleBase
         if (target.IsDisconnected()) return;
         if (!PyrophoricCanKill.GetBool()) return;
         if (!InPyrophoric) return;
-        if (killer == target || !killer || !target) return;
+        if (isSuicide || !killer || !target) return;
 
         killer.RpcMurderPlayer(killer);
         killer.SetDeathReason(PlayerState.DeathReason.Torched);

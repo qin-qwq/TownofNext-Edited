@@ -888,6 +888,7 @@ class BeginImpostorPatch
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.OnGameStart))]
 class IntroCutsceneDestroyPatch
 {
+    public static long IntroDestroyTS;
     public static void Postfix()
     {
         if (AmongUsClient.Instance.AmHost && !AmongUsClient.Instance.IsGameOver)
@@ -930,6 +931,7 @@ class IntroCutsceneDestroyPatch
         if (!GameStates.IsInGame) return;
 
         Main.IntroDestroyed = true;
+        IntroDestroyTS = Utils.TimeStamp;
 
         foreach (var pc in Main.EnumeratePlayerControls())
         {

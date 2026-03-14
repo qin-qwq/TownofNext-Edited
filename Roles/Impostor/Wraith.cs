@@ -153,4 +153,6 @@ internal class Wraithh : RoleBase
         killer.RpcResetAbilityCooldown();
         return false;
     }
+    // EAC bans players when GA uses sabotage
+    public override bool CanUseSabotage(PlayerControl pc) => false;
 }

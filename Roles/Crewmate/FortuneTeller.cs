@@ -54,6 +54,10 @@ internal class FortuneTeller : RoleBase
             .SetValueFormat(OptionFormat.Times);
         OverrideTasksData.Create(Id + 20, TabGroup.CrewmateRoles, CustomRoles.FortuneTeller);
     }
+    public override void Init()
+    {
+        targetList.Clear();
+    }
     public override void Add(byte playerId)
     {
         playerId.SetAbilityUseLimit(CheckLimitOpt.GetInt());
