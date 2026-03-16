@@ -913,6 +913,9 @@ public static class GuessManager
                 if (!listOfRoles.Contains(CustomRoles.DetectiveTONE))
                     listOfRoles.Add(CustomRoles.DetectiveTONE);
 
+                if (!listOfRoles.Contains(CustomRoles.ViperTONE))
+                    listOfRoles.Add(CustomRoles.ViperTONE);
+
                 if (!listOfRoles.Contains(CustomRoles.Amnesiac))
                     listOfRoles.Add(CustomRoles.Amnesiac);
 
