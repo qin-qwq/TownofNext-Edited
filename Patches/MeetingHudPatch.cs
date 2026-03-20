@@ -722,7 +722,7 @@ class CheckForEndVotingPatch
             }
         }
 
-        Lovers.OnCheckForEndVoting(deathReason, playerIds);
+        //Lovers.OnCheckForEndVoting(deathReason, playerIds);
 
         foreach (var playerId in playerIds)
         {

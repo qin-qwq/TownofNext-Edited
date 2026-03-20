@@ -112,7 +112,7 @@ public static class DraftAssign
         var CovenRoles = allRoles.Where(x => x.IsCoven()).Shuffle(rd).Take(optCovenNum * draftCount);
         var NARoles = allRoles.Where(x => x.IsNA()).Shuffle(rd).Take(optNeutralApocalypseNum * draftCount);
         var NKRoles = allRoles.Where(x => x.IsNK()).Shuffle(rd).Take(optNeutralKillingNum * draftCount);
-        var NNKRoles = allRoles.Where(x => x.IsNNK()).Shuffle(rd).Take(optNonNeutralKillingNum * draftCount);
+        var NNKRoles = allRoles.Where(x => x.IsNonNK()).Shuffle(rd).Take(optNonNeutralKillingNum * draftCount);
 
         if (ImpRoles.Count() < optImpNum * Options.DraftableCount.GetInt() || CovenRoles.Count() < optCovenNum * Options.DraftableCount.GetInt()
         || NARoles.Count() < optNeutralApocalypseNum * Options.DraftableCount.GetInt() || NKRoles.Count() < optNeutralKillingNum * Options.DraftableCount.GetInt()

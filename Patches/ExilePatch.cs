@@ -1,6 +1,7 @@
 using AmongUs.Data;
 using AmongUs.GameOptions;
 using System;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Neutral;
 
@@ -137,6 +138,7 @@ class ExileControllerWrapUpPatch
         foreach (var player in Main.EnumeratePlayerControls())
         {
             player.GetRoleClass()?.OnPlayerExiled(player, exiled);
+            Lovers.OnPlayerExiled(player, exiled);
 
             // Check for remove Pet
             player.RpcRemovePet();

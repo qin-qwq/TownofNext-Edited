@@ -130,7 +130,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Disperser or CustomRoles.RiftMaker => CustomRoles.Transporter, // 分散者，裂缝制造者 => 传送师
                 CustomRoles.Eraser or CustomRoles.Bandit => CustomRoles.Cleanser, // 抹除者，强盗 => 清洗者
                 CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
-                CustomRoles.Workaholic => CustomRoles.Snitch, // 工作狂 => 告密者
+                CustomRoles.Workaholic or CustomRoles.Philosopher => CustomRoles.Snitch, // 工作狂，哲学家 => 告密者
                 CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
                 CustomRoles.Councillor => CustomRoles.Judge, // 邪恶法官 => 法官
                 CustomRoles.Taskinator => CustomRoles.Benefactor, // 任务执行者 => 恩人
@@ -155,7 +155,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Instigator => CustomRoles.Requiter, // 教唆者 => 清算者
                 CustomRoles.Jackal => CustomRoles.ChiefOfPolice, // 豺狼 => 警察局长
                 CustomRoles.Sidekick or CustomRoles.SerialKiller => CustomRoles.Sheriff, // 跟班，连环杀手 => 警长
-                CustomRoles.Underdog => CustomRoles.Brave, // 失败者 => 勇者
+                CustomRoles.Underdog or CustomRoles.Logos => CustomRoles.Brave, // 失败者，逻各斯 => 勇者
                 CustomRoles.Saboteur => CustomRoles.Mechanic, // 破坏者 => 修理工
                 CustomRoles.PlagueBearer => CustomRoles.Socialite, // 瘟疫使者 => 社交达人
                 CustomRoles.Demon => CustomRoles.Spy, // 玩家 => 间谍

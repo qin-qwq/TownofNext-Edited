@@ -366,6 +366,7 @@ public class PlayerState(byte playerId)
         Suffocate,
         Ice,
         AFK,
+        Philosophy,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

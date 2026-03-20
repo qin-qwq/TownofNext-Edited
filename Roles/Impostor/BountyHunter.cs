@@ -99,8 +99,17 @@ internal class BountyHunter : RoleBase
         else
         {
             Logger.Info($"{killer?.Data?.PlayerName}: non-target kills", "BountyHunter");
-            Main.AllPlayerKillCooldown[killer.PlayerId] = FailureKillCooldown;
-            killer.SyncSettings();
+            if (!killer.IsModded())
+            {
+                killer.RpcMurderPlayer(target);
+                killer.SetKillCooldown(FailureKillCooldown, forceAnime: true);
+                return false;
+            }
+            else
+            {
+                Main.AllPlayerKillCooldown[killer.PlayerId] = FailureKillCooldown;
+                killer.SyncSettings();
+            }
         }
 
         return true;

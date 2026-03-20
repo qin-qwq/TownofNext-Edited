@@ -3078,6 +3078,7 @@ public static class Utils
             PlayerState.DeathReason.BlastedOff => CustomRoles.MoonDancer.IsEnable(),
             PlayerState.DeathReason.Suffocate => CustomRoles.Tunny.IsEnable(),
             PlayerState.DeathReason.Ice => CustomRoles.Iceologer.IsEnable(),
+            PlayerState.DeathReason.Philosophy => CustomRoles.Logos.IsEnable(),
             PlayerState.DeathReason.Kill => true,
             _ => true,
         };

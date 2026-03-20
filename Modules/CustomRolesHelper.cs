@@ -918,7 +918,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Visionary)
                     || pc.Is(CustomRoles.GuardianAngelTONE)
                     || pc.Is(CustomRoles.Mimic)
-                    || pc.Is(CustomRoles.Iceologer))
+                    || pc.Is(CustomRoles.Iceologer)
+                    || pc.Is(CustomRoles.Logos))
                     return false;
                 break;
 
@@ -1617,6 +1618,7 @@ public static class CustomRolesHelper
            CustomRoles.Revenant => CountTypes.None,
            CustomRoles.Dreamer => CountTypes.Dreamer,
            CustomRoles.Logos => CountTypes.Logos,
+           CustomRoles.Philosopher => CountTypes.Logos,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,

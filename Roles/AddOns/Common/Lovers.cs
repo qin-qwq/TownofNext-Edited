@@ -155,15 +155,15 @@ public class Lovers : IAddon
         return false;
     }
 
-    public static void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
+    public static void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
-        if (!IsEnable || deathReason == PlayerState.DeathReason.Vote) return;
+        if (!IsEnable) return;
 
         List<byte> toKill = [];
         foreach (var pair in loverPairs)
         {
-            if (exileIds.Contains(pair.Item1) && !exileIds.Contains(pair.Item2)) toKill.Add(pair.Item2);
-            if (exileIds.Contains(pair.Item2) && !exileIds.Contains(pair.Item1)) toKill.Add(pair.Item1);
+            if (exiled.PlayerId == pair.Item1 && exiled.PlayerId != pair.Item2) toKill.Add(pair.Item2);
+            if (exiled.PlayerId == pair.Item2 && exiled.PlayerId != pair.Item1) toKill.Add(pair.Item1);
         }
 
         foreach (var playerId in toKill)

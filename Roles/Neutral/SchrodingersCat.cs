@@ -28,16 +28,18 @@ internal class SchrodingersCat : RoleBase
         killer.RpcGuardAndKill(target);
         target.RpcGuardAndKill();
 
-        CustomRoles role = killer.GetCustomRole();
+        var addon = killer.GetBetrayalAddon(true); 
+        var role = killer.GetCustomRole();
 
         target.GetRoleClass()?.OnRemove(target.PlayerId);
         target.RpcSetCustomRole(role);
         target.RpcChangeRoleBasis(role);
         target.GetRoleClass()?.OnAdd(target.PlayerId);
-        if (killer.Is(CustomRoles.Narc)) target.RpcSetCustomRole(CustomRoles.Narc);
 
-        Utils.NotifyRoles(SpecifySeer: killer, SpecifyTarget: target, ForceLoop: true);
-        Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
+        if (killer.GetBetrayalAddon() != CustomRoles.NotAssigned)
+            target.RpcSetCustomRole(addon);
+
+        Utils.NotifyRoles(SpecifyTarget: target, ForceLoop: true);
 
         target.ResetKillCooldown();
         target.SetKillCooldown(forceAnime: true);
