@@ -54,7 +54,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.03.20"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginVersion = "26.03.21"; // YEAR.MMDD.VERSION.CANARYDEV
     public const string PluginDisplayVersion = "1.9.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [

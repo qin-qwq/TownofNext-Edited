@@ -282,7 +282,7 @@ public class GameStartManagerPatch
                     Logger.SendInGame(GetString("Error.InvalidColorPreventStart"));
                     var msg = GetString("Error.InvalidColor");
                     msg += "\n" + string.Join(",", invalidColor.Select(p => $"{p.GetRealName()}"));
-                    Utils.SendMessage(msg);
+                    Utils.SendMessage(msg, sendOption: Hazel.SendOption.None);
                 }
 
                 GameStartManagerBeginGamePatch.DoTasksForBeginGame();
@@ -312,7 +312,7 @@ public class GameStartManagerBeginGamePatch
             Logger.SendInGame(GetString("Error.InvalidColorPreventStart"));
             var msg = GetString("Error.InvalidColor");
             msg += "\n" + string.Join(",", invalidColor.Select(p => $"{p.GetRealName()}"));
-            Utils.SendMessage(msg);
+            Utils.SendMessage(msg, sendOption: Hazel.SendOption.None);
             return false;
         }
 

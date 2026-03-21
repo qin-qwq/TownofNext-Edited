@@ -338,7 +338,7 @@ internal class Doomsayer : RoleBase
                 var targetName = target.GetRealName();
                 if (targetIsVM) targetName = Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().GetRealName();
                 msg = string.Format(GetString("FortuneTellerCheck.Result"), target.GetRealName(), text);
-                SendMessage(GetString("FortuneTellerCheck") + "\n" + msg, pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()), sendOption: Hazel.SendOption.Reliable);
+                SendMessage(GetString("FortuneTellerCheck") + "\n" + msg, pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
                 void ChooseRole(Custom_Team team)
                 {
                     var num = team switch

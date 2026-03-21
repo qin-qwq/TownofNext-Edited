@@ -93,20 +93,20 @@ internal class Inspector : RoleBase
         if (CheckId == byte.MaxValue)
         {
             CheckId = target.PlayerId;
-            SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()));
+            SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()), sendOption: SendOption.None);
             return;
         }
         else
         {
             if (CheckId == target.PlayerId)
             {
-                SendMessage(GetString("Choose1=2"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()));
+                SendMessage(GetString("Choose1=2"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()), sendOption: SendOption.None);
                 CheckId = byte.MaxValue;
                 return;                
             }
             if (!CheckId.GetPlayer().IsAlive() || !target.IsAlive())
             {
-                SendMessage(GetString("InspectCheckNull"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()));
+                SendMessage(GetString("InspectCheckNull"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()), sendOption: SendOption.None);
                 CheckId = byte.MaxValue;
                 return;
             }
@@ -130,7 +130,7 @@ internal class Inspector : RoleBase
 
         if (!pc.IsAlive())
         {
-            SendMessage(GetString("InspectorDead"), pc.PlayerId);
+            SendMessage(GetString("InspectorDead"), pc.PlayerId, sendOption: SendOption.None);
             return true;
         }
 

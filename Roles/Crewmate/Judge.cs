@@ -130,7 +130,7 @@ internal class Judge : RoleBase
         {
             if (!MsgToPlayerAndRole(msg, out byte targetId, out string error))
             {
-                SendMessage(error, pc.PlayerId);
+                SendMessage(error, pc.PlayerId, sendOption: SendOption.None);
                 return true;
             }
             var target = GetPlayerById(targetId);

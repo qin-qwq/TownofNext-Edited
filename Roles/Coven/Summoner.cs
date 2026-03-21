@@ -153,14 +153,14 @@ internal class Summoner : CovenManager
         if (!pc.IsAlive())
         {
             Logger.Warn("Summoner is dead and cannot use commands.", "Summoner");
-            SendMessage(GetString("Summoner.SummonerDead"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            SendMessage(GetString("Summoner.SummonerDead"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper(), sendOption: SendOption.None);
             return true;
         }
 
         if (!byte.TryParse(msg, out var targetId))
         {
             Logger.Warn("Invalid target ID for /summon command.", "Summoner");
-            SendMessage(GetString("Summoner.InvalidID"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            SendMessage(GetString("Summoner.InvalidID"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper(), sendOption: SendOption.None);
             return true;
         }
 
@@ -169,7 +169,7 @@ internal class Summoner : CovenManager
         if (targetPlayer == null)
         {
             Logger.Warn("Target player is invalid or does not exist.", "Summoner");
-            SendMessage(GetString("Summoner.NullPlayer"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            SendMessage(GetString("Summoner.NullPlayer"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper(), sendOption: SendOption.None);
             return true;
         }
 
@@ -223,6 +223,12 @@ internal class Summoner : CovenManager
         {
             Logger.Warn($"{targetPlayer.GetRealName()} is already alive.", "Summoner");
             SendMessage(GetString("Summoner.PlayerAlive"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            return true;
+        }
+
+        if (targetPlayer.Is(CustomRoles.GM) || targetPlayer.Is(CustomRoles.Lazy) || targetPlayer.Is(CustomRoles.LazyGuy))
+        {
+            SendMessage(GetString("Summoner.CantSummon"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
             return true;
         }
 

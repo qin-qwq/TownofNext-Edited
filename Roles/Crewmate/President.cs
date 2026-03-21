@@ -72,7 +72,7 @@ internal class President : RoleBase
 
         if (!pc.IsAlive())
         {
-            Utils.SendMessage(GetString("PresidentDead"), pc.PlayerId);
+            Utils.SendMessage(GetString("PresidentDead"), pc.PlayerId, sendOption: SendOption.None);
             return false;
         }
 

@@ -4096,6 +4096,7 @@
   "Summoner.NullPlayer": "未找到召唤玩家",
   "Summoner.NoUses": "你已达到最大召唤次数",
   "Summoner.PlayerAlive": "被召唤的玩家还活着",
+  "Summoner.CantSummon": "该玩家无法被召唤",
   "Summoner.AlreadySummoned": "你之前已经召唤过{0}了。根据房主设置，你不能多次召唤同一玩家",
   "Summoner.SummonedThisMeeting": "你已经召唤过一名玩家了。每轮会议只能召唤一名玩家",
   "Summoner.SummonAnnouncement": "<size=3><b>死灵法师召唤了{0}！\n祝你好运！</b></size>",
