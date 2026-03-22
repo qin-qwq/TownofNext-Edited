@@ -19,6 +19,7 @@
 
 <center>
 <a href="https://github.com/qin-qwq/TownofNext-Edited/releases/latest" target="_blank"><img src="https://img.shields.io/badge/Latest Version%20-%231DA1F2.svg?&style=for-the-badge&logo=github&logoColor=white&color=181717"/></a>
+<a href="https://discord.gg/jg4a2Xqrbb" target="_blank"><img src="https://img.shields.io/badge/Discord%20-%231DA1F2.svg?&style=for-the-badge&logo=discord&logoColor=white&color=5662f6"/></a>
 </center>
 
 
