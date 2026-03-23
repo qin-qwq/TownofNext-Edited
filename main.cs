@@ -81,13 +81,13 @@ public class Main : BasePlugin
 
     public static readonly bool ShowUpdateButton = true;
 
-    public static readonly bool ShowGitHubButton = false;
+    public static readonly bool ShowGitHubButton = true;
     public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
 
-    public static readonly bool ShowDiscordButton = false;
-    public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
+    public static readonly bool ShowDiscordButton = true;
+    public static readonly string DiscordInviteUrl = "https://discord.gg/jg4a2Xqrbb";
 
-    public static readonly bool ShowWebsiteButton = false;
+    public static readonly bool ShowWebsiteButton = true;
     public static readonly string WebsiteInviteUrl = "https://tone2.top/";
 
     public static readonly bool ShowDonationButton = false;
@@ -217,9 +217,6 @@ public class Main : BasePlugin
 
     // public static bool isLoversDead = true;
     // public static readonly HashSet<PlayerControl> LoversPlayers = [];
-
-    public static float GameTimer;
-    public static bool GameEndDueToTimer;
 
     public static bool DoBlockNameChange = false;
     public static int updateTime;

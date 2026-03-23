@@ -1287,17 +1287,6 @@ class FixedUpdateInNormalGamePatch
                         if (!player.IsModded() && player.RemainingCD() <= 60)
                             Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false);
                     }
-                    if (playerAmOwner && Options.EnableGameTimeLimit.GetBool())
-                    {
-                        Main.GameTimer += Time.fixedDeltaTime;
-                        
-                        if (Main.GameTimer > Options.GameTimeLimit.GetInt() && Options.CurrentGameMode == CustomGameMode.Standard)
-                        {
-                            Main.GameTimer = 0f;
-                            Main.GameEndDueToTimer = true;
-                            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.None);
-                        }
-                    }
                     CustomRoleManager.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
 
                     player.OnFixedAddonUpdate(lowLoad);

@@ -262,8 +262,6 @@ internal class ChangeRoleSettings
             SabotageMapPatch.TimerTexts = [];
             MapRoomDoorsUpdatePatch.DoorTimerTexts = [];
 
-            Main.GameEndDueToTimer = false;
-
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
             AntiBlackout.Reset();

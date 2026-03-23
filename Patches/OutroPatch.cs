@@ -177,7 +177,6 @@ class EndGamePatch
             Main.RealOptionsData.Restore(GameOptionsManager.Instance.CurrentGameOptions);
             GameOptionsSender.AllSenders.Clear();
             GameOptionsSender.AllSenders.Add(new NormalGameOptionsSender());
-            Main.GameTimer = 0f;
             /* Send SyncSettings RPC */
         }
     }
@@ -296,7 +295,7 @@ class SetEverythingUpPatch
                 __instance.WinText.text = "";
                 __instance.WinText.color = Color.black;
                 __instance.BackgroundBar.material.color = Color.gray;
-                WinnerText.text = GetString(Main.GameEndDueToTimer ? "GameTimerEnded" : "EveryoneDied");
+                WinnerText.text = GetString("EveryoneDied");
                 WinnerText.color = Color.gray;
                 break;
             case CustomWinner.Error:

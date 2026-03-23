@@ -585,8 +585,6 @@ public static class Options
     public static OptionItem CancelPetAnimation;
     public static OptionItem CantUseAbilityDuringDiscussionTime;
     public static OptionItem EnableImpostorChannel;
-    public static OptionItem EnableGameTimeLimit;
-    public static OptionItem GameTimeLimit;
 
     // ------------ General Role Settings ------------
 
@@ -2222,16 +2220,6 @@ public static class Options
         EnableImpostorChannel = BooleanOptionItem.Create(61104, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
-            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-
-        EnableGameTimeLimit = BooleanOptionItem.Create(19329, "EnableGameTimeLimit", false, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetHeader(true)
-            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        GameTimeLimit = FloatOptionItem.Create(19330, "GameTimeLimit", new(60f, 3600f, 60f), 900f, TabGroup.ModSettings, false)
-            .SetParent(EnableGameTimeLimit)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 

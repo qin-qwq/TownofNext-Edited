@@ -176,8 +176,6 @@ internal class StartGameHostPatch
     }
 }
 
-#if !ANDROID
-
 [HarmonyPatch]
 internal class AuthTimeoutPatch
 {
@@ -198,6 +196,22 @@ internal class AuthTimeoutPatch
 
     // If you dont patch this, u still need to wait for 5s
     // I have no idea why this is happening
+#if ANDROID
+    [HarmonyPatch(typeof(AmongUsClient._CoJoinOnlinePublicGame_d__50), nameof(AmongUsClient._CoJoinOnlinePublicGame_d__50.MoveNext))]
+    [HarmonyPrefix]
+    public static void EnableUdpMatchmakingPrefix(AmongUsClient._CoJoinOnlinePublicGame_d__50 __instance)
+    {
+        // Skip to state 1 which just calls CoJoinOnlineGameDirect
+        if (__instance.__1__state == 0 && !ServerManager.Instance.IsHttp)
+        {
+            __instance.__1__state = 1;
+            __instance.__8__1 = new AmongUsClient.__c__DisplayClass50_0
+            {
+                matchmakerToken = string.Empty,
+            };
+        }
+    }
+#else
     [HarmonyPatch(typeof(AmongUsClient._CoJoinOnlinePublicGame_d__49), nameof(AmongUsClient._CoJoinOnlinePublicGame_d__49.MoveNext))]
     [HarmonyPrefix]
     public static void EnableUdpMatchmakingPrefix(AmongUsClient._CoJoinOnlinePublicGame_d__49 __instance)
@@ -212,9 +226,8 @@ internal class AuthTimeoutPatch
             };
         }
     }
-}
 #endif
-
+}
 [HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.UpdateName))]
 public class NetworkedPlayerInfoPatch
 {

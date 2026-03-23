@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
+using Il2CppInterop.Runtime.InteropTypes;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -88,13 +89,13 @@ public class SetUpRoleTextPatch
     public static bool IsInIntro = false;
 
 #if !ANDROID
-    public static void Prefix(IntroCutscene._ShowRole_d__41 __instance, ref bool __result)
+    public static void Postfix(IntroCutscene._ShowRole_d__41 __instance, ref bool __result)
 #else
-    public static void Prefix(IntroCutscene._ShowRole_d__40 __instance, ref bool __result)
+    public static void Postfix(IntroCutscene._ShowRole_d__40 __instance, ref bool __result)
 #endif
     {
         Logger.Info($"IntroCutScene.CoShowRole {__instance.__1__state} + {__result}", "IntroCutScene.CoShowRole.Prefix");
-        if (__instance.__1__state == 0) // RoleName displayed here
+        if (__instance.__1__state == 1 && __result) // RoleName displayed here
         {
             IntroCutscene introCutscene = __instance.__4__this;
 
@@ -885,12 +886,29 @@ class BeginImpostorPatch
     }
 }
 
-[HarmonyPatch(typeof(HudManager), nameof(HudManager.OnGameStart))]
+[HarmonyPatch]
 class IntroCutsceneDestroyPatch
 {
     public static long IntroDestroyTS;
-    public static void Postfix()
+
+    public static MethodBase TargetMethod()
     {
+        if (AccessTools.Method(typeof(IntroCutscene), "OnDestroy") is { } methodInfo)
+        {
+            return methodInfo;
+        }
+
+        return AccessTools.Method(typeof(IntroCutscene_CoBegin), "MoveNext");
+    }
+
+    public static void Prefix(Il2CppObjectBase __instance)
+    {
+        if (__instance.TryCast<IntroCutscene_CoBegin>() is { __1__state: >= 0 })
+        {
+            // return if using enumerator movenext and we are not at last state
+            return;
+        }
+
         if (AmongUsClient.Instance.AmHost && !AmongUsClient.Instance.IsGameOver)
         {
 #if ANDROID
@@ -926,6 +944,15 @@ class IntroCutsceneDestroyPatch
                     target.Data.Role.NameColor = Color.white;
                 }
             }
+        }
+    }
+
+    public static void Postfix(Il2CppObjectBase __instance)
+    {
+        if (__instance.TryCast<IntroCutscene_CoBegin>() is { __1__state: >= 0 })
+        {
+            // return if using enumerator movenext and we are not at last state
+            return;
         }
 
         if (!GameStates.IsInGame) return;
@@ -1035,11 +1062,6 @@ class IntroCutsceneDestroyPatch
             Utils.CheckAndSetVentInteractions();
 
             if (AFKDetector.ActivateOnStart.GetBool()) _ = new LateTask(() => Main.EnumerateAlivePlayerControls().Do(AFKDetector.RecordPosition), 1f);
-
-            _ = new LateTask(() =>
-            {
-                Main.GameTimer = 0f;
-            }, 1f);
 
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
             {

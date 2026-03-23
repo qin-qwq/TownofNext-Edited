@@ -1833,7 +1833,6 @@ internal class ChatCommands
                     Logger.Info("Game Starting", "ChatCommand");
                     break;
                 case "/deck":
-                case "/timelimit":
                     canceled = true;
                     DeckCommand(PlayerControl.LocalPlayer, text, args);
                     break;
@@ -3553,7 +3552,6 @@ internal class ChatCommands
                 GameManager.Instance.LogicFlow.CheckEndCriteria();
                 break;
             case "/deck":
-            case "/timelimit":
                 DeckCommand(player, text, args);
                 break;
             case "/ds":
@@ -3614,17 +3612,7 @@ internal class ChatCommands
 
     private static void DeckCommand(PlayerControl player, string text, string[] args)
     {
-        if (GameStates.IsLobby)
-        {
-            Utils.SendMessage(GetString("Message.CanNotUseInLobby"), player.PlayerId, sendOption: SendOption.None);
-            return;
-        }
-        if (!Options.EnableGameTimeLimit.GetBool())
-        {
-            Utils.SendMessage(GetString("Message.GameTimeLimitDisabled"), player.PlayerId, sendOption: SendOption.None);
-            return;            
-        }
-        Utils.SendMessage(string.Format(GetString("ShowGameTime"), (int)(Options.GameTimeLimit.GetFloat() - Main.GameTimer)), player.PlayerId);
+        return;
     }
 
     private static void DraftStartCommand(PlayerControl player, string text, string[] args)
