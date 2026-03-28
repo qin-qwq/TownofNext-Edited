@@ -23,6 +23,15 @@ public static class CustomRolesHelper
     {
         return role is CustomRoles.Transporter; 
     }
+    public static bool NotSpawnInRoundUp(this CustomRoles role)
+    {
+        return role is CustomRoles.Instigator or CustomRoles.Vindicator or CustomRoles.Mayor or
+                       CustomRoles.Dictator or CustomRoles.Jailer or CustomRoles.Pickpocket or
+                       CustomRoles.Stealer or CustomRoles.Watcher or CustomRoles.Tiebreaker or
+                       CustomRoles.Silent or CustomRoles.Evader or CustomRoles.VoidBallot or
+                       CustomRoles.Influenced or CustomRoles.Swapper or CustomRoles.Collector or
+                       CustomRoles.Speaker;
+    }
     public static CustomRoles GetVNRole(this CustomRoles role) // RoleBase: Impostor, Shapeshifter, Crewmate, Engineer, Scientist
     {
         // Vanilla roles
@@ -80,17 +89,6 @@ public static class CustomRolesHelper
         CustomRoles.EvilSpirit;
 
     }
-    public static bool IsBucketableRole(this CustomRoles role)
-        => !role.IsGhostRole() && !role.IsVanilla() && !(role is CustomRoles.GM
-                    or CustomRoles.SpeedBooster
-                    or CustomRoles.NotAssigned
-                    or CustomRoles.SuperStar
-                    or CustomRoles.Solsticer
-                    or CustomRoles.Killer
-                    or CustomRoles.Mini
-                    or CustomRoles.Apocalypse
-                    or CustomRoles.Coven)
-            && !role.IsTNA() && !role.IsAdditionRole();
 
     public static bool HasGhostRole(this PlayerControl player) => player.GetCustomRole().IsGhostRole() || player.IsAnySubRole(x => x.IsGhostRole());
 

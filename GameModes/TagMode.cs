@@ -317,6 +317,8 @@ public class TZombie : RoleBase
     public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => seer.IsAlive();
 
     public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];
+
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Infected");
 }
 
 public class TCrewmate : RoleBase

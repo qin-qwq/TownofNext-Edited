@@ -18,7 +18,7 @@ class EmergencyMinigamePatch
 {
     public static void Postfix(EmergencyMinigame __instance)
     {
-        if (Options.DisableMeeting.GetBool() || Options.CurrentGameMode != CustomGameMode.Standard)
+        if (Options.DisableMeeting.GetBool() || (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp))
             __instance.Close();
         return;
     }

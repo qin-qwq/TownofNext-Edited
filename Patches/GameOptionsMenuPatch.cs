@@ -666,6 +666,7 @@ public static class StringOptionPatch
                     _ => 0.35f,
                 };
 
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && role.NotSpawnInRoundUp()) name += GetString("NotSpawnRole");
                 if (role.OnlySpawnsWithPetsRole()) name += GetString("RequiresPet");
                 if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) name += GetString("SupportsPet");
 
@@ -731,14 +732,14 @@ public static class StringOptionPatch
 
             if (item is PresetOptionItem || (item is StringOptionItem && item.Name == "GameMode"))
             {
-                if (Options.GameMode.GetInt() == 4 && !GameStates.IsHideNSeek) //Hide And Seek
+                if (Options.GameMode.GetInt() == 5 && !GameStates.IsHideNSeek) //Hide And Seek
                 {
-                    if (Options.prevGameMode == 3) Options.GameMode.SetValue(0);
-                    else Options.GameMode.SetValue(3);
+                    if (Options.prevGameMode == 4) Options.GameMode.SetValue(0);
+                    else Options.GameMode.SetValue(4);
                 }
-                else if (Options.GameMode.GetInt() != 4 && GameStates.IsHideNSeek)
+                else if (Options.GameMode.GetInt() != 5 && GameStates.IsHideNSeek)
                 {
-                    Options.GameMode.SetValue(4);
+                    Options.GameMode.SetValue(5);
                 }
                 GameOptionsMenuPatch.ReOpenSettings(item.Name != "GameMode" ? 1 : 4);
                 Options.prevGameMode = Options.GameMode.GetInt();

@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using System;
+using UnityEngine;
 using static TONE.Options;
 
 namespace TONE.Roles.Crewmate;
@@ -88,4 +89,5 @@ internal class Reverie : RoleBase
         }
         return true;
     }
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");
 }

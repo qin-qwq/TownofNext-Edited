@@ -95,6 +95,9 @@ public static class NameColorManager
 
         if (target.Is(CustomRoles.Mare) && Utils.IsActive(SystemTypes.Electrical) && !isMeeting) color = Main.roleColors[CustomRoles.Mare];
 
+        // Round Up
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && RoundUp.Deputy == target.PlayerId) color = Main.roleColors[CustomRoles.RDeputy];
+
         // Balancer
         if (Balancer.Choose && (Balancer.Target1 == target.PlayerId || Balancer.Target2 == target.PlayerId) && isMeeting) color = Main.roleColors[CustomRoles.Balancer];
 

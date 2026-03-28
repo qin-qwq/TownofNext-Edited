@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using TONE.Modules;
 using TONE.Roles.Core;
 using TONE.Roles.Double;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -62,6 +63,8 @@ internal class Knight : RoleBase
         Logger.Info($"{killer.GetNameWithRole()} : " + "Kill chance used", "Knight");
         return true;
     }
+
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");
 }
 
 internal class Requiter : RoleBase
@@ -120,4 +123,6 @@ internal class Requiter : RoleBase
         killer.RpcRemoveAbilityUse();
         target.SetDeathReason(PlayerState.DeathReason.Retribution);
     }
+
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");
 }

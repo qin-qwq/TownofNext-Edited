@@ -1,4 +1,5 @@
 using TONE.Roles.AddOns.Common;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -48,4 +49,5 @@ internal class Vigilante : RoleBase
         }
         return true;
     }
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");
 }

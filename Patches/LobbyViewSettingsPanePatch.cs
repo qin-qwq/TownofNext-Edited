@@ -521,6 +521,7 @@ public static class LobbyViewSettingsPanePatch
             switch (currentGameMode)
             {
                 case CustomGameMode.Standard:
+                case CustomGameMode.RoundUp:
                     buttonTab.gameObject.SetActive(true);
                     break;
                 default:
@@ -770,7 +771,11 @@ public static class LobbyViewSettingsPanePatch
             foreach (OptionItem option in OptionItem.AllOptions)
             {
                 if (option.Tab != tabName) continue;
-                if (option.GameMode is not CustomGameMode.All && option.GameMode != LastGameModeSelected) continue;
+                if (option.GameMode is not CustomGameMode.All && option.GameMode != LastGameModeSelected)
+                {
+                    if (!(LastGameModeSelected == CustomGameMode.RoundUp && option.GameMode == CustomGameMode.Standard))
+                    continue;
+                }
 
                 var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode, true) && option.Parent?.GetBool() is null or true;
                 var enabled = !option.IsHiddenOn(Options.CurrentGameMode, true, false) && option.Parent?.GetBool() is null or true;
@@ -859,6 +864,7 @@ public static class LobbyViewSettingsPanePatch
 
                             titleName = titleName.RemoveHtmlTags();
 
+                            if (LastGameModeSelected == CustomGameMode.RoundUp && role.NotSpawnInRoundUp()) titleName += GetString("NotSpawnRole");
                             if (role.OnlySpawnsWithPetsRole()) titleName += GetString("RequiresPet");
                             if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) titleName += GetString("SupportsPet");
 

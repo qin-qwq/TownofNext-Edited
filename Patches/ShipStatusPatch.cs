@@ -185,7 +185,8 @@ class StartPatch
 
         Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
 
-        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || Options.CurrentGameMode != CustomGameMode.Standard)
+        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || (Options.CurrentGameMode != CustomGameMode.Standard &&
+            Options.CurrentGameMode != CustomGameMode.RoundUp))
         {
             __instance.BreakEmergencyButton();
         }

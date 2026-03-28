@@ -92,7 +92,7 @@ class OnGameJoinedPatch
                         AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
 
                     // If custom Gamemode is HideNSeekTONE in normal game, set Standard
-                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTONE)
+                    if ((Options.CurrentGameMode == CustomGameMode.HidenSeekTONE) || (Options.CurrentGameMode == CustomGameMode.RoundUp && !Main.IsAprilFools && !PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev))
                     {
                         // Select Standard
                         Options.GameMode.SetValue(0);
@@ -103,11 +103,11 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTONE
+                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode/RoundUp in H&S game, set HideNSeekTONE
                     if (Options.CurrentGameMode != CustomGameMode.HidenSeekTONE)
                     {
                         // Select HideNSeekTONE
-                        Options.GameMode.SetValue(4);
+                        Options.GameMode.SetValue(5);
                     }
                     break;
 

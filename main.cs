@@ -54,7 +54,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.03.21"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginVersion = "26.03.29"; // YEAR.MMDD.VERSION.CANARYDEV
     public const string PluginDisplayVersion = "1.9.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
@@ -170,6 +170,7 @@ public class Main : BasePlugin
         [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
+        [CustomGameMode.RoundUp] = new Color32(248, 216, 110, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
     };
 
@@ -1029,6 +1030,9 @@ public enum CustomRoles
     // Tag Mode
     TZombie,
     TCrewmate,
+
+    // Round Up
+    RDeputy,
 
     // Sub-role after 500
     NotAssigned = 500,

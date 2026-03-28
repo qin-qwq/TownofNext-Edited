@@ -1783,6 +1783,8 @@ public static class Utils
                 name = $"<color=#fffb00><size=1.7>{GetString("ModeSpeedRun")}</size></color>\r\n" + name;
             if (Options.CurrentGameMode == CustomGameMode.TagMode)
                 name = $"<color=#2ccc00><size=1.7>{GetString("ModeTagMode")}</size></color>\r\n" + name;
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp)
+                name = $"<color=#f8d86e><size=1.7>{GetString("ModeRoundUp")}</size></color>\r\n" + name;
         }
 
 
@@ -2723,7 +2725,7 @@ public static class Utils
                         // Hide player names in during Mushroom Mixup if seer is alive and desync impostor
                         if (!CamouflageIsForMeeting && MushroomMixupIsActive && target.IsAlive() && (!seer.Is(Custom_Team.Impostor) || Main.PlayerStates[seer.PlayerId].IsNecromancer) && seer.HasDesyncRole())
                         {
-                            sender.RpcSetName(target, "<size=0%>", seer);
+                            sender.RpcSetName(realTarget, "<size=0%>", seer);
                             hasValue = true;
                             senderWasCleared = false;
 
@@ -2913,7 +2915,7 @@ public static class Utils
                             if (TargetName.EndsWith("</size>")) TargetName = TargetName.Remove(TargetName.Length - 7);
                             if (TargetName.EndsWith("</color>")) TargetName = TargetName.Remove(TargetName.Length - 8);
 
-                            sender.RpcSetName(target, TargetName, seer);
+                            sender.RpcSetName(realTarget, TargetName, seer);
                             hasValue = true;
                             senderWasCleared = false;
 
@@ -3137,6 +3139,8 @@ public static class Utils
                 }
                 playerState.RoleClass.LastBlockedMoveInVentVents.Clear();
             }
+
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.AfterMeetingTasks();
 
             //Set kill timer
             foreach (var player in Main.EnumerateAlivePlayerControls())

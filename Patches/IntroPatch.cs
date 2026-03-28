@@ -985,7 +985,7 @@ class IntroCutsceneDestroyPatch
                 {
                     pc.RpcResetAbilityCooldown();
 
-                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode is not CustomGameMode.FFA or CustomGameMode.TagMode)
+                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode != CustomGameMode.FFA && Options.CurrentGameMode != CustomGameMode.TagMode)
                     {
                         _ = new LateTask(() =>
                         {
