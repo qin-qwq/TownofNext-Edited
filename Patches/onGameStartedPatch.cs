@@ -151,7 +151,7 @@ internal class ChangeRoleSettings
                     Logger.SendInGame(sb.ToString());
                     sb.Append($" {string.Join(", ", invalidColor.Where(pc => pc != null).Select(p => $"{Main.AllPlayerNames.GetValueOrDefault(p.PlayerId, "PlayerNotFound")}"))}");
                     var msg = sb.ToString();
-                    Utils.SendMessage(msg, sendOption: SendOption.None);
+                    Utils.SendMessage(msg);
                     CriticalErrorManager.SetCriticalError("Player Have Invalid Color", true);
                     Logger.Error(msg, "CoStartGame");
                 }

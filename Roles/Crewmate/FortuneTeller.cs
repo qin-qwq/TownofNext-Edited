@@ -98,7 +98,7 @@ internal class FortuneTeller : RoleBase
         abilityUse = player.GetAbilityUseLimit();
         if (player.PlayerId == target.PlayerId)
         {
-            SendMessage(GetString("FortuneTellerCheckSelfMsg") + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()), sendOption: Hazel.SendOption.None);
+            SendMessage(GetString("FortuneTellerCheckSelfMsg") + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()));
             return true;
         }
 

@@ -51,7 +51,7 @@ internal class Cleanser : RoleBase
 
         if (target.PlayerId == voter.PlayerId)
         {
-            Utils.SendMessage(GetString("CleanserRemoveSelf"), voter.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()), sendOption: Hazel.SendOption.None);
+            Utils.SendMessage(GetString("CleanserRemoveSelf"), voter.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()));
             return true;
         }
         if (target.Is(CustomRoles.Stubborn))
@@ -77,7 +77,7 @@ internal class Cleanser : RoleBase
         CleanserTarget[voter.PlayerId] = target.PlayerId;
 
         Logger.Info($"{voter.GetNameWithRole()} cleansed {target.GetNameWithRole()}", "Cleansed");
-        Utils.SendMessage(string.Format(GetString("CleanserRemovedRole"), targetName), voter.PlayerId, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()), sendOption: Hazel.SendOption.None);
+        Utils.SendMessage(string.Format(GetString("CleanserRemovedRole"), targetName), voter.PlayerId, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()));
 
         voter.GetRoleClass().HasVoted = true;
         return false;

@@ -833,7 +833,7 @@ public static class Utils
     {
         if (Options.HideGameSettings.GetBool() && PlayerId != byte.MaxValue)
         {
-            SendMessage(GetString("Message.HideGameSettings"), PlayerId, sendOption: SendOption.None);
+            SendMessage(GetString("Message.HideGameSettings"), PlayerId);
             return;
         }
 
@@ -862,7 +862,7 @@ public static class Utils
     {
         if (Options.HideGameSettings.GetBool() && PlayerId != byte.MaxValue)
         {
-            SendMessage(GetString("Message.HideGameSettings"), PlayerId, sendOption: SendOption.None);
+            SendMessage(GetString("Message.HideGameSettings"), PlayerId);
             return;
         }
         var sb = new StringBuilder();
@@ -926,7 +926,7 @@ public static class Utils
     {
         if (Options.HideGameSettings.GetBool() && PlayerId != byte.MaxValue)
         {
-            SendMessage(GetString("Message.HideGameSettings"), PlayerId, sendOption: SendOption.None);
+            SendMessage(GetString("Message.HideGameSettings"), PlayerId);
             return;
         }
 
@@ -1005,7 +1005,7 @@ public static class Utils
     {
         if (AmongUsClient.Instance.IsGameStarted)
         {
-            SendMessage(GetString("CantUse.lastroles"), PlayerId, sendOption: SendOption.None);
+            SendMessage(GetString("CantUse.lastroles"), PlayerId);
             return;
         }
 
@@ -1068,7 +1068,7 @@ public static class Utils
     {
         if (GameStates.IsInGame)
         {
-            SendMessage(GetString("CantUse.killlog"), PlayerId, sendOption: SendOption.None);
+            SendMessage(GetString("CantUse.killlog"), PlayerId);
             return;
         }
         if (EndGamePatch.KillLog != "")
@@ -1087,7 +1087,7 @@ public static class Utils
     {
         if (GameStates.IsInGame)
         {
-            SendMessage(GetString("CantUse.lastresult"), PlayerId, sendOption: SendOption.None);
+            SendMessage(GetString("CantUse.lastresult"), PlayerId);
             return;
         }
         var sb = new StringBuilder();
@@ -1390,7 +1390,7 @@ public static class Utils
         { "grey",   (128, 128, 128) },
         { "black",  (  0,   0,   0) }
     };
-    public static void SendMessage(string text, byte sendTo = byte.MaxValue, string title = "", bool logforChatManager = false, bool noReplay = false, bool ShouldSplit = false, SendOption sendOption = SendOption.Reliable, bool noNumberSplit = false)
+    public static void SendMessage(string text, byte sendTo = byte.MaxValue, string title = "", bool logforChatManager = false, bool noReplay = false, bool ShouldSplit = false, SendOption sendOption = SendOption.None, bool noNumberSplit = false)
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (title.IsNullOrWhiteSpace()) title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";

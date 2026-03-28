@@ -55,7 +55,7 @@ internal class Balancer : RoleBase
             Target2 = target.PlayerId;
             if (Target1 == Target2)
             {
-                SendMessage(GetString("Choose1=2"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()), sendOption: SendOption.None);
+                SendMessage(GetString("Choose1=2"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
                 Target1 = 253;
                 Target2 = 253;
                 return false;
@@ -88,7 +88,7 @@ internal class Balancer : RoleBase
         if (voter == null || target == null) return;
         if (!voter.IsAlive())
         {
-            SendMessage(GetString("BalancerDead"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()), sendOption: SendOption.None);
+            SendMessage(GetString("BalancerDead"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
             return;
         }
         if (Target1 != 253)
@@ -96,7 +96,7 @@ internal class Balancer : RoleBase
             Target2 = target.PlayerId;
             if (Target1 == Target2)
             {
-                SendMessage(GetString("Choose1=2"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()), sendOption: SendOption.None);
+                SendMessage(GetString("Choose1=2"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
                 Target1 = 253;
                 Target2 = 253;
                 return;

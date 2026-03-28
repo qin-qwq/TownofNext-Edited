@@ -188,7 +188,7 @@ public static class TemplateManager
         {
             if (playerId == 0xff)
                 HudManager.Instance.Chat.AddChat(PlayerControl.LocalPlayer, string.Format(GetString("Message.TemplateNotFoundHost"), str, tags.Join(delimiter: ", ")));
-            else Utils.SendMessage(string.Format(GetString("Message.TemplateNotFoundClient"), str), playerId, noReplay: true, sendOption: Hazel.SendOption.None);
+            else Utils.SendMessage(string.Format(GetString("Message.TemplateNotFoundClient"), str), playerId, noReplay: true);
         }
         else for (int i = 0; i < sendList.Count; i++)
             {
@@ -196,9 +196,9 @@ public static class TemplateManager
                 {
                     var player = Utils.GetPlayerById(playerId);
                     if (player == null) continue;
-                    Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.IsHost() ? Main.HostRealName : player.GetRealName(clientData: true))), sendOption: Hazel.SendOption.None);
+                    Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.IsHost() ? Main.HostRealName : player.GetRealName(clientData: true))));
                 }
-                else Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, sendOption: Hazel.SendOption.None);
+                else Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId);
             }
     }
 

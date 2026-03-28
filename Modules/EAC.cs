@@ -694,7 +694,7 @@ internal class EAC
                 break;
             case 3:
                 foreach (var apc in Main.EnumeratePlayerControls().Where(x => x.PlayerId != pc?.Data?.PlayerId).ToArray())
-                    Utils.SendMessage(string.Format(GetString("Message.NoticeByEAC"), pc?.Data?.PlayerName, text), apc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Impostor), GetString("MessageFromEAC")), sendOption: SendOption.None);
+                    Utils.SendMessage(string.Format(GetString("Message.NoticeByEAC"), pc?.Data?.PlayerName, text), apc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Impostor), GetString("MessageFromEAC")));
                 break;
             case 4:
                 if (!BanManager.TempBanWhiteList.Contains(pc.GetClient().GetHashedPuid()))

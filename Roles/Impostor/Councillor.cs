@@ -81,7 +81,7 @@ internal class Councillor : RoleBase
 
         if (!pc.IsAlive())
         {
-            Utils.SendMessage(GetString("CouncillorDead"), pc.PlayerId, sendOption: SendOption.None);
+            Utils.SendMessage(GetString("CouncillorDead"), pc.PlayerId);
             return true;
         }
 
