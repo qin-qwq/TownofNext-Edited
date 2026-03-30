@@ -46,6 +46,7 @@ class CheckForEndVotingPatch
 {
     public static string TempExileMsg;
     public static NetworkedPlayerInfo TempExiledPlayer;
+    public static bool SomeoneExiled;
     public static bool Prefix(MeetingHud __instance)
     {
         if (!AmongUsClient.Instance.AmHost) return true;
@@ -517,6 +518,8 @@ class CheckForEndVotingPatch
 
         if (Options.PlayEjectSfx.GetBool())
             CustomSoundsManager.RPCPlayCustomSoundAll("Dramatic");
+
+        SomeoneExiled = true;
 
         var realName = Main.AllPlayerNames[exiledPlayer.PlayerId];
         Main.LastVotedPlayer = realName;

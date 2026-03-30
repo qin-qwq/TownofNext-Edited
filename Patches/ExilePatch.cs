@@ -212,24 +212,6 @@ class ExileControllerWrapUpPatch
                     Utils.NotifyRoles();
                 }
 
-                /*_ = new LateTask(() =>
-                {
-                    foreach (var player in Main.EnumerateAlivePlayerControls())
-                    {
-                        if (player.GetRoleClass() is not DefaultSetup)
-                        {
-                            if (player.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
-                            {
-                                player.ResetKillCooldown();
-                                if (Main.AllPlayerKillCooldown.TryGetValue(player.PlayerId, out var killTimer) && (killTimer - 2f) > 0f)
-                                {
-                                    player.SetKillCooldown(killTimer - 2f);
-                                }
-                            }
-                        }
-                    }
-                }, 1f, $"Fix Kill Cooldown Task after meeting");*/
-
                 Main.LastMeetingEnded = Utils.TimeStamp;
             }, 1f, "AfterMeetingDeathPlayers Task");
         }

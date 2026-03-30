@@ -588,6 +588,7 @@ public static class Options
     public static OptionItem CancelPetAnimation;
     public static OptionItem CantUseAbilityDuringDiscussionTime;
     public static OptionItem EnableImpostorChannel;
+    public static OptionItem ShowExileMsgAfterMeeting;
 
     // ------------ General Role Settings ------------
 
@@ -2226,6 +2227,9 @@ public static class Options
         EnableImpostorChannel = BooleanOptionItem.Create(61104, "EnableImpostorChannel", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        ShowExileMsgAfterMeeting = BooleanOptionItem.Create(61105, "ShowExileMsgAfterMeeting", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 

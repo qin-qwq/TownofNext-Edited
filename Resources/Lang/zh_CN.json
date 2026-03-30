@@ -4460,5 +4460,7 @@
   "RDeputy": "警官",
   "RDeputyInfoLong": "(未知阵营):\n警官是游戏模式围捕行动中的职业，警官可以使用指令围捕其他玩家，该玩家将被驱逐。如果没有围捕任何玩家，警官就会被驱逐。警官不能正常投票\n指令格式：/ls [玩家编号] 进行选择目标\n你可以在玩家的名字前看到该玩家的编号\n或者使用/id查看玩家编号列表",
   "Warning.GameModeNotEnabled": "警告：游戏模式<b>{0}</b>尚未开放！",
-  "NotSpawnRole": "    <color=#f8d86e>〤</color>"
+  "NotSpawnRole": "    <color=#f8d86e>〤</color>",
+  "ShowExileMsgAfterMeeting": "会议后显示原版驱逐结果",
+  "VanillaImpRemain": "剩下 {0} 个伪装者"
 }

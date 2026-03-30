@@ -693,8 +693,8 @@ public static class GuessManager
             {
                 if (RoleBtn == null) continue;
                 index++;
-                if (index <= (Page - 1) * 40) { RoleBtn.gameObject.SetActive(false); continue; }
-                if ((Page * 40) < index) { RoleBtn.gameObject.SetActive(false); continue; }
+                if (index <= (Page - 1) * MaxOneScreenRole) { RoleBtn.gameObject.SetActive(false); continue; }
+                if ((Page * MaxOneScreenRole) < index) { RoleBtn.gameObject.SetActive(false); continue; }
                 RoleBtn.gameObject.SetActive(RoleButton.Key == Role);
             }
         }
@@ -1040,7 +1040,7 @@ public static class GuessManager
             }
             void CreateRole(CustomRoles role)
             {
-                if (40 <= info[(int)role.GetCustomRoleTeam()]) info[(int)role.GetCustomRoleTeam()] = 0;
+                if (MaxOneScreenRole <= info[(int)role.GetCustomRoleTeam()]) info[(int)role.GetCustomRoleTeam()] = 0;
                 Transform buttonParent = new GameObject().transform;
                 buttonParent.SetParent(container);
                 Transform button = UnityEngine.Object.Instantiate(buttonTemplate, buttonParent);

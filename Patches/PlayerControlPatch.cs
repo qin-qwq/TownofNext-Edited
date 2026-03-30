@@ -1001,6 +1001,7 @@ class ReportDeadBodyPatch
                 // Check shapeshift and revert skin to default
                 if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
                 {
+                    pc.RpcShapeshift(pc, false);
                     Camouflage.RpcSetSkin(pc, RevertToDefault: true);
                 }
             }

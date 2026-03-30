@@ -260,7 +260,7 @@ class MapBehaviourShowPatch
 
         var player = PlayerControl.LocalPlayer;
 
-        if (player.GetCustomRole() == CustomRoles.NiceHacker)
+        if (player.GetCustomRole() == CustomRoles.NiceHacker && opts.Mode is not MapOptions.Modes.CountOverlay)
         {
             Logger.Info("Modded Client uses Map", "Hacker");
             NiceHacker.MapHandle(player, __instance, opts);
@@ -321,7 +321,7 @@ class TaskPanelBehaviourPatch
                     if (sb.Length > 1)
                     {
                         var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1)
+                        if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
                             text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
@@ -363,7 +363,7 @@ class TaskPanelBehaviourPatch
                     if (sb2.Length > 1)
                     {
                         var text = sb2.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb2.ToString().Count(s => (s == '\n')) >= 1)
+                        if (!Utils.HasTasks(player.Data, false) && sb2.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
                             text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
