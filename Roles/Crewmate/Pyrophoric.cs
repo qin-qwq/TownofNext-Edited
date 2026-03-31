@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using UnityEngine;
 using TONE.Modules;
+using TONE.Roles.Double;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
-using TONE.Roles.Double;
 
 namespace TONE.Roles.Crewmate;
 
@@ -92,7 +92,7 @@ internal partial class Pyrophoric : RoleBase
         else
         {
             hud.PetButton.buttonLabelText.text = GetString("PyrophoricVentButtonText");
-        }        
+        }
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
     {

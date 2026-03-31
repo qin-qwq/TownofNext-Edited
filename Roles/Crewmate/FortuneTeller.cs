@@ -40,7 +40,7 @@ internal class FortuneTeller : RoleBase
         RandomActiveRoles = BooleanOptionItem.Create(Id + 11, "RandomActiveRoles", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
         RoleNumber = IntegerOptionItem.Create(Id + 12, "CheckRoleNumber", new(1, 30, 1), 6, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
             .SetValueFormat(OptionFormat.Pieces);
-        ImpostorRoleNumber = IntegerOptionItem.Create(Id + 13, "DoomsayerObserveImpostorRoleNumber", new(0, 10, 1), 2,TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
+        ImpostorRoleNumber = IntegerOptionItem.Create(Id + 13, "DoomsayerObserveImpostorRoleNumber", new(0, 10, 1), 2, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
             .SetValueFormat(OptionFormat.Pieces);
         CrewmateRoleNumber = IntegerOptionItem.Create(Id + 14, "DoomsayerObserveCrewmateRoleNumber", new(0, 10, 1), 2, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
             .SetValueFormat(OptionFormat.Pieces);

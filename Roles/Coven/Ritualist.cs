@@ -1,9 +1,6 @@
-using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using TONE.Modules.ChatManager;
 using TONE.Roles.Crewmate;
-using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;

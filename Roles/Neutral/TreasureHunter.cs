@@ -81,7 +81,7 @@ internal class TreasureHunter : RoleBase
                 {
                     CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TreasureHunter);
                     CustomWinnerHolder.WinnerIds.Add(pc.PlayerId);
-                }            
+                }
             }
         }
     }

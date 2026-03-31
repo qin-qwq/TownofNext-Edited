@@ -336,30 +336,30 @@ internal class Jackal : RoleBase
             && !pc.Is(CustomRoles.Contagious) && !pc.Is(CustomRoles.Enchanted) && !(CovenManager.HasNecronomicon(pc.PlayerId) && pc.Is(CustomRoles.CovenLeader));
     }
 
-	public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
-	{
-		if (lowLoad) return;
-		if (player.IsAlive()) return;
-		if (hasConverted[player.PlayerId]) return;
-		var ConvertedPlayer = Utils.GetPlayerById(ConvertedPlayerId[player.PlayerId]);
-		if (ConvertedPlayerId[player.PlayerId] == byte.MaxValue || !ConvertedPlayer.IsAlive())
-		{
-			Logger.Info("Jackal dead, but no alive sidekick can be assigned!", "Jackal");
-			hasConverted[player.PlayerId] = true;
-			return;
-		}
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (lowLoad) return;
+        if (player.IsAlive()) return;
+        if (hasConverted[player.PlayerId]) return;
+        var ConvertedPlayer = Utils.GetPlayerById(ConvertedPlayerId[player.PlayerId]);
+        if (ConvertedPlayerId[player.PlayerId] == byte.MaxValue || !ConvertedPlayer.IsAlive())
+        {
+            Logger.Info("Jackal dead, but no alive sidekick can be assigned!", "Jackal");
+            hasConverted[player.PlayerId] = true;
+            return;
+        }
 
-		SidekickBecomeJackal(player);
-	}
+        SidekickBecomeJackal(player);
+    }
 
     public static void OnJackalLeft(PlayerControl player)
     {
         var ConvertedPlayer = Utils.GetPlayerById(ConvertedPlayerId[player.PlayerId]);
-		if (ConvertedPlayerId[player.PlayerId] == byte.MaxValue || !ConvertedPlayer.IsAlive())
-		{
-			Logger.Info("Jackal dead, but no alive sidekick can be assigned!", "Jackal");
-			hasConverted[player.PlayerId] = true;
-		}
+        if (ConvertedPlayerId[player.PlayerId] == byte.MaxValue || !ConvertedPlayer.IsAlive())
+        {
+            Logger.Info("Jackal dead, but no alive sidekick can be assigned!", "Jackal");
+            hasConverted[player.PlayerId] = true;
+        }
         else if (!hasConverted[player.PlayerId])
         {
             SidekickBecomeJackal(player);

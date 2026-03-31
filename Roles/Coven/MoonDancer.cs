@@ -188,7 +188,7 @@ internal class MoonDancer : CovenManager
                 }
             }
         }
-        
+
         return false;
     }
 

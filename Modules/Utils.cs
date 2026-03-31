@@ -1485,14 +1485,14 @@ public static class Utils
 
             return result;
         }
-        
+
         static string ReplaceHexColorsWithSafeColors(string text) => ColorTagRegex.Replace(text, match =>
         {
             string hex = match.Groups[1].Value.ToLowerInvariant();
-            
+
             string a = hex.Length == 8 ? hex[6..8] : string.Empty;
             if (!string.IsNullOrEmpty(a)) hex = hex[..6];
-            
+
             if (hex.Length != 6 || !hex.Any(char.IsDigit)) return match.Value;
 
             int r = Convert.ToInt32(hex[..2], 16);
@@ -1509,7 +1509,7 @@ public static class Utils
         static string FindClosestSafeColor(int r, int g, int b)
         {
             if (CachedColorReplacements.TryGetValue((r, g, b), out string cache)) return cache;
-            
+
             double bestDist = double.MaxValue;
             string bestValue = "white";
 
@@ -1606,7 +1606,7 @@ public static class Utils
         static bool IsTooManyDigits(string text)
         {
             int count = 0;
-            
+
             foreach (char c in text)
             {
                 if (c is >= '0' and <= '9')

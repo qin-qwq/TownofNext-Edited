@@ -170,7 +170,7 @@ internal class Grenadier : RoleBase
         }
         else
         {
-            hud.PetButton.buttonLabelText.text = GetString("GrenadierVentButtonText");            
+            hud.PetButton.buttonLabelText.text = GetString("GrenadierVentButtonText");
         }
     }
 }

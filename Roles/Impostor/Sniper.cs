@@ -190,9 +190,9 @@ internal class Sniper : RoleBase
     }
     public override bool OnCheckVanish(PlayerControl phantom)
     {
-       if (!UsePhantomBasis.GetBool()) return false;
+        if (!UsePhantomBasis.GetBool()) return false;
 
-       if (phantom.GetAbilityUseLimit() <= 0) return false;
+        if (phantom.GetAbilityUseLimit() <= 0) return false;
 
         phantom.RpcRemoveAbilityUse();
 
@@ -222,7 +222,7 @@ internal class Sniper : RoleBase
         if (validTargets.Count > 0)
         {
             var selectedTarget = validTargets.RandomElement();
-    
+
             if (!Options.DisableShieldAnimations.GetBool())
                 phantom.RpcGuardAndKill();
             else

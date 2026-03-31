@@ -275,7 +275,7 @@ public class PlayerState(byte playerId)
         if (!AmongUsClient.Instance.AmHost) return;
         var msg = new RpcRemoveSubRole(PlayerControl.LocalPlayer.NetId, PlayerId, addOn);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
 
     public void SetDead()

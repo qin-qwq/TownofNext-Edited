@@ -3,7 +3,6 @@ using System;
 using System.Text.RegularExpressions;
 using TMPro;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
@@ -135,7 +134,7 @@ public static class GuessManager
             Logger.Msg($" {target.PlayerId}", "Guesser - target.PlayerId");
             Logger.Msg($" {role}", "Guesser - role");
 
-            if (role.GetStaticRoleClass().ThisRoleType == Custom_RoleType.CrewmateInvestigative && 
+            if (role.GetStaticRoleClass().ThisRoleType == Custom_RoleType.CrewmateInvestigative &&
                 !Options.CanGuessCrewInvestigative.GetBool())
             {
                 Logger.Info($"Guess disabled for Crewmate Investigative roles.", "GuessManager");

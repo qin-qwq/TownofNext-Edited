@@ -1,7 +1,6 @@
 using Hazel;
 using TMPro;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using UnityEngine;

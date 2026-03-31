@@ -68,6 +68,6 @@ internal class NotificationPopperPatch
 
         var msg = new RpcNotificationPopper(PlayerControl.LocalPlayer.NetId, index, playSound);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
 }

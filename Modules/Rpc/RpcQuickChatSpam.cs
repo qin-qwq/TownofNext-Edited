@@ -288,12 +288,12 @@ namespace TONE.Modules.Rpc
                     // }
 
                     for (int i = 0; i < 21; i++)
-                        {
-                            var randomString = stringNamesValues[random.Next(stringNamesValues.Length)];
-                            var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, randomString, 0, null));
-                            message.Serialize(writer);
-                            DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(randomString), false);
-                        }
+                    {
+                        var randomString = stringNamesValues[random.Next(stringNamesValues.Length)];
+                        var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, randomString, 0, null));
+                        message.Serialize(writer);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(randomString), false);
+                    }
                     break;
                 case QuickChatSpamMode.QuickChatSpam_How2PlayNormal:
                     foreach (var names in Main.how2playN)

@@ -2,7 +2,6 @@ using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.Coven;
 using TONE.Roles.Double;

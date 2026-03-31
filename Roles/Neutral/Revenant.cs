@@ -1,8 +1,8 @@
-using AmongUs.GameOptions;
 using TONE.Roles.Core;
 using static TONE.Translator;
 
 namespace TONE.Roles.Neutral;
+
 internal class Revenant : RoleBase
 {
     //===========================SETUP================================\\
@@ -20,7 +20,7 @@ internal class Revenant : RoleBase
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
-        var addon = killer.GetBetrayalAddon(true); 
+        var addon = killer.GetBetrayalAddon(true);
         var role = killer.GetCustomRole();
         if (role.IsTNA()) return false;
 

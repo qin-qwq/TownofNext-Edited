@@ -1868,8 +1868,8 @@ internal class ChatCommands
                     ChatManager.SendPreviousMessagesToAll();
                     break;
 
-                case "/fix" 
-                or "/blackscreenfix" 
+                case "/fix"
+                or "/blackscreenfix"
                 or "/fixblackscreen":
                     canceled = true;
                     FixCommand(PlayerControl.LocalPlayer, text, args);
@@ -1942,7 +1942,7 @@ internal class ChatCommands
         {
             if (!WaitingToSend) Main.Instance.StartCoroutine(Wait());
             return false;
-            
+
             IEnumerator Wait()
             {
                 WaitingToSend = true;
@@ -2150,7 +2150,7 @@ internal class ChatCommands
         }
 
 
-        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=70%>{GetString("SupportsPetMessage")}</size>" 
+        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=70%>{GetString("SupportsPetMessage")}</size>"
            : result.GetInfoLong();
         var title = "▲" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
@@ -3618,8 +3618,8 @@ internal class ChatCommands
                 }
                 break;
 
-            case "/fix" 
-            or "/blackscreenfix" 
+            case "/fix"
+            or "/blackscreenfix"
             or "/fixblackscreen":
                 FixCommand(player, text, args);
                 break;
@@ -3649,7 +3649,7 @@ internal class ChatCommands
         if (!player.IsHost() && !player.FriendCode.GetDevUser().IsDev && !Utils.IsPlayerModerator(player.FriendCode))
         {
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
-            return;            
+            return;
         }
         if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp)
         {

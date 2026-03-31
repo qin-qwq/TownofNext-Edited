@@ -560,7 +560,7 @@ internal static class MapRoomDoorsUpdatePatch
         total = 0f;
         timer = 0f;
 
-        Skip:
+    Skip:
 
         __instance.door.material.SetFloat(Percent, __instance.Parent.CanUseDoors ? timer / total : 1f);
 

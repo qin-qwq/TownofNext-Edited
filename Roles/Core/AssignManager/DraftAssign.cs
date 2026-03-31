@@ -1,5 +1,5 @@
-using System.Text;
 using AmongUs.GameOptions;
+using System.Text;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
@@ -128,7 +128,7 @@ public static class DraftAssign
         allRoles.RemoveAll(x => x.IsNK());
         allRoles.RemoveAll(x => x.IsNonNK());
 
-        var num = playerCount - optImpNum - optNonNeutralKillingNum - optNeutralKillingNum - optNeutralApocalypseNum - optCovenNum - RoleAssign.SetRoles.Values.Count > 0 ? 
+        var num = playerCount - optImpNum - optNonNeutralKillingNum - optNeutralKillingNum - optNeutralApocalypseNum - optCovenNum - RoleAssign.SetRoles.Values.Count > 0 ?
             (playerCount - optImpNum - optNonNeutralKillingNum - optNeutralKillingNum - optNeutralApocalypseNum - optCovenNum - RoleAssign.SetRoles.Values.Count) * Options.DraftableCount.GetInt() :
             0;
 

@@ -1,6 +1,5 @@
 using Hazel;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using static TONE.Options;
 using static TONE.Translator;
@@ -166,7 +165,7 @@ internal class President : RoleBase
         }
         var msg2 = new RpcPresidentEnd(PlayerControl.LocalPlayer.NetId, playerId);
         RpcUtils.LateBroadcastReliableMessage(msg2);
-         
+
     }
     public static void ReceiveRPC(MessageReader reader, PlayerControl pc, bool isEnd = true)
     {

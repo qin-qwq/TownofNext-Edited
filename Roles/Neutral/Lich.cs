@@ -2,13 +2,12 @@ using AmongUs.GameOptions;
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
-using TONE.Roles.Core;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Impostor;
+using TONE.Roles.Core;
+using TONE.Roles.Coven;
 using static TONE.Options;
 using static TONE.Translator;
-using TONE.Roles.Coven;
-using TONE.Roles.Crewmate;
 
 namespace TONE.Roles.Neutral;
 
@@ -266,7 +265,7 @@ internal class Lich : RoleBase
             player.RpcGuardAndKill(player);
         }
     }
-    
+
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.KillButton.OverrideText(GetString("LichKillButtonText"));

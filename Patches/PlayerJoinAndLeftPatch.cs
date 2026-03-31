@@ -132,7 +132,7 @@ class OnGameJoinedPatch
             {
                 if (!GameStates.IsOnlineGame) return;
                 //if (!GameStates.IsModHost)
-                    //RPC.RpcRequestRetryVersionCheck();
+                //RPC.RpcRequestRetryVersionCheck();
                 if (BanManager.CheckEACList(EOSManager.Instance.FriendCode, BanManager.GetHashedPuid(EOSManager.Instance.ProductUserId)) && GameStates.IsOnlineGame)
                 {
                     AmongUsClient.Instance.ExitGame(DisconnectReasons.Banned);

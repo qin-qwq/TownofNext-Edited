@@ -1,7 +1,6 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
-using TONE.Roles.Core;
 using static TONE.CheckForEndVotingPatch;
 using static TONE.Options;
 using static TONE.Utils;

@@ -1744,7 +1744,7 @@ public static class Options
         // Disable
         TextOptionItem.Create(10000027, "MenuTitle.Disable", TabGroup.ModSettings)
             .SetColor(new Color32(255, 153, 153, byte.MaxValue));
-            //.HideInHnS();
+        //.HideInHnS();
 
         DisableShieldAnimations = BooleanOptionItem.Create(60560, "DisableShieldAnimations", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)

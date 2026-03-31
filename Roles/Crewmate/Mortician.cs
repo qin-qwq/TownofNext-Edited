@@ -5,6 +5,7 @@ using static TONE.Options;
 using static TONE.Translator;
 
 namespace TONE.Roles.Crewmate;
+
 internal class Mortician : RoleBase
 {
     //===========================SETUP================================\\

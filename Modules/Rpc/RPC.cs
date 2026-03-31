@@ -1060,7 +1060,7 @@ internal static class RPC
         if (!AmongUsClient.Instance.AmHost) return;
         var msg = new RpcSyncDeadPassedMeetingList(PlayerControl.LocalPlayer.NetId, Main.DeadPassedMeetingPlayers);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void SendRpcLogger(uint targetNetId, byte callId, SendOption sendOption, int targetClientId = -1)
     {

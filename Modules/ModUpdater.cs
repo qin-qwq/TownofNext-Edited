@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -286,9 +285,9 @@ public class ModUpdater
         Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
         return;
 #else
-    ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
-    Task.Run(() => DownloadDLLAsync(url));
-    return;
+        ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
+        Task.Run(() => DownloadDLLAsync(url));
+        return;
 #endif
     }
     public static bool NewVersionCheck()
@@ -302,9 +301,9 @@ public class ModUpdater
             {
                 DirectoryInfo di = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA"));
 #else
-        if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
-        {
-            DirectoryInfo di = new("TOH_DATA");
+            if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
+            {
+                DirectoryInfo di = new("TOH_DATA");
 #endif
                 di.Delete(true);
                 Logger.Warn("Deleting old data：TOH_DATA", "NewVersionCheck");

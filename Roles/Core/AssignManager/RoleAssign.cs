@@ -103,7 +103,7 @@ public class RoleAssign
                     {
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;                        
+                        continue;
                     }
                     RoleResult[pc.PlayerId] = CustomRoles.Killer;
                 }
@@ -127,7 +127,7 @@ public class RoleAssign
                     {
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;                        
+                        continue;
                     }
                     RoleResult[pc.PlayerId] = CustomRoles.Runner;
                 }
@@ -154,7 +154,7 @@ public class RoleAssign
                     {
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;                        
+                        continue;
                     }
                     else if (ZombieNum > 0)
                     {
@@ -348,7 +348,7 @@ public class RoleAssign
                 RoleResult[player.PlayerId] = CustomRoles.GM;
                 SetRoles.Remove(player.PlayerId);
                 AllPlayers.Remove(player);
-                Logger.Info($"Assign Game Master due to tag for [{player.PlayerId}]{player.GetRealName()}", "SetRoles");                     
+                Logger.Info($"Assign Game Master due to tag for [{player.PlayerId}]{player.GetRealName()}", "SetRoles");
             }
         }
 

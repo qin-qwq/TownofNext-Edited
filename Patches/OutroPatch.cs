@@ -3,7 +3,6 @@ using System.Text;
 using TMPro;
 using TONE.Modules;
 using TONE.Modules.ChatManager;
-using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Crewmate;

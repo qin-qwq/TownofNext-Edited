@@ -230,7 +230,7 @@ internal class Altruist : RoleBase
 
                 if (IsRevivingMode)
                     hud?.ReportButton?.OverrideText(Translator.GetString("AltruistReviveMode"));
-            }            
+            }
         }
     }
 }

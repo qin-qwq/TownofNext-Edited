@@ -3,8 +3,8 @@ using System;
 using System.Text;
 using TONE.Modules;
 using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
 using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -343,11 +343,11 @@ internal class Doomsayer : RoleBase
                 {
                     var num = team switch
                     {
-                       Custom_Team.Coven => CovenRoleNumber.GetInt(),
-                       Custom_Team.Crewmate => CrewmateRoleNumber.GetInt(),
-                       Custom_Team.Impostor => ImpostorRoleNumber.GetInt(),
-                       Custom_Team.Neutral => NeutralRoleNumber.GetInt(),
-                       _ => 0,
+                        Custom_Team.Coven => CovenRoleNumber.GetInt(),
+                        Custom_Team.Crewmate => CrewmateRoleNumber.GetInt(),
+                        Custom_Team.Impostor => ImpostorRoleNumber.GetInt(),
+                        Custom_Team.Neutral => NeutralRoleNumber.GetInt(),
+                        _ => 0,
                     };
                     if (targetRole.GetCustomRoleTeam() == team) num--;
                     if (num <= 0) return;

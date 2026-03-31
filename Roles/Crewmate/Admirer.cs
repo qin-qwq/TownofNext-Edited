@@ -61,7 +61,7 @@ internal class Admirer : RoleBase
     {
         var msg = new RpcSyncAdmiredList(PlayerControl.LocalPlayer.NetId, playerId, targetId);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void ReceiveRPC(MessageReader reader)
     {

@@ -81,7 +81,7 @@ public abstract class GameOptionsSender
     protected virtual void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte LogicOptionsIndex, int targetClientId)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        
+
         var message = new SendOptionsArray(optionArray);
 
         if (targetClientId < 0)

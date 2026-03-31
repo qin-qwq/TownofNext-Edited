@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace TONE.Roles.Impostor;
 
 internal class EvilGuesser : RoleBase

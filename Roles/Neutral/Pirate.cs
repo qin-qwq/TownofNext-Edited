@@ -2,7 +2,6 @@ using Hazel;
 using System.Text;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Double;
@@ -13,6 +12,7 @@ using static TONE.Utils;
 
 
 namespace TONE.Roles.Neutral;
+
 internal class Pirate : RoleBase
 {
     //===========================SETUP================================\\

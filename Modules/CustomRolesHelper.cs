@@ -4,7 +4,6 @@ using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
-using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Double;
@@ -21,7 +20,7 @@ public static class CustomRolesHelper
     public static readonly Custom_Team[] AllRoleTypes = EnumHelper.GetAllValues<Custom_Team>();
     public static bool OnlySpawnsWithPetsRole(this CustomRoles role)
     {
-        return role is CustomRoles.Transporter; 
+        return role is CustomRoles.Transporter;
     }
     public static bool NotSpawnInRoundUp(this CustomRoles role)
     {
@@ -661,9 +660,9 @@ public static class CustomRolesHelper
                 break;
 
             case CustomRoles.Guesser:
-                if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool()) 
-                || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool()) 
-                || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool()) 
+                if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool())
+                || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool())
+                || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool())
                 || (pc.GetCustomRole().IsCoven() && Options.CovenCanGuess.GetBool())
                 || (pc.GetCustomRole().IsNA() && Options.NeutralApocalypseCanGuess.GetBool())
                 || (pc.GetCustomRole().IsNonNK() && Options.PassiveNeutralsCanGuess.GetBool())))

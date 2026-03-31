@@ -180,7 +180,7 @@ public static class CustomRoleManager
         if (playerstates.IsBlackOut)
         {
             opt.SetFloat(FloatOptionNames.ImpostorLightMod, 0);
-            opt.SetFloat(FloatOptionNames.CrewLightMod, 0);         
+            opt.SetFloat(FloatOptionNames.CrewLightMod, 0);
         }
     }
 
@@ -368,7 +368,7 @@ public static class CustomRoleManager
                     case CustomRoles.Bait when !inMeeting && !fromRole:
                         Bait.BaitAfterDeathTasks(trueDMKiller, target); // Use trueDMKiller to any roles that needs the Dollmaster to be the killer!
                         break;
-                        
+
                     case CustomRoles.Randomizer when !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
                         Randomizer.RandomizerKilled(killer, target);
                         break;

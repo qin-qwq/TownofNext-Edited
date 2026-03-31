@@ -1143,7 +1143,7 @@ static class ExtendedPlayerControl
             return State.SubRoles;
         }
 
-        return  [CustomRoles.NotAssigned];
+        return [CustomRoles.NotAssigned];
     }
     public static CountTypes GetCountTypes(this PlayerControl player)
     {
@@ -2076,7 +2076,7 @@ static class ExtendedPlayerControl
             or CustomRoles.Exorcist) return false;
         return player.IsMeetingShapeshifterRole();
     }
-    
+
     public static void RpcTeleportRandomSpawn(this PlayerControl player)
     {
         RandomSpawn.SpawnMap map;
@@ -2137,7 +2137,7 @@ static class ExtendedPlayerControl
     public static void FreezeForOthers(this PlayerControl player)
     {
         if (!AmongUsClient.Instance.AmHost) return;
- 
+
         foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
         {
             if (pc == player || pc.AmOwner) continue;

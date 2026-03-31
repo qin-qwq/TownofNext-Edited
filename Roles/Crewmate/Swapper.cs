@@ -2,7 +2,6 @@ using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
@@ -139,12 +138,12 @@ internal class Swapper : RoleBase
                         var target1 = Vote.Item1.GetPlayer();
                         var target2 = Vote.Item2.GetPlayer();
 
-                        pc.ShowInfoMessage(isUI, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));                        
+                        pc.ShowInfoMessage(isUI, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     }
                     else if (dp.PlayerId != Vote.Item1)
                     {
                         Vote.Item2 = 253;
-                        pc.ShowInfoMessage(isUI, GetString("CancelSwap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));                        
+                        pc.ShowInfoMessage(isUI, GetString("CancelSwap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     }
                     else if (dp.PlayerId != Vote.Item2)
                     {

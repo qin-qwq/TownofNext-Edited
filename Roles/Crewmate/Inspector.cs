@@ -1,18 +1,17 @@
 using Hazel;
 using System;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Neutral;
-using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
 
 namespace TONE.Roles.Crewmate;
+
 internal class Inspector : RoleBase
 {
     //===========================SETUP================================\\
@@ -102,7 +101,7 @@ internal class Inspector : RoleBase
             {
                 SendMessage(GetString("Choose1=2"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Inspector), GetString("Inspector").ToUpper()));
                 CheckId = byte.MaxValue;
-                return;                
+                return;
             }
             if (!CheckId.GetPlayer().IsAlive() || !target.IsAlive())
             {

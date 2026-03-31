@@ -1,5 +1,4 @@
 using AmongUs.Data;
-using AmongUs.GameOptions;
 using System;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;

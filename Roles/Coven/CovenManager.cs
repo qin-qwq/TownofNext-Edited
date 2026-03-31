@@ -6,6 +6,7 @@ using static TONE.Translator;
 using static TONE.Utils;
 
 namespace TONE;
+
 public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
 {
     public static byte necroHolder = byte.MaxValue;

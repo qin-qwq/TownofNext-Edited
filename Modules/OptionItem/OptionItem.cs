@@ -1,7 +1,7 @@
 using System;
 using TONE.Modules;
-using TONE.Patches;
 using TONE.Modules.Rpc;
+using TONE.Patches;
 using UnityEngine;
 
 namespace TONE;

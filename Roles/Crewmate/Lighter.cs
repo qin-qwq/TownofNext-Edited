@@ -115,7 +115,7 @@ internal class Lighter : RoleBase
         }
         else
         {
-            hud.PetButton.buttonLabelText.text = GetString("LighterVentButtonText");            
+            hud.PetButton.buttonLabelText.text = GetString("LighterVentButtonText");
         }
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)

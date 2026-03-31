@@ -1,8 +1,4 @@
-using AmongUs.GameOptions;
-using Hazel;
-using TONE.Modules.Rpc;
 using TONE.Roles.Core;
-using static TONE.Translator;
 
 namespace TONE.Roles.Neutral;
 
@@ -28,7 +24,7 @@ internal class SchrodingersCat : RoleBase
         killer.RpcGuardAndKill(target);
         target.RpcGuardAndKill();
 
-        var addon = killer.GetBetrayalAddon(true); 
+        var addon = killer.GetBetrayalAddon(true);
         var role = killer.GetCustomRole();
 
         target.GetRoleClass()?.OnRemove(target.PlayerId);

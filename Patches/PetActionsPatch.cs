@@ -1,10 +1,7 @@
-using AmongUs.GameOptions;
-using TONE.Roles.Crewmate;
-using TONE.Roles.Impostor;
-using TONE.Modules;
-using TONE.Roles.Neutral;
 using Hazel;
+using TONE.Modules;
 using TONE.Roles.Core;
+using TONE.Roles.Neutral;
 
 namespace TONE.Patches;
 /*
@@ -23,7 +20,7 @@ internal static class LocalPetPatch
         if (!Options.UsePets.GetBool()) return true;
         if (!(AmongUsClient.Instance.AmHost && AmongUsClient.Instance.AmClient)) return true;
         if (GameStates.IsLobby || !__instance.IsAlive()) return true;
-        
+
         if (__instance.petting) return true;
         __instance.petting = true;
 
@@ -42,7 +39,7 @@ internal static class LocalPetPatch
         if (!(AmongUsClient.Instance.AmHost && AmongUsClient.Instance.AmClient)) return;
 
         __instance.petting = false;
-        
+
         if (!Options.CancelPetAnimation.GetBool()) _ = new LateTask(() => __instance.MyPhysics?.CancelPet(), 0.4f);
     }
 }

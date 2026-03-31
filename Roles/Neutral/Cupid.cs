@@ -2,14 +2,11 @@ using AmongUs.GameOptions;
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.AddOns.Impostor;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
-using TONE.Roles.Coven;
-using TONE.Roles.Crewmate;
-using TONE.Roles.AddOns.Common;
-using UnityEngine;
 
 namespace TONE.Roles.Neutral;
 

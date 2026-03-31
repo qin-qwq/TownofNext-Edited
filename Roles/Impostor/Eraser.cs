@@ -1,7 +1,5 @@
-using AmongUs.GameOptions;
 using TONE.Modules;
 using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
 using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;

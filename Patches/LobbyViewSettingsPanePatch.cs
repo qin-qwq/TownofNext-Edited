@@ -2,9 +2,9 @@ using BepInEx.Unity.IL2CPP.Utils.Collections;
 using System;
 using System.Collections;
 using TMPro;
+using TONE.Roles.Core;
 using UnityEngine;
 using UnityEngine.Events;
-using TONE.Roles.Core;
 using static TONE.Translator;
 
 namespace TONE.Patches;
@@ -287,7 +287,7 @@ public static class LobbyViewSettingsPanePatch
             rightButton.transform.localPosition = new Vector3(-5.5f, 3.85f, -2f);
             rightButton.transform.localScale = new Vector3(3f, 3f, 2f);
             rightButton.name = "RightButtonArrow";
-            
+
             var rightButtonInactiveSprite = rightButton.transform.FindChild("Normal").GetComponentInChildren<SpriteRenderer>();
             rightButtonInactiveSprite.transform.localPosition = new Vector3(0f, 0f, 0.3f);
             rightButtonInactiveSprite.sprite = Utils.LoadSprite("TONE.Resources.Images.InactiveNextButton.png", 100f);
@@ -318,7 +318,7 @@ public static class LobbyViewSettingsPanePatch
             // flip button
             leftButton.transform.FindChild("Normal").gameObject.GetComponentInChildren<SpriteRenderer>().flipX = true;
             leftButton.transform.FindChild("Hover").gameObject.GetComponentInChildren<SpriteRenderer>().flipX = true;
-            
+
             var leftButtonPassiveButton = leftButton.gameObject.GetComponent<PassiveButton>();
             leftButtonPassiveButton.OnClick = new();
             if (GameStates.IsNormalGame) leftButtonPassiveButton.OnClick.AddListener((UnityAction)OnLeftPassiveClick);
@@ -401,7 +401,7 @@ public static class LobbyViewSettingsPanePatch
                             /*if (tabGroup is TabGroup.Addons)
                                 newXPos.y += 0.6f;
                             else*/
-                                indexRoles++;
+                            indexRoles++;
 
                             cloneRoleTabButton.transform.localPosition = newXPos;
                         }
@@ -443,9 +443,9 @@ public static class LobbyViewSettingsPanePatch
             __instance.taskTabButton.inactiveSprites.GetComponent<SpriteRenderer>().color = Color.black;
             __instance.taskTabButton.activeSprites.GetComponent<SpriteRenderer>().color = new(0.2f, 0.2f, 0.2f);
             __instance.taskTabButton.selectedSprites.GetComponent<SpriteRenderer>().color = new(0.1f, 0.1f, 0.1f);
-            
+
             LastGameModeSelected = Options.CurrentGameMode;
-            
+
             __instance.ChangeTab(LastTabPressed);
         }, 0.3f, "ChangeTab", shoudLog: false);
     }
@@ -550,7 +550,7 @@ public static class LobbyViewSettingsPanePatch
 
         __instance.taskTabButton.SelectButton(false);
         __instance.rolesTabButton.SelectButton(false);
-        
+
         foreach (var tabButton in AllTabButtons)
         {
             var tabGroup = tabButton.Key;
@@ -774,7 +774,7 @@ public static class LobbyViewSettingsPanePatch
                 if (option.GameMode is not CustomGameMode.All && option.GameMode != LastGameModeSelected)
                 {
                     if (!(LastGameModeSelected == CustomGameMode.RoundUp && option.GameMode == CustomGameMode.Standard))
-                    continue;
+                        continue;
                 }
 
                 var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode, true) && option.Parent?.GetBool() is null or true;
@@ -971,7 +971,7 @@ public static class LobbyViewSettingsPanePatch
 
                 viewSettings.scrollBar.SetYBoundsMax(-yPos - 4f);
             }
-            
+
             if (RoleEnabledList.Count <= 0) yield break;
             yield return CoShowRoleSettings().WrapToIl2Cpp();
 

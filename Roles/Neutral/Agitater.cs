@@ -6,6 +6,7 @@ using UnityEngine;
 using static TONE.Translator;
 
 namespace TONE.Roles.Neutral;
+
 internal class Agitater : RoleBase
 {
     //===========================SETUP================================\\

@@ -1,12 +1,10 @@
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
-using InnerNet;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Patches;
 using TONE.Roles.AddOns.Common;
@@ -1047,7 +1045,7 @@ class FixedUpdateInNormalGamePatch
         if (__instance == null || __instance.PlayerId >= 254) return;
 
         CheckMurderPatch.Update(__instance.PlayerId);
-        
+
         byte id = __instance.PlayerId;
 
         if (GameStates.IsHideNSeek) return;
@@ -1245,7 +1243,7 @@ class FixedUpdateInNormalGamePatch
                         FallFromLadder.FixedUpdate(player);
 
                     if (CustomNetObject.AllObjects.Count > 0)
-                    CustomNetObject.FixedUpdate();
+                        CustomNetObject.FixedUpdate();
 
                     if (!lowLoad)
                     {

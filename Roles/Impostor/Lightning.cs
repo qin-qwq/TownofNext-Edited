@@ -41,7 +41,7 @@ internal class Lightning : RoleBase
     {
         var msg = new RpcLightningSetGhostPlayer(PlayerControl.LocalPlayer.NetId, playerId, IsGhost(playerId));
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void ReceiveRPC(MessageReader reader)
     {

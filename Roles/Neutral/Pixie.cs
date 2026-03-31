@@ -9,6 +9,7 @@ using static TONE.Translator;
 using static TONE.Utils;
 
 namespace TONE.Roles.Neutral;
+
 internal class Pixie : RoleBase
 {
     //===========================SETUP================================\\

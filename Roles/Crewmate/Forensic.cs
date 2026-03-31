@@ -1,4 +1,3 @@
-using AmongUs.GameOptions;
 using System.Text;
 using TONE.Roles.Core;
 using TONE.Roles.Neutral;
