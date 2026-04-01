@@ -3687,6 +3687,7 @@
   "HaterCanKillEnchanted": "FFF团能击杀附魔类",
   "HorseMode": "启用牧马模式",
   "LongMode": "使脖子变长",
+  "ClassicMode": "启用怀旧模式",
   "FFA": "自由对战",
   "ModeFFA": "游戏模式：自由对战",
   "ModeDescribe.FFA": "在游戏模式自由对战中，每个玩家都是带刀玩家，都可以击杀任何人。存活到最后的玩家获胜！\n同时，一些随机事件会让游戏更加有趣！",

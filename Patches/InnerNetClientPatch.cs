@@ -1,5 +1,7 @@
 using Hazel;
+using Il2CppInterop.Runtime.InteropTypes;
 using InnerNet;
+using System;
 using TONE.Modules;
 
 namespace TONE.Patches;
@@ -178,54 +180,53 @@ internal class StartGameHostPatch
 [HarmonyPatch]
 internal class AuthTimeoutPatch
 {
-    [HarmonyPatch(typeof(AuthManager._CoConnect_d__4), nameof(AuthManager._CoConnect_d__4.MoveNext))]
-    [HarmonyPatch(typeof(AuthManager._CoWaitForNonce_d__6), nameof(AuthManager._CoWaitForNonce_d__6.MoveNext))]
-    [HarmonyPrefix]
     // From Reactor.gg
     // https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Patches/Miscellaneous/CustomServersPatch.cs
-    public static bool CoWaitforNoncePrefix(ref bool __result)
+    [HarmonyPatch(typeof(AuthManager), nameof(AuthManager.CoConnect))]
+    [HarmonyPrefix]
+    public static bool CoConnect_Prefix()
     {
-        if (GameStates.IsVanillaServer)
-        {
-            return true;
-        }
-        __result = false;
-        return false;
+        return GameStates.IsVanillaServer || GameStates.IsFreePlay || GameStates.IsLocalGame || GameStates.IsNotJoined;
+    }
+    [HarmonyPatch(typeof(AuthManager), nameof(AuthManager.CoWaitForNonce))]
+    [HarmonyPrefix]
+    public static bool CoWaitforNonce_Prefix()
+    {
+        return GameStates.IsVanillaServer || GameStates.IsFreePlay || GameStates.IsLocalGame || GameStates.IsNotJoined;
     }
 
     // If you dont patch this, u still need to wait for 5s
     // I have no idea why this is happening
-#if ANDROID
-    [HarmonyPatch(typeof(AmongUsClient._CoJoinOnlinePublicGame_d__50), nameof(AmongUsClient._CoJoinOnlinePublicGame_d__50.MoveNext))]
-    [HarmonyPrefix]
-    public static void EnableUdpMatchmakingPrefix(AmongUsClient._CoJoinOnlinePublicGame_d__50 __instance)
+    [HarmonyPatch]
+    public static class EnableUdpPatch
     {
-        // Skip to state 1 which just calls CoJoinOnlineGameDirect
-        if (__instance.__1__state == 0 && !ServerManager.Instance.IsHttp)
+        public static MethodBase TargetMethod()
         {
-            __instance.__1__state = 1;
-            __instance.__8__1 = new AmongUsClient.__c__DisplayClass50_0
+            return Utils.GetStateMachineMoveNext<AmongUsClient>(nameof(AmongUsClient.CoJoinOnlinePublicGame))!;
+        }
+
+        public static void Prefix(Il2CppObjectBase __instance)
+        {
+            var stateMachine = new StateMachineWrapper<AmongUsClient>(__instance);
+
+            // Skip to state 1 which just calls CoJoinOnlineGameDirect
+            if (stateMachine.State == 0 && !ServerManager.Instance.IsHttp)
             {
-                matchmakerToken = string.Empty,
-            };
+                stateMachine.State = 1;
+                var lambdaType = stateMachine.GetParameter<Il2CppObjectBase>("__8__1").GetType();
+                var newDisplayClass = Activator.CreateInstance(lambdaType);
+                if (newDisplayClass == null)
+                {
+                    throw new InvalidOperationException($"Could not create display class of type '{lambdaType}'.");
+                }
+
+                var displayClass = new CompilerGeneratedObjectWrapper(newDisplayClass);
+                displayClass.SetField("matchmakerToken", string.Empty);
+
+                stateMachine.SetParameter("__8__1", newDisplayClass);
+            }
         }
     }
-#else
-    [HarmonyPatch(typeof(AmongUsClient._CoJoinOnlinePublicGame_d__49), nameof(AmongUsClient._CoJoinOnlinePublicGame_d__49.MoveNext))]
-    [HarmonyPrefix]
-    public static void EnableUdpMatchmakingPrefix(AmongUsClient._CoJoinOnlinePublicGame_d__49 __instance)
-    {
-        // Skip to state 1 which just calls CoJoinOnlineGameDirect
-        if (__instance.__1__state == 0 && !ServerManager.Instance.IsHttp)
-        {
-            __instance.__1__state = 1;
-            __instance.__8__1 = new AmongUsClient.__c__DisplayClass49_0
-            {
-                matchmakerToken = string.Empty,
-            };
-        }
-    }
-#endif
 }
 [HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.UpdateName))]
 public class NetworkedPlayerInfoPatch

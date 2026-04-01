@@ -60,7 +60,7 @@ public class Main : BasePlugin
     public const string PluginDisplayVersion = "1.9.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 2026.3.31 & 17.0.0 & 17.0.1 & 17.1.0 & 17.3.0
+            (2026, 3, 31, 0) // 2026.3.31 & 17.3
         ];
 
     // Change this to change alpha/beta/full release
@@ -121,6 +121,7 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> ShowModdedClientText { get; private set; }
     public static ConfigEntry<bool> HorseMode { get; private set; }
     public static ConfigEntry<bool> LongMode { get; private set; }
+    public static ConfigEntry<bool> ClassicMode { get; private set; }
     public static ConfigEntry<bool> ForceOwnLanguage { get; private set; }
     public static ConfigEntry<bool> ForceOwnLanguageRoleName { get; private set; }
     public static ConfigEntry<bool> EnableCustomButton { get; private set; }
@@ -583,6 +584,7 @@ public class Main : BasePlugin
         ShowModdedClientText = Config.Bind("Client Options", "ShowModdedClientText", true);
         HorseMode = Config.Bind("Client Options", "HorseMode", false);
         LongMode = Config.Bind("Client Options", "LongMode", false);
+        ClassicMode = Config.Bind("Client Options", "ClassicMode", false);
         ForceOwnLanguage = Config.Bind("Client Options", "ForceOwnLanguage", false);
         ForceOwnLanguageRoleName = Config.Bind("Client Options", "ForceOwnLanguageRoleName", false);
         EnableCustomButton = Config.Bind("Client Options", "EnableCustomButton", true);
