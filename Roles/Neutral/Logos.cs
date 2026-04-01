@@ -345,7 +345,14 @@ internal class Philosopher : RoleBase
             .Do(x => x.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Logos), GetString("Logos.UnlockStage4Ability"))));
             Logos.AbilityStage++;
             SendRPC();
-            Utils.NotifyRoles();
+            if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
+            {
+                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+            }
+            else
+            {
+                Utils.NotifyRoles();
+            }
         }
 
         return true;

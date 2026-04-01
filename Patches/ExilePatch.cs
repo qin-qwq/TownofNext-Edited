@@ -169,7 +169,7 @@ class ExileControllerWrapUpPatch
                     exiled != null && // Exiled is not null
                     exiled.Object != null) //exiled.Object is not null
                 {
-                    exiled.Object.RpcExileV3();
+                    exiled.Object.RpcExileV2();
                 }
             }, Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp ? 0.5f : 1.4f, "Restore IsDead Task");
 

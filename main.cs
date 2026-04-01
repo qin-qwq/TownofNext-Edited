@@ -19,6 +19,8 @@ using TONE.Roles.Core;
 using TONE.Roles.Double;
 using TONE.Roles.Neutral;
 using UnityEngine;
+using DateTime = Il2CppSystem.DateTime;
+using DateTimeKind = Il2CppSystem.DateTimeKind;
 
 [assembly: AssemblyFileVersion(TONE.Main.PluginVersion)]
 [assembly: AssemblyInformationalVersion(TONE.Main.PluginVersion)]
@@ -54,20 +56,20 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.03.30"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.9.0 Beta 2";
+    public const string PluginVersion = "26.04.01"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.9.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
+            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 2026.3.31 & 17.0.0 & 17.0.1 & 17.1.0 & 17.3.0
         ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.BETA;
+    public static readonly Release RELEASE = Release.RELEASE;
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 2
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
-    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.8.1
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.9.0
 #pragma warning restore IDE1006 // Naming Styles
 
     public enum Release
@@ -237,10 +239,14 @@ public class Main : BasePlugin
     {
         get
         {
-            DateTime utcNow = DateTime.UtcNow;
-            DateTime t = new(utcNow.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
-            DateTime t2 = new(utcNow.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
-            return utcNow >= t && utcNow <= t2;
+            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
+            {
+                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
+                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
+            }
+            return false;
         }
     }
     public static bool ResetOptions = true;

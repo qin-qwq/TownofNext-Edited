@@ -153,13 +153,7 @@ class VersionShowerStartPatch
         Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TONE version");
 
         if (Main.IsAprilFools)
-            Main.credentialsText = $"<color=#00bfff>Town Of Host</color> v11.45.14";
-
-        var credentials = Object.Instantiate(__instance.text);
-        credentials.text = Main.credentialsText;
-        credentials.alignment = TextAlignmentOptions.Right;
-        credentials.transform.position = new Vector3(1f, 2.67f, -2f);
-        credentials.fontSize = credentials.fontSizeMax = credentials.fontSizeMin = 2f;
+            Main.credentialsText = $"<color=#00bfff>Town Of Host</color> - 11.45.14";
 
         ErrorText.Create(__instance.text);
         if (Main.hasArgumentException && ErrorText.Instance != null)
@@ -198,6 +192,41 @@ class VersionShowerStartPatch
             {
                 SpecialEventText.color = col;
             }
+        }
+    }
+}
+// From TONX/Patches/AccountManagerPatch.cs, by KARPED1EM
+[HarmonyPatch(typeof(AccountTab), nameof(AccountTab.Awake))]
+public static class UpdateFriendCodeUIPatch
+{
+    private static GameObject VersionShower;
+
+    public static void Prefix()
+    {
+        var credentialsText = $"<color={Main.ModColor}>Qin-qwq</color> \u00a9 2026";
+        credentialsText += "\t\t\t";
+        credentialsText += $"<color={Main.ModColor}>{Main.ModName}</color> - {Main.PluginDisplayVersion}";
+
+        GameObject friendCode = GameObject.Find("FriendCode");
+
+        if (friendCode && !VersionShower)
+        {
+            VersionShower = Object.Instantiate(friendCode, friendCode.transform.parent);
+            VersionShower.name = "TONE Version Shower";
+            VersionShower.transform.localPosition = friendCode.transform.localPosition + new Vector3(3.2f, 0f, 0f);
+            VersionShower.transform.localScale *= 1.7f;
+            var tmp = VersionShower.GetComponent<TextMeshPro>();
+            tmp.alignment = TextAlignmentOptions.Right;
+            tmp.fontSize = 30f;
+            tmp.SetText(credentialsText);
+        }
+
+        GameObject newRequest = GameObject.Find("NewRequest");
+
+        if (newRequest)
+        {
+            newRequest.transform.localPosition -= new Vector3(0f, 0f, 10f);
+            newRequest.transform.localScale = new(0f, 0f, 0f);
         }
     }
 }

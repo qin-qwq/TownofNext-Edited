@@ -13,7 +13,6 @@ using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
-using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
@@ -366,16 +365,9 @@ static class ExtendedPlayerControl
     }
     public static void RpcExile(this PlayerControl player)
     {
-        if (Main.CurrentServerIsVanilla)
-        {
-            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-        }
-        else
-        {
-            player.Exiled();
-            var message = new RpcExiled(player.NetId);
-            RpcUtils.LateBroadcastReliableMessage(message);
-        }
+        player.Exiled();
+        var message = new RpcExiled(player.NetId);
+        RpcUtils.LateBroadcastReliableMessage(message);
     }
     public static void RpcExileDesync(this PlayerControl player, PlayerControl seer)
     {
@@ -395,16 +387,10 @@ static class ExtendedPlayerControl
         {
             Susceptible.CallEnabledAndChange(player);
         }
-        if (Main.CurrentServerIsVanilla)
-        {
-            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-        }
-        else
-        {
-            player.Exiled();
-            var message = new RpcExiled(player.NetId);
-            RpcUtils.LateBroadcastReliableMessage(message);
-        }
+
+        player.Exiled();
+        var message = new RpcExiled(player.NetId);
+        RpcUtils.LateBroadcastReliableMessage(message);
     }
     public static void RpcExileV3(this PlayerControl player)
     {
@@ -415,16 +401,9 @@ static class ExtendedPlayerControl
             Susceptible.CallEnabledAndChange(player);
         }
 
-        if (Main.CurrentServerIsVanilla)
-        {
-            player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-        }
-        else
-        {
-            player.Exiled();
-            var message = new RpcExiled(player.NetId);
-            RpcUtils.LateBroadcastReliableMessage(message);
-        }
+        player.Exiled();
+        var message = new RpcExiled(player.NetId);
+        RpcUtils.LateBroadcastReliableMessage(message);
 
         player.Data.IsDead = true;
         MurderPlayerPatch.AfterPlayerDeathTasks(player, player, GameStates.IsMeeting, true);
@@ -1968,15 +1947,8 @@ static class ExtendedPlayerControl
 
             var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);
             sender.StartMessage(pc.OwnerId);
-            if (Main.CurrentServerIsVanilla)
-            {
-                player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-            }
-            else
-            {
-                sender.StartRpc(player.NetId, RpcCalls.Exiled)
-                    .EndRpc();
-            }
+            sender.StartRpc(player.NetId, RpcCalls.Exiled)
+                .EndRpc();
             RoleTypes role = Utils.GetRoleMap(pc.PlayerId, player.PlayerId).RoleType;
             sender.StartRpc(player.NetId, RpcCalls.SetRole)
                 .Write((ushort)role)
@@ -2266,14 +2238,5 @@ static class ExtendedPlayerControl
         writer.EndMessage();
         AmongUsClient.Instance.SendOrDisconnect(writer);
         writer.Recycle();
-    }
-
-    public static RoleTypes GetGhostRoleBasis(this PlayerControl player)
-    {
-        if (GhostRoleAssign.GhostGetPreviousRole.TryGetValue(player.PlayerId, out var role) && role.IsGhostRole())
-            return RoleTypes.GuardianAngel;
-        else if (player.GetCustomRole().IsImpostor())
-            return RoleTypes.ImpostorGhost;
-        else return RoleTypes.CrewmateGhost;
     }
 }

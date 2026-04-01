@@ -192,15 +192,8 @@ public static class AntiBlackout
         {
             if (player.Data.IsDead && !player.Data.Disconnected)
             {
-                if (Main.CurrentServerIsVanilla)
-                {
-                    player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-                }
-                else
-                {
-                    sender.AutoStartRpc(player.NetId, (byte)RpcCalls.Exiled);
-                    sender.EndRpc();
-                }
+                sender.AutoStartRpc(player.NetId, (byte)RpcCalls.Exiled);
+                sender.EndRpc();
                 hasValue = true;
             }
         }
@@ -294,15 +287,8 @@ public static class AntiBlackout
 
                     if (!pc.IsAlive())
                     {
-                        if (Main.CurrentServerIsVanilla)
-                        {
-                            pc.RpcSetRoleGlobal(pc.GetGhostRoleBasis());
-                        }
-                        else
-                        {
-                            sender.AutoStartRpc(pc.NetId, (byte)RpcCalls.Exiled, -1);
-                            sender.EndRpc();
-                        }
+                        sender.AutoStartRpc(pc.NetId, (byte)RpcCalls.Exiled, -1);
+                        sender.EndRpc();
                     }
                 }
 
@@ -372,15 +358,8 @@ public static class AntiBlackout
         {
             int ownerId = pc.OwnerId;
 
-            if (Main.CurrentServerIsVanilla)
-            {
-                pc.RpcSetRoleGlobal(pc.GetGhostRoleBasis());
-            }
-            else
-            {
-                var message1 = new RpcExiled(pc.NetId);
-                RpcUtils.LateSpecificSendMessage(message1, ownerId);
-            }
+            var message1 = new RpcExiled(pc.NetId);
+            RpcUtils.LateSpecificSendMessage(message1, ownerId);
 
             if (!pc.IsModded() && pc.PlayerId == ExileControllerWrapUpPatch.AntiBlackout_LastExiled?.PlayerId)
             {
