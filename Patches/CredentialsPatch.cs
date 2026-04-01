@@ -135,24 +135,21 @@ class VersionShowerStartPatch
         var buildtype = "";
 
 #if RELEASE
-            //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
-            buildtype = "Release";
+        buildtype = "Release";
 #endif
 
 #if BETA
         Main.credentialsText += $"\r\n<color=#ffc0cb>Beta:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
-        //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
         buildtype = "Beta";
 #endif
 
 #if DEBUG
         Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
-        //Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
         buildtype = "Debug";
 #endif
         Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TONE version");
 
-        if (Main.IsAprilFools)
+        if (Main.IsAprilFools2)
             Main.credentialsText = $"<color=#00bfff>Town Of Host</color> - 11.45.14";
 
         ErrorText.Create(__instance.text);

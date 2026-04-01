@@ -56,7 +56,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.04.01"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginVersion = "26.04.02"; // YEAR.MMDD.VERSION.CANARYDEV
     public const string PluginDisplayVersion = "1.9.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
@@ -248,6 +248,16 @@ public class Main : BasePlugin
                 return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
             }
             return false;
+        }
+    }
+    public static bool IsAprilFools2
+    {
+        get
+        {
+            DateTime utcNow = DateTime.UtcNow;
+            DateTime t = new(utcNow.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
+            DateTime t2 = new(utcNow.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
+            return utcNow >= t && utcNow <= t2;
         }
     }
     public static bool ResetOptions = true;
