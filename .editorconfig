@@ -155,6 +155,11 @@ dotnet_naming_style.帕斯卡拼写法.required_suffix =
 dotnet_naming_style.帕斯卡拼写法.word_separator = 
 dotnet_naming_style.帕斯卡拼写法.capitalization = pascal_case
 
+# Remove warning about invalid name like __instance
+dotnet_diagnostic.IDE1006.severity = none
+# Remove suggestion to reduce NULL checking
+dotnet_diagnostic.IDE0031.severity = none
+
 [*.{cs,vb}]
 end_of_line = crlf
 tab_width = 4

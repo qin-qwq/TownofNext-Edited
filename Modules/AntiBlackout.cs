@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Impostor;
 
 namespace TONE;
 
@@ -121,12 +122,12 @@ public static class AntiBlackout
 
         if (ExilePlayerId == PlayerControl.LocalPlayer.PlayerId)
         {
-            // Dead > Modded > not Impostor/Shapeshifter/Phantom
+            // Dead > Modded > not Impostor/Shapeshifter/Phantom/Viper
             dummyImp = Main.EnumeratePlayerControls()
                 .Where(pc => pc.PlayerId != PlayerControl.LocalPlayer.PlayerId)
                 .OrderByDescending(pc => !pc.IsAlive())
                 .ThenByDescending(pc => pc.IsModded())
-                .ThenByDescending(pc => pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom)
+                .ThenByDescending(pc => pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
                 .FirstOrDefault() ?? PlayerControl.LocalPlayer;
 
             Logger.Info($"Dummy Impostor is set to ({dummyImp.PlayerId}){dummyImp.Data.PlayerName}", "AntiBlackout.RevivePlayersAndSetDummyImp");
@@ -191,15 +192,8 @@ public static class AntiBlackout
         {
             if (player.Data.IsDead && !player.Data.Disconnected)
             {
-                if (Main.CurrentServerIsVanilla)
-                {
-                    player.RpcSetRoleGlobal(player.GetGhostRoleBasis());
-                }
-                else
-                {
-                    sender.AutoStartRpc(player.NetId, (byte)RpcCalls.Exiled);
-                    sender.EndRpc();
-                }
+                sender.AutoStartRpc(player.NetId, (byte)RpcCalls.Exiled);
+                sender.EndRpc();
                 hasValue = true;
             }
         }
@@ -293,15 +287,8 @@ public static class AntiBlackout
 
                     if (!pc.IsAlive())
                     {
-                        if (Main.CurrentServerIsVanilla)
-                        {
-                            pc.RpcSetRoleGlobal(pc.GetGhostRoleBasis());
-                        }
-                        else
-                        {
-                            sender.AutoStartRpc(pc.NetId, (byte)RpcCalls.Exiled, -1);
-                            sender.EndRpc();
-                        }
+                        sender.AutoStartRpc(pc.NetId, (byte)RpcCalls.Exiled, -1);
+                        sender.EndRpc();
                     }
                 }
 
@@ -346,7 +333,7 @@ public static class AntiBlackout
                 }
                 else
                 {
-                    if (roletype is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom)
+                    if (roletype is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper)
                     {
                         changedRoleType = RoleTypes.ImpostorGhost;
                     }
@@ -371,15 +358,8 @@ public static class AntiBlackout
         {
             int ownerId = pc.OwnerId;
 
-            if (Main.CurrentServerIsVanilla)
-            {
-                pc.RpcSetRoleGlobal(pc.GetGhostRoleBasis());
-            }
-            else
-            {
-                var message1 = new RpcExiled(pc.NetId);
-                RpcUtils.LateSpecificSendMessage(message1, ownerId);
-            }
+            var message1 = new RpcExiled(pc.NetId);
+            RpcUtils.LateSpecificSendMessage(message1, ownerId);
 
             if (!pc.IsModded() && pc.PlayerId == ExileControllerWrapUpPatch.AntiBlackout_LastExiled?.PlayerId)
             {
@@ -397,15 +377,22 @@ public static class AntiBlackout
         foreach (var seer in Main.EnumeratePlayerControls())
         {
             seer.RpcResetAbilityCooldown();
-            seer.RpcAddAbilityCD();
-            if (seer.GetRoleClass() is not DefaultSetup)
+        }
+        foreach (var pc in Main.EnumerateAlivePlayerControls())
+        {
+            pc.RpcAddAbilityCD();
+            if (pc.GetRoleClass() is not DefaultSetup)
             {
-                if (seer.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
+                if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
                 {
-                    seer.ResetKillCooldown();
-                    if (Main.AllPlayerKillCooldown.TryGetValue(seer.PlayerId, out var killTimer) && killTimer > 0f)
+                    pc.ResetKillCooldown();
+                    if (pc.Is(CustomRoles.Saboteur) && Utils.AnySabotageIsActive())
                     {
-                        seer.SetKillCooldown(killTimer);
+                        pc.SetKillCooldown(Saboteur.SaboteurMinCD.GetFloat());
+                    }
+                    else if (Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var killTimer) && killTimer > 0f)
+                    {
+                        pc.SetKillCooldown(killTimer);
                     }
                 }
             }

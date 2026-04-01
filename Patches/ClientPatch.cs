@@ -180,7 +180,7 @@ internal class IsMinorByDatePatch
         */
 
         return true;
-        
+
     }
 }
 

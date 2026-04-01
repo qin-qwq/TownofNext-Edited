@@ -207,11 +207,9 @@ internal class Witch : RoleBase
             var witch = Utils.GetPlayerById(whichId);
             if (witch != null && witch.IsAlive())
             {
-                pc.RpcExileV2();
+                pc.RpcExileV3();
                 pc.SetRealKiller(witch);
                 pc.SetDeathReason(PlayerState.DeathReason.Spell);
-                Main.PlayerStates[pc.PlayerId].SetDead();
-                MurderPlayerPatch.AfterPlayerDeathTasks(witch, pc, inMeeting: false, fromRole: true);
             }
         }
         RemoveSpelledPlayer();

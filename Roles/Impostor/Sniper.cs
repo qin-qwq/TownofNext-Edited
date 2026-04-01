@@ -190,9 +190,9 @@ internal class Sniper : RoleBase
     }
     public override bool OnCheckVanish(PlayerControl phantom)
     {
-       if (!UsePhantomBasis.GetBool()) return false;
+        if (!UsePhantomBasis.GetBool()) return false;
 
-       if (phantom.GetAbilityUseLimit() <= 0) return false;
+        if (phantom.GetAbilityUseLimit() <= 0) return false;
 
         phantom.RpcRemoveAbilityUse();
 
@@ -222,7 +222,7 @@ internal class Sniper : RoleBase
         if (validTargets.Count > 0)
         {
             var selectedTarget = validTargets.RandomElement();
-    
+
             if (!Options.DisableShieldAnimations.GetBool())
                 phantom.RpcGuardAndKill();
             else
@@ -230,6 +230,7 @@ internal class Sniper : RoleBase
 
             selectedTarget.RpcMurderPlayer(selectedTarget);
             selectedTarget.SetRealKiller(phantom);
+            selectedTarget.SetDeathReason(PlayerState.DeathReason.Sniped);
 
             Logger.Info($"{selectedTarget?.Data?.PlayerName} 被 {phantom?.Data?.PlayerName} 狙击", "Sniper");
         }
@@ -295,6 +296,7 @@ internal class Sniper : RoleBase
             var snipedTarget = targets.OrderBy(c => c.Value).First().Key;
             snipeTarget[sniperId] = snipedTarget.PlayerId;
             snipedTarget.CheckMurder(snipedTarget);
+            snipedTarget.SetDeathReason(PlayerState.DeathReason.Sniped);
 
             if (!Options.DisableShieldAnimations.GetBool())
                 sniper.RpcGuardAndKill();

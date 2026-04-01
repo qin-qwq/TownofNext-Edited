@@ -23,6 +23,11 @@ public class PresetOptionItem(int defaultValue, TabGroup tab, bool vanilla) : Op
             2 => Main.Preset3.Value == (string)Main.Preset3.DefaultValue ? Translator.GetString("Preset_3") : Main.Preset3.Value,
             3 => Main.Preset4.Value == (string)Main.Preset4.DefaultValue ? Translator.GetString("Preset_4") : Main.Preset4.Value,
             4 => Main.Preset5.Value == (string)Main.Preset5.DefaultValue ? Translator.GetString("Preset_5") : Main.Preset5.Value,
+            5 => Main.Preset6.Value == (string)Main.Preset6.DefaultValue ? Translator.GetString("Preset_6") : Main.Preset6.Value,
+            6 => Main.Preset7.Value == (string)Main.Preset7.DefaultValue ? Translator.GetString("Preset_7") : Main.Preset7.Value,
+            7 => Main.Preset8.Value == (string)Main.Preset8.DefaultValue ? Translator.GetString("Preset_8") : Main.Preset8.Value,
+            8 => Main.Preset9.Value == (string)Main.Preset9.DefaultValue ? Translator.GetString("Preset_9") : Main.Preset9.Value,
+            9 => Main.Preset10.Value == (string)Main.Preset10.DefaultValue ? Translator.GetString("Preset_10") : Main.Preset10.Value,
             _ => null,
         };
     }

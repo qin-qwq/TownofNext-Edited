@@ -1,6 +1,5 @@
 using System.Text;
 using TMPro;
-using TONE.Roles.Core;
 using UnityEngine;
 using static TONE.Translator;
 

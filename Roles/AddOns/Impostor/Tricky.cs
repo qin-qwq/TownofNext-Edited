@@ -1,6 +1,7 @@
 using static TONE.Options;
 
 namespace TONE.Roles.AddOns.Impostor;
+
 public class Tricky : IAddon
 {
     public CustomRoles Role => CustomRoles.Tricky;

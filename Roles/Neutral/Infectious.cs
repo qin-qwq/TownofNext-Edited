@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using TONE.Modules;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Double;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -181,4 +182,5 @@ internal class Infectious : RoleBase
         else
             hud.KillButton.OverrideText($"{GetString("KillButtonText")}");
     }
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Infected");
 }

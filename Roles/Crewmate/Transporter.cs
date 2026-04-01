@@ -115,7 +115,7 @@ internal class Transporter : RoleBase
 
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
-        hud.PetButton.OverrideText(GetString("TransporterButtonText"));        
+        hud.PetButton.OverrideText(GetString("TransporterButtonText"));
     }
 
     public override Sprite GetPetButtonSprite(PlayerControl player) => CustomButton.Get("Teleport");

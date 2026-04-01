@@ -50,7 +50,7 @@ internal class Consigliere : RoleBase
     {
         var msg = new RpcSetConsigliere(PlayerControl.LocalPlayer.NetId, playerId, targetId);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void ReceiveRPC(MessageReader reader)
     {

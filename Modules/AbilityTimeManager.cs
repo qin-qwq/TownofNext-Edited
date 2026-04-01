@@ -1,5 +1,4 @@
 using TONE.Roles.Core;
-using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
@@ -22,7 +21,7 @@ public static class AbilityTimeManager
 
     public static long RemainingCD(this PlayerControl pc)
     {
-       return AbilityCooldown.GetValueOrDefault(pc.PlayerId, -1) + AbilityDuration.GetValueOrDefault(pc.PlayerId, -1) + pc.DefaultAbilityCD() - Utils.TimeStamp + 1;
+        return AbilityCooldown.GetValueOrDefault(pc.PlayerId, -1) + AbilityDuration.GetValueOrDefault(pc.PlayerId, -1) + pc.DefaultAbilityCD() - Utils.TimeStamp + 1;
     }
 
     public static void RpcAddAbilityCD(this byte playerId) => RpcAddAbilityCD(playerId.GetPlayer(), true);
@@ -55,7 +54,7 @@ public static class AbilityTimeManager
             AbilityDuration.Remove(pc.PlayerId);
 
             if (rpc) SendRPC(pc);
-        }        
+        }
     }
 
     public static long DefaultAbilityCD(this PlayerControl pc)

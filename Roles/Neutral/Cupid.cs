@@ -2,14 +2,11 @@ using AmongUs.GameOptions;
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.AddOns.Impostor;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
-using TONE.Roles.Coven;
-using TONE.Roles.Crewmate;
-using TONE.Roles.AddOns.Common;
-using UnityEngine;
 
 namespace TONE.Roles.Neutral;
 
@@ -194,7 +191,14 @@ internal class Cupid : RoleBase
             p.RpcSetCustomRole(CustomRoles.Lovers, false, true);
             target.RpcSetCustomRole(CustomRoles.Lovers, false, true);
 
-            Utils.NotifyRoles();
+            if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
+            {
+                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+            }
+            else
+            {
+                Utils.NotifyRoles();
+            }
 
             Logger.Info($"{p.GetNameWithRole()} is Lover1", "Cupid");
             Logger.Info($"{target.GetNameWithRole()} is Lover2", "Cupid");

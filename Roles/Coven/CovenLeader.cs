@@ -102,7 +102,7 @@ internal class CovenLeader : CovenManager
             retrainPlayer.Remove(target.PlayerId);
             killer.RpcRemoveAbilityUse();
             if (RetrainConvertsHelpers.GetBool()) PassRecruit(killer, target);
-            
+
             return;
         }
         killer.Notify(GetString("CovenLeaderRetrain"));

@@ -1,4 +1,3 @@
-using AmongUs.GameOptions;
 using TONE.Modules;
 using TONE.Roles.Core;
 using UnityEngine;

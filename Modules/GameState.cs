@@ -275,7 +275,7 @@ public class PlayerState(byte playerId)
         if (!AmongUsClient.Instance.AmHost) return;
         var msg = new RpcRemoveSubRole(PlayerControl.LocalPlayer.NetId, PlayerId, addOn);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
 
     public void SetDead()
@@ -366,6 +366,7 @@ public class PlayerState(byte playerId)
         Suffocate,
         Ice,
         AFK,
+        Philosophy,
 
         //Please add all new roles with deathreason & new deathreason in Utils.DeathReasonIsEnable();
         etc = -1,

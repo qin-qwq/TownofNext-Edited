@@ -47,9 +47,9 @@ public class Bait : IAddon
     {
         if (MeetingStates.FirstMeeting && CustomRoles.Bait.RoleExist() && BaitNotification.GetBool())
         {
-            foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Bait) && !BaitAlive.Contains(x.PlayerId)).ToArray())
+            foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Bait) && !x.IsAlive() && BaitAlive.Contains(x.PlayerId)).ToArray())
             {
-                BaitAlive.Add(pc.PlayerId);
+                BaitAlive.Remove(pc.PlayerId);
             }
             HashSet<string> baitAliveList = [];
             foreach (var whId in BaitAlive.ToArray())
@@ -74,6 +74,7 @@ public class Bait : IAddon
                 || realkiller.Is(CustomRoles.Swooper)
                 || realkiller.Is(CustomRoles.Cleaner)
                 || realkiller.Is(CustomRoles.Swift)
+                || realkiller.Is(CustomRoles.Scavenger)
                 || (DisableReportWhenCC.GetBool() && Utils.IsActive(SystemTypes.Comms) && Camouflage.IsActive && !BaitCanBeReportedUnderAllConditions.GetBool())
                 || (realkiller.Is(CustomRoles.Oblivious) && Oblivious.ObliviousBaitImmune.GetBool()))
                 return;

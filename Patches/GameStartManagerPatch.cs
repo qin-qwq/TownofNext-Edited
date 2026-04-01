@@ -112,6 +112,14 @@ public class GameStartManagerPatch
                 if (AURoleOptions.GuardianAngelCooldown == 0f)
                     AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
             }
+
+            if (!HudManager.InstanceExists) return;
+
+            if (__instance.LobbyInfoPane.gameObject.activeSelf)
+            {
+                var lobbyViewSettingsPane = __instance.LobbyInfoPane.LobbyViewSettingsPane;
+                lobbyViewSettingsPane.scrollBar.enabled = !HudManager.Instance.Chat.IsOpenOrOpening;
+            }
         }
     }
 
@@ -305,6 +313,13 @@ public class GameStartManagerBeginGamePatch
             var msg = GetString("Error.InvalidColor");
             msg += "\n" + string.Join(",", invalidColor.Select(p => $"{p.GetRealName()}"));
             Utils.SendMessage(msg);
+            return false;
+        }
+
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp && !Main.IsAprilFools && !PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
+        {
+            Options.GameMode.SetValue(0);
+            Logger.SendInGame(string.Format(GetString("Warning.GameModeNotEnabled"), GetString("RoundUp")));
             return false;
         }
 

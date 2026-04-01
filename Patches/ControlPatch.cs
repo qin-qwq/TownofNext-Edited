@@ -1,8 +1,6 @@
 using System;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using TONE.Patches;
-using TONE.Roles.AddOns.Common;
 using UnityEngine;
 using static TONE.Translator;
 
@@ -36,19 +34,6 @@ internal class ControllerManagerUpdatePatch
                 Logger.Info("User canceled Auto Play Again!", "ControllerManager");
                 EndGameManagerPatch.IsRestarting = false;
             }
-            // Do next page
-            if (GameStates.IsLobby && DestroyableSingleton<HudManager>.InstanceExists && DestroyableSingleton<HudManager>.Instance.Chat.IsClosedOrClosing)
-            {
-                if (Input.GetKeyDown(KeyCode.Tab))
-                {
-                    OptionShower.Next();
-                }
-                for (var i = 0; i < 9; i++)
-                {
-                    if (ORGetKeysDown(KeyCode.Alpha1 + i, KeyCode.Keypad1 + i) && OptionShower.pages.Count >= i + 1)
-                        OptionShower.currentPage = i;
-                }
-            }
 
             //捕捉全屏快捷键
             //if (GetKeysDown(KeyCode.LeftAlt, KeyCode.Return))
@@ -57,7 +42,8 @@ internal class ControllerManagerUpdatePatch
             //}
 
             // Show Role info
-            if (GameStates.IsInGame && (GameStates.IsCanMove || GameStates.IsMeeting) && Options.CurrentGameMode == CustomGameMode.Standard)
+            if (GameStates.IsInGame && (GameStates.IsCanMove || GameStates.IsMeeting) && Options.CurrentGameMode is CustomGameMode.Standard or
+                CustomGameMode.RoundUp)
             {
                 if (Input.GetKey(KeyCode.F1))
                 {
@@ -70,73 +56,6 @@ internal class ControllerManagerUpdatePatch
                 else if (InGameRoleInfoMenu.Showing) InGameRoleInfoMenu.Hide();
             }
             else if (InGameRoleInfoMenu.Showing) InGameRoleInfoMenu.Show();
-            // Show Add-on info
-            /*if (Input.GetKeyDown(KeyCode.F2) && GameStates.IsInGame && Options.CurrentGameMode == CustomGameMode.Standard)
-            {
-                try
-                {
-                    var lp = PlayerControl.LocalPlayer;
-                    if (Main.PlayerStates[lp.PlayerId].SubRoles.Count == 0) return;
-
-                    List<string> addDes = [];
-                    foreach (var subRole in Main.PlayerStates[lp.PlayerId].SubRoles.Where(x => x is not CustomRoles.Charmed).ToArray())
-                    {
-                        addDes.Add(GetString($"{subRole}") + Utils.GetRoleMode(subRole) + GetString($"{subRole}InfoLong"));
-                    }
-
-                    addonInfoIndex++;
-                    if (addonInfoIndex >= addDes.Count) addonInfoIndex = 0;
-                    HudManager.Instance.ShowPopUp(addDes[addonInfoIndex] + "<size=0%>tohe</size>");
-                }
-                catch (Exception ex)
-                {
-                    Utils.ThrowException(ex);
-                    throw;
-                }
-            }
-            if (Input.GetKeyDown(KeyCode.F3) && GameStates.IsInGame && Options.CurrentGameMode == CustomGameMode.Standard)
-            {
-                try
-                {
-                    var lp = PlayerControl.LocalPlayer;
-                    var role = lp.GetCustomRole();
-                    var sb = new StringBuilder();
-                    if (Options.CustomRoleSpawnChances.TryGetValue(role, out var soi))
-                        Utils.ShowChildrenSettings(soi, ref sb, command: false);
-                    HudManager.Instance.ShowPopUp(sb.ToString().Trim());
-                }
-                catch (Exception ex)
-                {
-                    Utils.ThrowException(ex);
-                }
-            }
-            if (Input.GetKeyDown(KeyCode.F4) && GameStates.IsInGame && Options.CurrentGameMode == CustomGameMode.Standard)
-            {
-                try
-                {
-                    var lp = PlayerControl.LocalPlayer;
-                    if (Main.PlayerStates[lp.PlayerId].SubRoles.Count == 0) return;
-
-                    var sb = new StringBuilder();
-                    List<string> addSett = [];
-
-                    foreach (var subRole in Main.PlayerStates[lp.PlayerId].SubRoles.Where(x => x is not CustomRoles.Charmed).ToArray())
-                    {
-                        if (Options.CustomRoleSpawnChances.TryGetValue(subRole, out var soi))
-                            Utils.ShowChildrenSettings(soi, ref sb, command: false);
-
-                        addSett.Add(sb.ToString());
-                    }
-
-                    addonSettingsIndex++;
-                    if (addonSettingsIndex >= addSett.Count) addonSettingsIndex = 0;
-                    HudManager.Instance.ShowPopUp(addSett[addonSettingsIndex] + "<size=0%>tohe</size>");
-                }
-                catch (Exception ex)
-                {
-                    Utils.ThrowException(ex);
-                }
-            }*/
             // Changing the resolution
             if (GetKeysDown(KeyCode.F11, KeyCode.LeftAlt))
             {
@@ -288,10 +207,7 @@ internal class ControllerManagerUpdatePatch
             {
                 PlayerControl.LocalPlayer.SetDeathReason(PlayerState.DeathReason.etc);
                 PlayerControl.LocalPlayer.SetRealKiller(PlayerControl.LocalPlayer);
-                Main.PlayerStates[PlayerControl.LocalPlayer.PlayerId].SetDead();
-                PlayerControl.LocalPlayer.RpcExileV2();
-                PlayerControl.LocalPlayer.Data.IsDead = true;
-                MurderPlayerPatch.AfterPlayerDeathTasks(PlayerControl.LocalPlayer, PlayerControl.LocalPlayer, GameStates.IsMeeting);
+                PlayerControl.LocalPlayer.RpcExileV3();
 
                 Utils.SendMessage(GetString("HostKillSelfByCommand"), title: $"<color=#ff0000>{GetString("DefaultSystemMessageTitle")}</color>");
             }

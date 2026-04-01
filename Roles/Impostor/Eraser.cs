@@ -1,7 +1,5 @@
-using AmongUs.GameOptions;
 using TONE.Modules;
 using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
 using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;
@@ -99,7 +97,7 @@ internal class Eraser : RoleBase
                 Logger.Info($"Canceled {player.GetNameWithRole()} because player have ghost role", "Eraser");
                 return;
             }
-            CustomRoles EraserRole = player.IsPlayerImpostorTeam() ? CustomRoles.ImpostorTONE : CustomRoles.CrewmateTONE;
+            CustomRoles EraserRole = player.GetCustomRole().IsImpostor() ? CustomRoles.ImpostorTONE : CustomRoles.CrewmateTONE;
 
             player.GetRoleClass()?.OnRemove(player.PlayerId);
             player.RpcChangeRoleBasis(EraserRole);

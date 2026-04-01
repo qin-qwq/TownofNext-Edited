@@ -21,6 +21,12 @@ internal class ViperTONE : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
     }
 
+    public override void Add(byte playerId)
+    {
+        var player = Utils.GetPlayerById(playerId);
+        player.RpcChangeRoleBasis(CustomRoles.ViperTONE);
+    }
+
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.ViperDissolveTime = ViperDissolveTime.GetInt();

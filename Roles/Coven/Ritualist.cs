@@ -1,9 +1,6 @@
-using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using TONE.Modules.ChatManager;
 using TONE.Roles.Crewmate;
-using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
@@ -100,6 +97,11 @@ internal class Ritualist : CovenManager
             if (!MsgToPlayerAndRole(msg, out byte targetId, out CustomRoles role, out string error))
             {
                 pc.ShowInfoMessage(isUI, error);
+                return true;
+            }
+            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            {
+                pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                 return true;
             }
             if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))

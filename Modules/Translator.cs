@@ -1,4 +1,3 @@
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using System;
 using System.Globalization;
 using System.IO;
@@ -92,7 +91,7 @@ public static class Translator
 #if ANDROID
             string langFile = Path.Combine(Main.LANGUAGE_FOLDER_NAME, $"{lang}.dat");
 #else
-        string langFile = @$"./{Main.LANGUAGE_FOLDER_NAME}/{lang}.dat";
+            string langFile = @$"./{Main.LANGUAGE_FOLDER_NAME}/{lang}.dat";
 #endif
             if (File.Exists(langFile))
             {
@@ -335,7 +334,7 @@ public static class Translator
 #if ANDROID
         string path = Path.Combine(Main.LANGUAGE_FOLDER_NAME, filename);
 #else
-    string path = @$"./{Main.LANGUAGE_FOLDER_NAME}/{filename}";
+        string path = @$"./{Main.LANGUAGE_FOLDER_NAME}/{filename}";
 #endif
         if (File.Exists(path))
         {
@@ -383,7 +382,7 @@ public static class Translator
 #if ANDROID
         string path = Path.Combine(Main.LANGUAGE_FOLDER_NAME, filename);
 #else
-    string path = @$"./{Main.LANGUAGE_FOLDER_NAME}/{filename}";
+        string path = @$"./{Main.LANGUAGE_FOLDER_NAME}/{filename}";
 #endif
         if (File.Exists(path))
         {
@@ -420,7 +419,7 @@ public static class Translator
 #if ANDROID
         string templatePath = Path.Combine(Main.LANGUAGE_FOLDER_NAME, "template.dat");
 #else
-    string templatePath = @$"./{Main.LANGUAGE_FOLDER_NAME}/template.dat";
+        string templatePath = @$"./{Main.LANGUAGE_FOLDER_NAME}/template.dat";
 #endif
         File.WriteAllText(templatePath, sb.ToString());
     }
@@ -437,7 +436,7 @@ public static class Translator
 #if ANDROID
         string exportPath = Path.Combine(Main.LANGUAGE_FOLDER_NAME, $"export_{lang}.dat");
 #else
-    string exportPath = @$"./{Main.LANGUAGE_FOLDER_NAME}/export_{lang}.dat";
+        string exportPath = @$"./{Main.LANGUAGE_FOLDER_NAME}/export_{lang}.dat";
 #endif
         File.WriteAllText(exportPath, sb.ToString());
     }
@@ -484,5 +483,15 @@ public static class Translator
 
             item.Value.Where(x => x.Contains("<INVALID:".ToLower())).ToList().ForEach(x => item.Value.Remove(x));
         }
+    }
+
+    public static bool LangHasSensitiveOutlineText()
+    {
+        return TranslationController.InstanceExists && TranslationController.Instance.currentLanguage.languageID is
+                SupportedLangs.Russian or
+                SupportedLangs.Korean or
+                SupportedLangs.Japanese or
+                SupportedLangs.SChinese or
+                SupportedLangs.TChinese;
     }
 }

@@ -11,6 +11,7 @@ using static TONE.Translator;
 using static TONE.Utils;
 
 namespace TONE.Roles.Impostor;
+
 internal class DoubleAgent : RoleBase
 {
     //===========================SETUP================================\\

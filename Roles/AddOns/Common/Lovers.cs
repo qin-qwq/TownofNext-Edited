@@ -1,7 +1,6 @@
 using Hazel;
 using TONE.Modules.Rpc;
 using TONE.Roles.Neutral;
-using UnityEngine;
 using static TONE.Options;
 
 namespace TONE.Roles.AddOns.Common;
@@ -155,15 +154,15 @@ public class Lovers : IAddon
         return false;
     }
 
-    public static void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
+    public static void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
-        if (!IsEnable || deathReason == PlayerState.DeathReason.Vote) return;
+        if (!IsEnable) return;
 
         List<byte> toKill = [];
         foreach (var pair in loverPairs)
         {
-            if (exileIds.Contains(pair.Item1) && !exileIds.Contains(pair.Item2)) toKill.Add(pair.Item2);
-            if (exileIds.Contains(pair.Item2) && !exileIds.Contains(pair.Item1)) toKill.Add(pair.Item1);
+            if (exiled.PlayerId == pair.Item1 && exiled.PlayerId != pair.Item2) toKill.Add(pair.Item2);
+            if (exiled.PlayerId == pair.Item2 && exiled.PlayerId != pair.Item1) toKill.Add(pair.Item1);
         }
 
         foreach (var playerId in toKill)
@@ -205,9 +204,7 @@ public class Lovers : IAddon
             {
                 if (Main.PlayersDiedInMeeting.Contains(deathId))
                 {
-                    p2.RpcExileV2();
-                    p2.Data.IsDead = true;
-                    Main.PlayerStates[p2.PlayerId].SetDead();
+                    p2.RpcExileV3();
                     if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
                     {
                         MeetingHud.Instance?.CheckForEndVoting();

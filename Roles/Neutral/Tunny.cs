@@ -1,5 +1,3 @@
-using AmongUs.GameOptions;
-using TONE.Roles.Core;
 using UnityEngine;
 using static TONE.Options;
 

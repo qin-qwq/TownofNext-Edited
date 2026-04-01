@@ -3,28 +3,33 @@ using static CosmeticsLayer;
 
 namespace TONE.Patches;
 
-[HarmonyPatch(typeof(AprilFoolsMode), nameof(AprilFoolsMode.ShouldShowAprilFoolsToggle))]
+/*[HarmonyPatch(typeof(AprilFoolsMode), nameof(AprilFoolsMode.ShouldShowAprilFoolsToggle))]
 public static class ShouldShowTogglePatch
 {
     public static void Postfix(ref bool __result)
     {
         __result = false;
     }
-}
+}*/
 #region GameManager Patches
 [HarmonyPatch(typeof(NormalGameManager), nameof(NormalGameManager.GetBodyType))]
 public static class GetNormalBodyType_Patch
 {
     public static void Postfix(ref PlayerBodyTypes __result)
     {
-        if (Main.HorseMode.Value)
+        if (Main.HorseMode.Value || AprilFoolsMode.ShouldHorseAround())
         {
             __result = PlayerBodyTypes.Horse;
             return;
         }
-        if (Main.LongMode.Value)
+        if (Main.LongMode.Value || AprilFoolsMode.ShouldLongAround())
         {
             __result = PlayerBodyTypes.Long;
+            return;
+        }
+        if (Main.ClassicMode.Value || AprilFoolsMode.ShouldClassicMode())
+        {
+            __result = PlayerBodyTypes.Classic;
             return;
         }
         __result = PlayerBodyTypes.Normal;
@@ -38,20 +43,25 @@ public static class GetHnsBodyType_Patch
     {
         if (player == null || player.Data == null || player.Data.Role == null)
         {
-            if (Main.HorseMode.Value)
+            if (Main.HorseMode.Value || AprilFoolsMode.ShouldHorseAround())
             {
                 __result = PlayerBodyTypes.Horse;
                 return;
             }
-            if (Main.LongMode.Value)
+            if (Main.LongMode.Value || AprilFoolsMode.ShouldLongAround())
             {
                 __result = PlayerBodyTypes.Long;
+                return;
+            }
+            if (Main.ClassicMode.Value || AprilFoolsMode.ShouldClassicMode())
+            {
+                __result = PlayerBodyTypes.Classic;
                 return;
             }
             __result = PlayerBodyTypes.Normal;
             return;
         }
-        else if (Main.HorseMode.Value)
+        else if (Main.HorseMode.Value || AprilFoolsMode.ShouldHorseAround())
         {
             if (player.Data.Role.IsImpostor)
             {
@@ -61,7 +71,7 @@ public static class GetHnsBodyType_Patch
             __result = PlayerBodyTypes.Horse;
             return;
         }
-        else if (Main.LongMode.Value)
+        else if (Main.LongMode.Value || AprilFoolsMode.ShouldLongAround())
         {
             if (player.Data.Role.IsImpostor)
             {
@@ -69,6 +79,16 @@ public static class GetHnsBodyType_Patch
                 return;
             }
             __result = PlayerBodyTypes.Long;
+            return;
+        }
+        else if (Main.ClassicMode.Value || AprilFoolsMode.ShouldClassicMode())
+        {
+            if (player.Data.Role.IsImpostor)
+            {
+                __result = PlayerBodyTypes.Seeker;
+                return;
+            }
+            __result = PlayerBodyTypes.Classic;
             return;
         }
         else
@@ -94,6 +114,7 @@ public static class LongBoiPatches
     public static bool LongBoyAwake_Prefix(LongBoiPlayerBody __instance)
     {
         //Fixes base-game layer issues
+        if (!AprilFoolsMode.ShouldLongAround() && !Main.LongMode.Value) return false;
         __instance.cosmeticLayer.OnSetBodyAsGhost += (Action)__instance.SetPoolableGhost;
         __instance.cosmeticLayer.OnColorChange += (Action<int>)__instance.SetHeightFromColor;
         __instance.cosmeticLayer.OnCosmeticSet += (Action<string, int, CosmeticKind>)__instance.OnCosmeticSet;
@@ -106,6 +127,14 @@ public static class LongBoiPatches
     public static bool LongBoyStart_Prefix(LongBoiPlayerBody __instance)
     {
         //Fixes more runtime issues
+        if (!AprilFoolsMode.ShouldLongAround() && !Main.LongMode.Value)
+        {
+            __instance.ShouldLongAround = false;
+            __instance.headSprite.gameObject.SetActive(false);
+            __instance.neckSprite.gameObject.SetActive(false);
+            __instance.foregroundNeckSprite.gameObject.SetActive(false);
+            return false;
+        }
         __instance.ShouldLongAround = true;
         if (__instance.hideCosmeticsQC)
         {

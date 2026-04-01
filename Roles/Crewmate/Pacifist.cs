@@ -91,7 +91,7 @@ internal class Pacifist : RoleBase
         }
         else
         {
-            hud.PetButton.buttonLabelText.text = GetString("PacifistVentButtonText");            
+            hud.PetButton.buttonLabelText.text = GetString("PacifistVentButtonText");
         }
     }
 }

@@ -30,7 +30,7 @@ public class GameSettingMenuPatch
 
         TabGroup[] ExludeList = Options.CurrentGameMode switch
         {
-            CustomGameMode.HidenSeekTONE => Enum.GetValues<TabGroup>().Skip(3).ToArray(),
+            CustomGameMode.HidenSeekTONE => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
             CustomGameMode.FFA => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
             CustomGameMode.SpeedRun => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
             CustomGameMode.TagMode => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
@@ -314,6 +314,7 @@ public class GameSettingMenuPatch
 
             Result.Do(x => x.SetHidden(true));
 
+            settingsTab.scrollBar.ScrollToTop();
             GameOptionsMenuPatch.ReCreateSettings(settingsTab);
             textField.Clear();
         }

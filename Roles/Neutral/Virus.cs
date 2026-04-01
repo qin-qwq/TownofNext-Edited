@@ -4,6 +4,7 @@ using TONE.Modules;
 using TONE.Roles.AddOns.Crewmate;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
+using UnityEngine;
 using static TONE.MeetingHudStartPatch;
 using static TONE.Options;
 using static TONE.Translator;
@@ -166,6 +167,7 @@ internal class Virus : RoleBase
         if (seer.Is(CustomRoles.Contagious) && target.Is(CustomRoles.Contagious) && TargetKnowOtherTarget.GetBool()) return Main.roleColors[CustomRoles.Virus];
         return "";
     }
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Infected");
 }
 public static class VirusPlayerControls
 {

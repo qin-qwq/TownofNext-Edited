@@ -177,6 +177,12 @@ internal class Summoner : CovenManager
         bool allowResummoning = AllowSummoningRevivedPlayers.GetBool();
 
         // Handle the case where reviving already summoned players is allowed
+        if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+        {
+            SendMessage(GetString("UseAbilityDuringDiscussion"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            return true;
+        }
+
         if (allowResummoning && isAlreadySummoned)
         {
             // Add to pending revives list without using a summon or marking the meeting as used
@@ -217,6 +223,12 @@ internal class Summoner : CovenManager
         {
             Logger.Warn($"{targetPlayer.GetRealName()} is already alive.", "Summoner");
             SendMessage(GetString("Summoner.PlayerAlive"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            return true;
+        }
+
+        if (targetPlayer.Is(CustomRoles.GM) || targetPlayer.Is(CustomRoles.Lazy) || targetPlayer.Is(CustomRoles.LazyGuy))
+        {
+            SendMessage(GetString("Summoner.CantSummon"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
             return true;
         }
 
@@ -689,9 +701,8 @@ internal class Summoned : RoleBase
 
         var playerState = Main.PlayerStates[player.PlayerId];
 
-        // Use RpcExileV2 to remove the player without leaving a body
-        player.RpcExileV2();
-        playerState.IsDead = true;
+        // Use RpcExileV3 to remove the player without leaving a body
+        player.RpcExileV3();
         /*
         player.RpcTeleport(ExtendedPlayerControl.GetBlackRoomPosition());
         player.RpcMurderPlayer(player);

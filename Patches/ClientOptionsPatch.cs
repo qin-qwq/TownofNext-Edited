@@ -15,6 +15,7 @@ public static class OptionsMenuBehaviourStartPatch
     private static ClientOptionItem ShowModdedClientText;
     private static ClientOptionItem HorseMode;
     private static ClientOptionItem LongMode;
+    private static ClientOptionItem ClassicMode;
     private static ClientOptionItem ForceOwnLanguage;
     private static ClientOptionItem ForceOwnLanguageRoleName;
     private static ClientOptionItem EnableCustomButton;
@@ -96,8 +97,10 @@ public static class OptionsMenuBehaviourStartPatch
             static void SwitchHorseMode()
             {
                 Main.LongMode.Value = false;
+                Main.ClassicMode.Value = false;
                 HorseMode.UpdateToggle();
                 LongMode.UpdateToggle();
+                ClassicMode.UpdateToggle();
 
                 foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {
@@ -114,8 +117,30 @@ public static class OptionsMenuBehaviourStartPatch
             static void SwitchLongMode()
             {
                 Main.HorseMode.Value = false;
+                Main.ClassicMode.Value = false;
                 HorseMode.UpdateToggle();
                 LongMode.UpdateToggle();
+                ClassicMode.UpdateToggle();
+
+                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
+                {
+                    pc.MyPhysics.SetBodyType(pc.BodyType);
+                    if (pc.BodyType == PlayerBodyTypes.Normal) pc.cosmetics.currentBodySprite.BodySprite.transform.localScale = new(0.5f, 0.5f, 1f);
+                }
+            }
+        }
+
+        if (ClassicMode == null || ClassicMode.ToggleButton == null)
+        {
+            ClassicMode = ClientOptionItem.Create("ClassicMode", Main.ClassicMode, __instance, SwitchClassicMode);
+
+            static void SwitchClassicMode()
+            {
+                Main.HorseMode.Value = false;
+                Main.LongMode.Value = false;
+                HorseMode.UpdateToggle();
+                LongMode.UpdateToggle();
+                ClassicMode.UpdateToggle();
 
                 foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                 {

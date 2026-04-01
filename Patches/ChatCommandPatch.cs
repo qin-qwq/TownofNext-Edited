@@ -95,6 +95,7 @@ internal class ChatCommands
         if (ImpostorChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (RoundUp.DeputyCommand(PlayerControl.LocalPlayer, text)) goto Canceled;
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
         Directory.CreateDirectory(sponsorTagsFiles);
@@ -521,6 +522,7 @@ internal class ChatCommands
                     switch (Options.CurrentGameMode)
                     {
                         case CustomGameMode.Standard:
+                        case CustomGameMode.RoundUp:
                             var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                             int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                             int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
@@ -579,6 +581,16 @@ internal class ChatCommands
                     if (Options.ShouldVoteCmdsSpamChat.GetBool())
                     {
                         canceled = true;
+                    }
+                    if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                    {
+                        Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
+                    }
+                    if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && PlayerControl.LocalPlayer.PlayerId == RoundUp.Deputy)
+                    {
+                        Utils.SendMessage(GetString("RoundUp_Help"), PlayerControl.LocalPlayer.PlayerId);
+                        break;
                     }
 
                     if (arg != 253) // skip
@@ -1036,10 +1048,7 @@ internal class ChatCommands
                     {
                         player.SetDeathReason(PlayerState.DeathReason.etc);
                         player.SetRealKiller(PlayerControl.LocalPlayer);
-                        Main.PlayerStates[player.PlayerId].SetDead();
-                        player.RpcExileV2();
-                        player.Data.IsDead = true;
-                        MurderPlayerPatch.AfterPlayerDeathTasks(PlayerControl.LocalPlayer, player, GameStates.IsMeeting);
+                        player.RpcExileV3();
 
                         if (player.IsHost()) Utils.SendMessage(GetString("HostKillSelfByCommand"), title: $"<color=#ff0000>{GetString("DefaultSystemMessageTitle")}</color>");
                         else Utils.SendMessage(string.Format(GetString("Message.Executed"), player.Data.PlayerName));
@@ -1859,8 +1868,8 @@ internal class ChatCommands
                     ChatManager.SendPreviousMessagesToAll();
                     break;
 
-                case "/fix" 
-                or "/blackscreenfix" 
+                case "/fix"
+                or "/blackscreenfix"
                 or "/fixblackscreen":
                     canceled = true;
                     FixCommand(PlayerControl.LocalPlayer, text, args);
@@ -1933,7 +1942,7 @@ internal class ChatCommands
         {
             if (!WaitingToSend) Main.Instance.StartCoroutine(Wait());
             return false;
-            
+
             IEnumerator Wait()
             {
                 WaitingToSend = true;
@@ -2141,7 +2150,7 @@ internal class ChatCommands
         }
 
 
-        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=70%>{GetString("SupportsPetMessage")}</size>" 
+        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=70%>{GetString("SupportsPetMessage")}</size>"
            : result.GetInfoLong();
         var title = "▲" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
@@ -2171,6 +2180,7 @@ internal class ChatCommands
         if (text.StartsWith("\n")) text = text[1..];
         if (text.StartsWith("/cmd"))
         {
+            canceled = true;
             text = "/" + text[4..].TrimStart();
         }
         //if (!text.StartsWith("/")) return;
@@ -2198,6 +2208,7 @@ internal class ChatCommands
         if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
         if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
         if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
+        if (RoundUp.DeputyCommand(player, text)) { canceled = true; Logger.Info($"Is RoundUp Command", "OnReceiveChat"); return; }
 
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
@@ -2530,6 +2541,7 @@ internal class ChatCommands
                 switch (Options.CurrentGameMode)
                 {
                     case CustomGameMode.Standard:
+                    case CustomGameMode.RoundUp:
                         var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                         int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                         int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
@@ -3163,6 +3175,16 @@ internal class ChatCommands
                     canceled = true;
                     ChatManager.SendPreviousMessagesToAll();
                 }
+                if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                {
+                    Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), player.PlayerId);
+                    break;
+                }
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && player.PlayerId == RoundUp.Deputy)
+                {
+                    Utils.SendMessage(GetString("RoundUp_Help"), player.PlayerId);
+                    break;
+                }
 
                 if (arg != 253) // skip
                 {
@@ -3591,16 +3613,13 @@ internal class ChatCommands
                 {
                     target.SetDeathReason(PlayerState.DeathReason.etc);
                     target.SetRealKiller(player);
-                    Main.PlayerStates[target.PlayerId].SetDead();
-                    target.RpcExileV2();
-                    target.Data.IsDead = true;
-                    MurderPlayerPatch.AfterPlayerDeathTasks(target, target, GameStates.IsMeeting);
+                    target.RpcExileV3();
                     Utils.SendMessage(string.Format(GetString("Message.ExecutedNonHost"), target.Data.PlayerName, player.Data.PlayerName));
                 }
                 break;
 
-            case "/fix" 
-            or "/blackscreenfix" 
+            case "/fix"
+            or "/blackscreenfix"
             or "/fixblackscreen":
                 FixCommand(player, text, args);
                 break;
@@ -3617,17 +3636,7 @@ internal class ChatCommands
 
     private static void DeckCommand(PlayerControl player, string text, string[] args)
     {
-        if (GameStates.IsLobby)
-        {
-            Utils.SendMessage(GetString("Message.CanNotUseInLobby"), player.PlayerId);
-            return;
-        }
-        if (!Options.EnableGameTimeLimit.GetBool())
-        {
-            Utils.SendMessage(GetString("Message.GameTimeLimitDisabled"), player.PlayerId);
-            return;            
-        }
-        Utils.SendMessage(string.Format(GetString("ShowGameTime"), (int)(Options.GameTimeLimit.GetFloat() - Main.GameTimer)), player.PlayerId);
+        return;
     }
 
     private static void DraftStartCommand(PlayerControl player, string text, string[] args)
@@ -3640,9 +3649,9 @@ internal class ChatCommands
         if (!player.IsHost() && !player.FriendCode.GetDevUser().IsDev && !Utils.IsPlayerModerator(player.FriendCode))
         {
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
-            return;            
+            return;
         }
-        if (Options.CurrentGameMode != CustomGameMode.Standard)
+        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp)
         {
             Utils.SendMessage(GetString("StartDraftWrongGameMode"), player.PlayerId);
             return;

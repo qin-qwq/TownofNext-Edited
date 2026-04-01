@@ -258,8 +258,11 @@
   "Forensic": "#7160e8",
   "Viper": "#ff1919",
   "Catalyst": "#3cff00",
-  "Dreamer": "#e1eef3",
+  "Dreamer": "#297ef8",
   "NiceHacker": "#75fa4c",
   "Drunkard": "#0acd4b",
-  "TreasureHunter": "#d0a12d"
+  "TreasureHunter": "#d0a12d",
+  "Logos": "#cdf1ff",
+  "Philosopher": "#cdf1ff",
+  "RDeputy": "#f8d86e"
 }

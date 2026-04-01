@@ -46,6 +46,7 @@ class CheckForEndVotingPatch
 {
     public static string TempExileMsg;
     public static NetworkedPlayerInfo TempExiledPlayer;
+    public static bool SomeoneExiled;
     public static bool Prefix(MeetingHud __instance)
     {
         if (!AmongUsClient.Instance.AmHost) return true;
@@ -137,6 +138,13 @@ class CheckForEndVotingPatch
                     voteTarget.SetRealKiller(pc);
 
                     return true;
+                }
+
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && pc.PlayerId == RoundUp.Deputy && pva.VotedFor < 254)
+                {
+                    __instance.UpdateButtons();
+                    __instance.RpcClearVoteDelay(pc.GetClientId());
+                    continue;
                 }
 
                 if (Balancer.Choose && !(pva.VotedFor == Balancer.Target1 || pva.VotedFor == Balancer.Target2) && pva.VotedFor < 254)
@@ -431,6 +439,20 @@ class CheckForEndVotingPatch
             else if (!braked)
                 exiledPlayer = allPlayers.FirstOrDefault(info => !tie && info.PlayerId == exileId);
 
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp)
+            {
+                if (RoundUp.Deputy != byte.MaxValue)
+                {
+                    exileId = RoundUp.Deputy;
+                    exiledPlayer = GetPlayerInfoById(exileId);
+                }
+                else
+                {
+                    exileId = 0xff;
+                    exiledPlayer = GetPlayerInfoById(exileId);
+                }
+            }
+
             if (Keeper.IsTargetExiled(exileId))
             {
                 exileId = 0xff;
@@ -496,6 +518,8 @@ class CheckForEndVotingPatch
 
         if (Options.PlayEjectSfx.GetBool())
             CustomSoundsManager.RPCPlayCustomSoundAll("Dramatic");
+
+        SomeoneExiled = true;
 
         var realName = Main.AllPlayerNames[exiledPlayer.PlayerId];
         Main.LastVotedPlayer = realName;
@@ -722,7 +746,7 @@ class CheckForEndVotingPatch
             }
         }
 
-        Lovers.OnCheckForEndVoting(deathReason, playerIds);
+        //Lovers.OnCheckForEndVoting(deathReason, playerIds);
 
         foreach (var playerId in playerIds)
         {
@@ -786,6 +810,11 @@ class CastVotePatch
                 __instance.RpcClearVoteDelay(voter.GetClientId());
                 return false;
             }
+        }
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && voter.PlayerId == RoundUp.Deputy && suspectPlayerId < 254)
+        {
+            __instance.RpcClearVoteDelay(voter.GetClientId());
+            return false;
         }
         if (Balancer.Choose && !(suspectPlayerId == Balancer.Target1 || suspectPlayerId == Balancer.Target2) && suspectPlayerId < 254)
         {
@@ -1144,6 +1173,8 @@ class MeetingHudStartPatch
             }
         }
 
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMeetingHudStart();
+
         msgToSend.Do(x => Logger.Info($"To:{x.Item2} {x.Item3} => {x.Item1}", "Skill Notice OnMeeting Start"));
 
         // Send message
@@ -1344,7 +1375,7 @@ class MeetingHudStartPatch
                 foreach (var pc in Main.EnumerateAlivePlayerControls())
                 {
                     if (pc.IsHost()) continue;
-                    if (!pc.IsPlayerImpostorTeam()) continue;
+                    if (!pc.IsPlayerImpostorTeam() || !pc.GetCustomRole().IsImpostor()) continue;
                     SendMessage(GetString("CanUseImpostorChannel"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")}"), noReplay: true);
                 }
             }
@@ -1404,8 +1435,8 @@ class MeetingHudStartPatch
             PlayerControl seer = PlayerControl.LocalPlayer;
             var seerRoleClass = seer.GetRoleClass();
 
-            // if based role is Shapeshifter/Phantom and is Desync Shapeshifter/Phantom
-            if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom && seer.HasDesyncRole())
+            // if based role is Shapeshifter/Phantom/Viper and is Desync Shapeshifter/Phantom/Viper
+            if (seerRoleClass?.ThisRoleBase.GetRoleTypes() is RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper && seer.HasDesyncRole())
             {
                 // When target is impostor, set name color as white
                 target.cosmetics.SetNameColor(Color.white);
@@ -1517,9 +1548,7 @@ class MeetingHudUpdatePatch
                 {
                     player.SetDeathReason(PlayerState.DeathReason.Execution);
                     player.SetRealKiller(PlayerControl.LocalPlayer);
-                    player.RpcExileV2();
-                    Main.PlayerStates[player.PlayerId].SetDead();
-                    MurderPlayerPatch.AfterPlayerDeathTasks(PlayerControl.LocalPlayer, player, GameStates.IsMeeting);
+                    player.RpcExileV3();
                     SendMessage(string.Format(GetString("Message.Executed"), player.Data.PlayerName));
                     Logger.Info($"{player.GetNameWithRole()} was executed", "Execution");
                     __instance.CheckForEndVoting();
@@ -1622,10 +1651,11 @@ class MeetingHudOnDestroyPatch
 
             yield return new WaitForSeconds(1f);
             if (!ExileController.Instance || GameStates.IsEnded) yield break;
-            
-            if (CheckForEndVotingPatch.TempExileMsg.EndsWith("<size=0>") && Options.CurrentGameMode == CustomGameMode.Standard && CheckForEndVotingPatch.TempExiledPlayer != null)
+
+            if (CheckForEndVotingPatch.TempExileMsg.EndsWith("<size=0>") && Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp
+            && CheckForEndVotingPatch.TempExiledPlayer != null)
                 ExileController.Instance.completeString = CheckForEndVotingPatch.TempExileMsg[..^8];
-            
+
             while (ExileController.Instance) yield return null;
 
             try { ExileControllerWrapUpPatch.WrapUpPostfix(CheckForEndVotingPatch.TempExiledPlayer); }
@@ -1641,7 +1671,7 @@ class MeetingHudRpcClosePatch
     {
         Logger.Info("MeetingHud.RpcClose is being called", "MeetingHudRpcClosePatch");
         // Send SetName rpc together with Close rpc
-        if (Options.CurrentGameMode is CustomGameMode.Standard)
+        if (Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
         {
             if (AmongUsClient.Instance.AmClient)
             {

@@ -1,6 +1,5 @@
 using Hazel;
 using InnerNet;
-using System.Xml;
 
 namespace TONE.Modules.Rpc
 {

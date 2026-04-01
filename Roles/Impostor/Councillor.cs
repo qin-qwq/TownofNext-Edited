@@ -2,7 +2,6 @@ using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
@@ -122,6 +121,24 @@ internal class Councillor : RoleBase
                 {
                     pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
                     return true;
+                }
+                if (Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                {
+                    pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
+                    return true;
+                }
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
+                {
+                    if (target.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
+                        return true;
+                    }
+                    if (pc.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
+                        return true;
+                    }
                 }
                 if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
                 {
@@ -361,7 +378,7 @@ internal class Councillor : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Councillor) && PlayerControl.LocalPlayer.IsAlive())
+            if (PlayerControl.LocalPlayer.Is(CustomRoles.Councillor) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
                 CreateCouncillorButton(__instance);
         }
     }

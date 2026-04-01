@@ -19,6 +19,8 @@ using TONE.Roles.Core;
 using TONE.Roles.Double;
 using TONE.Roles.Neutral;
 using UnityEngine;
+using DateTime = Il2CppSystem.DateTime;
+using DateTimeKind = Il2CppSystem.DateTimeKind;
 
 [assembly: AssemblyFileVersion(TONE.Main.PluginVersion)]
 [assembly: AssemblyInformationalVersion(TONE.Main.PluginVersion)]
@@ -54,20 +56,20 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.02.26"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.8.1";
+    public const string PluginVersion = "26.04.01"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.9.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2025, 9, 9, 0) // 2025.9.9 & 2025.10.14 & 2025.11.18 & 17.0.0 & 17.0.1 & 17.1.0
+            (2026, 3, 31, 0) // 2026.3.31 & 17.3
         ];
 
     // Change this to change alpha/beta/full release
     public static readonly Release RELEASE = Release.RELEASE;
 
 #pragma warning disable IDE1006 // Naming Styles
-    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 1
-    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.8.0 Beta 2
-    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.8.1
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 2
+    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.9.0
 #pragma warning restore IDE1006 // Naming Styles
 
     public enum Release
@@ -81,13 +83,13 @@ public class Main : BasePlugin
 
     public static readonly bool ShowUpdateButton = true;
 
-    public static readonly bool ShowGitHubButton = false;
+    public static readonly bool ShowGitHubButton = true;
     public static readonly string GitHubInviteUrl = "https://github.com/qin-qwq/TownofNext-Edited";
 
-    public static readonly bool ShowDiscordButton = false;
-    public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
+    public static readonly bool ShowDiscordButton = true;
+    public static readonly string DiscordInviteUrl = "https://discord.gg/jg4a2Xqrbb";
 
-    public static readonly bool ShowWebsiteButton = false;
+    public static readonly bool ShowWebsiteButton = true;
     public static readonly string WebsiteInviteUrl = "https://tone2.top/";
 
     public static readonly bool ShowDonationButton = false;
@@ -119,6 +121,7 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> ShowModdedClientText { get; private set; }
     public static ConfigEntry<bool> HorseMode { get; private set; }
     public static ConfigEntry<bool> LongMode { get; private set; }
+    public static ConfigEntry<bool> ClassicMode { get; private set; }
     public static ConfigEntry<bool> ForceOwnLanguage { get; private set; }
     public static ConfigEntry<bool> ForceOwnLanguageRoleName { get; private set; }
     public static ConfigEntry<bool> EnableCustomButton { get; private set; }
@@ -140,6 +143,11 @@ public class Main : BasePlugin
     public static ConfigEntry<string> Preset3 { get; private set; }
     public static ConfigEntry<string> Preset4 { get; private set; }
     public static ConfigEntry<string> Preset5 { get; private set; }
+    public static ConfigEntry<string> Preset6 { get; private set; }
+    public static ConfigEntry<string> Preset7 { get; private set; }
+    public static ConfigEntry<string> Preset8 { get; private set; }
+    public static ConfigEntry<string> Preset9 { get; private set; }
+    public static ConfigEntry<string> Preset10 { get; private set; }
     //Other Configs
     public static ConfigEntry<string> WebhookURL { get; private set; }
     public static ConfigEntry<string> BetaBuildURL { get; private set; }
@@ -165,6 +173,7 @@ public class Main : BasePlugin
         [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
+        [CustomGameMode.RoundUp] = new Color32(248, 216, 110, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
     };
 
@@ -213,9 +222,6 @@ public class Main : BasePlugin
     // public static bool isLoversDead = true;
     // public static readonly HashSet<PlayerControl> LoversPlayers = [];
 
-    public static float GameTimer;
-    public static bool GameEndDueToTimer;
-
     public static bool DoBlockNameChange = false;
     public static int updateTime;
     public const float MinSpeed = 0.0001f;
@@ -234,10 +240,14 @@ public class Main : BasePlugin
     {
         get
         {
-            DateTime utcNow = DateTime.UtcNow;
-            DateTime t = new(utcNow.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
-            DateTime t2 = new(utcNow.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
-            return utcNow >= t && utcNow <= t2;
+            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
+            {
+                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
+                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
+            }
+            return false;
         }
     }
     public static bool ResetOptions = true;
@@ -574,6 +584,7 @@ public class Main : BasePlugin
         ShowModdedClientText = Config.Bind("Client Options", "ShowModdedClientText", true);
         HorseMode = Config.Bind("Client Options", "HorseMode", false);
         LongMode = Config.Bind("Client Options", "LongMode", false);
+        ClassicMode = Config.Bind("Client Options", "ClassicMode", false);
         ForceOwnLanguage = Config.Bind("Client Options", "ForceOwnLanguage", false);
         ForceOwnLanguageRoleName = Config.Bind("Client Options", "ForceOwnLanguageRoleName", false);
         EnableCustomButton = Config.Bind("Client Options", "EnableCustomButton", true);
@@ -635,6 +646,11 @@ public class Main : BasePlugin
         Preset3 = Config.Bind("Preset Name Options", "Preset3", "Preset_3");
         Preset4 = Config.Bind("Preset Name Options", "Preset4", "Preset_4");
         Preset5 = Config.Bind("Preset Name Options", "Preset5", "Preset_5");
+        Preset6 = Config.Bind("Preset Name Options", "Preset6", "Preset_6");
+        Preset7 = Config.Bind("Preset Name Options", "Preset7", "Preset_7");
+        Preset8 = Config.Bind("Preset Name Options", "Preset8", "Preset_8");
+        Preset9 = Config.Bind("Preset Name Options", "Preset9", "Preset_9");
+        Preset10 = Config.Bind("Preset Name Options", "Preset10", "Preset_10");
         WebhookURL = Config.Bind("Other", "WebhookURL", "none");
         BetaBuildURL = Config.Bind("Other", "BetaBuildURL", "");
         MessageWait = Config.Bind("Other", "MessageWait", 1);
@@ -677,7 +693,6 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<CustomModdedData>();
 
         ClassInjector.RegisterTypeInIl2Cpp<ErrorText>();
-        ClassInjector.RegisterTypeInIl2Cpp<OptionShower>();
         ClassInjector.RegisterTypeInIl2Cpp<MeetingHudPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
@@ -941,10 +956,12 @@ public enum CustomRoles
     Juggernaut,
     Lawyer,
     Lich,
+    Logos,
     Maverick,
     Opportunist,
     Pelican,
     Pestilence,
+    Philosopher,
     Pickpocket,
     Pirate,
     Pixie,
@@ -1021,6 +1038,9 @@ public enum CustomRoles
     // Tag Mode
     TZombie,
     TCrewmate,
+
+    // Round Up
+    RDeputy,
 
     // Sub-role after 500
     NotAssigned = 500,
@@ -1186,6 +1206,7 @@ public enum CustomWinner
     TCrewmate = CustomRoles.TCrewmate,
     Dreamer = CustomRoles.Dreamer,
     TreasureHunter = CustomRoles.TreasureHunter,
+    Logos = CustomRoles.Logos,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners

@@ -57,7 +57,7 @@ internal class Undertaker : RoleBase
         var yLoc = MarkedLocation[playerId].y;
         var msg = new RpcUndertakerLocationSync(PlayerControl.LocalPlayer.NetId, playerId, xLoc, yLoc);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void ReceiveRPC(MessageReader reader)
     {

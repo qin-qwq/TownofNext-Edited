@@ -76,5 +76,5 @@ namespace TONE.Modules.Rpc
         private readonly byte targetId;
         private readonly string colorCode;
     }
-    
+
 }

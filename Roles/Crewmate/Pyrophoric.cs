@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using UnityEngine;
 using TONE.Modules;
+using TONE.Roles.Double;
+using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
-using TONE.Roles.Double;
 
 namespace TONE.Roles.Crewmate;
 
@@ -92,7 +92,7 @@ internal partial class Pyrophoric : RoleBase
         else
         {
             hud.PetButton.buttonLabelText.text = GetString("PyrophoricVentButtonText");
-        }        
+        }
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
     {
@@ -113,10 +113,8 @@ internal partial class Pyrophoric : RoleBase
             {
                 PlayerControl re = pcList.RandomElement();
                 re.SetDeathReason(PlayerState.DeathReason.Revenge);
-                re.RpcExileV2();
+                re.RpcExileV3();
                 re.SetRealKiller(_Player);
-                Main.PlayerStates[re.PlayerId].SetDead();
-                MurderPlayerPatch.AfterPlayerDeathTasks(_Player, re, inMeeting: false, fromRole: true);
                 Revenge = false;
             }
         }
@@ -127,10 +125,9 @@ internal partial class Pyrophoric : RoleBase
                 _Player.RpcRemoveAbilityUse();
                 if (_Player.GetAbilityUseLimit() <= 0)
                 {
-                    _Player.RpcExileV2();
+                    _Player.RpcExileV3();
                     _Player.SetDeathReason(PlayerState.DeathReason.Torched);
                     _Player.SetRealKiller(_Player);
-                    Main.PlayerStates[_Player.PlayerId].SetDead();
                 }
             }
         }
@@ -141,7 +138,7 @@ internal partial class Pyrophoric : RoleBase
         if (target.IsDisconnected()) return;
         if (!PyrophoricCanKill.GetBool()) return;
         if (!InPyrophoric) return;
-        if (killer == target || !killer || !target) return;
+        if (isSuicide || !killer || !target) return;
 
         killer.RpcMurderPlayer(killer);
         killer.SetDeathReason(PlayerState.DeathReason.Torched);

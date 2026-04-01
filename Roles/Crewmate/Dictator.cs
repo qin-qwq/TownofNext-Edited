@@ -75,6 +75,11 @@ internal class Dictator : RoleBase
                 MeetingHud.Instance.RpcClearVoteDelay(pc.GetClientId());
                 return true;
             }
+            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            {
+                pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
+                return true;
+            }
             if (Balancer.Choose && !(targetid == Balancer.Target1 || targetid == Balancer.Target2))
             {
                 pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
@@ -164,7 +169,7 @@ internal class Dictator : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dictator)
+            if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dictator && PlayerControl.LocalPlayer.IsAlive())
                 if (ChangeCommandToExpel.GetBool())
                     dictator.CreateDictatorButton(__instance);
         }

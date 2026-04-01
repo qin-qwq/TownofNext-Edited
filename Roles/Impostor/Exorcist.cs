@@ -1,7 +1,6 @@
 using Hazel;
 using TMPro;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using UnityEngine;
@@ -100,6 +99,11 @@ internal class Exorcist : RoleBase
                     player.ShowInfoMessage(isUI, GetString("ExorcistOutOfUsages"));
                     return true;
                 }
+                if (Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                {
+                    player.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
+                    return true;
+                }
                 if (Dispelled)
                 {
                     player.ShowInfoMessage(isUI, GetString("ExorcistDispelled"));
@@ -188,7 +192,7 @@ internal class Exorcist : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Exorcist exorcist)
+            if (PlayerControl.LocalPlayer.GetRoleClass() is Exorcist exorcist && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
                 exorcist.CreateExorcistButton(__instance);
         }
     }

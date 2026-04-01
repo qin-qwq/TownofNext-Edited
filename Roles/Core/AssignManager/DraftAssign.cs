@@ -1,5 +1,5 @@
-using System.Text;
 using AmongUs.GameOptions;
+using System.Text;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
@@ -112,7 +112,7 @@ public static class DraftAssign
         var CovenRoles = allRoles.Where(x => x.IsCoven()).Shuffle(rd).Take(optCovenNum * draftCount);
         var NARoles = allRoles.Where(x => x.IsNA()).Shuffle(rd).Take(optNeutralApocalypseNum * draftCount);
         var NKRoles = allRoles.Where(x => x.IsNK()).Shuffle(rd).Take(optNeutralKillingNum * draftCount);
-        var NNKRoles = allRoles.Where(x => x.IsNNK()).Shuffle(rd).Take(optNonNeutralKillingNum * draftCount);
+        var NNKRoles = allRoles.Where(x => x.IsNonNK()).Shuffle(rd).Take(optNonNeutralKillingNum * draftCount);
 
         if (ImpRoles.Count() < optImpNum * Options.DraftableCount.GetInt() || CovenRoles.Count() < optCovenNum * Options.DraftableCount.GetInt()
         || NARoles.Count() < optNeutralApocalypseNum * Options.DraftableCount.GetInt() || NKRoles.Count() < optNeutralKillingNum * Options.DraftableCount.GetInt()
@@ -128,7 +128,7 @@ public static class DraftAssign
         allRoles.RemoveAll(x => x.IsNK());
         allRoles.RemoveAll(x => x.IsNonNK());
 
-        var num = playerCount - optImpNum - optNonNeutralKillingNum - optNeutralKillingNum - optNeutralApocalypseNum - optCovenNum - RoleAssign.SetRoles.Values.Count > 0 ? 
+        var num = playerCount - optImpNum - optNonNeutralKillingNum - optNeutralKillingNum - optNeutralApocalypseNum - optCovenNum - RoleAssign.SetRoles.Values.Count > 0 ?
             (playerCount - optImpNum - optNonNeutralKillingNum - optNeutralKillingNum - optNeutralApocalypseNum - optCovenNum - RoleAssign.SetRoles.Values.Count) * Options.DraftableCount.GetInt() :
             0;
 
@@ -297,7 +297,8 @@ public static class DraftAssign
     public static bool NoAssignRoles(CustomRoles role)
     {
         int chance = role.GetMode();
-        if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) return true;
+        if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool()) ||
+           (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) return true;
         if (RoleAssign.SetRoles.ContainsValue(role)) return true;
         switch (role)
         {

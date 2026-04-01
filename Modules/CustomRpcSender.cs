@@ -4,10 +4,6 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
 using System;
 using UnityEngine;
-using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
-using TONE.Roles.Neutral;
-using TONE.Modules;
 
 namespace TONE;
 
@@ -174,7 +170,7 @@ public class CustomRpcSender
     public CustomRpcSender AutoStartRpc(
         uint targetNetId,
         RpcCalls callId,
-        int targetClientId = -1) => AutoStartRpc(targetNetId, (byte) callId, targetClientId);
+        int targetClientId = -1) => AutoStartRpc(targetNetId, (byte)callId, targetClientId);
     public CustomRpcSender AutoStartRpc(
         uint targetNetId,
         byte callId,
@@ -295,12 +291,10 @@ public static class CustomRpcSenderExtensions
 
     public static void RpcSetName(this CustomRpcSender sender, PlayerControl player, string name, PlayerControl seer = null)
     {
-        bool seerIsNull = seer == null;
+        bool seerIsNull = !seer;
         int targetClientId = seerIsNull ? -1 : seer.OwnerId;
 
         name = name.Replace("color=", string.Empty);
-
-        var saw = seerIsNull ? "Everyone" : seer.GetRealName(); // Ternary operators can't be used inside of $ strings
 
         switch (seerIsNull)
         {
@@ -335,7 +329,7 @@ public static class CustomRpcSenderExtensions
     public static bool TP(this CustomRpcSender sender, PlayerControl pc, Vector2 location, bool noCheckState = false, bool log = true)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
-        
+
         CustomNetworkTransform nt = pc.NetTransform;
 
         if (!noCheckState)
@@ -355,7 +349,7 @@ public static class CustomRpcSenderExtensions
             }
         }
 
-        
+
         nt.SnapTo(location, (ushort)(nt.lastSequenceId + 328));
         nt.SetDirtyBit(uint.MaxValue);
 

@@ -11,15 +11,6 @@ using static TONE.Translator;
 
 namespace TONE;
 
-[HarmonyPatch(typeof(HudManager), nameof(HudManager.Start))]
-class HudManagerStartPatch
-{
-    public static void Postfix(HudManager __instance)
-    {
-        __instance.gameObject.AddComponent<OptionShower>().hudManager = __instance;
-    }
-}
-
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
 class HudManagerUpdatePatch
 {
@@ -105,6 +96,7 @@ class HudManagerUpdatePatch
                 switch (Options.CurrentGameMode)
                 {
                     case CustomGameMode.Standard:
+                    case CustomGameMode.RoundUp:
                         var roleClass = player.GetRoleClass();
                         LowerInfoText.text = roleClass?.GetLowerText(player, player, isForMeeting: Main.MeetingIsStarted, isForHud: true) ?? string.Empty;
 
@@ -230,7 +222,8 @@ class SetHudActivePatch
         if (GameStates.IsLobby || !isActive) return;
         if (player == null) return;
 
-        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || Options.CurrentGameMode != CustomGameMode.Standard)
+        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || (Options.CurrentGameMode != CustomGameMode.Standard &&
+            Options.CurrentGameMode != CustomGameMode.RoundUp))
             __instance.ReportButton.ToggleVisible(false);
 
         if (player.Is(CustomRoles.Mare) && !Utils.IsActive(SystemTypes.Electrical))
@@ -267,7 +260,7 @@ class MapBehaviourShowPatch
 
         var player = PlayerControl.LocalPlayer;
 
-        if (player.GetCustomRole() == CustomRoles.NiceHacker)
+        if (player.GetCustomRole() == CustomRoles.NiceHacker && opts.Mode is not MapOptions.Modes.CountOverlay)
         {
             Logger.Info("Modded Client uses Map", "Hacker");
             NiceHacker.MapHandle(player, __instance, opts);
@@ -291,7 +284,7 @@ class TaskPanelBehaviourPatch
 
         if (GameStates.IsHideNSeek)
         {
-            __instance.open = false;
+            //__instance.open = false;
             return;
         }
 
@@ -312,7 +305,9 @@ class TaskPanelBehaviourPatch
 
             switch (Options.CurrentGameMode)
             {
-                case CustomGameMode.Standard or CustomGameMode.TagMode:
+                case CustomGameMode.Standard:
+                case CustomGameMode.TagMode:
+                case CustomGameMode.RoundUp:
 
                     var lines = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
                     StringBuilder sb = new();
@@ -326,19 +321,14 @@ class TaskPanelBehaviourPatch
                     if (sb.Length > 1)
                     {
                         var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1)
+                        if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
                             text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
 
-                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode == CustomGameMode.Standard)
+                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
                     {
                         AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
-                        /*if (Main.PlayerStates.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out var ps) && ps.SubRoles.Count >= 1)
-                            AllText += $"\r\n{GetString("PressF2ShowAddRoleDes")}";
-                        AllText += $"\r\n{GetString("PressF3ShowRoleSettings")}";
-                        if (ps.SubRoles.Count >= 1)
-                            AllText += $"\r\n{GetString("PressF4ShowAddOnsSettings")}";*/
                         AllText += "</size>";
                     }
                     break;
@@ -373,7 +363,7 @@ class TaskPanelBehaviourPatch
                     if (sb2.Length > 1)
                     {
                         var text = sb2.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb2.ToString().Count(s => (s == '\n')) >= 1)
+                        if (!Utils.HasTasks(player.Data, false) && sb2.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
                             text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
@@ -570,7 +560,7 @@ internal static class MapRoomDoorsUpdatePatch
         total = 0f;
         timer = 0f;
 
-        Skip:
+    Skip:
 
         __instance.door.material.SetFloat(Percent, __instance.Parent.CanUseDoors ? timer / total : 1f);
 

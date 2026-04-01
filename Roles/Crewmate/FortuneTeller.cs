@@ -40,7 +40,7 @@ internal class FortuneTeller : RoleBase
         RandomActiveRoles = BooleanOptionItem.Create(Id + 11, "RandomActiveRoles", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller]);
         RoleNumber = IntegerOptionItem.Create(Id + 12, "CheckRoleNumber", new(1, 30, 1), 6, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
             .SetValueFormat(OptionFormat.Pieces);
-        ImpostorRoleNumber = IntegerOptionItem.Create(Id + 13, "DoomsayerObserveImpostorRoleNumber", new(0, 10, 1), 2,TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
+        ImpostorRoleNumber = IntegerOptionItem.Create(Id + 13, "DoomsayerObserveImpostorRoleNumber", new(0, 10, 1), 2, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
             .SetValueFormat(OptionFormat.Pieces);
         CrewmateRoleNumber = IntegerOptionItem.Create(Id + 14, "DoomsayerObserveCrewmateRoleNumber", new(0, 10, 1), 2, TabGroup.CrewmateRoles, false).SetParent(RandomActiveRoles)
             .SetValueFormat(OptionFormat.Pieces);
@@ -53,6 +53,10 @@ internal class FortuneTeller : RoleBase
         FortuneTellerAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Id + 19, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.FortuneTeller])
             .SetValueFormat(OptionFormat.Times);
         OverrideTasksData.Create(Id + 20, TabGroup.CrewmateRoles, CustomRoles.FortuneTeller);
+    }
+    public override void Init()
+    {
+        targetList.Clear();
     }
     public override void Add(byte playerId)
     {
@@ -216,7 +220,7 @@ internal class FortuneTeller : RoleBase
         }
 
         player.GetRoleClass().HasVoted = true;
-        SendMessage(GetString("FortuneTellerCheck") + "\n" + msg + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()), sendOption: Hazel.SendOption.Reliable);
+        SendMessage(GetString("FortuneTellerCheck") + "\n" + msg + "\n\n" + string.Format(GetString("FortuneTellerCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.FortuneTeller), GetString("FortuneTeller").ToUpper()));
         SendMessage(GetString("VoteHasReturned"), player.PlayerId, title: ColorString(GetRoleColor(CustomRoles.FortuneTeller), string.Format(GetString("VoteAbilityUsed"), GetString("FortuneTeller"))), noReplay: true);
         return false;
     }

@@ -7,7 +7,6 @@ using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
-using UnityEngine;
 
 namespace TONE.Patches;
 

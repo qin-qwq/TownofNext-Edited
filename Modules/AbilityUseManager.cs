@@ -1,5 +1,5 @@
-using Hazel;
 using System;
+using TONE.Modules.Rpc;
 
 namespace TONE.Modules;
 
@@ -40,12 +40,10 @@ public static class AbilityUseManager
         AbilityUseLimit[playerId] = limit;
 
         var player = playerId.GetPlayer();
-        if (AmongUsClient.Instance.AmHost && player.IsNonHostModdedClient() && rpc)
+        if (AmongUsClient.Instance.AmHost && rpc)
         {
-            var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncAbilityUseLimit, SendOption.Reliable);
-            writer.Write(playerId);
-            writer.Write(limit);
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            var message = new RpcSyncAbilityUseLimit(PlayerControl.LocalPlayer.NetId, playerId, limit);
+            RpcUtils.LateBroadcastReliableMessage(message);
         }
 
         Utils.NotifyRoles(SpecifySeer: player, ForceLoop: false);

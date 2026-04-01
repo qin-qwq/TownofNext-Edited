@@ -80,7 +80,8 @@ public static class GameOptionsMenuPatch
                 var option = OptionItem.AllOptions[index];
                 if (option.Tab != modTab) continue;
 
-                var enabled = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
+                var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
+                var enabled = !option.IsHiddenOn(Options.CurrentGameMode, checkCollapsedSection: false) && option.Parent?.GetBool() is null or true;
 
                 if (option is TextOptionItem toi)
                 {
@@ -107,13 +108,13 @@ public static class GameOptionsMenuPatch
                     categoryHeaderMasked.gameObject.SetActive(enabled);
                     ModGameOptionsMenu.CategoryHeaderList.TryAdd(index, categoryHeaderMasked);
 
-                    if (enabled) num -= 0.63f;
+                    if (enabledOrNotCollapsed) num -= 0.63f;
                     header = toi;
                     continue;
                 }
                 option.Header = header;
 
-                if (option.IsHeader && enabled)
+                if (option.IsHeader && enabledOrNotCollapsed)
                     num -= 0.3f;
 
                 var baseGameSetting = GetSetting(option);
@@ -174,11 +175,11 @@ public static class GameOptionsMenuPatch
                 optionBehaviour.SetUpFromData(baseGameSetting, 20);
                 ModGameOptionsMenu.OptionList.TryAdd(optionBehaviour.GetInstanceID(), index);
                 ModGameOptionsMenu.BehaviourList.TryAdd(index, optionBehaviour);
-                optionBehaviour.gameObject.SetActive(enabled);
+                optionBehaviour.gameObject.SetActive(enabledOrNotCollapsed);
                 optionBehaviour.OnValueChanged = new Action<OptionBehaviour>(__instance.ValueChanged);
                 __instance.Children.Add(optionBehaviour);
 
-                if (enabled) num -= 0.45f;
+                if (enabledOrNotCollapsed) num -= 0.45f;
 
                 if (index % 50 == 0) yield return null;
             }
@@ -199,10 +200,10 @@ public static class GameOptionsMenuPatch
             {
                 if (option.Tab != (TabGroup)(ModGameOptionsMenu.TabIndex - 3)) continue;
 
-                var enabled = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
+                var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
 
                 if (option is TextOptionItem) num -= 0.63f;
-                else if (enabled)
+                else if (enabledOrNotCollapsed)
                 {
                     if (option.IsHeader) num -= 0.3f;
                     num -= 0.45f;
@@ -310,6 +311,15 @@ public static class GameOptionsMenuPatch
         }, 0.28f, "Change Tab");
 
     }
+    [HarmonyPatch(nameof(GameOptionsMenu.Update))]
+    [HarmonyPrefix]
+    public static void UpdatePostfix(GameOptionsMenu __instance)
+    {
+        // Disable scroll options when chat open
+        if (!HudManager.InstanceExists || !__instance.gameObject.activeSelf) return;
+
+        __instance.scrollBar.enabled = !HudManager.Instance.Chat.IsOpenOrOpening;
+    }
     [HarmonyPatch(nameof(GameOptionsMenu.ValueChanged)), HarmonyPrefix]
     private static bool ValueChangedPrefix(GameOptionsMenu __instance, OptionBehaviour option)
     {
@@ -333,21 +343,22 @@ public static class GameOptionsMenuPatch
             var option = OptionItem.AllOptions[index];
             if (option.Tab != modTab) continue;
 
-            var enabled = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
+            var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
+            var enabled = !option.IsHiddenOn(Options.CurrentGameMode, checkCollapsedSection: false) && option.Parent?.GetBool() is null or true;
 
             if (ModGameOptionsMenu.CategoryHeaderList.TryGetValue(index, out var categoryHeaderMasked))
             {
                 categoryHeaderMasked.transform.localPosition = new(-0.903f, num, -2f);
                 categoryHeaderMasked.gameObject.SetActive(enabled);
-                if (enabled) num -= 0.63f;
+                if (enabledOrNotCollapsed) num -= 0.63f;
             }
-            else if (option.IsHeader && enabled) num -= 0.3f;
+            else if (option.IsHeader && enabledOrNotCollapsed) num -= 0.3f;
 
             if (ModGameOptionsMenu.BehaviourList.TryGetValue(index, out var optionBehaviour))
             {
                 optionBehaviour.transform.localPosition = new(0.952f, num, -2f);
-                optionBehaviour.gameObject.SetActive(enabled);
-                if (enabled) num -= 0.45f;
+                optionBehaviour.gameObject.SetActive(enabledOrNotCollapsed);
+                if (enabledOrNotCollapsed) num -= 0.45f;
             }
         }
 
@@ -356,7 +367,7 @@ public static class GameOptionsMenuPatch
             __instance.ControllerSelectable.Add(x);
         __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
     }
-    private static BaseGameSetting GetSetting(OptionItem item)
+    public static BaseGameSetting GetSetting(OptionItem item)
     {
         static TSetting CreateAndInvoke<TSetting>(Func<TSetting> func) where TSetting : BaseGameSetting
         {
@@ -655,6 +666,7 @@ public static class StringOptionPatch
                     _ => 0.35f,
                 };
 
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && role.NotSpawnInRoundUp()) name += GetString("NotSpawnRole");
                 if (role.OnlySpawnsWithPetsRole()) name += GetString("RequiresPet");
                 if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) name += GetString("SupportsPet");
 
@@ -718,21 +730,16 @@ public static class StringOptionPatch
             string name = item.GetName();
             string name1 = name;
 
-            if (Enum.GetValues<CustomRoles>().Find(x => GetString($"{x}") == name1.RemoveHtmlTags(), out CustomRoles role))
-            {
-                if (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool()) DestroyableSingleton<HudManager>.Instance.ShowPopUp(GetString("Warning.UsePetsIsNotEnabled"));
-            }
-
             if (item is PresetOptionItem || (item is StringOptionItem && item.Name == "GameMode"))
             {
-                if (Options.GameMode.GetInt() == 4 && !GameStates.IsHideNSeek) //Hide And Seek
+                if (Options.GameMode.GetInt() == 5 && !GameStates.IsHideNSeek) //Hide And Seek
                 {
-                    if (Options.prevGameMode == 3) Options.GameMode.SetValue(0);
-                    else Options.GameMode.SetValue(3);
+                    if (Options.prevGameMode == 4) Options.GameMode.SetValue(0);
+                    else Options.GameMode.SetValue(4);
                 }
-                else if (Options.GameMode.GetInt() != 4 && GameStates.IsHideNSeek)
+                else if (Options.GameMode.GetInt() != 5 && GameStates.IsHideNSeek)
                 {
-                    Options.GameMode.SetValue(4);
+                    Options.GameMode.SetValue(5);
                 }
                 GameOptionsMenuPatch.ReOpenSettings(item.Name != "GameMode" ? 1 : 4);
                 Options.prevGameMode = Options.GameMode.GetInt();

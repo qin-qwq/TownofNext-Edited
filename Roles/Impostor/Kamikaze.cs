@@ -91,9 +91,7 @@ internal class Kamikaze : RoleBase
             }
             else
             {
-                pc.RpcExileV2();
-                Main.PlayerStates[pc.PlayerId].SetDead();
-                pc.Data.IsDead = true;
+                pc.RpcExileV3();
             }
             pc.SetRealKiller(_Player);
         }

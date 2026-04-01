@@ -186,7 +186,7 @@ internal class Sheriff : RoleBase
     }
     public static void OnSheriffLeft()
     {
-        if (Deputy.DeputyCanBecomeSheriff.GetBool()) DeputyBecomeSheriff();        
+        if (Deputy.DeputyCanBecomeSheriff.GetBool()) DeputyBecomeSheriff();
     }
     public static void DeputyBecomeSheriff()
     {

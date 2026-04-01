@@ -15,7 +15,7 @@ namespace TONE.Modules.Rpc
         public override void SerializeRpcValues(MessageWriter writer)
         {
             writer.Write(playerId);
-            writer.Write((int)addon);
+            writer.WritePacked((int)addon);
         }
 
         private readonly byte playerId;

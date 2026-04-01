@@ -124,4 +124,8 @@
 >
 > - TONE 包含 CrowdedMod
 >
+### :star: [MiraAPI](https://github.com/All-Of-Us-Mods/MiraAPI)
+>
+> - 下一个按钮图像
+>
 ---

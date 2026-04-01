@@ -101,7 +101,7 @@ internal class Fury : RoleBase
         Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed[player.PlayerId];
         Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKcd[player.PlayerId];
         player.Notify(GetString("FuryInCalm"), 5f);
-        player.MarkDirtySettings(); 
+        player.MarkDirtySettings();
     }
 
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
@@ -109,7 +109,7 @@ internal class Fury : RoleBase
         if (PlayerToAngry.Item1)
         {
             PlayerToAngry.Item2 -= Time.fixedDeltaTime;
-            
+
             if (PlayerToAngry.Item2 <= 0)
             {
                 ToCalm(pc);

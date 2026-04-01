@@ -1,4 +1,3 @@
-using UnityEngine;
 using static TONE.Options;
 
 namespace TONE.Roles.Crewmate;

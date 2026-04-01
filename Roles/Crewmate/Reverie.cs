@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using System;
+using UnityEngine;
 using static TONE.Options;
 
 namespace TONE.Roles.Crewmate;
@@ -68,7 +69,6 @@ internal class Reverie : RoleBase
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = NowCooldown[id];
     public override bool CanUseImpostorVentButton(PlayerControl pc) => false;
     public override bool CanUseKillButton(PlayerControl pc) => true;
-    public override bool CanUseSabotage(PlayerControl pc) => false;
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(false);
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
@@ -89,4 +89,5 @@ internal class Reverie : RoleBase
         }
         return true;
     }
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");
 }

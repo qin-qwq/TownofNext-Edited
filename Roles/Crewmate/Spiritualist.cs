@@ -1,4 +1,3 @@
-using Hazel;
 using static TONE.Options;
 using static TONE.Translator;
 

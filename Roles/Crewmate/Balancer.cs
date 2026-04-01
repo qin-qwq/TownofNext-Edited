@@ -125,7 +125,7 @@ internal class Balancer : RoleBase
     {
         var Tar1 = GetPlayerById(Target1);
         var Tar2 = GetPlayerById(Target2);
-        if (Choose) MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), ColorString(Main.PlayerColors[Target1], Tar1.GetRealName()), ColorString(Main.PlayerColors[Target2], Tar2.GetRealName()), 
+        if (Choose) MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), ColorString(Main.PlayerColors[Target1], Tar1.GetRealName()), ColorString(Main.PlayerColors[Target2], Tar2.GetRealName()),
             255, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper())));
         else
         {
@@ -159,10 +159,10 @@ internal class Balancer : RoleBase
         if (CustomRoles.Death.RoleExist() && !Tar1.Is(CustomRoles.Death) && !Tar2.Is(CustomRoles.Death))
         {
             foreach (var Tar3 in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Death)))
-            if (!CustomWinnerHolder.CheckForConvertedWinner(Tar3.PlayerId))
-            {
-                CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Apocalypse);
-            }
+                if (!CustomWinnerHolder.CheckForConvertedWinner(Tar3.PlayerId))
+                {
+                    CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Apocalypse);
+                }
             return;
         }
         _ = new LateTask(() =>

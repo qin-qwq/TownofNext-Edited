@@ -98,7 +98,7 @@ internal class Dreamer : RoleBase
         if (SkillTime.Item1)
         {
             SkillTime.Item2 -= Time.fixedDeltaTime;
-            
+
             if (SkillTime.Item2 <= 0)
             {
                 pc.RevertFreeze(RealPosition);

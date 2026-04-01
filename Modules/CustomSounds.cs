@@ -41,7 +41,7 @@ public static class CustomSoundsManager
 
     public static void Play(string sound)
     {
-        if (!Constants.ShouldPlaySfx() || !Main.EnableCustomSoundEffect.Value) return;
+        if (!Constants.ShouldPlaySfx() || !Main.EnableCustomSoundEffect.Value || OperatingSystem.IsAndroid()) return;
 
         var path = Path.Combine(SOUNDS_PATH, sound + ".wav");
 

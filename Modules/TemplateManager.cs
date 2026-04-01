@@ -115,8 +115,8 @@ public static class TemplateManager
             string dataDirectory = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA");
             string defaultTemplatePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Default_Teamplate.txt");
 #else
-        string dataDirectory = @"TONE-DATA";
-        string defaultTemplatePath = @"./TONE-DATA/Default_Teamplate.txt";
+            string dataDirectory = @"TONE-DATA";
+            string defaultTemplatePath = @"./TONE-DATA/Default_Teamplate.txt";
 #endif
 
             if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
@@ -191,15 +191,15 @@ public static class TemplateManager
             else Utils.SendMessage(string.Format(GetString("Message.TemplateNotFoundClient"), str), playerId, noReplay: true);
         }
         else for (int i = 0; i < sendList.Count; i++)
+        {
+            if (str == "welcome" && playerId != 0xff)
             {
-                if (str == "welcome" && playerId != 0xff)
-                {
-                    var player = Utils.GetPlayerById(playerId);
-                    if (player == null) continue;
-                    Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.IsHost() ? Main.HostRealName : player.GetRealName(clientData: true))));
-                }
-                else Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId);
+                var player = Utils.GetPlayerById(playerId);
+                if (player == null) continue;
+                Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId, string.Format($"<color=#aaaaff>{GetString("OnPlayerJoinMsgTitle")}</color>", Utils.ColorString(Palette.PlayerColors.Length > player.cosmetics.ColorId ? Palette.PlayerColors[player.cosmetics.ColorId] : UnityEngine.Color.white, player.IsHost() ? Main.HostRealName : player.GetRealName(clientData: true))));
             }
+            else Utils.SendMessage(ApplyReplaceDictionary(sendList[i]), playerId);
+        }
     }
 
     private static string ApplyReplaceDictionary(string text)

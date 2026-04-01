@@ -38,7 +38,7 @@ public static class Il2CppHelper
     public static T CastFast<T>(this Il2CppObjectBase obj) where T : Il2CppObjectBase
     {
         if (obj is T casted) return casted;
-        return obj.Pointer.CastFast<T>();
+        return OperatingSystem.IsAndroid() ? obj.Cast<T>() : obj.Pointer.CastFast<T>();
     }
 
     private static T CastFast<T>(this IntPtr ptr) where T : Il2CppObjectBase

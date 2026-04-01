@@ -3,7 +3,6 @@ using System;
 using System.Text.RegularExpressions;
 using TMPro;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
@@ -135,7 +134,7 @@ public static class GuessManager
             Logger.Msg($" {target.PlayerId}", "Guesser - target.PlayerId");
             Logger.Msg($" {role}", "Guesser - role");
 
-            if (role.GetStaticRoleClass().ThisRoleType == Custom_RoleType.CrewmateInvestigative && 
+            if (role.GetStaticRoleClass().ThisRoleType == Custom_RoleType.CrewmateInvestigative &&
                 !Options.CanGuessCrewInvestigative.GetBool())
             {
                 Logger.Info($"Guess disabled for Crewmate Investigative roles.", "GuessManager");
@@ -218,6 +217,19 @@ public static class GuessManager
                     Logger.Info($"Guess Disabled for this player {pc.PlayerId}", "GuessManager");
                     pc.ShowInfoMessage(isUI, GetString("GuessDisabled"));
                     return true;
+                }
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue)
+                {
+                    if (target.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
+                        return true;
+                    }
+                    if (pc.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
+                        return true;
+                    }
                 }
                 if (Balancer.Choose && !(target.PlayerId == Balancer.Target1 || target.PlayerId == Balancer.Target2))
                 {
@@ -456,9 +468,7 @@ public static class GuessManager
             // DEATH STUFF //
             GameEndCheckerForNormal.ShouldNotCheck = true;
             var amOwner = pc.AmOwner;
-            pc.RpcExileV2();
-            pc.Data.IsDead = true;
-            Main.PlayerStates[pc.PlayerId].SetDead();
+            pc.RpcExileV3();
             var meetingHud = MeetingHud.Instance;
             var hudManager = DestroyableSingleton<HudManager>.Instance;
             SoundManager.Instance.PlaySound(pc.KillSfx, false, 0.8f);
@@ -682,8 +692,8 @@ public static class GuessManager
             {
                 if (RoleBtn == null) continue;
                 index++;
-                if (index <= (Page - 1) * 40) { RoleBtn.gameObject.SetActive(false); continue; }
-                if ((Page * 40) < index) { RoleBtn.gameObject.SetActive(false); continue; }
+                if (index <= (Page - 1) * MaxOneScreenRole) { RoleBtn.gameObject.SetActive(false); continue; }
+                if ((Page * MaxOneScreenRole) < index) { RoleBtn.gameObject.SetActive(false); continue; }
                 RoleBtn.gameObject.SetActive(RoleButton.Key == Role);
             }
         }
@@ -915,6 +925,9 @@ public static class GuessManager
                 if (!listOfRoles.Contains(CustomRoles.DetectiveTONE))
                     listOfRoles.Add(CustomRoles.DetectiveTONE);
 
+                if (!listOfRoles.Contains(CustomRoles.ViperTONE))
+                    listOfRoles.Add(CustomRoles.ViperTONE);
+
                 if (!listOfRoles.Contains(CustomRoles.Amnesiac))
                     listOfRoles.Add(CustomRoles.Amnesiac);
 
@@ -1026,7 +1039,7 @@ public static class GuessManager
             }
             void CreateRole(CustomRoles role)
             {
-                if (40 <= info[(int)role.GetCustomRoleTeam()]) info[(int)role.GetCustomRoleTeam()] = 0;
+                if (MaxOneScreenRole <= info[(int)role.GetCustomRoleTeam()]) info[(int)role.GetCustomRoleTeam()] = 0;
                 Transform buttonParent = new GameObject().transform;
                 buttonParent.SetParent(container);
                 Transform button = UnityEngine.Object.Instantiate(buttonTemplate, buttonParent);

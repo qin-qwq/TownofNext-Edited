@@ -229,7 +229,7 @@ internal class Jailer : RoleBase
         else
         {
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
-                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));            
+                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
         }
 
         return true;

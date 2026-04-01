@@ -1,6 +1,6 @@
 using AmongUs.Data;
-using AmongUs.GameOptions;
 using System;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Neutral;
 
@@ -15,7 +15,7 @@ class ExileControllerWrapUpPatch
         // This patch is to show exile string for modded players
         public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
         {
-            if (Options.CurrentGameMode is CustomGameMode.Standard && init != null && init.outfit != null)
+            if (Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp && init != null && init.outfit != null)
                 __instance.completeString = CheckForEndVotingPatch.TempExileMsg;
             // TempExileMsg for client is sent in RpcClose
         }
@@ -48,29 +48,25 @@ class ExileControllerWrapUpPatch
         }
     }
 
-    [HarmonyPatch(typeof(AirshipExileController._WrapUpAndSpawn_d__11), nameof(AirshipExileController._WrapUpAndSpawn_d__11.MoveNext))]
+    [HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
     class AirshipExileControllerPatch
     {
-        public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
+        public static void Postfix(AirshipExileController __instance)
         {
             if (Main.NormalOptions.MapId == 7) return;
 
-            var instance = __instance.__4__this;
-            if (!__result)
+            Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
+            try
             {
-                Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
-                try
-                {
-                    WrapUpPostfix(instance.initData.networkedPlayer);
-                }
-                catch (Exception error)
-                {
-                    Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
-                }
-                finally
-                {
-                    WrapUpFinalizer(instance.initData.networkedPlayer);
-                }
+                WrapUpPostfix(__instance.initData.networkedPlayer);
+            }
+            catch (Exception error)
+            {
+                Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
+            }
+            finally
+            {
+                WrapUpFinalizer(__instance.initData.networkedPlayer);
             }
         }
     }
@@ -137,6 +133,7 @@ class ExileControllerWrapUpPatch
         foreach (var player in Main.EnumeratePlayerControls())
         {
             player.GetRoleClass()?.OnPlayerExiled(player, exiled);
+            Lovers.OnPlayerExiled(player, exiled);
 
             // Check for remove Pet
             player.RpcRemovePet();
@@ -148,7 +145,7 @@ class ExileControllerWrapUpPatch
         Main.MeetingIsStarted = false;
         Main.MeetingsPassed++;
 
-        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: Options.CurrentGameMode == CustomGameMode.Standard);
+        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp);
     }
 
     public static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
@@ -170,7 +167,7 @@ class ExileControllerWrapUpPatch
                 {
                     exiled.Object.RpcExileV2();
                 }
-            }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
+            }, Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp ? 0.5f : 1.4f, "Restore IsDead Task");
 
             _ = new LateTask(AntiBlackout.ResetAfterMeeting, 0.6f, "ResetAfterMeeting");
 
@@ -186,16 +183,13 @@ class ExileControllerWrapUpPatch
                     Logger.Info($"{player?.GetNameWithRole().RemoveHtmlTags()} died with {x.Value}", "AfterMeetingDeath");
 
                     state.deathReason = x.Value;
-                    state.SetDead();
-                    player?.RpcExileV2();
+                    player?.RpcExileV3();
 
                     // Just to be sure
                     _ = new LateTask(() => player?.RpcExile(), 0.5f, "Extra Exile to be Sure");
 
                     if (x.Value == PlayerState.DeathReason.Suicide)
                         player?.SetRealKiller(player, true);
-
-                    MurderPlayerPatch.AfterPlayerDeathTasks(player, player, true);
                 });
 
                 Main.AfterMeetingDeathPlayers.Clear();
@@ -212,24 +206,6 @@ class ExileControllerWrapUpPatch
                 {
                     Utils.NotifyRoles();
                 }
-
-                /*_ = new LateTask(() =>
-                {
-                    foreach (var player in Main.EnumerateAlivePlayerControls())
-                    {
-                        if (player.GetRoleClass() is not DefaultSetup)
-                        {
-                            if (player.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
-                            {
-                                player.ResetKillCooldown();
-                                if (Main.AllPlayerKillCooldown.TryGetValue(player.PlayerId, out var killTimer) && (killTimer - 2f) > 0f)
-                                {
-                                    player.SetKillCooldown(killTimer - 2f);
-                                }
-                            }
-                        }
-                    }
-                }, 1f, $"Fix Kill Cooldown Task after meeting");*/
 
                 Main.LastMeetingEnded = Utils.TimeStamp;
             }, 1f, "AfterMeetingDeathPlayers Task");

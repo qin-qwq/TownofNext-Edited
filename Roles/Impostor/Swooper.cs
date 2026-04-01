@@ -62,7 +62,7 @@ internal class Swooper : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = SwooperCooldown.GetFloat() + 1;        
+        AURoleOptions.PhantomCooldown = SwooperCooldown.GetFloat() + 1;
     }
 
     private static bool CanGoInvis(byte id)
@@ -78,7 +78,7 @@ internal class Swooper : RoleBase
         if (CanGoInvis(player.PlayerId))
         {
             player.RpcMakeInvisible();
-            
+
             InvisDuration.Remove(player.PlayerId);
             InvisDuration.Add(player.PlayerId, Utils.GetTimeStamp());
 

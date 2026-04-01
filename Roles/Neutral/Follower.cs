@@ -140,4 +140,5 @@ internal class Follower : RoleBase
     {
         hud.KillButton.OverrideText(GetString("FollowerKillButtonText"));
     }
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Follower");
 }

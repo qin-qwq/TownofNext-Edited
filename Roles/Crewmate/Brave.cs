@@ -1,4 +1,3 @@
-using AmongUs.GameOptions;
 using TONE.Roles.Core;
 using static TONE.Translator;
 

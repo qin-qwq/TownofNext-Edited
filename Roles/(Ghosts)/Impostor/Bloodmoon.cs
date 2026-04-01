@@ -63,7 +63,7 @@ internal class Bloodmoon : RoleBase
     }
     private void SendRPC(byte targetId, bool add)
     {
-        
+
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(add);
         writer.Write(targetId);

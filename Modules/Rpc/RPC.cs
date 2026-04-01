@@ -320,9 +320,6 @@ internal class RPCHandlerPatch
                         optionItem.SetValue(value, false);
                     }
 
-                    // Reset pages in OptionShower
-                    OptionShower.GetText();
-
                     return;
                 }
 
@@ -349,15 +346,12 @@ internal class RPCHandlerPatch
                     // Set Value Options
                     option.SetValue(reader.ReadPackedInt32(), false);
 
-                    // Set Preset 5 for modded non-host players
-                    if (startAmount == 0 && option.Name == "Preset" && option.CurrentValue != 4)
+                    // Set Preset 10 for modded non-host players
+                    if (startAmount == 0 && option.Name == "Preset" && option.CurrentValue != 9)
                     {
-                        option.SetValue(4); // 4 => Preset 5
+                        option.SetValue(9); // 9 => Preset 10
                     }
                 }
-
-                // Reset pages in OptionShower
-                OptionShower.GetText();
                 break;
 
             case CustomRPC.RemoveSubRole:
@@ -1066,7 +1060,7 @@ internal static class RPC
         if (!AmongUsClient.Instance.AmHost) return;
         var msg = new RpcSyncDeadPassedMeetingList(PlayerControl.LocalPlayer.NetId, Main.DeadPassedMeetingPlayers);
         RpcUtils.LateBroadcastReliableMessage(msg);
-        
+
     }
     public static void SendRpcLogger(uint targetNetId, byte callId, SendOption sendOption, int targetClientId = -1)
     {

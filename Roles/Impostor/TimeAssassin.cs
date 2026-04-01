@@ -28,7 +28,7 @@ internal class TimeAssassin : RoleBase
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.TimeAssassin);
         TimeAssassinSkillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.AbilityCooldown, new(1f, 180f, 1f), 25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeAssassin])
             .SetValueFormat(OptionFormat.Seconds);
-        TimeAssassinSkillDuration = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityDuration, new(1f, 60f, 1f), 6f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeAssassin])
+        TimeAssassinSkillDuration = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityDuration, new(1f, 60f, 1f), 7f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.TimeAssassin])
             .SetValueFormat(OptionFormat.Seconds);
     }
 

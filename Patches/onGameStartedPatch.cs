@@ -44,11 +44,12 @@ internal class ChangeRoleSettings
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Noisemaker, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Phantom, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Tracker, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Detective, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Viper, 0, 0);
                 }
             }
             else if (GameStates.IsHideNSeek)
             {
-                Main.HideNSeekOptions.NumImpostors = Options.NumImpostorsHnS.GetInt();
                 Main.AliveImpostorCount = Main.HideNSeekOptions.NumImpostors;
             }
 
@@ -88,7 +89,9 @@ internal class ChangeRoleSettings
 
             Main.LastNotifyNames.Clear();
 
-            Main.FirstDiedPrevious = Options.CurrentGameMode == CustomGameMode.Standard && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
+            Main.FirstDiedPrevious = Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp
+            && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
+
             Main.FirstDied = "";
             Main.MadmateNum = 0;
             Main.BardCreations = 0;
@@ -102,6 +105,7 @@ internal class ChangeRoleSettings
             OnPlayerLeftPatch.LeftPlayerId = byte.MaxValue;
             FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
             Main.Invisible.Clear();
+            CheckForEndVotingPatch.SomeoneExiled = false;
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
@@ -139,6 +143,7 @@ internal class ChangeRoleSettings
 
             if (AmongUsClient.Instance.AmHost)
             {
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && !Main.IsAprilFools && !PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev) Options.GameMode.SetValue(0);
                 var invalidColor = Main.EnumeratePlayerControls().Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId);
                 if (invalidColor.Any())
                 {
@@ -151,6 +156,7 @@ internal class ChangeRoleSettings
                     CriticalErrorManager.SetCriticalError("Player Have Invalid Color", true);
                     Logger.Error(msg, "CoStartGame");
                 }
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && !Options.UseMeetingShapeshift.GetBool()) Options.UseMeetingShapeshift.SetValue(1);
             }
 
             foreach (var pc in Main.EnumeratePlayerControls())
@@ -183,7 +189,7 @@ internal class ChangeRoleSettings
                     Main.LastNotifyNames[pair] = currentName;
                 }
 
-                if (Options.UsePets.GetBool() && Options.CurrentGameMode == CustomGameMode.Standard && AmongUsClient.Instance.AmHost)
+                if (Options.UsePets.GetBool() && Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp && AmongUsClient.Instance.AmHost)
                 {
                     foreach (var player in Main.EnumeratePlayerControls())
                     {
@@ -251,17 +257,18 @@ internal class ChangeRoleSettings
             //Tag Mode
             TagMode.Init();
 
+            //Round Up
+            RoundUp.Init();
+
             try
             {
                 SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
                 MapRoomDoorsUpdatePatch.DoorTimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
             }
             catch (Exception e) { Utils.ThrowException(e); }
-            
+
             SabotageMapPatch.TimerTexts = [];
             MapRoomDoorsUpdatePatch.DoorTimerTexts = [];
-
-            Main.GameEndDueToTimer = false;
 
             FallFromLadder.Reset();
             CustomWinnerHolder.Reset();
@@ -419,11 +426,6 @@ internal class StartGameHostPatch
 
             if (Options.DraftMode.GetBool())
             {
-                foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
-                {
-                    if (pc != null && DraftAssign.DraftPools.ContainsKey(pc.PlayerId) && DraftAssign.DraftRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.NotAssigned)
-                        DraftAssign.DraftedRoles(pc, IRandom.Instance.Next(1, DraftAssign.DraftPools[pc.PlayerId].Count + 1), false);
-                }
                 foreach (var kvp in DraftAssign.DraftRoles.Where(x => x.Value != CustomRoles.NotAssigned))
                 {
                     if (!RoleAssign.SetRoles.ContainsKey(kvp.Key))
@@ -514,7 +516,7 @@ internal class StartGameHostPatch
 
             try
             {
-                if (Options.CurrentGameMode == CustomGameMode.Standard)
+                if (Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
@@ -575,6 +577,7 @@ internal class StartGameHostPatch
             switch (Options.CurrentGameMode)
             {
                 case CustomGameMode.Standard:
+                case CustomGameMode.RoundUp:
                     GameEndCheckerForNormal.SetPredicateToNormal();
                     break;
                 case CustomGameMode.FFA:
@@ -675,24 +678,48 @@ internal class SelectRolesPatch
 
         if (GameStates.IsHideNSeek)
         {
-            if (Main.EnableGM.Value)
+            var ImpostorNum = Options.NumImpostorsHnS.GetInt();
+            var Impostor = new List<PlayerControl>();
+
+            if (Main.HideNSeekOptions.ImpostorPlayerID != -1)
             {
-                PlayerControl.LocalPlayer.RpcSetCustomRole(CustomRoles.GM);
-                PlayerControl.LocalPlayer.RpcSetRole(RoleTypes.Crewmate, false);
-                PlayerControl.LocalPlayer.Data.IsDead = true;
-                Main.PlayerStates[PlayerControl.LocalPlayer.PlayerId].SetDead();
+                var player = Utils.GetPlayerById(Main.HideNSeekOptions.ImpostorPlayerID);
+                if (player) Impostor.Add(player);
             }
 
-            foreach (var player in Main.EnumeratePlayerControls())
+            var Player = Main.EnumeratePlayerControls().Shuffle(IRandom.Instance).ToList();
+            foreach (var player in Player)
             {
-                if (!player.IsDisconnected() && TagManager.AssignGameMaster(player.FriendCode))
+                if (Main.EnableGM.Value && player.IsHost())
+                {
+                    player.RpcSetCustomRole(CustomRoles.GM);
+                    player.RpcSetRole(RoleTypes.Crewmate, false);
+                    player.Data.IsDead = true;
+                    Main.PlayerStates[player.PlayerId].SetDead();
+                    continue;
+                }
+                else if (!player.IsDisconnected() && TagManager.AssignGameMaster(player.FriendCode))
                 {
                     Logger.Info($"Setting GM role for [{player.PlayerId}]{player.GetRealName()}", "SelectRolesPatch.HnS");
                     player.RpcSetCustomRole(CustomRoles.GM);
                     player.RpcSetRole(RoleTypes.Crewmate, false);
                     player.Data.IsDead = true;
                     Main.PlayerStates[player.PlayerId].SetDead();
+                    continue;
                 }
+                else if (Impostor.Contains(player))
+                {
+                    player.RpcSetRole(RoleTypes.Impostor);
+                    ImpostorNum--;
+                    continue;
+                }
+                else if (ImpostorNum > 0)
+                {
+                    player.RpcSetRole(RoleTypes.Impostor);
+                    ImpostorNum--;
+                    continue;
+                }
+                player.RpcSetRole(RoleTypes.Engineer);
             }
 
             EAC.OriginalRoles = [];
@@ -774,7 +801,7 @@ public static class RpcSetRoleReplacer
             {
                 var roleType = role.GetRoleTypes();
 
-                if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom)
+                if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
                 {
                     foreach (var target in Main.EnumeratePlayerControls())
                     {

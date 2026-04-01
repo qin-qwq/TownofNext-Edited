@@ -7,3 +7,8 @@ global using HarmonyLib;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Reflection;
+#if ANDROID
+global using IntroCutscene_CoBegin = IntroCutscene._CoBegin_d__34;
+#else
+global using IntroCutscene_CoBegin = IntroCutscene._CoBegin_d__35;
+#endif

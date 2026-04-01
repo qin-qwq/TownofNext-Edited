@@ -4,7 +4,6 @@ using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
-using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Double;
@@ -21,7 +20,16 @@ public static class CustomRolesHelper
     public static readonly Custom_Team[] AllRoleTypes = EnumHelper.GetAllValues<Custom_Team>();
     public static bool OnlySpawnsWithPetsRole(this CustomRoles role)
     {
-        return role is CustomRoles.Transporter; 
+        return role is CustomRoles.Transporter;
+    }
+    public static bool NotSpawnInRoundUp(this CustomRoles role)
+    {
+        return role is CustomRoles.Instigator or CustomRoles.Vindicator or CustomRoles.Mayor or
+                       CustomRoles.Dictator or CustomRoles.Jailer or CustomRoles.Pickpocket or
+                       CustomRoles.Stealer or CustomRoles.Watcher or CustomRoles.Tiebreaker or
+                       CustomRoles.Silent or CustomRoles.Evader or CustomRoles.VoidBallot or
+                       CustomRoles.Influenced or CustomRoles.Swapper or CustomRoles.Collector or
+                       CustomRoles.Speaker;
     }
     public static CustomRoles GetVNRole(this CustomRoles role) // RoleBase: Impostor, Shapeshifter, Crewmate, Engineer, Scientist
     {
@@ -80,17 +88,6 @@ public static class CustomRolesHelper
         CustomRoles.EvilSpirit;
 
     }
-    public static bool IsBucketableRole(this CustomRoles role)
-        => !role.IsGhostRole() && !role.IsVanilla() && !(role is CustomRoles.GM
-                    or CustomRoles.SpeedBooster
-                    or CustomRoles.NotAssigned
-                    or CustomRoles.SuperStar
-                    or CustomRoles.Solsticer
-                    or CustomRoles.Killer
-                    or CustomRoles.Mini
-                    or CustomRoles.Apocalypse
-                    or CustomRoles.Coven)
-            && !role.IsTNA() && !role.IsAdditionRole();
 
     public static bool HasGhostRole(this PlayerControl player) => player.GetCustomRole().IsGhostRole() || player.IsAnySubRole(x => x.IsGhostRole());
 
@@ -98,7 +95,7 @@ public static class CustomRolesHelper
     public static bool HasImpBasis(this CustomRoles role, bool ForDesyncRole = true)
         => role.GetVNRole() is CustomRoles.Impostor
             or CustomRoles.Shapeshifter
-            or CustomRoles.Phantom or CustomRoles.ViperTONE
+            or CustomRoles.Phantom or CustomRoles.Viper
             || (ForDesyncRole && role.GetDYRole() is RoleTypes.Impostor
                 or RoleTypes.Shapeshifter
                 or RoleTypes.Phantom or RoleTypes.Viper);
@@ -663,9 +660,9 @@ public static class CustomRolesHelper
                 break;
 
             case CustomRoles.Guesser:
-                if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool()) 
-                || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool()) 
-                || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool()) 
+                if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool())
+                || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool())
+                || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool())
                 || (pc.GetCustomRole().IsCoven() && Options.CovenCanGuess.GetBool())
                 || (pc.GetCustomRole().IsNA() && Options.NeutralApocalypseCanGuess.GetBool())
                 || (pc.GetCustomRole().IsNonNK() && Options.PassiveNeutralsCanGuess.GetBool())))
@@ -918,7 +915,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Visionary)
                     || pc.Is(CustomRoles.GuardianAngelTONE)
                     || pc.Is(CustomRoles.Mimic)
-                    || pc.Is(CustomRoles.Iceologer))
+                    || pc.Is(CustomRoles.Iceologer)
+                    || pc.Is(CustomRoles.Logos))
                     return false;
                 break;
 
@@ -1616,6 +1614,8 @@ public static class CustomRolesHelper
            CustomRoles.Solsticer => CountTypes.None,
            CustomRoles.Revenant => CountTypes.None,
            CustomRoles.Dreamer => CountTypes.Dreamer,
+           CustomRoles.Logos => CountTypes.Logos,
+           CustomRoles.Philosopher => CountTypes.Logos,
            _ => role.IsImpostorTeam() ? CountTypes.Impostor : CountTypes.Crew,
 
            // CustomRoles.Phantom => CountTypes.OutOfGame,
@@ -1676,6 +1676,7 @@ public static class CustomRolesHelper
             CustomRoles.Shocker => CustomWinner.Shocker,
             CustomRoles.Dreamer => CustomWinner.Dreamer,
             CustomRoles.TreasureHunter => CustomWinner.TreasureHunter,
+            CustomRoles.Logos => CustomWinner.Logos,
             _ => throw new NotImplementedException()
 
         };
@@ -1710,6 +1711,7 @@ public static class CustomRolesHelper
             CountTypes.RuthlessRomantic => CustomRoles.RuthlessRomantic,
             CountTypes.Shocker => CustomRoles.Shocker,
             CountTypes.Dreamer => CustomRoles.Dreamer,
+            CountTypes.Logos => CustomRoles.Logos,
             _ => throw new NotImplementedException()
         };
     public static bool HasSubRole(this PlayerControl pc) => Main.PlayerStates[pc.PlayerId].SubRoles.Any();
@@ -1798,4 +1800,5 @@ public enum CountTypes
     Shocker,
     Coven,
     Dreamer,
+    Logos,
 }

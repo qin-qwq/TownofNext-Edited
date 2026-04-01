@@ -118,7 +118,6 @@ class RpcSetTasksPatch
      */
 
     public static List<byte> decidedCommonTasks = [];
-    public static List<byte> decidedMedBayPlayer = [];
     public static bool Prefix(NetworkedPlayerInfo __instance)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -220,9 +219,11 @@ class RpcSetTasksPatch
 
         if (!GameManager.Instance.LogicOptions.GetVisualTasks())
         {
-            shortTasks.RemoveAll(x => x.TaskType == TaskTypes.SubmitScan);
-            longTasks.RemoveAll(x => x.TaskType == TaskTypes.SubmitScan);
-            // Niko admits this is shit.
+            if (!Options.OverrideMedbayScan_OnVisualOff.GetBool())
+            {
+                shortTasks.RemoveAll(x => x.TaskType == TaskTypes.SubmitScan);
+                longTasks.RemoveAll(x => x.TaskType == TaskTypes.SubmitScan);
+            }
         }
 
         // Remove all disabled tasks

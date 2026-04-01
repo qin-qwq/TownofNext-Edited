@@ -3,8 +3,8 @@ using System;
 using System.Text;
 using TONE.Modules;
 using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
 using TONE.Roles.Coven;
+using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -338,16 +338,16 @@ internal class Doomsayer : RoleBase
                 var targetName = target.GetRealName();
                 if (targetIsVM) targetName = Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().GetRealName();
                 msg = string.Format(GetString("FortuneTellerCheck.Result"), target.GetRealName(), text);
-                SendMessage(GetString("FortuneTellerCheck") + "\n" + msg, pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()), sendOption: Hazel.SendOption.Reliable);
+                SendMessage(GetString("FortuneTellerCheck") + "\n" + msg, pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Doomsayer), GetString("Doomsayer").ToUpper()));
                 void ChooseRole(Custom_Team team)
                 {
                     var num = team switch
                     {
-                       Custom_Team.Coven => CovenRoleNumber.GetInt(),
-                       Custom_Team.Crewmate => CrewmateRoleNumber.GetInt(),
-                       Custom_Team.Impostor => ImpostorRoleNumber.GetInt(),
-                       Custom_Team.Neutral => NeutralRoleNumber.GetInt(),
-                       _ => 0,
+                        Custom_Team.Coven => CovenRoleNumber.GetInt(),
+                        Custom_Team.Crewmate => CrewmateRoleNumber.GetInt(),
+                        Custom_Team.Impostor => ImpostorRoleNumber.GetInt(),
+                        Custom_Team.Neutral => NeutralRoleNumber.GetInt(),
+                        _ => 0,
                     };
                     if (targetRole.GetCustomRoleTeam() == team) num--;
                     if (num <= 0) return;

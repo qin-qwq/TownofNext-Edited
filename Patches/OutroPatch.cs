@@ -3,7 +3,6 @@ using System.Text;
 using TMPro;
 using TONE.Modules;
 using TONE.Modules.ChatManager;
-using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Crewmate;
@@ -115,7 +114,7 @@ class EndGamePatch
         var sb2 = new StringBuilder(GetString("MainRoleLog") + ":");
         foreach (var kvp in Main.PlayerStates.OrderBy(x => x.Key))
         {
-            if (Options.CurrentGameMode != CustomGameMode.Standard) break;
+            if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) break;
             if (kvp.Value.MainRoleLogs.Where(x => !x.Item2.IsVanilla()).ToList().Count <= 1) continue;
             sb2.Append($"\n[{kvp.Key}] {Main.AllPlayerNames[kvp.Key]} {Utils.GetDisplayRoleAndSubName(kvp.Key, kvp.Key, false, false)}");
             foreach (var item in kvp.Value.MainRoleLogs.OrderBy(x => x.Item1.Ticks))
@@ -177,7 +176,6 @@ class EndGamePatch
             Main.RealOptionsData.Restore(GameOptionsManager.Instance.CurrentGameOptions);
             GameOptionsSender.AllSenders.Clear();
             GameOptionsSender.AllSenders.Add(new NormalGameOptionsSender());
-            Main.GameTimer = 0f;
             /* Send SyncSettings RPC */
         }
     }
@@ -296,7 +294,7 @@ class SetEverythingUpPatch
                 __instance.WinText.text = "";
                 __instance.WinText.color = Color.black;
                 __instance.BackgroundBar.material.color = Color.gray;
-                WinnerText.text = GetString(Main.GameEndDueToTimer ? "GameTimerEnded" : "EveryoneDied");
+                WinnerText.text = GetString("EveryoneDied");
                 WinnerText.color = Color.gray;
                 break;
             case CustomWinner.Error:

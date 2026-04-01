@@ -373,9 +373,7 @@ internal class Quizmaster : RoleBase
     {
         if (!plrToKill.IsAlive() || plrToKill.IsTransformedNeutralApocalypse()) return;
         plrToKill.SetDeathReason(PlayerState.DeathReason.WrongAnswer);
-        Main.PlayerStates[plrToKill.PlayerId].SetDead();
-        plrToKill.RpcExileV2();
-        plrToKill.Data.IsDead = true;
+        plrToKill.RpcExileV3();
         plrToKill.SetRealKiller(Player);
         ResetMarkedPlayer(true);
     }

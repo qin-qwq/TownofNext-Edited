@@ -103,7 +103,7 @@ public class RoleAssign
                     {
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;                        
+                        continue;
                     }
                     RoleResult[pc.PlayerId] = CustomRoles.Killer;
                 }
@@ -127,7 +127,7 @@ public class RoleAssign
                     {
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;                        
+                        continue;
                     }
                     RoleResult[pc.PlayerId] = CustomRoles.Runner;
                 }
@@ -154,7 +154,7 @@ public class RoleAssign
                     {
                         RoleResult[pc.PlayerId] = CustomRoles.GM;
                         Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;                        
+                        continue;
                     }
                     else if (ZombieNum > 0)
                     {
@@ -203,7 +203,8 @@ public class RoleAssign
         foreach (var role in EnumHelper.GetAllValues<CustomRoles>())
         {
             int chance = role.GetMode();
-            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) continue;
+            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool()) ||
+               (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) continue;
             switch (role)
             {
                 case CustomRoles.Stalker when GameStates.FungleIsActive:
@@ -347,7 +348,7 @@ public class RoleAssign
                 RoleResult[player.PlayerId] = CustomRoles.GM;
                 SetRoles.Remove(player.PlayerId);
                 AllPlayers.Remove(player);
-                Logger.Info($"Assign Game Master due to tag for [{player.PlayerId}]{player.GetRealName()}", "SetRoles");                     
+                Logger.Info($"Assign Game Master due to tag for [{player.PlayerId}]{player.GetRealName()}", "SetRoles");
             }
         }
 

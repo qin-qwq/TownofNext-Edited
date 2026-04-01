@@ -22,7 +22,8 @@ public static class CustomRoleManager
         var roleClass = RoleClass.FirstOrDefault(x => x.Key == role).Value;
 
         if (!role.IsVanilla() && !role.IsAdditionRole()
-            && role is not CustomRoles.Apocalypse and not CustomRoles.Mini and not CustomRoles.NotAssigned and not CustomRoles.SpeedBooster and not CustomRoles.Killer and not CustomRoles.GM)
+            && role is not CustomRoles.Apocalypse and not CustomRoles.Mini and not CustomRoles.NotAssigned and not CustomRoles.SpeedBooster and not CustomRoles.Killer and not CustomRoles.GM
+                   and not CustomRoles.RDeputy)
         {
             if (RoleClass.Count(x => x.Value.Role == role) > 1)
                 Logger.Error($"RoleClass for {role} is not unique.", "GetStaticRoleClass");
@@ -179,7 +180,7 @@ public static class CustomRoleManager
         if (playerstates.IsBlackOut)
         {
             opt.SetFloat(FloatOptionNames.ImpostorLightMod, 0);
-            opt.SetFloat(FloatOptionNames.CrewLightMod, 0);         
+            opt.SetFloat(FloatOptionNames.CrewLightMod, 0);
         }
     }
 
@@ -350,6 +351,7 @@ public static class CustomRoleManager
         // Check Suicide
         var isSuicide = killer.PlayerId == target.PlayerId;
 
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
         // Target was murdered by Killer
         targetRoleClass.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
 
@@ -366,7 +368,7 @@ public static class CustomRoleManager
                     case CustomRoles.Bait when !inMeeting && !fromRole:
                         Bait.BaitAfterDeathTasks(trueDMKiller, target); // Use trueDMKiller to any roles that needs the Dollmaster to be the killer!
                         break;
-                        
+
                     case CustomRoles.Randomizer when !inMeeting && !fromRole && !isSuicide && !killer.Is(CustomRoles.KillingMachine):
                         Randomizer.RandomizerKilled(killer, target);
                         break;

@@ -460,6 +460,23 @@ public static class Utils
         _ = ColorUtility.TryParseHtmlString(hexColor, out Color c);
         return c;
     }
+    public static Color GetTabColor(this TabGroup tab)
+    {
+        string htmlcolor = tab switch
+        {
+            TabGroup.SystemSettings => Main.ModColor,
+            TabGroup.ModSettings => "#59ef83",
+            TabGroup.ImpostorRoles => "#f74631",
+            TabGroup.CrewmateRoles => "#8cffff",
+            TabGroup.NeutralRoles => "#7f8c8d",
+            TabGroup.CovenRoles => "#ac42f2",
+            TabGroup.Addons => "#ff9ace",
+            _ => "#ffffff",
+        };
+
+        _ = ColorUtility.TryParseHtmlString(htmlcolor, out Color c);
+        return c;
+    }
     public static string GetRoleColorCode(CustomRoles role)
     {
         if (!Main.roleColors.TryGetValue(role, out var hexColor)) hexColor = "#ffffff";
@@ -1066,17 +1083,6 @@ public static class Utils
             SendSpesificMessage(EndGamePatch.MainRoleLog, PlayerId);
         }
     }
-    public static string GetTeamMark(CustomRoles role, int sizePer)
-    {
-        string text = "　";
-        if (role.IsAdditionRole()) text = "<color=#ff9ace>Ⓐ</color>";
-        else if (role.IsImpostor()) text = "<color=#ff1919>Ⓘ</color>";
-        else if (role.IsCrewmate()) text = "<color=#8cffff>Ⓒ</color>";
-        else if (role.IsNeutral()) text = "<color=#7f8c8d>Ⓝ</color>";
-        else if (role.IsCoven()) text = "<color=#ac42f2>Ⓒ</color>";
-
-        return $"<size={sizePer}%>{text}</size>";
-    }
     public static void ShowLastResult(byte PlayerId = byte.MaxValue)
     {
         if (GameStates.IsInGame)
@@ -1479,14 +1485,14 @@ public static class Utils
 
             return result;
         }
-        
+
         static string ReplaceHexColorsWithSafeColors(string text) => ColorTagRegex.Replace(text, match =>
         {
             string hex = match.Groups[1].Value.ToLowerInvariant();
-            
+
             string a = hex.Length == 8 ? hex[6..8] : string.Empty;
             if (!string.IsNullOrEmpty(a)) hex = hex[..6];
-            
+
             if (hex.Length != 6 || !hex.Any(char.IsDigit)) return match.Value;
 
             int r = Convert.ToInt32(hex[..2], 16);
@@ -1503,7 +1509,7 @@ public static class Utils
         static string FindClosestSafeColor(int r, int g, int b)
         {
             if (CachedColorReplacements.TryGetValue((r, g, b), out string cache)) return cache;
-            
+
             double bestDist = double.MaxValue;
             string bestValue = "white";
 
@@ -1568,7 +1574,7 @@ public static class Utils
 
         static string ReplaceDigitsOutsideRichText(string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) return text;
+            if (string.IsNullOrWhiteSpace(text) || !IsTooManyDigits(text)) return text;
 
             StringBuilder sb = new(text.Length);
             bool insideTag = false;
@@ -1595,6 +1601,22 @@ public static class Utils
             }
 
             return sb.ToString();
+        }
+
+        static bool IsTooManyDigits(string text)
+        {
+            int count = 0;
+
+            foreach (char c in text)
+            {
+                if (c is >= '0' and <= '9')
+                {
+                    count++;
+                    if (count >= 5) return true;
+                }
+            }
+
+            return false;
         }
     }
     public static bool IsPlayerModerator(string friendCode)
@@ -1761,6 +1783,8 @@ public static class Utils
                 name = $"<color=#fffb00><size=1.7>{GetString("ModeSpeedRun")}</size></color>\r\n" + name;
             if (Options.CurrentGameMode == CustomGameMode.TagMode)
                 name = $"<color=#2ccc00><size=1.7>{GetString("ModeTagMode")}</size></color>\r\n" + name;
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp)
+                name = $"<color=#f8d86e><size=1.7>{GetString("ModeRoundUp")}</size></color>\r\n" + name;
         }
 
 
@@ -2701,7 +2725,7 @@ public static class Utils
                         // Hide player names in during Mushroom Mixup if seer is alive and desync impostor
                         if (!CamouflageIsForMeeting && MushroomMixupIsActive && target.IsAlive() && (!seer.Is(Custom_Team.Impostor) || Main.PlayerStates[seer.PlayerId].IsNecromancer) && seer.HasDesyncRole())
                         {
-                            sender.RpcSetName(target, "<size=0%>", seer);
+                            sender.RpcSetName(realTarget, "<size=0%>", seer);
                             hasValue = true;
                             senderWasCleared = false;
 
@@ -2891,7 +2915,7 @@ public static class Utils
                             if (TargetName.EndsWith("</size>")) TargetName = TargetName.Remove(TargetName.Length - 7);
                             if (TargetName.EndsWith("</color>")) TargetName = TargetName.Remove(TargetName.Length - 8);
 
-                            sender.RpcSetName(target, TargetName, seer);
+                            sender.RpcSetName(realTarget, TargetName, seer);
                             hasValue = true;
                             senderWasCleared = false;
 
@@ -3056,6 +3080,7 @@ public static class Utils
             PlayerState.DeathReason.BlastedOff => CustomRoles.MoonDancer.IsEnable(),
             PlayerState.DeathReason.Suffocate => CustomRoles.Tunny.IsEnable(),
             PlayerState.DeathReason.Ice => CustomRoles.Iceologer.IsEnable(),
+            PlayerState.DeathReason.Philosophy => CustomRoles.Logos.IsEnable(),
             PlayerState.DeathReason.Kill => true,
             _ => true,
         };
@@ -3115,6 +3140,8 @@ public static class Utils
                 playerState.RoleClass.LastBlockedMoveInVentVents.Clear();
             }
 
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.AfterMeetingTasks();
+
             //Set kill timer
             foreach (var player in Main.EnumerateAlivePlayerControls())
             {
@@ -3128,11 +3155,15 @@ public static class Utils
                 AFKDetector.RecordPosition(player);
             }
 
+            if (Options.ShowExileMsgAfterMeeting.GetBool() && !CheckForEndVotingPatch.SomeoneExiled) ExileMsgAfterMeeting();
+
             if (Statue.IsEnable) Statue.AfterMeetingTasks();
             if (Burst.IsEnable) Burst.AfterMeetingTasks();
 
             if (CustomRoles.CopyCat.HasEnabled()) CopyCat.UnAfterMeetingTasks(); // All crew hast to be before this
             if (CustomRoles.Necromancer.HasEnabled()) Necromancer.UnAfterMeetingTasks();
+
+            CheckForEndVotingPatch.SomeoneExiled = false;
         }
         catch (Exception error)
         {
@@ -3152,6 +3183,15 @@ public static class Utils
             ventilationSystem.PlayersInsideVents.Clear();
             ventilationSystem.IsDirty = true;
             // Will be synced by ShipStatus patch, SetAllVentInteractions
+        }
+
+        void ExileMsgAfterMeeting()
+        {
+            var impnum = Main.EnumerateAlivePlayerControls().Count(x => x.GetCustomRole().IsImpostorTeamV3() && !x.Is(CustomRoles.Narc));
+            foreach (var player in Main.EnumerateAlivePlayerControls())
+            {
+                player.Notify(string.Format(GetString("VanillaImpRemain"), impnum));
+            }
         }
     }
     public static string ToColoredString(this CustomRoles role) => ColorString(GetRoleColor(role), GetString(role.ToString()));
@@ -3622,5 +3662,30 @@ public static class Utils
         UnityEngine.Object.Destroy(playerControl.gameObject);
         sender.EndMessage();
         sender.SendMessage();
+    }
+
+    public static MethodBase GetStateMachineMoveNext<T>(string methodName)
+    {
+        var typeName = typeof(T).FullName;
+        var stateMachine =
+            typeof(T)
+                .GetNestedTypes()
+                .FirstOrDefault(x => x.Name.Contains(methodName));
+
+        if (stateMachine == null)
+        {
+            Logger.Error($"Failed to find {methodName} state machine for {typeName}", "GetStateMachineMoveNext");
+            return null;
+        }
+
+        var moveNext = AccessTools.Method(stateMachine, "MoveNext");
+        if (moveNext == null)
+        {
+            Logger.Error($"Failed to find MoveNext method for {typeName}.{methodName}", "GetStateMachineMoveNext");
+            return null;
+        }
+
+        Logger.Info($"Found {methodName}.MoveNext", "GetStateMachineMoveNext");
+        return moveNext;
     }
 }

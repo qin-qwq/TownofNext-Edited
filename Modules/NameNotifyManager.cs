@@ -7,23 +7,23 @@ namespace TONE;
 public static class NameNotifyManager
 {
     public static readonly Dictionary<byte, List<(string Text, long TimeStamp)>> Notice = [];
-    
+
     public static void Reset() => Notice.Clear();
-    
+
     public static bool Notifying(this PlayerControl pc) => Notice.ContainsKey(pc.PlayerId) && Notice[pc.PlayerId].Any();
-    
+
     public static void Notify(this PlayerControl pc, string text, float time = 5f, bool sendInLog = true, bool hasPriority = false)
     {
         if (!AmongUsClient.Instance.AmHost || pc == null) return;
         if (!GameStates.IsInTask) return;
-        
+
         text = text.Trim();
         if (!text.Contains("<color=") && !text.Contains("</color>")) text = Utils.ColorString(Color.white, text);
         if (!text.Contains("<size=")) text = $"<size=1.9>{text}</size>";
 
         if (!Notice.ContainsKey(pc.PlayerId))
             Notice[pc.PlayerId] = new List<(string Text, long TimeStamp)>();
-  
+
         if (hasPriority)
         {
             Notice[pc.PlayerId].Clear();
@@ -40,7 +40,7 @@ public static class NameNotifyManager
             var newNotification = (text, Utils.TimeStamp + (long)time);
             Notice[pc.PlayerId].Add(newNotification);
         }
-        
+
         //var newNotification = (text, Utils.TimeStamp + (long)time);
         //Notice[pc.PlayerId].Add(newNotification);
 
@@ -49,7 +49,7 @@ public static class NameNotifyManager
 
         if (sendInLog) Logger.Info($"New name notify for {pc.GetNameWithRole().RemoveHtmlTags()}: {text} ({time}s)", "Name Notify");
     }
-    
+
     public static void OnFixedUpdate(PlayerControl player)
     {
         if (!GameStates.IsInTask)
@@ -65,7 +65,7 @@ public static class NameNotifyManager
             {
                 Notice[player.PlayerId].Remove(notify);
             }
-            
+
             if (!Notice[player.PlayerId].Any())
             {
                 Notice.Remove(player.PlayerId);
@@ -77,17 +77,17 @@ public static class NameNotifyManager
             }
         }
     }
-    
+
     public static bool GetNameNotify(PlayerControl player, out string name)
     {
         name = string.Empty;
-        if (!Notice.TryGetValue(player.PlayerId, out List<(string Text, long TimeStamp)> value) || !value.Any()) 
+        if (!Notice.TryGetValue(player.PlayerId, out List<(string Text, long TimeStamp)> value) || !value.Any())
             return false;
-        
+
         name = string.Join("\n", value.Select(n => n.Text));
         return true;
     }
-    
+
     private static void SendRPC(byte playerId)
     {
         var player = playerId.GetPlayer();
@@ -102,21 +102,21 @@ public static class NameNotifyManager
             playerNotifies.Any() ? playerNotifies.Max(n => n.TimeStamp) - Utils.GetTimeStamp() : 0f);
         RpcUtils.LateSpecificSendMessage(message, player.OwnerId);
     }
-    
+
     public static void ReceiveRPC(MessageReader reader)
     {
         byte PlayerId = reader.ReadByte();
         Notice.Remove(PlayerId);
         long now = Utils.GetTimeStamp();
-        
+
         if (reader.ReadBoolean())
         {
             var text = reader.ReadString();
             var timeLeft = reader.ReadSingle();
-            
+
             var texts = text.Split('\n');
             var notifications = new List<(string Text, long TimeStamp)>();
-            
+
             foreach (var t in texts)
             {
                 if (!string.IsNullOrEmpty(t.Trim()))
@@ -133,7 +133,7 @@ public static class NameNotifyManager
                     }
                 }
             }
-            
+
             if (notifications.Any())
             {
                 Notice[PlayerId] = notifications;

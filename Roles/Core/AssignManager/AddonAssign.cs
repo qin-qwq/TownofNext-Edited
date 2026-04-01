@@ -12,6 +12,7 @@ public static class AddonAssign
 
     private static bool NotAssignAddOnInGameStarted(CustomRoles role)
     {
+        if (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp) return true;
         switch (role)
         {
             case CustomRoles.Workhorse:
@@ -30,7 +31,7 @@ public static class AddonAssign
 
     public static void StartSelect()
     {
-        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) return;
 
         AddonRolesList.Clear();
         foreach (var cr in CustomRolesHelper.AllRoles)
@@ -45,7 +46,7 @@ public static class AddonAssign
     }
     public static void StartSortAndAssign()
     {
-        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) return;
 
         var rd = IRandom.Instance;
         List<CustomRoles> addonsList = [];
@@ -112,10 +113,10 @@ public static class AddonAssign
                 // Set Add-on
                 Main.PlayerStates[player.PlayerId].SetSubRole(addon);
                 Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {addon}", $"Assign {addon}");
-                
+
                 addonsList.Remove(addon);
             }
-            
+
         }
 
         // Assign add-ons
@@ -133,9 +134,9 @@ public static class AddonAssign
         {
             var allAlivePlayers = Main.EnumerateAlivePlayerControls().ToList();
             if (!allAlivePlayers.Any()) return;
-        
+
             var eligiblePlayers = new List<PlayerControl>();
-        
+
             foreach (var pc in allAlivePlayers)
             {
                 if (CustomRolesHelper.CheckAddonConfilct(role, pc))
@@ -143,11 +144,11 @@ public static class AddonAssign
                     eligiblePlayers.Add(pc);
                 }
             }
-        
+
             if (!eligiblePlayers.Any()) return;
-        
+
             var count = Math.Clamp(RawCount, 0, eligiblePlayers.Count);
-        
+
             if (RawCount == -1) count = Math.Clamp(role.GetCount(), 0, eligiblePlayers.Count);
 
             if (role == CustomRoles.Lovers)
@@ -163,12 +164,12 @@ public static class AddonAssign
             }
 
             if (count <= 0) return;
-        
+
             for (var i = 0; i < count; i++)
             {
-                if (!eligiblePlayers.Any()) 
+                if (!eligiblePlayers.Any())
                 {
-                    if (role == CustomRoles.Lovers && i % 2 != 0) 
+                    if (role == CustomRoles.Lovers && i % 2 != 0)
                         Logger.Warn("Odd number of lovers assigned.", "AssignSubRoles:Lovers");
                     return;
                 }
@@ -177,7 +178,7 @@ public static class AddonAssign
                 eligiblePlayers.Remove(player);
 
                 Main.PlayerStates[player.PlayerId].SetSubRole(role);
-            
+
                 Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {role}", $"Assign {role}");
             }
         }
@@ -219,9 +220,9 @@ public static class AddonAssign
         foreach (PlayerControl pc in AllPlayers)
         {
             if (pc == null) continue;
-            if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool()) 
-            || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool()) 
-            || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool()) 
+            if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool())
+            || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool())
+            || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool())
             || (pc.GetCustomRole().IsCoven() && Options.CovenCanGuess.GetBool())
             || (pc.GetCustomRole().IsNA() && Options.NeutralApocalypseCanGuess.GetBool())
             || (pc.GetCustomRole().IsNonNK() && Options.PassiveNeutralsCanGuess.GetBool())))

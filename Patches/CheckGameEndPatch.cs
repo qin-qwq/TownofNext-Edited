@@ -207,6 +207,12 @@ class GameEndCheckerForNormal
                             WinnerIds.Add(pc.PlayerId);
                         }
                         break;
+                    case CustomWinner.Logos:
+                        if ((pc.Is(CustomRoles.Philosopher) || pc.Is(CustomRoles.Logos)) && (countType == CountTypes.Logos || pc.Is(CustomRoles.Soulless)) && !Main.PlayerStates[pc.PlayerId].IsNecromancer)
+                        {
+                            WinnerIds.Add(pc.PlayerId);
+                        }
+                        break;
                 }
             }
 

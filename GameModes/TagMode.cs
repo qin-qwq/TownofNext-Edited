@@ -69,7 +69,7 @@ public static class TagMode
             .SetValueFormat(OptionFormat.Seconds)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
 
-        CrewmateTasks = StringOptionItem.Create(Id + 6, "TagMode_CrewmateTasks", EnumHelper.GetAllNames<TCrewmateTaskList>(), 0 , TabGroup.ModSettings, false)
+        CrewmateTasks = StringOptionItem.Create(Id + 6, "TagMode_CrewmateTasks", EnumHelper.GetAllNames<TCrewmateTaskList>(), 0, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.TagMode)
             .SetColor(new Color32(44, 204, 0, byte.MaxValue))
             .SetHeader(true);
@@ -164,7 +164,7 @@ public static class TagMode
 
             newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
             newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("TagMode.BecomeZombie");
-            newPopUp.Show(target, 0);      
+            newPopUp.Show(target, 0);
         }
     }
 
@@ -300,7 +300,7 @@ public class TZombie : RoleBase
 
         newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
         newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("TagMode.BecomeZombie");
-        newPopUp.Show(target, 0);   
+        newPopUp.Show(target, 0);
 
         TagMode.SendTaskRPC(target.PlayerId);
 
@@ -317,6 +317,8 @@ public class TZombie : RoleBase
     public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => seer.IsAlive();
 
     public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];
+
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Infected");
 }
 
 public class TCrewmate : RoleBase

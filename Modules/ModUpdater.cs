@@ -1,7 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -236,7 +235,7 @@ public class ModUpdater
             string[] tag = data["tag_name"]?.ToString()[1..].Split(".");
 
             var pluginNum = int.Parse(Main.PluginVersion.Substring(10, 1)) * 10000 + int.Parse(Main.PluginVersion.Substring(11, 1)) * 1000 + int.Parse(Main.PluginVersion.Substring(12, 1)) * 100;
-            var versionNum = int.Parse(tag[0]) * 10000 + int.Parse(tag[1]) * 1000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'B' ? int.Parse(tag[2][2..]) : 999);
+            var versionNum = int.Parse(tag[0]) * 10000 + int.Parse(tag[1]) * 1000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) : 999);
 
             Logger.Info($"Found local version: {pluginNum}; github version: {versionNum}", "CheckRelease");
 
@@ -286,9 +285,9 @@ public class ModUpdater
         Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
         return;
 #else
-    ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
-    Task.Run(() => DownloadDLLAsync(url));
-    return;
+        ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
+        Task.Run(() => DownloadDLLAsync(url));
+        return;
 #endif
     }
     public static bool NewVersionCheck()
@@ -302,9 +301,9 @@ public class ModUpdater
             {
                 DirectoryInfo di = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA"));
 #else
-        if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
-        {
-            DirectoryInfo di = new("TOH_DATA");
+            if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
+            {
+                DirectoryInfo di = new("TOH_DATA");
 #endif
                 di.Delete(true);
                 Logger.Warn("Deleting old data：TOH_DATA", "NewVersionCheck");

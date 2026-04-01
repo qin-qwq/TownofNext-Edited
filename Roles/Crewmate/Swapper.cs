@@ -2,7 +2,6 @@ using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
@@ -108,6 +107,11 @@ internal class Swapper : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("SwapperTrialMax"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     return true;
                 }
+                if (Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                {
+                    pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
+                    return true;
+                }
                 if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
                 {
                     pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
@@ -134,12 +138,12 @@ internal class Swapper : RoleBase
                         var target1 = Vote.Item1.GetPlayer();
                         var target2 = Vote.Item2.GetPlayer();
 
-                        pc.ShowInfoMessage(isUI, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));                        
+                        pc.ShowInfoMessage(isUI, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     }
                     else if (dp.PlayerId != Vote.Item1)
                     {
                         Vote.Item2 = 253;
-                        pc.ShowInfoMessage(isUI, GetString("CancelSwap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));                        
+                        pc.ShowInfoMessage(isUI, GetString("CancelSwap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     }
                     else if (dp.PlayerId != Vote.Item2)
                     {
@@ -353,9 +357,6 @@ internal class Swapper : RoleBase
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Swapper sp && PlayerControl.LocalPlayer.IsAlive())
-                sp.CreateSwapperButton(__instance);
-
             if (AmongUsClient.Instance.AmHost)
             {
                 foreach (var pc in Main.EnumerateAlivePlayerControls().ToArray())
@@ -370,6 +371,9 @@ internal class Swapper : RoleBase
                     ResultSent.Clear();
                 }
             }
+
+            if (PlayerControl.LocalPlayer.GetRoleClass() is Swapper sp && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
+                sp.CreateSwapperButton(__instance);
         }
     }
     public void CreateSwapperButton(MeetingHud __instance)
