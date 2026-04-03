@@ -106,6 +106,7 @@ internal class ChangeRoleSettings
             FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
             Main.Invisible.Clear();
             CheckForEndVotingPatch.SomeoneExiled = false;
+            ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();

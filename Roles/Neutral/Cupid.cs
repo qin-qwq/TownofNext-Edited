@@ -151,9 +151,15 @@ internal class Cupid : RoleBase
         }
         if (shapeshifter == null || target == null) return false;
 
-        AddTarget(shapeshifter, target);
-
         resetCooldown = false;
+
+        if (!target.IsAlive())
+        {
+            shapeshifter.Notify(GetString("Cupid.TargetDead"));
+            return false;
+        }
+
+        AddTarget(shapeshifter, target);
 
         return false;
     }

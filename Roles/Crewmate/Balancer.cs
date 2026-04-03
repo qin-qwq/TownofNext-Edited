@@ -165,10 +165,7 @@ internal class Balancer : RoleBase
                 }
             return;
         }
-        _ = new LateTask(() =>
-        {
-            Tar1?.NoCheckStartMeeting(null);
-        }, 1f);
+        Tar1?.NoCheckStartMeeting(null);
     }
     public override void AfterMeetingTasks()
     {
@@ -215,7 +212,7 @@ internal class Balancer : RoleBase
             if (pc == null || !pc.IsAlive()) continue;
 
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
+            GameObject targetBox = Object.Instantiate(template, pva.transform);
             targetBox.name = "BalancerButton";
             targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
             SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();

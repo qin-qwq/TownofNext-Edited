@@ -1886,6 +1886,14 @@ internal class ChatCommands
                     SpectateCommand(PlayerControl.LocalPlayer, text, args);
                     break;
 
+                case "/ear":
+                case "/enableallroles":
+                case "/启用全部职业":
+                case "/启用所有职业":
+                    canceled = true;
+                    EnableAllRolesCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
                 default:
                     Main.isChatCommand = false;
                     break;
@@ -3688,7 +3696,7 @@ internal class ChatCommands
 
     private static void FixCommand(PlayerControl player, string text, string[] args)
     {
-        if (!AmongUsClient.Instance.AmHost)
+        if (!player.IsHost())
         {
             if (!Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
         }
@@ -3706,7 +3714,7 @@ internal class ChatCommands
 
     private static void AFKExemptCommand(PlayerControl player, string text, string[] args)
     {
-        if (!AmongUsClient.Instance.AmHost)
+        if (!player.IsHost())
         {
             if (!Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
         }
@@ -3738,6 +3746,12 @@ internal class ChatCommands
             Utils.SendMessage(GetString("PlayerDeleteFromSpectateList"), player.PlayerId);
             if (pc.FriendCode.GetDevUser().IsDev) Utils.SendMessage(GetString("YouDeleteFromSpectateList"), pc.PlayerId);
         }
+    }
+
+    private static void EnableAllRolesCommand(PlayerControl player, string text, string[] args)
+    {
+        Options.CustomRoleSpawnChances.Values.DoIf(x => x.GetValue() == 0, x => x.SetValue(1));
+        Utils.SendMessage(GetString("AllRolesEnabled"), player.PlayerId);
     }
 
     private static bool ImpostorChannel(PlayerControl pc, string msg, bool check = true)

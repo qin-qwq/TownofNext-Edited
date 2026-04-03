@@ -45,14 +45,6 @@ public static class Utils
     {
         if (!AmongUsClient.Instance.AmHost) return;
         SendMessage(GetString("NotifyGameEnding"), 255);
-        /*foreach (var player in Main.EnumeratePlayerControls().Where(x => x.GetClient() != null && !x.Data.Disconnected))
-        {
-            var writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SendChat, SendOption.None, player.OwnerId);
-            writer.Write(GetString("NotifyGameEnding"));
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
-        }
-
-        RpcUtils.LateBroadcastReliableMessage(new RpcSendChatMessage(PlayerControl.LocalPlayer.NetId, GetString("NotifyGameEnding")));*/
     }
 
     public static ClientData GetClientById(int id)

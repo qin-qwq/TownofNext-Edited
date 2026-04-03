@@ -11,6 +11,7 @@ internal class ControllerManagerUpdatePatch
 {
     private static readonly (int, int)[] resolutions = [(480, 270), (640, 360), (800, 450), (1280, 720), (1600, 900), (1920, 1080)];
     private static int resolutionIndex = 0;
+    public static List<byte> CompletedRepairingPlayer = [];
 
     //private static int addonInfoIndex = -1;
     //private static int addonSettingsIndex = -1;
@@ -78,6 +79,16 @@ internal class ControllerManagerUpdatePatch
                 ExportCustomTranslation();
                 Main.ExportCustomRoleColors();
                 Logger.SendInGame("Exported Custom Translation and Role File");
+            }
+            // Fix Black Screen
+            if (GetKeysDown(KeyCode.F5, KeyCode.F))
+            {
+                if (MeetingStates.FirstMeeting && !CompletedRepairingPlayer.Contains(PlayerControl.LocalPlayer.PlayerId))
+                {
+                    Logger.Info("Attempted to fix Black Screen", "KeyCommand");
+                    PlayerControl.LocalPlayer.FixBlackScreen();
+                    CompletedRepairingPlayer.Add(PlayerControl.LocalPlayer.PlayerId);
+                }
             }
             // Send logs
             if (GetKeysDown(KeyCode.F1, KeyCode.LeftControl))

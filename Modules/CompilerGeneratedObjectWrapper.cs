@@ -1,9 +1,6 @@
-﻿// https://github.com/XtraCube/Reactor/blob/main/Reactor/Utilities/CompilerGeneratedObjectWrapper.cs
+// https://github.com/XtraCube/Reactor/blob/main/Reactor/Utilities/CompilerGeneratedObjectWrapper.cs
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 
 namespace TONE.Modules;
 
@@ -58,7 +55,7 @@ public class CompilerGeneratedObjectWrapper
             PropertyCache[fieldName] = propertyInfo;
         }
 
-        return (TField) propertyInfo.GetValue(GeneratedObject)!;
+        return (TField)propertyInfo.GetValue(GeneratedObject)!;
     }
 
     /// <summary>
