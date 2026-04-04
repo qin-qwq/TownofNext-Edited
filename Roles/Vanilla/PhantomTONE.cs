@@ -43,6 +43,7 @@ internal class PhantomTONE : RoleBase
 
     public override bool OnCheckVanish(PlayerControl phantom)
     {
+        if (Main.Invisible.Contains(phantom.PlayerId)) return false;
         phantom.RpcMakeInvisible(true);
         IsInvisible = (true, InvisDuration.GetInt());
         return false;
@@ -84,5 +85,6 @@ internal class PhantomTONE : RoleBase
     {
         if (!phantom) return;
         phantom.RpcMakeVisible(true);
+        phantom.RpcResetAbilityCooldown();
     }
 }

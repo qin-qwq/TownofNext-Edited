@@ -97,6 +97,8 @@ public static class PhantomRolePatch
         var role = phantom.GetRoleClass();
         if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false || TimeAssassin.TimeStop || Pelican.IsEaten(phantom.PlayerId))
         {
+            var killCooldown = phantom.GetKillTimer();
+
             if (phantom.AmOwner)
             {
                 DestroyableSingleton<HudManager>.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
@@ -123,7 +125,7 @@ public static class PhantomRolePatch
             _ = new LateTask(() =>
             {
                 if (phantom.GetCustomRole() is CustomRoles.Fury) return;
-                phantom.SetKillCooldown(Math.Max(phantom.GetKillTimer(), 0.001f));
+                phantom.SetKillCooldown(Math.Max(killCooldown, 0.001f));
             }, 0.2f, $"Phantom Check");
 
             return false;
