@@ -3687,7 +3687,7 @@
   "HaterCanKillEnchanted": "Can kill Enchanted",
   "HorseMode": "Enable to become a horse",
   "LongMode": "Enable to have a long neck",
-  "ClassicMode": "启用怀旧模式",
+  "ClassicMode": "Enable classic mode",
   "FFA": "Free For All",
   "ModeFFA": "Gamemode: FFA",
   "ModeDescribe.FFA": "In the FFA (Free For All) Gamemode, everyone is a killer, and everyone can kill anyone. The last player alive wins!\n\nSome random events make this even more fun in the meantime!",
