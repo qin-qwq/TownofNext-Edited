@@ -1980,7 +1980,7 @@ static class ExtendedPlayerControl
     }
     public static string ColoredPlayerName(this byte id)
     {
-        return Utils.ColorString(Main.PlayerColors.GetValueOrDefault(id, Color.white), Main.AllPlayerNames.GetValueOrDefault(id, Utils.GetPlayerById(id)?.GetRealName() ?? $"Someone (ID {id})"));
+        return Utils.ColorString(id.GetPlayerColor(), Main.AllPlayerNames.GetValueOrDefault(id, Utils.GetPlayerById(id)?.GetRealName() ?? $"Someone (ID {id})"));
     }
     public static void SetChatVisible(this PlayerControl player, bool visible)
     {
@@ -2134,7 +2134,7 @@ static class ExtendedPlayerControl
     {
         if (!pc || !AmongUsClient.Instance.AmHost) return;
 
-        if (MeetingStates.FirstMeeting)
+        if (MeetingStates.FirstMeeting && !GameStates.IsMeeting)
         {
             pc.RpcSetRoleDesync(pc.GetCustomRole().GetRoleTypes(), pc.GetClientId());
             return;
@@ -2238,5 +2238,13 @@ static class ExtendedPlayerControl
         writer.EndMessage();
         AmongUsClient.Instance.SendOrDisconnect(writer);
         writer.Recycle();
+    }
+
+    public static Color32 GetPlayerColor(this byte playerId)
+    {
+        var player = Utils.GetPlayerById(playerId);
+        if (!player) return Color.white;
+        if (Main.PlayerColors.TryGetValue(playerId, out var color)) return color;
+        return Palette.PlayerColors[player.Data.DefaultOutfit.ColorId];
     }
 }

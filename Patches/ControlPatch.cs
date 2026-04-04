@@ -24,6 +24,8 @@ internal class ControllerManagerUpdatePatch
         */
         try
         {
+            if (OperatingSystem.IsAndroid()) return;
+
             if (!RehostManager.IsAutoRehostDone && GetKeysDown(KeyCode.LeftShift, KeyCode.C))
             {
                 Logger.Info("User canceled Auto Rehost!", "ControllerManager");
@@ -83,7 +85,7 @@ internal class ControllerManagerUpdatePatch
             // Fix Black Screen
             if (GetKeysDown(KeyCode.F5, KeyCode.F))
             {
-                if (MeetingStates.FirstMeeting && !CompletedRepairingPlayer.Contains(PlayerControl.LocalPlayer.PlayerId))
+                if (MeetingStates.FirstMeeting && !CompletedRepairingPlayer.Contains(PlayerControl.LocalPlayer.PlayerId) && GameStates.IsInGame && !GameStates.IsMeeting)
                 {
                     Logger.Info("Attempted to fix Black Screen", "KeyCommand");
                     PlayerControl.LocalPlayer.FixBlackScreen();

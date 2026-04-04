@@ -523,7 +523,7 @@ class CheckForEndVotingPatch
 
         var realName = Main.AllPlayerNames[exiledPlayer.PlayerId];
         Main.LastVotedPlayer = realName;
-        string coloredRealName = ColorString(Main.PlayerColors[exiledPlayer.PlayerId], realName);
+        var coloredRealName = ColorString(exiledPlayer.PlayerId.GetPlayerColor(), realName);
 
         var player = GetPlayerById(exiledPlayer.PlayerId);
         var role = GetString(exiledPlayer.GetCustomRole().ToString());
@@ -1331,7 +1331,7 @@ class MeetingHudStartPatch
             if (ReportDeadBodyPatch.ReportTarget == null && !Balancer.Choose)
                 SendMessage(GetString("Message.isButton"));
             else if (ReportDeadBodyPatch.ReportTarget != null && !Balancer.Choose)
-                SendMessage(string.Format(GetString("Message.isReport"), ColorString(Main.PlayerColors[ReportDeadBodyPatch.ReportTarget.PlayerId], ReportDeadBodyPatch.ReportTarget.PlayerName)));
+                SendMessage(string.Format(GetString("Message.isReport"), ColorString(ReportDeadBodyPatch.ReportTarget.PlayerId.GetPlayerColor(), ReportDeadBodyPatch.ReportTarget.PlayerName)));
         }
 
         // AntiBlackout Message

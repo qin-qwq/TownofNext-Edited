@@ -78,7 +78,7 @@ public static class Translator
 
         string languageFolderPath = Main.LANGUAGE_FOLDER_NAME;
 
-        if (!Directory.Exists(languageFolderPath)) Directory.CreateDirectory(languageFolderPath);
+        if (!Directory.Exists(@$"{Main.Path}/{languageFolderPath}")) Directory.CreateDirectory(@$"{Main.Path}/{languageFolderPath}");
 
         // 翻訳テンプレートの作成
         CreateTemplateFile();
@@ -88,11 +88,7 @@ public static class Translator
 
         foreach (var lang in EnumHelper.GetAllValues<SupportedLangs>())
         {
-#if ANDROID
-            string langFile = Path.Combine(Main.LANGUAGE_FOLDER_NAME, $"{lang}.dat");
-#else
-            string langFile = @$"./{Main.LANGUAGE_FOLDER_NAME}/{lang}.dat";
-#endif
+            string langFile = @$"{Main.Path}/{Main.LANGUAGE_FOLDER_NAME}/{lang}.dat";
             if (File.Exists(langFile))
             {
                 Logger.Info($"Loading custom translation file from: {lang}.dat", "Translator");
@@ -331,11 +327,7 @@ public static class Translator
     }
     static void UpdateCustomTranslation(string filename/*, SupportedLangs lang*/)
     {
-#if ANDROID
-        string path = Path.Combine(Main.LANGUAGE_FOLDER_NAME, filename);
-#else
-        string path = @$"./{Main.LANGUAGE_FOLDER_NAME}/{filename}";
-#endif
+        string path = @$"{Main.Path}/{Main.LANGUAGE_FOLDER_NAME}/{filename}";
         if (File.Exists(path))
         {
             Logger.Info("Updating Custom Translations", "UpdateCustomTranslation");
@@ -379,11 +371,7 @@ public static class Translator
     }
     public static void LoadCustomTranslation(string filename, SupportedLangs lang)
     {
-#if ANDROID
-        string path = Path.Combine(Main.LANGUAGE_FOLDER_NAME, filename);
-#else
-        string path = @$"./{Main.LANGUAGE_FOLDER_NAME}/{filename}";
-#endif
+        string path = @$"{Main.Path}/{Main.LANGUAGE_FOLDER_NAME}/{filename}";
         if (File.Exists(path))
         {
             Logger.Info($"加载自定义翻译文件：{filename}", "LoadCustomTranslation");
@@ -416,11 +404,7 @@ public static class Translator
     {
         var sb = new StringBuilder();
         foreach (var title in translateMaps) sb.Append($"{title.Key}:\n");
-#if ANDROID
-        string templatePath = Path.Combine(Main.LANGUAGE_FOLDER_NAME, "template.dat");
-#else
-        string templatePath = @$"./{Main.LANGUAGE_FOLDER_NAME}/template.dat";
-#endif
+        string templatePath = @$"{Main.Path}/{Main.LANGUAGE_FOLDER_NAME}/template.dat";
         File.WriteAllText(templatePath, sb.ToString());
     }
     public static void ExportCustomTranslation()
@@ -433,11 +417,7 @@ public static class Translator
             if (!title.Value.TryGetValue((int)lang, out var text)) text = "";
             sb.Append($"{title.Key}:{text.Replace("\n", "\\n").Replace("\r", "\\r")}\n");
         }
-#if ANDROID
-        string exportPath = Path.Combine(Main.LANGUAGE_FOLDER_NAME, $"export_{lang}.dat");
-#else
-        string exportPath = @$"./{Main.LANGUAGE_FOLDER_NAME}/export_{lang}.dat";
-#endif
+        string exportPath = @$"{Main.Path}/{Main.LANGUAGE_FOLDER_NAME}/export_{lang}.dat";
         File.WriteAllText(exportPath, sb.ToString());
     }
 

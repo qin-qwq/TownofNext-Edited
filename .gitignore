@@ -4,7 +4,7 @@
 /.editorconfig
 /.vscode
 /.idea
-
+*.user
 token.env
 FodyWeavers.xsd
 TONE.sln

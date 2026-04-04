@@ -125,7 +125,7 @@ internal class Balancer : RoleBase
     {
         var Tar1 = GetPlayerById(Target1);
         var Tar2 = GetPlayerById(Target2);
-        if (Choose) MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), ColorString(Main.PlayerColors[Target1], Tar1.GetRealName()), ColorString(Main.PlayerColors[Target2], Tar2.GetRealName()),
+        if (Choose) MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), ColorString(Target1.GetPlayerColor(), Tar1.GetRealName()), ColorString(Target2.GetPlayerColor(), Tar2.GetRealName()),
             255, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper())));
         else
         {

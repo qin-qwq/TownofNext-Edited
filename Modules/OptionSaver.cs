@@ -6,13 +6,8 @@ namespace TONE.Modules;
 // https://github.com/tukasa0001/TownOfHost/blob/main/Modules/OptionSaver.cs
 public static class OptionSaver
 {
-#if ANDROID
-    private static readonly DirectoryInfo SaveDataDirectoryInfo = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "SaveData"));
-    private static readonly FileInfo OptionSaverFileInfo = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "SaveData", "Options.json"));
-#else
-    private static readonly DirectoryInfo SaveDataDirectoryInfo = new(@"./TONE-DATA/SaveData/");
-    private static readonly FileInfo OptionSaverFileInfo = new(@"./TONE-DATA/SaveData/Options.json");
-#endif
+    private static readonly DirectoryInfo SaveDataDirectoryInfo = new(@$"{Main.Path}/TONE-DATA/SaveData/");
+    private static readonly FileInfo OptionSaverFileInfo = new(@$"{Main.Path}/TONE-DATA/SaveData/Options.json");
     public static void Initialize()
     {
         if (!SaveDataDirectoryInfo.Exists)

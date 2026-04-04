@@ -51,7 +51,7 @@ public static class ServerDropDownPatch
     [HarmonyPrefix]
     internal static bool FillServerOptions_Prefix(ServerDropdown __instance)
     {
-        if (SceneManager.GetActiveScene().name == "FindAGame") return true;
+        if (SceneManager.GetActiveScene().name == "FindAGame" || OperatingSystem.IsAndroid()) return true;
 
         __instance.background.size = new Vector2(5, 1);
 

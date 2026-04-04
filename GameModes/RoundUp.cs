@@ -66,7 +66,7 @@ internal static class RoundUp
     {
         if (Deputy != byte.MaxValue)
         {
-            MeetingHudStartPatch.AddMsg(string.Format(GetString("RoundUp.SendDeputy"), ColorString(Main.PlayerColors[Deputy], Deputy.GetPlayer().GetRealName())),
+            MeetingHudStartPatch.AddMsg(string.Format(GetString("RoundUp.SendDeputy"), ColorString(Deputy.GetPlayerColor(), Deputy.GetPlayer().GetRealName())),
             255, ColorString(new Color32(248, 216, 110, byte.MaxValue), GetString("RoundUp").ToUpper()));
             MeetingHudStartPatch.AddMsg(GetString("RoundUp.YouBecomeDeputy"), Deputy, ColorString(new Color32(248, 216, 110, byte.MaxValue), GetString("RoundUp").ToUpper()));
         }

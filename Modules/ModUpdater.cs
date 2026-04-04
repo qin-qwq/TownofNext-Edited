@@ -297,16 +297,9 @@ public class ModUpdater
         try
         {
             var fileName = Assembly.GetExecutingAssembly().Location;
-#if ANDROID
-            if (Directory.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA")) &&
-                File.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "BanWords.txt")))
-            {
-                DirectoryInfo di = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA"));
-#else
-            if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
+            if (Directory.Exists("TOH_DATA") && File.Exists(@$"{Main.Path}/TONE-DATA/BanWords.txt"))
             {
                 DirectoryInfo di = new("TOH_DATA");
-#endif
                 di.Delete(true);
                 Logger.Warn("Deleting old data：TOH_DATA", "NewVersionCheck");
             }

@@ -1614,22 +1614,14 @@ public static class Utils
     public static bool IsPlayerModerator(string friendCode)
     {
         if (friendCode == "") return false;
-#if ANDROID
-        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
-#else
-        var friendCodesFilePath = @"./TONE-DATA/Moderators.txt";
-#endif
+        var friendCodesFilePath = @$"{Main.Path}/TONE-DATA/Moderators.txt";
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
     public static bool IsPlayerVIP(string friendCode)
     {
         if (friendCode == "") return false;
-#if ANDROID
-        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
-#else
-        var friendCodesFilePath = @"./TONE-DATA/VIP-List.txt";
-#endif
+        var friendCodesFilePath = @$"{Main.Path}/TONE-DATA/VIP-List.txt";
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
@@ -1785,11 +1777,7 @@ public static class Utils
         {
             if (IsPlayerVIP(player.FriendCode))
             {
-#if ANDROID
-                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS", $"{player.FriendCode}.txt");
-#else
-                string colorFilePath = @$"./TONE-DATA/Tags/VIP_TAGS/{player.FriendCode}.txt";
-#endif
+                string colorFilePath = @$"{Main.Path}/TONE-DATA/Tags/VIP_TAGS/{player.FriendCode}.txt";
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -1833,11 +1821,7 @@ public static class Utils
         {
             if (IsPlayerModerator(player.FriendCode))
             {
-#if ANDROID
-                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS", $"{player.FriendCode}.txt");
-#else
-                string colorFilePath = @$"./TONE-DATA/Tags/MOD_TAGS/{player.FriendCode}.txt";
-#endif
+                string colorFilePath = @$"{Main.Path}/TONE-DATA/Tags/MOD_TAGS/{player.FriendCode}.txt";
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -3316,11 +3300,11 @@ public static class Utils
         else { TaskCount = GetProgressText(id); }
 
         var disconnectedText = playerState.deathReason != PlayerState.DeathReason.etc && playerState.Disconnected ? $"({GetString("Disconnected")})" : string.Empty;
-        string summary = $"{ColorString(Main.PlayerColors[id], name)} - {GetDisplayRoleAndSubName(id, id, false, true)}{GetSubRolesText(id, summary: true)}{TaskCount} {GetKillCountText(id)} 『{GetVitalText(id, true)}』{disconnectedText}";
+        string summary = $"{ColorString(id.GetPlayerColor(), name)} - {GetDisplayRoleAndSubName(id, id, false, true)}{GetSubRolesText(id, summary: true)}{TaskCount} {GetKillCountText(id)} 『{GetVitalText(id, true)}』{disconnectedText}";
         switch (Options.CurrentGameMode)
         {
             case CustomGameMode.FFA:
-                summary = $"{ColorString(Main.PlayerColors[id], name)} {GetKillCountText(id, ffa: true)}";
+                summary = $"{ColorString(id.GetPlayerColor(), name)} {GetKillCountText(id, ffa: true)}";
                 break;
         }
         return check && GetDisplayRoleAndSubName(id, id, false, true).RemoveHtmlTags().Contains("INVALID:NotAssigned")
@@ -3654,30 +3638,5 @@ public static class Utils
         UnityEngine.Object.Destroy(playerControl.gameObject);
         sender.EndMessage();
         sender.SendMessage();
-    }
-
-    public static MethodBase GetStateMachineMoveNext<T>(string methodName)
-    {
-        var typeName = typeof(T).FullName;
-        var stateMachine =
-            typeof(T)
-                .GetNestedTypes()
-                .FirstOrDefault(x => x.Name.Contains(methodName));
-
-        if (stateMachine == null)
-        {
-            Logger.Error($"Failed to find {methodName} state machine for {typeName}", "GetStateMachineMoveNext");
-            return null;
-        }
-
-        var moveNext = AccessTools.Method(stateMachine, "MoveNext");
-        if (moveNext == null)
-        {
-            Logger.Error($"Failed to find MoveNext method for {typeName}.{methodName}", "GetStateMachineMoveNext");
-            return null;
-        }
-
-        Logger.Info($"Found {methodName}.MoveNext", "GetStateMachineMoveNext");
-        return moveNext;
     }
 }

@@ -337,7 +337,7 @@ class TaskPanelBehaviourPatch
                     foreach (var id in Main.PlayerStates.Keys)
                     {
                         string name = Main.AllPlayerNames[id].RemoveHtmlTags().Replace("\r\n", string.Empty);
-                        string summary = $"{Utils.GetProgressText(id)}  {Utils.ColorString(Main.PlayerColors[id], name)}";
+                        string summary = $"{Utils.GetProgressText(id)}  {Utils.ColorString(id.GetPlayerColor(), name)}";
                         if (Utils.GetProgressText(id).Trim() == string.Empty) continue;
                         SummaryText2[id] = summary;
                     }

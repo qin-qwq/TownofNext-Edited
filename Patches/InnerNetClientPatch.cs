@@ -26,6 +26,8 @@ internal class GameDataHandlerPatch
 {
     public static bool Prefix(InnerNetClient __instance, MessageReader reader, int msgNum)
     {
+        if (OperatingSystem.IsAndroid()) return true;
+
         MessageReader subReader = MessageReader.Get(reader);
         var tag = (GameDataTag)reader.Tag;
 
@@ -197,34 +199,18 @@ internal class AuthTimeoutPatch
 
     // If you dont patch this, u still need to wait for 5s
     // I have no idea why this is happening
-    [HarmonyPatch]
-    public static class EnableUdpPatch
+    [HarmonyPatch(typeof(AmongUsClient_CoJoinOnlinePublicGame), "MoveNext")]
+    [HarmonyPrefix]
+    public static void EnableUdpMatchmakingPrefix(AmongUsClient_CoJoinOnlinePublicGame __instance)
     {
-        public static MethodBase TargetMethod()
+        // Skip to state 1 which just calls CoJoinOnlineGameDirect
+        if (__instance.__1__state == 0 && !ServerManager.Instance.IsHttp)
         {
-            return Utils.GetStateMachineMoveNext<AmongUsClient>(nameof(AmongUsClient.CoJoinOnlinePublicGame))!;
-        }
-
-        public static void Prefix(Il2CppObjectBase __instance)
-        {
-            var stateMachine = new StateMachineWrapper<AmongUsClient>(__instance);
-
-            // Skip to state 1 which just calls CoJoinOnlineGameDirect
-            if (stateMachine.State == 0 && !ServerManager.Instance.IsHttp)
+            __instance.__1__state = 1;
+            __instance.__8__1 = new AmongUsClient_DisplayClassToken
             {
-                stateMachine.State = 1;
-                var lambdaType = stateMachine.GetParameter<Il2CppObjectBase>("__8__1").GetType();
-                var newDisplayClass = Activator.CreateInstance(lambdaType);
-                if (newDisplayClass == null)
-                {
-                    throw new InvalidOperationException($"Could not create display class of type '{lambdaType}'.");
-                }
-
-                var displayClass = new CompilerGeneratedObjectWrapper(newDisplayClass);
-                displayClass.SetField("matchmakerToken", string.Empty);
-
-                stateMachine.SetParameter("__8__1", newDisplayClass);
-            }
+                matchmakerToken = string.Empty,
+            };
         }
     }
 }

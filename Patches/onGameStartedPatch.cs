@@ -98,6 +98,7 @@ internal class ChangeRoleSettings
             Main.MeetingsPassed = 0;
             Main.MeetingIsStarted = false;
             Main.IntroDestroyed = false;
+            ShipStatusBeginPatch.hasBegun = false;
             GameEndCheckerForNormal.ShouldNotCheck = false;
             GameEndCheckerForNormal.ForEndGame = false;
             GameEndCheckerForNormal.GameIsEnded = false;

@@ -10,11 +10,7 @@ namespace TONE;
 
 public static class TemplateManager
 {
-#if ANDROID
-    private static readonly string TEMPLATE_FILE_PATH = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "template.txt");
-#else
-    private static readonly string TEMPLATE_FILE_PATH = "./TONE-DATA/template.txt";
-#endif
+    private static readonly string TEMPLATE_FILE_PATH = @$"{Main.Path}/TONE-DATA/template.txt";
 
     private static readonly Dictionary<string, Func<string>> _replaceDictionaryNormalOptions = new()
     {
@@ -111,13 +107,8 @@ public static class TemplateManager
                 };
             else fileName = "English";
 
-#if ANDROID
-            string dataDirectory = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA");
-            string defaultTemplatePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Default_Teamplate.txt");
-#else
-            string dataDirectory = @"TONE-DATA";
-            string defaultTemplatePath = @"./TONE-DATA/Default_Teamplate.txt";
-#endif
+            string dataDirectory = @$"{Main.Path}/TONE-DATA";
+            string defaultTemplatePath = @$"{Main.Path}/TONE-DATA/Default_Teamplate.txt";
 
             if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
             var defaultTemplateMsg = GetResourcesTxt($"TONE.Resources.Config.template.{fileName}.txt");

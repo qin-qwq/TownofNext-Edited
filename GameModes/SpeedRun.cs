@@ -286,7 +286,7 @@ public static class SpeedRun
 
             if (kvp.Value.MainRole is not CustomRoles.Runner) continue;
 
-            var playerName = ColorString(Main.PlayerColors.GetValueOrDefault(playerId, Color.white), Main.AllPlayerNames[playerId] ?? "ERROR");
+            var playerName = ColorString(playerId.GetPlayerColor(), Main.AllPlayerNames[playerId] ?? "ERROR");
             bool isAlive = !playerState.IsDead;
             bool finishedTasks = false;
             int kills = 0;

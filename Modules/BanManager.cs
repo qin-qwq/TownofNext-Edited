@@ -10,19 +10,11 @@ namespace TONE;
 
 public static class BanManager
 {
-#if ANDROID
-    private static string DenyNameListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "DenyName.txt");
-    private static string BanListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "BanList.txt");
-    private static string ModeratorListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
-    private static string VIPListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
-    private static string WhiteListListPath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "WhiteList.txt");
-#else
-    private static string DenyNameListPath = "./TONE-DATA/DenyName.txt";
-    private static string BanListPath = "./TONE-DATA/BanList.txt";
-    private static string ModeratorListPath = "./TONE-DATA/Moderators.txt";
-    private static string VIPListPath = "./TONE-DATA/VIP-List.txt";
-    private static string WhiteListListPath = "./TONE-DATA/WhiteList.txt";
-#endif
+    private static string DenyNameListPath = @$"{Main.Path}/TONE-DATA/DenyName.txt";
+    private static string BanListPath = @$"{Main.Path}/TONE-DATA/BanList.txt";
+    private static string ModeratorListPath = @$"{Main.Path}/TONE-DATA/Moderators.txt";
+    private static string VIPListPath = @$"{Main.Path}/TONE-DATA/VIP-List.txt";
+    private static string WhiteListListPath = @$"{Main.Path}/TONE-DATA/WhiteList.txt";
     //private static List<string> EACList = []; // Don't make it read-only
     public static List<string> TempBanWhiteList = []; //To prevent writing to ban list
     public static List<Dictionary<string, System.Text.Json.JsonElement>> EACDict = [];
@@ -30,11 +22,7 @@ public static class BanManager
     {
         try
         {
-#if ANDROID
-            Directory.CreateDirectory(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA"));
-#else
-            Directory.CreateDirectory("TONE-DATA");
-#endif
+            Directory.CreateDirectory(@$"{Main.Path}/TONE-DATA");
 
             if (!File.Exists(BanListPath))
             {
@@ -127,11 +115,7 @@ public static class BanManager
 
         try
         {
-#if ANDROID
-            Directory.CreateDirectory(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA"));
-#else
-            Directory.CreateDirectory("TONE-DATA");
-#endif
+            Directory.CreateDirectory(@$"{Main.Path}/TONE-DATA");
             if (!File.Exists(DenyNameListPath)) File.Create(DenyNameListPath).Close();
             using StreamReader sr = new(DenyNameListPath);
             string line;
@@ -200,11 +184,7 @@ public static class BanManager
 
         try
         {
-#if ANDROID
-            Directory.CreateDirectory(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA"));
-#else
-            Directory.CreateDirectory("TONE-DATA");
-#endif
+            Directory.CreateDirectory(@$"{Main.Path}/TONE-DATA");
             if (!File.Exists(BanListPath)) File.Create(BanListPath).Close();
             using StreamReader sr = new(BanListPath);
             string line;

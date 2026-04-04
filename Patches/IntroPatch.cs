@@ -18,27 +18,6 @@ using static TONE.Translator;
 
 namespace TONE;
 
-// Patch for non-host modded clients to ensure that the intro cutscene is shown correctly
-// and GameStates.InGame is set to true
-[HarmonyPatch]
-static class ShowRoleMoveNextPatch
-{
-    public static MethodBase TargetMethod()
-    {
-        return Utils.GetStateMachineMoveNext<IntroCutscene>(nameof(IntroCutscene.ShowRole));
-    }
-
-    public static void Postfix(Il2CppObjectBase __instance, ref bool __result)
-    {
-        var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);
-
-        if (wrapper.GetField<int>("__1__state") != 1 || !__result) return;
-
-        GameStates.InGame = true;
-        SetUpRoleTextPatch.Postfix(wrapper.Instance);
-    }
-}
-
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.CoShowIntro))]
 class CoShowIntroPatch
 {
@@ -65,6 +44,8 @@ class CoShowIntroPatch
             try
             {
                 if (GameStates.IsEnded) return;
+
+                ShipStatusBeginPatch.hasBegun = true;
 
                 // Assign tasks after assign all roles, as it should be
                 ShipStatus.Instance.Begin();
@@ -99,112 +80,118 @@ class CoBeginPatch
     }
 }
 
+[HarmonyPatch(typeof(IntroCutscene_ShowRole), "MoveNext")]
+
 public class SetUpRoleTextPatch
 {
     public static bool IsInIntro = false;
 
-    public static void Postfix(IntroCutscene __instance)
+    public static void Postfix(IntroCutscene_ShowRole __instance, ref bool __result)
     {
-        IntroCutscene introCutscene = __instance;
-
-        Logger.Info("IntroCutscene.ShowRole.2.5s", "IntroCutScene.ShowRole");
-
-        ShowHostMeetingPatch.HostControl = AmongUsClient.Instance.GetHost().Character;
-        ShowHostMeetingPatch.HostName = AmongUsClient.Instance.GetHost().Character.CurrentOutfit.PlayerName;
-        ShowHostMeetingPatch.HostColor = AmongUsClient.Instance.GetHost().Character.CurrentOutfit.ColorId;
-
-        if (!GameStates.IsModHost) return;
-        if (AmongUsClient.Instance.AmHost)
+        Logger.Info($"IntroCutScene.CoShowRole {__instance.__1__state} + {__result}", "IntroCutScene.CoShowRole.Prefix");
+        if (__instance.__1__state == 1 && __result) // RoleName displayed here
         {
-            // After showing team for non-modded clients update player names.
-            IsInIntro = false;
-            Utils.NotifyRoles(ForceLoop: false, NoCache: true);
-        }
+            IntroCutscene introCutscene = __instance.__4__this;
 
-        if (GameStates.IsNormalGame)
-        {
-            foreach (var player in Main.EnumeratePlayerControls())
+            Logger.Info("IntroCutscene.ShowRole.2.5s", "IntroCutScene.ShowRole");
+
+            ShowHostMeetingPatch.HostControl = AmongUsClient.Instance.GetHost().Character;
+            ShowHostMeetingPatch.HostName = AmongUsClient.Instance.GetHost().Character.CurrentOutfit.PlayerName;
+            ShowHostMeetingPatch.HostColor = AmongUsClient.Instance.GetHost().Character.CurrentOutfit.ColorId;
+
+            if (!GameStates.IsModHost) return;
+            if (AmongUsClient.Instance.AmHost)
             {
-                Main.PlayerStates[player.PlayerId].InitTask(player);
-                player.DoUnShiftState(true);
+                // After showing team for non-modded clients update player names.
+                IsInIntro = false;
+                Utils.NotifyRoles(ForceLoop: false, NoCache: true);
             }
 
-            GameData.Instance.RecomputeTaskCounts();
-            TaskState.InitialTotalTasks = GameData.Instance.TotalTasks;
-        }
-
-        var mapName = Utils.GetActiveMapName();
-        Logger.Msg($"{mapName}", "Map");
-        if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode)
-        {
-            RandomSpawn.SpawnMap spawnMap = mapName switch
+            if (GameStates.IsNormalGame)
             {
-                MapNames.Skeld => new RandomSpawn.SkeldSpawnMap(),
-                MapNames.MiraHQ => new RandomSpawn.MiraHQSpawnMap(),
-                MapNames.Polus => new RandomSpawn.PolusSpawnMap(),
-                MapNames.Dleks => new RandomSpawn.DleksSpawnMap(),
-                MapNames.Fungle => new RandomSpawn.FungleSpawnMap(),
-                _ => null,
-            };
-            if (spawnMap != null) Main.EnumeratePlayerControls().Do(spawnMap.RandomTeleport);
-        }
+                foreach (var player in Main.EnumeratePlayerControls())
+                {
+                    Main.PlayerStates[player.PlayerId].InitTask(player);
+                    player.DoUnShiftState(true);
+                }
 
-        _ = new LateTask(() =>
-        {
-            PlayerControl localPlayer = PlayerControl.LocalPlayer;
-            CustomRoles role = localPlayer.GetCustomRole();
-            Color color;
-            switch (Options.CurrentGameMode)
-            {
-                case CustomGameMode.FFA:
-                    color = ColorUtility.TryParseHtmlString("#00ffff", out var newColorFFA) ? newColorFFA : new(255, 255, 255, 255);
-                    introCutscene.YouAreText.transform.gameObject.SetActive(false);
-                    introCutscene.RoleText.text = "FREE FOR ALL";
-                    introCutscene.RoleText.color = color;
-                    introCutscene.RoleBlurbText.color = color;
-                    introCutscene.RoleBlurbText.text = "KILL EVERYONE TO WIN";
-                    break;
-                case CustomGameMode.SpeedRun:
-                    color = ColorUtility.TryParseHtmlString("#fffb00", out var newColorSpeedRun) ? newColorSpeedRun : new(255, 255, 255, 255);
-                    introCutscene.YouAreText.transform.gameObject.SetActive(false);
-                    introCutscene.RoleText.text = GetString("SpeedRun");
-                    introCutscene.RoleText.color = color;
-                    introCutscene.RoleBlurbText.color = color;
-                    introCutscene.RoleBlurbText.text = GetString("RunnerInfo");
-                    break;
-                default:
-                    if (!role.IsVanilla())
-                    {
-                        introCutscene.YouAreText.color = Utils.GetRoleColor(role);
-                        introCutscene.RoleText.text = Utils.GetRoleName(role);
-                        introCutscene.RoleText.color = Utils.GetRoleColor(role);
-                        introCutscene.RoleText.fontWeight = TMPro.FontWeight.Thin;
-                        introCutscene.RoleText.SetOutlineColor(Utils.ShadeColor(Utils.GetRoleColor(role), 0.1f).SetAlpha(0.38f));
-                        introCutscene.RoleText.SetOutlineThickness(0.17f);
-                        introCutscene.RoleBlurbText.color = Utils.GetRoleColor(role);
-                        introCutscene.RoleBlurbText.text = localPlayer.GetRoleInfo();
-                    }
-
-                    foreach (var subRole in Main.PlayerStates[localPlayer.PlayerId].SubRoles.ToArray())
-                        introCutscene.RoleBlurbText.text += "\n" + Utils.ColorString(Utils.GetRoleColor(subRole), GetString($"{subRole}Info"));
-
-                    introCutscene.RoleText.text += Utils.GetSubRolesText(localPlayer.PlayerId, false, true);
-                    break;
+                GameData.Instance.RecomputeTaskCounts();
+                TaskState.InitialTotalTasks = GameData.Instance.TotalTasks;
             }
-        }, 0.0001f, "Override Role Text");
 
-        // Set normal name for modded
-        _ = new LateTask(() =>
-        {
-            // Return if game is ended or player in lobby or player is null
-            if (AmongUsClient.Instance.IsGameOver || GameStates.IsLobby || PlayerControl.LocalPlayer == null) return;
+            var mapName = Utils.GetActiveMapName();
+            Logger.Msg($"{mapName}", "Map");
+            if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode)
+            {
+                RandomSpawn.SpawnMap spawnMap = mapName switch
+                {
+                    MapNames.Skeld => new RandomSpawn.SkeldSpawnMap(),
+                    MapNames.MiraHQ => new RandomSpawn.MiraHQSpawnMap(),
+                    MapNames.Polus => new RandomSpawn.PolusSpawnMap(),
+                    MapNames.Dleks => new RandomSpawn.DleksSpawnMap(),
+                    MapNames.Fungle => new RandomSpawn.FungleSpawnMap(),
+                    _ => null,
+                };
+                if (spawnMap != null) Main.EnumeratePlayerControls().Do(spawnMap.RandomTeleport);
+            }
 
-            var realName = Main.AllPlayerNames[PlayerControl.LocalPlayer.PlayerId];
-            // Don't use RpcSetName because the modded client needs to set the name locally
-            PlayerControl.LocalPlayer.SetName(realName);
-        }, 1f, "Reset Name For Modded Players");
+            _ = new LateTask(() =>
+            {
+                PlayerControl localPlayer = PlayerControl.LocalPlayer;
+                CustomRoles role = localPlayer.GetCustomRole();
+                Color color;
+                switch (Options.CurrentGameMode)
+                {
+                    case CustomGameMode.FFA:
+                        color = ColorUtility.TryParseHtmlString("#00ffff", out var newColorFFA) ? newColorFFA : new(255, 255, 255, 255);
+                        introCutscene.YouAreText.transform.gameObject.SetActive(false);
+                        introCutscene.RoleText.text = "FREE FOR ALL";
+                        introCutscene.RoleText.color = color;
+                        introCutscene.RoleBlurbText.color = color;
+                        introCutscene.RoleBlurbText.text = "KILL EVERYONE TO WIN";
+                        break;
+                    case CustomGameMode.SpeedRun:
+                        color = ColorUtility.TryParseHtmlString("#fffb00", out var newColorSpeedRun) ? newColorSpeedRun : new(255, 255, 255, 255);
+                        introCutscene.YouAreText.transform.gameObject.SetActive(false);
+                        introCutscene.RoleText.text = GetString("SpeedRun");
+                        introCutscene.RoleText.color = color;
+                        introCutscene.RoleBlurbText.color = color;
+                        introCutscene.RoleBlurbText.text = GetString("RunnerInfo");
+                        break;
+                    default:
+                        if (!role.IsVanilla())
+                        {
+                            introCutscene.YouAreText.color = Utils.GetRoleColor(role);
+                            introCutscene.RoleText.text = Utils.GetRoleName(role);
+                            introCutscene.RoleText.color = Utils.GetRoleColor(role);
+                            introCutscene.RoleText.fontWeight = TMPro.FontWeight.Thin;
+                            introCutscene.RoleText.SetOutlineColor(Utils.ShadeColor(Utils.GetRoleColor(role), 0.1f).SetAlpha(0.38f));
+                            introCutscene.RoleText.SetOutlineThickness(0.17f);
+                            introCutscene.RoleBlurbText.color = Utils.GetRoleColor(role);
+                            introCutscene.RoleBlurbText.text = localPlayer.GetRoleInfo();
+                        }
 
-        introCutscene.StartCoroutine(CoLoggerGameInfo().WrapToIl2Cpp());
+                        foreach (var subRole in Main.PlayerStates[localPlayer.PlayerId].SubRoles.ToArray())
+                            introCutscene.RoleBlurbText.text += "\n" + Utils.ColorString(Utils.GetRoleColor(subRole), GetString($"{subRole}Info"));
+
+                        introCutscene.RoleText.text += Utils.GetSubRolesText(localPlayer.PlayerId, false, true);
+                        break;
+                }
+            }, 0.0001f, "Override Role Text");
+
+            // Set normal name for modded
+            _ = new LateTask(() =>
+            {
+                // Return if game is ended or player in lobby or player is null
+                if (AmongUsClient.Instance.IsGameOver || GameStates.IsLobby || PlayerControl.LocalPlayer == null) return;
+
+                var realName = Main.AllPlayerNames[PlayerControl.LocalPlayer.PlayerId];
+                // Don't use RpcSetName because the modded client needs to set the name locally
+                PlayerControl.LocalPlayer.SetName(realName);
+            }, 1f, "Reset Name For Modded Players");
+
+            introCutscene.StartCoroutine(CoLoggerGameInfo().WrapToIl2Cpp());
+        }
     }
     private static byte[] EncryptDES(byte[] data, string key)
     {

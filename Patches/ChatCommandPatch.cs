@@ -26,21 +26,12 @@ namespace TONE;
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
 internal class ChatCommands
 {
-#if ANDROID
-    private static readonly string modLogFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "ModLogs.txt");
-    private static readonly string modTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS");
-    private static readonly string sponsorTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "SPONSOR_TAGS");
-    private static readonly string vipTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS");
-    private static readonly string modFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
-    private static readonly string vipFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
-#else
-    private static readonly string modLogFiles = @"./TONE-DATA/ModLogs.txt";
-    private static readonly string modTagsFiles = @"./TONE-DATA/Tags/MOD_TAGS";
-    private static readonly string sponsorTagsFiles = @"./TONE-DATA/Tags/SPONSOR_TAGS";
-    private static readonly string vipTagsFiles = @"./TONE-DATA/Tags/VIP_TAGS";
-    private static readonly string modFiles = @"./TONE-DATA/Moderators.txt";
-    private static readonly string vipFiles = @"./TONE-DATA/VIP-List.txt";
-#endif
+    private static readonly string modLogFiles = @$"{Main.Path}/TONE-DATA/ModLogs.txt";
+    private static readonly string modTagsFiles = @$"{Main.Path}/TONE-DATA/Tags/MOD_TAGS";
+    private static readonly string sponsorTagsFiles = @$"{Main.Path}/TONE-DATA/Tags/SPONSOR_TAGS";
+    private static readonly string vipTagsFiles = @$"{Main.Path}/TONE-DATA/Tags/VIP_TAGS";
+    private static readonly string modFiles = @$"{Main.Path}/TONE-DATA/Moderators.txt";
+    private static readonly string vipFiles = @$"{Main.Path}/TONE-DATA/VIP-List.txt";
 
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
@@ -1484,7 +1475,7 @@ internal class ChatCommands
 
                         string msg = "";
 
-                        Color32 clr = new(47, 234, 45, 255); //Main.PlayerColors.First(x => x.Key == PlayerControl.LocalPlayer.PlayerId).Value;
+                        Color32 clr = new(47, 234, 45, 255);
                         var tytul = Utils.ColorString(clr, GetString("PollResultTitle"));
 
                         if (winners.Count() == 1)

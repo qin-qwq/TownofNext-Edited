@@ -13,7 +13,7 @@ public class dbConnect
     private static Dictionary<string, string> UserType = [];
 
     private const string ApiUrl = "https://raw.githubusercontent.com/qin-qwq/TONE-Record/main";
-    private const string FallBackUrl = "https://raw.bgithub.xyz/qin-qwq/TONE-Record/main";
+    private const string FallBackUrl = "https://raw.githubusercontent.com/qin-qwq/TONE-Record/main";
 
     public static IEnumerator Init()
     {
