@@ -257,7 +257,7 @@ class GameEndCheckerForNormal
                                 WinnerIds.Add(pc.PlayerId);
                             }
                             break;
-                        case CustomRoles.Quizmaster when pc.IsAlive() && !Quizmaster.CanKillsAfterMark() && WinnerTeam == CustomWinner.Default:
+                        case CustomRoles.Quizmaster when pc.IsAlive() && !Quizmaster.CanKillsAfterMark() && WinnerTeam is not CustomWinner.Terrorist:
                             reason = GameOverReason.ImpostorsByKill;
                             if (!CheckForConvertedWinner(pc.PlayerId))
                             {
@@ -531,7 +531,6 @@ class GameEndCheckerForNormal
                             {
                                 WinnerIds.Add(pc.PlayerId);
                                 AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
-                                break;
                             }
                         }
                         if (Lovers.loverPairs.Count(p => p.Item1.GetPlayer().IsPlayerNeutralTeam() || p.Item2.GetPlayer().IsPlayerNeutralTeam()) != 0) Lovers.CheckAdditionalWin();

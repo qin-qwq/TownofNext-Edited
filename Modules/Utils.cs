@@ -1,6 +1,7 @@
 using AmongUs.Data;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
+using BepInEx;
 using Hazel;
 using Il2CppInterop.Generator.Extensions;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
@@ -45,14 +46,6 @@ public static class Utils
     {
         if (!AmongUsClient.Instance.AmHost) return;
         SendMessage(GetString("NotifyGameEnding"), 255);
-        /*foreach (var player in Main.EnumeratePlayerControls().Where(x => x.GetClient() != null && !x.Data.Disconnected))
-        {
-            var writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SendChat, SendOption.None, player.OwnerId);
-            writer.Write(GetString("NotifyGameEnding"));
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
-        }
-
-        RpcUtils.LateBroadcastReliableMessage(new RpcSendChatMessage(PlayerControl.LocalPlayer.NetId, GetString("NotifyGameEnding")));*/
     }
 
     public static ClientData GetClientById(int id)
@@ -1622,22 +1615,14 @@ public static class Utils
     public static bool IsPlayerModerator(string friendCode)
     {
         if (friendCode == "") return false;
-#if ANDROID
-        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
-#else
-        var friendCodesFilePath = @"./TONE-DATA/Moderators.txt";
-#endif
+        var friendCodesFilePath = @$"{Main.Path}/TONE-DATA/Moderators.txt";
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
     public static bool IsPlayerVIP(string friendCode)
     {
         if (friendCode == "") return false;
-#if ANDROID
-        var friendCodesFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
-#else
-        var friendCodesFilePath = @"./TONE-DATA/VIP-List.txt";
-#endif
+        var friendCodesFilePath = @$"{Main.Path}/TONE-DATA/VIP-List.txt";
         var friendCodes = File.ReadAllLines(friendCodesFilePath);
         return friendCodes.Any(code => code.Contains(friendCode));
     }
@@ -1783,8 +1768,6 @@ public static class Utils
                 name = $"<color=#fffb00><size=1.7>{GetString("ModeSpeedRun")}</size></color>\r\n" + name;
             if (Options.CurrentGameMode == CustomGameMode.TagMode)
                 name = $"<color=#2ccc00><size=1.7>{GetString("ModeTagMode")}</size></color>\r\n" + name;
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp)
-                name = $"<color=#f8d86e><size=1.7>{GetString("ModeRoundUp")}</size></color>\r\n" + name;
         }
 
 
@@ -1793,11 +1776,7 @@ public static class Utils
         {
             if (IsPlayerVIP(player.FriendCode))
             {
-#if ANDROID
-                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS", $"{player.FriendCode}.txt");
-#else
-                string colorFilePath = @$"./TONE-DATA/Tags/VIP_TAGS/{player.FriendCode}.txt";
-#endif
+                string colorFilePath = @$"{Main.Path}/TONE-DATA/Tags/VIP_TAGS/{player.FriendCode}.txt";
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -1841,11 +1820,7 @@ public static class Utils
         {
             if (IsPlayerModerator(player.FriendCode))
             {
-#if ANDROID
-                string colorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS", $"{player.FriendCode}.txt");
-#else
-                string colorFilePath = @$"./TONE-DATA/Tags/MOD_TAGS/{player.FriendCode}.txt";
-#endif
+                string colorFilePath = @$"{Main.Path}/TONE-DATA/Tags/MOD_TAGS/{player.FriendCode}.txt";
                 //static color
                 if (!Options.GradientTagsOpt.GetBool())
                 {
@@ -3140,8 +3115,6 @@ public static class Utils
                 playerState.RoleClass.LastBlockedMoveInVentVents.Clear();
             }
 
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.AfterMeetingTasks();
-
             //Set kill timer
             foreach (var player in Main.EnumerateAlivePlayerControls())
             {
@@ -3257,11 +3230,11 @@ public static class Utils
     }
     public static void DumpLog(bool open = true)
     {
-        string f = $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/TONE-logs/";
+        string f = OperatingSystem.IsAndroid() ? $"{Main.Path}/TONE-logs/" : $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/TONE-logs/";
         string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
         string filename = $"{f}TONE-v{Main.PluginVersion}-{t}.log";
         if (!Directory.Exists(f)) Directory.CreateDirectory(f);
-        FileInfo file = new(@$"{Environment.CurrentDirectory}/BepInEx/LogOutput.log");
+        FileInfo file = new(Path.Combine(Paths.BepInExRootPath, "LogOutput.log"));
         file.CopyTo(@filename);
 
         if (!open) return;
@@ -3324,11 +3297,11 @@ public static class Utils
         else { TaskCount = GetProgressText(id); }
 
         var disconnectedText = playerState.deathReason != PlayerState.DeathReason.etc && playerState.Disconnected ? $"({GetString("Disconnected")})" : string.Empty;
-        string summary = $"{ColorString(Main.PlayerColors[id], name)} - {GetDisplayRoleAndSubName(id, id, false, true)}{GetSubRolesText(id, summary: true)}{TaskCount} {GetKillCountText(id)} 『{GetVitalText(id, true)}』{disconnectedText}";
+        string summary = $"{ColorString(id.GetPlayerColor(), name)} - {GetDisplayRoleAndSubName(id, id, false, true)}{GetSubRolesText(id, summary: true)}{TaskCount} {GetKillCountText(id)} 『{GetVitalText(id, true)}』{disconnectedText}";
         switch (Options.CurrentGameMode)
         {
             case CustomGameMode.FFA:
-                summary = $"{ColorString(Main.PlayerColors[id], name)} {GetKillCountText(id, ffa: true)}";
+                summary = $"{ColorString(id.GetPlayerColor(), name)} {GetKillCountText(id, ffa: true)}";
                 break;
         }
         return check && GetDisplayRoleAndSubName(id, id, false, true).RemoveHtmlTags().Contains("INVALID:NotAssigned")
@@ -3662,30 +3635,5 @@ public static class Utils
         UnityEngine.Object.Destroy(playerControl.gameObject);
         sender.EndMessage();
         sender.SendMessage();
-    }
-
-    public static MethodBase GetStateMachineMoveNext<T>(string methodName)
-    {
-        var typeName = typeof(T).FullName;
-        var stateMachine =
-            typeof(T)
-                .GetNestedTypes()
-                .FirstOrDefault(x => x.Name.Contains(methodName));
-
-        if (stateMachine == null)
-        {
-            Logger.Error($"Failed to find {methodName} state machine for {typeName}", "GetStateMachineMoveNext");
-            return null;
-        }
-
-        var moveNext = AccessTools.Method(stateMachine, "MoveNext");
-        if (moveNext == null)
-        {
-            Logger.Error($"Failed to find MoveNext method for {typeName}.{methodName}", "GetStateMachineMoveNext");
-            return null;
-        }
-
-        Logger.Info($"Found {methodName}.MoveNext", "GetStateMachineMoveNext");
-        return moveNext;
     }
 }

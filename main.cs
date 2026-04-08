@@ -56,8 +56,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.04.02"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.9.0";
+    public const string PluginVersion = "26.04.08";
+    public const string PluginDisplayVersion = "1.9.3";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 3, 31, 0) // 2026.3.31 & 17.3
@@ -69,7 +69,7 @@ public class Main : BasePlugin
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 2
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
-    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.9.0
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.9.3
 #pragma warning restore IDE1006 // Naming Styles
 
     public enum Release
@@ -173,15 +173,12 @@ public class Main : BasePlugin
         [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
-        [CustomGameMode.RoundUp] = new Color32(248, 216, 110, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
     };
 
-#if ANDROID
-    public static readonly string LANGUAGE_FOLDER_NAME = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Language");
-#else
+    public static string Star_Path = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
+    public static readonly string Path = OperatingSystem.IsAndroid() ? Star_Path : ".";
     public const string LANGUAGE_FOLDER_NAME = "TONE-DATA/Language";
-#endif
 
     public static bool IsFixedCooldown => CustomRoles.Vampire.IsEnable() || CustomRoles.Poisoner.IsEnable();
     public static float RefixCooldownDelay = 0f;
@@ -310,12 +307,12 @@ public class Main : BasePlugin
     {
         var sb = new StringBuilder();
         foreach (var title in roleColors) sb.Append($"{title.Key}:\n");
-        File.WriteAllText(Path.Combine(LANGUAGE_FOLDER_NAME, "templateRoleColor.dat"), sb.ToString());
+        File.WriteAllText(@$"{Path}/{LANGUAGE_FOLDER_NAME}/templateRoleColor.dat", sb.ToString());
     }
     public static void LoadCustomRoleColor()
     {
         const string filename = "RoleColor.dat";
-        string path = Path.Combine(LANGUAGE_FOLDER_NAME, filename);
+        string path = @$"{Path}/{LANGUAGE_FOLDER_NAME}/{filename}";
         if (File.Exists(path))
         {
             TONE.Logger.Info($"Load custom Role Color file：{filename}", "LoadCustomRoleColor");
@@ -424,9 +421,9 @@ public class Main : BasePlugin
                         break;
                 }
             }
-            if (!Directory.Exists(LANGUAGE_FOLDER_NAME)) Directory.CreateDirectory(LANGUAGE_FOLDER_NAME);
+            if (!Directory.Exists(@$"{Path}/{LANGUAGE_FOLDER_NAME}")) Directory.CreateDirectory(@$"{Path}/{LANGUAGE_FOLDER_NAME}");
             CreateTemplateRoleColorFile();
-            if (File.Exists(Path.Combine(LANGUAGE_FOLDER_NAME, "RoleColor.dat")))
+            if (File.Exists(@$"{Path}/{LANGUAGE_FOLDER_NAME}/RoleColor.dat"))
             {
                 UpdateCustomTranslation();
                 LoadCustomRoleColor();
@@ -512,7 +509,7 @@ public class Main : BasePlugin
     }
     static void UpdateCustomTranslation()
     {
-        string path = Path.Combine(LANGUAGE_FOLDER_NAME, "RoleColor.dat");
+        string path = @$"{Path}/{LANGUAGE_FOLDER_NAME}/RoleColor.dat";
         if (File.Exists(path))
         {
             TONE.Logger.Info("Updating Custom Role Colors", "UpdateRoleColors");
@@ -560,7 +557,7 @@ public class Main : BasePlugin
         {
             sb.Append($"{kvp.Key.ToString()}:{kvp.Value}\n");
         }
-        File.WriteAllText(Path.Combine(LANGUAGE_FOLDER_NAME, "export_RoleColor.dat"), sb.ToString());
+        File.WriteAllText(@$"{Path}/{LANGUAGE_FOLDER_NAME}/export_RoleColor.dat", sb.ToString());
     }
 
     private static void InitializeFileHash()
@@ -715,9 +712,7 @@ public class Main : BasePlugin
         Harmony.PatchAll();
 
         // ConsoleManager.DetachConsole();
-#if !ANDROID
-        if (DebugModeManager.AmDebugger) ConsoleManager.CreateConsole();
-#endif
+        if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();
 
         // InitializeFileHash();
         FileHash = "Support_2025_09_09";
@@ -1048,9 +1043,6 @@ public enum CustomRoles
     // Tag Mode
     TZombie,
     TCrewmate,
-
-    // Round Up
-    RDeputy,
 
     // Sub-role after 500
     NotAssigned = 500,

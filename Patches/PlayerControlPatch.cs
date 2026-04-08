@@ -767,7 +767,7 @@ class ReportDeadBodyPatch
             return false;
         }
         if (Options.DisableMeeting.GetBool()) return false;
-        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) return false;
+        if (Options.CurrentGameMode != CustomGameMode.Standard) return false;
 
         if (!CanReport[__instance.PlayerId])
         {
@@ -963,7 +963,6 @@ class ReportDeadBodyPatch
                     Logger.SendInGame($"Error: {error}");
                 }
             }
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnReportDeadBody();
 
             Rebirth.OnReportDeadBody();
 
@@ -1589,12 +1588,13 @@ class FixedUpdateInNormalGamePatch
         }
     }
 }
-[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Start))]
+[HarmonyPatch(typeof(PlayerControl._Start_d__82), "MoveNext")]
 class PlayerStartPatch
 {
-    public static void Postfix(PlayerControl __instance)
+    public static void Postfix(PlayerControl._Start_d__82 __instance, ref bool __result)
     {
-        var instance = __instance;
+        if (__result) return;
+        var instance = __instance.__4__this;
 
         if (GameStates.IsHideNSeek) return;
 
@@ -1607,6 +1607,93 @@ class PlayerStartPatch
         roleText.text = "RoleText";
         roleText.gameObject.name = "RoleText";
         roleText.enabled = false;
+    }
+}
+// Player press vent button
+[HarmonyPatch(typeof(PlayerPhysics._CoEnterVent_d__47), "MoveNext")]
+class CoEnterVentPatch
+{
+    public static bool Prefix(PlayerPhysics._CoEnterVent_d__47 __instance)
+    {
+        if (__instance.__1__state >= 1) return true; // track the start of function
+
+        if (MeetingHud.Instance) return true; // vent action will be canceled if a meeting is called
+
+        var instance = __instance.__4__this;
+        var id = __instance.id;
+
+        if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek) return true;
+        Logger.Info($" {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()}, Vent ID: {id}", "CoEnterVent");
+
+        //FFA
+        if (Options.CurrentGameMode == CustomGameMode.FFA && FFAManager.CheckCoEnterVent(instance, id))
+        {
+            return true;
+        }
+
+        if (KillTimerManager.AllKillTimers.TryGetValue(instance.myPlayer.PlayerId, out var timer))
+        {
+            KillTimerManager.AllKillTimers[instance.myPlayer.PlayerId] = timer + 0.5f;
+        }
+
+        if (AntiBlackout.SkipTasks)
+        {
+            Logger.Warn($"AntiBlackout SkipTasks is enabled, {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()} can't enter vent", "CoEnterVent");
+            _ = new LateTask(() => instance?.RpcBootFromVent(id), 0.5f, "Prevent Enter Vents");
+            return true;
+        }
+
+        // Check others enter to vent
+        if (CustomRoleManager.OthersCoEnterVent(instance, id))
+        {
+            return true;
+        }
+
+        var playerRoleClass = instance.myPlayer.GetRoleClass();
+
+        // Prevent vanilla players from enter vents if their current role does not allow it
+        if (!instance.myPlayer.CanUseVents() || (playerRoleClass != null && playerRoleClass.CheckBootFromVent(instance, id))
+        )
+        {
+            _ = new LateTask(() => instance?.RpcBootFromVent(id), 0.5f, "Prevent Enter Vents");
+            return true;
+        }
+
+
+        playerRoleClass?.OnCoEnterVent(instance, id);
+        if (Options.DisableVenting1v1.GetBool() && Main.AllAlivePlayerControls.Count <= 2)
+        {
+            var pc = instance?.myPlayer;
+            _ = new LateTask(() =>
+            {
+                pc?.Notify(GetString("FFA-NoVentingBecauseTwoPlayers"), 7f);
+                pc?.MyPhysics?.RpcBootFromVent(id);
+            }, 0.5f, "Player No Venting Because Two Players");
+            return true;
+        }
+
+        if (playerRoleClass?.BlockMoveInVent(instance.myPlayer) ?? false)
+        {
+            foreach (var ventId in playerRoleClass.LastBlockedMoveInVentVents)
+            {
+                CustomRoleManager.BlockedVentsList[instance.myPlayer.PlayerId].Remove(ventId);
+            }
+            playerRoleClass.LastBlockedMoveInVentVents.Clear();
+
+            var vent = ShipStatus.Instance.AllVents.First(v => v.Id == id);
+            foreach (var nextvent in vent.NearbyVents.ToList())
+            {
+                if (nextvent == null) continue;
+                // Skip current vent or ventid 5 in Dleks to prevent stuck
+                if (nextvent.Id == id || (GameStates.DleksIsActive && id is 5 && nextvent.Id is 6)) continue;
+                CustomRoleManager.BlockedVentsList[instance.myPlayer.PlayerId].Add(nextvent.Id);
+                playerRoleClass.LastBlockedMoveInVentVents.Add(nextvent.Id);
+            }
+            instance.myPlayer.RpcSetVentInteraction();
+        }
+
+        _ = new LateTask(() => VentSystemDeterioratePatch.ForceUpadate = false, 1f, "Set Force Upadate As False", shoudLog: false);
+        return true;
     }
 }
 // Player entered in vent
@@ -1622,74 +1709,7 @@ class EnterVentPatch
         Main.LastEnteredVentLocation.Remove(pc.PlayerId);
         Main.LastEnteredVentLocation.Add(pc.PlayerId, pc.GetCustomPosition());
 
-        if (!AmongUsClient.Instance.AmHost) return;
-
-        Logger.Info($" {pc.GetNameWithRole()}, Vent ID: {__instance.Id} ({__instance.name})", "EnterVent");
-
-        if (Options.CurrentGameMode == CustomGameMode.FFA && FFAManager.CheckCoEnterVent(pc.MyPhysics, __instance.Id))
-        {
-            return;
-        }
-
-        if (KillTimerManager.AllKillTimers.TryGetValue(pc.PlayerId, out var timer))
-        {
-            KillTimerManager.AllKillTimers[pc.PlayerId] = timer + 0.5f;
-        }
-
-        if (AntiBlackout.SkipTasks)
-        {
-            Logger.Warn($"AntiBlackout SkipTasks is enabled, {pc.GetNameWithRole().RemoveHtmlTags()} can't enter vent", "EnterVent");
-            pc?.MyPhysics?.RpcBootFromVent(__instance.Id);
-            return;
-        }
-
-        // Check others enter to vent
-        if (CustomRoleManager.OthersCoEnterVent(pc.MyPhysics, __instance.Id))
-        {
-            return;
-        }
-
-        var playerRoleClass = pc.GetRoleClass();
-
-        // Prevent vanilla players from enter vents if their current role does not allow it
-        if (!pc.CanUseVents() || (playerRoleClass != null && playerRoleClass.CheckBootFromVent(pc.MyPhysics, __instance.Id))
-        )
-        {
-            Logger.Info($"Prevent Enter Vents", "EnterVent");
-            pc?.MyPhysics?.RpcBootFromVent(__instance.Id);
-            return;
-        }
-
-        playerRoleClass?.OnCoEnterVent(pc.MyPhysics, __instance.Id);
-        if (Options.DisableVenting1v1.GetBool() && Main.AllAlivePlayerControls.Count <= 2)
-        {
-            Logger.Info($"Player No Venting Because Two Players", "EnterVent");
-            pc?.Notify(GetString("FFA-NoVentingBecauseTwoPlayers"), 7f);
-            pc?.MyPhysics?.RpcBootFromVent(__instance.Id);
-            return;
-        }
-
-        if (playerRoleClass?.BlockMoveInVent(pc) ?? false)
-        {
-            foreach (var ventId in playerRoleClass.LastBlockedMoveInVentVents)
-            {
-                CustomRoleManager.BlockedVentsList[pc.PlayerId].Remove(ventId);
-            }
-            playerRoleClass.LastBlockedMoveInVentVents.Clear();
-
-            var vent = ShipStatus.Instance.AllVents.First(v => v.Id == __instance.Id);
-            foreach (var nextvent in vent.NearbyVents.ToList())
-            {
-                if (nextvent == null) continue;
-                // Skip current vent or ventid 5 in Dleks to prevent stuck
-                if (nextvent.Id == __instance.Id || (GameStates.DleksIsActive && __instance.Id is 5 && nextvent.Id is 6)) continue;
-                CustomRoleManager.BlockedVentsList[pc.PlayerId].Add(nextvent.Id);
-                playerRoleClass.LastBlockedMoveInVentVents.Add(nextvent.Id);
-            }
-            pc.RpcSetVentInteraction();
-        }
-
-        _ = new LateTask(() => VentSystemDeterioratePatch.ForceUpadate = false, 0.5f, "Set Force Upadate As False", shoudLog: false);
+        if (!AmongUsClient.Instance.AmHost || AntiBlackout.SkipTasks) return;
 
         if (TimeMaster.Rewinding)
         {
@@ -1724,16 +1744,19 @@ class RpcEnterVentPatch
     }
 }
 
-[HarmonyPatch(typeof(Vent), nameof(Vent.ExitVent))]
+[HarmonyPatch(typeof(PlayerPhysics._CoExitVent_d__48), "MoveNext")]
 class CoExitVentPatch
 {
-    public static void Postfix(Vent __instance, [HarmonyArgument(0)] PlayerControl player)
+    public static void Postfix(PlayerPhysics._CoExitVent_d__48 __instance, ref bool __result)
     {
-        var instance = __instance;
+        if (__result) return; // false is end of co
 
+        var instance = __instance.__4__this;
+        var id = __instance.id;
         if (GameStates.IsHideNSeek) return;
-        Logger.Info($" {player.GetNameWithRole()}, Vent ID: {__instance.Id} ({__instance.name})", "ExitVent");
+        Logger.Info($" {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()}, Vent ID: {id}", "CoExitVent");
 
+        var player = instance.myPlayer;
         if (Options.CurrentGameMode == CustomGameMode.FFA && FFAManager.FFA_DisableVentingWhenKCDIsUp.GetBool())
         {
             FFAManager.CoExitVent(player);
@@ -1741,7 +1764,7 @@ class CoExitVentPatch
 
         if (!AmongUsClient.Instance.AmHost) return;
 
-        player.GetRoleClass()?.OnExitVent(player, instance.Id);
+        player.GetRoleClass()?.OnExitVent(player, id);
 
         foreach (var ventId in player.GetRoleClass().LastBlockedMoveInVentVents)
         {

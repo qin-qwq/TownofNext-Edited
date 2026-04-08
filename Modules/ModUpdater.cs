@@ -232,10 +232,12 @@ public class ModUpdater
         }
         else
         {
+            string[] versionString = Main.PluginDisplayVersion?.ToString().Split(".");
             string[] tag = data["tag_name"]?.ToString()[1..].Split(".");
 
-            var pluginNum = int.Parse(Main.PluginVersion.Substring(10, 1)) * 10000 + int.Parse(Main.PluginVersion.Substring(11, 1)) * 1000 + int.Parse(Main.PluginVersion.Substring(12, 1)) * 100;
-            var versionNum = int.Parse(tag[0]) * 10000 + int.Parse(tag[1]) * 1000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) : 999);
+            var pluginNum = int.Parse(versionString[0]) * 10000 + int.Parse(versionString[1]) * 1000 + int.Parse($"{versionString[2][0]}") * 100
+                + (versionString[2].Length > 2 && versionString[2][2] == 'B' ? int.Parse($"{versionString[2][7]}") * 10 : versionString[2].Length > 2 && versionString[2][2] == 'A' ? int.Parse($"{versionString[2][8]}") : 999);
+            var versionNum = int.Parse(tag[0]) * 10000 + int.Parse(tag[1]) * 1000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) * 10 : 999);
 
             Logger.Info($"Found local version: {pluginNum}; github version: {versionNum}", "CheckRelease");
 
@@ -295,16 +297,9 @@ public class ModUpdater
         try
         {
             var fileName = Assembly.GetExecutingAssembly().Location;
-#if ANDROID
-            if (Directory.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA")) &&
-                File.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "BanWords.txt")))
-            {
-                DirectoryInfo di = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA"));
-#else
-            if (Directory.Exists("TOH_DATA") && File.Exists(@"./TONE-DATA/BanWords.txt"))
+            if (Directory.Exists("TOH_DATA") && File.Exists(@$"{Main.Path}/TONE-DATA/BanWords.txt"))
             {
                 DirectoryInfo di = new("TOH_DATA");
-#endif
                 di.Delete(true);
                 Logger.Warn("Deleting old data：TOH_DATA", "NewVersionCheck");
             }

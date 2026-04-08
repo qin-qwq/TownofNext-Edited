@@ -201,7 +201,7 @@ public abstract class OptionItem
             || (HideOptionInSpeedRun != CustomGameMode.All && HideOptionInSpeedRun == mode)
             || (HideOptionInTagMode != CustomGameMode.All && HideOptionInTagMode == mode)
             || (checkCollapsedSection && Header is { CollapsesSection: true })
-            || (GameMode != CustomGameMode.All && GameMode != mode && !(mode == CustomGameMode.RoundUp && GameMode == CustomGameMode.Standard));
+            || (GameMode != CustomGameMode.All && GameMode != mode);
     }
     public string ApplyFormat(string value)
     {

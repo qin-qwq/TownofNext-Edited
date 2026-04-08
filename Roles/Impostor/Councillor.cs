@@ -127,19 +127,6 @@ internal class Councillor : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                     return true;
                 }
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
-                {
-                    if (target.PlayerId == RoundUp.Deputy)
-                    {
-                        pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
-                        return true;
-                    }
-                    if (pc.PlayerId == RoundUp.Deputy)
-                    {
-                        pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
-                        return true;
-                    }
-                }
                 if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
                 {
                     pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));

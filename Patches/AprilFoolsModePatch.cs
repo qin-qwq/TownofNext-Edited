@@ -27,11 +27,13 @@ public static class GetNormalBodyType_Patch
             __result = PlayerBodyTypes.Long;
             return;
         }
+#if !ANDROID
         if (Main.ClassicMode.Value || AprilFoolsMode.ShouldClassicMode())
         {
             __result = PlayerBodyTypes.Classic;
             return;
         }
+#endif
         __result = PlayerBodyTypes.Normal;
     }
 }
@@ -53,11 +55,13 @@ public static class GetHnsBodyType_Patch
                 __result = PlayerBodyTypes.Long;
                 return;
             }
+#if !ANDROID
             if (Main.ClassicMode.Value || AprilFoolsMode.ShouldClassicMode())
             {
                 __result = PlayerBodyTypes.Classic;
                 return;
             }
+#endif
             __result = PlayerBodyTypes.Normal;
             return;
         }
@@ -81,6 +85,7 @@ public static class GetHnsBodyType_Patch
             __result = PlayerBodyTypes.Long;
             return;
         }
+#if !ANDROID
         else if (Main.ClassicMode.Value || AprilFoolsMode.ShouldClassicMode())
         {
             if (player.Data.Role.IsImpostor)
@@ -91,6 +96,7 @@ public static class GetHnsBodyType_Patch
             __result = PlayerBodyTypes.Classic;
             return;
         }
+#endif
         else
         {
             if (player.Data.Role.IsImpostor)

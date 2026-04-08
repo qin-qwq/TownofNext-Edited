@@ -76,7 +76,7 @@ class HudManagerUpdatePatch
             if (player.IsAlive())
             {
                 // Set default
-                __instance.KillButton?.OverrideText(GetString("KillButtonText"));
+                __instance.KillButton?.OverrideText(player.GetCustomRole().GetRoleTypes() is RoleTypes.Viper ? GetString("ViperKillButtonText") : GetString("KillButtonText"));
                 __instance.ReportButton?.OverrideText(GetString("ReportButtonText"));
                 __instance.SabotageButton?.OverrideText(GetString("SabotageButtonText"));
 
@@ -96,7 +96,6 @@ class HudManagerUpdatePatch
                 switch (Options.CurrentGameMode)
                 {
                     case CustomGameMode.Standard:
-                    case CustomGameMode.RoundUp:
                         var roleClass = player.GetRoleClass();
                         LowerInfoText.text = roleClass?.GetLowerText(player, player, isForMeeting: Main.MeetingIsStarted, isForHud: true) ?? string.Empty;
 
@@ -222,8 +221,7 @@ class SetHudActivePatch
         if (GameStates.IsLobby || !isActive) return;
         if (player == null) return;
 
-        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || (Options.CurrentGameMode != CustomGameMode.Standard &&
-            Options.CurrentGameMode != CustomGameMode.RoundUp))
+        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || Options.CurrentGameMode != CustomGameMode.Standard)
             __instance.ReportButton.ToggleVisible(false);
 
         if (player.Is(CustomRoles.Mare) && !Utils.IsActive(SystemTypes.Electrical))
@@ -307,7 +305,6 @@ class TaskPanelBehaviourPatch
             {
                 case CustomGameMode.Standard:
                 case CustomGameMode.TagMode:
-                case CustomGameMode.RoundUp:
 
                     var lines = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
                     StringBuilder sb = new();
@@ -326,7 +323,7 @@ class TaskPanelBehaviourPatch
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
 
-                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
+                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode is CustomGameMode.Standard && !OperatingSystem.IsAndroid())
                     {
                         AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
                         AllText += "</size>";
@@ -337,7 +334,7 @@ class TaskPanelBehaviourPatch
                     foreach (var id in Main.PlayerStates.Keys)
                     {
                         string name = Main.AllPlayerNames[id].RemoveHtmlTags().Replace("\r\n", string.Empty);
-                        string summary = $"{Utils.GetProgressText(id)}  {Utils.ColorString(Main.PlayerColors[id], name)}";
+                        string summary = $"{Utils.GetProgressText(id)}  {Utils.ColorString(id.GetPlayerColor(), name)}";
                         if (Utils.GetProgressText(id).Trim() == string.Empty) continue;
                         SummaryText2[id] = summary;
                     }

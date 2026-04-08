@@ -6,11 +6,7 @@ namespace TONE;
 
 public static class TagManager
 {
-#if ANDROID
-    private static readonly string TAGS_FILE_PATH = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags");
-#else
-    private static readonly string TAGS_FILE_PATH = "./TONE-DATA/Tags";
-#endif
+    private static readonly string TAGS_FILE_PATH = @$"{Main.Path}/TONE-DATA/Tags";
 
     public static void Init()
     {
@@ -21,13 +17,8 @@ public static class TagManager
     {
         try
         {
-#if ANDROID
-            string dataDirectory = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags");
-            string templateFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "Tag_Template.txt");
-#else
-            string dataDirectory = @"TONE-DATA/Tags";
-            string templateFilePath = @"./TONE-DATA/Tags/Tag_Template.txt";
-#endif
+            string dataDirectory = @$"{Main.Path}/TONE-DATA/Tags";
+            string templateFilePath = @$"{Main.Path}/TONE-DATA/Tags/Tag_Template.txt";
 
             if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
             var defaultTagMsg = GetResourcesTxt($"TONE.Resources.Config.TagTemplate.txt");

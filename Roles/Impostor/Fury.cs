@@ -93,6 +93,7 @@ internal class Fury : RoleBase
 
     public void ToCalm(PlayerControl player, bool reset = false)
     {
+        if (!player) return;
         if (reset)
         {
             player.RpcRemoveAbilityCD();

@@ -218,19 +218,6 @@ public static class GuessManager
                     pc.ShowInfoMessage(isUI, GetString("GuessDisabled"));
                     return true;
                 }
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue)
-                {
-                    if (target.PlayerId == RoundUp.Deputy)
-                    {
-                        pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
-                        return true;
-                    }
-                    if (pc.PlayerId == RoundUp.Deputy)
-                    {
-                        pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
-                        return true;
-                    }
-                }
                 if (Balancer.Choose && !(target.PlayerId == Balancer.Target1 || target.PlayerId == Balancer.Target2))
                 {
                     pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
@@ -1120,6 +1107,35 @@ public static class GuessManager
                 return;
             }
             UnityEngine.Object.Destroy(textTemplate.gameObject);
+            // 参考：https://github.com/Gurge44/EndlessHostRoles/blob/main/Modules/GuessManager.cs
+            if (guesserUI) UnityEngine.Object.Destroy(guesserUI);
+
+            foreach (var roleButtonsValue in RoleButtons.Values)
+            {
+                foreach (var transform in roleButtonsValue)
+                {
+                    if (transform.gameObject)
+                        UnityEngine.Object.Destroy(transform.gameObject);
+                }
+            }
+
+            foreach (var spriteRenderer in RoleSelectButtons.Values)
+            {
+                if (spriteRenderer.gameObject)
+                    UnityEngine.Object.Destroy(spriteRenderer.gameObject);
+            }
+
+            foreach (var spriteRenderer in PageButtons)
+            {
+                if (spriteRenderer.gameObject)
+                    UnityEngine.Object.Destroy(spriteRenderer.gameObject);
+            }
+            
+            textTemplate = null;
+            guesserUI = null;
+            RoleButtons.Clear();
+            RoleSelectButtons.Clear();
+            PageButtons.Clear();
         }
     }
 

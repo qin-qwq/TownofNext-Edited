@@ -18,12 +18,8 @@ public class DevUser(string code = "", string color = "null", string userType = 
     public bool HasTag() => Tag != "null";
     public string GetTag()
     {
-#if ANDROID
-        string tagColorFilePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "SPONSOR_TAGS", $"{Code}.txt");
-#else
-        string tagColorFilePath = @$"./TONE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
+        string tagColorFilePath = @$"{Main.Path}/TONE-DATA/Tags/SPONSOR_TAGS/{Code}.txt";
 
-#endif
         if (Color == "null" || Color == string.Empty) return $"{Tag}";
         var startColor = Color.TrimStart('#');
 

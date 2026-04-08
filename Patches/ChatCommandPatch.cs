@@ -26,21 +26,12 @@ namespace TONE;
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.SendChat))]
 internal class ChatCommands
 {
-#if ANDROID
-    private static readonly string modLogFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "ModLogs.txt");
-    private static readonly string modTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "MOD_TAGS");
-    private static readonly string sponsorTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "SPONSOR_TAGS");
-    private static readonly string vipTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Tags", "VIP_TAGS");
-    private static readonly string modFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "Moderators.txt");
-    private static readonly string vipFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "VIP-List.txt");
-#else
-    private static readonly string modLogFiles = @"./TONE-DATA/ModLogs.txt";
-    private static readonly string modTagsFiles = @"./TONE-DATA/Tags/MOD_TAGS";
-    private static readonly string sponsorTagsFiles = @"./TONE-DATA/Tags/SPONSOR_TAGS";
-    private static readonly string vipTagsFiles = @"./TONE-DATA/Tags/VIP_TAGS";
-    private static readonly string modFiles = @"./TONE-DATA/Moderators.txt";
-    private static readonly string vipFiles = @"./TONE-DATA/VIP-List.txt";
-#endif
+    private static readonly string modLogFiles = @$"{Main.Path}/TONE-DATA/ModLogs.txt";
+    private static readonly string modTagsFiles = @$"{Main.Path}/TONE-DATA/Tags/MOD_TAGS";
+    private static readonly string sponsorTagsFiles = @$"{Main.Path}/TONE-DATA/Tags/SPONSOR_TAGS";
+    private static readonly string vipTagsFiles = @$"{Main.Path}/TONE-DATA/Tags/VIP_TAGS";
+    private static readonly string modFiles = @$"{Main.Path}/TONE-DATA/Moderators.txt";
+    private static readonly string vipFiles = @$"{Main.Path}/TONE-DATA/VIP-List.txt";
 
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
@@ -95,7 +86,6 @@ internal class ChatCommands
         if (ImpostorChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
-        if (RoundUp.DeputyCommand(PlayerControl.LocalPlayer, text)) goto Canceled;
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
         Directory.CreateDirectory(sponsorTagsFiles);
@@ -522,7 +512,6 @@ internal class ChatCommands
                     switch (Options.CurrentGameMode)
                     {
                         case CustomGameMode.Standard:
-                        case CustomGameMode.RoundUp:
                             var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                             int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                             int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
@@ -585,11 +574,6 @@ internal class ChatCommands
                     if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
                     {
                         Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), PlayerControl.LocalPlayer.PlayerId);
-                        break;
-                    }
-                    if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && PlayerControl.LocalPlayer.PlayerId == RoundUp.Deputy)
-                    {
-                        Utils.SendMessage(GetString("RoundUp_Help"), PlayerControl.LocalPlayer.PlayerId);
                         break;
                     }
 
@@ -1484,7 +1468,7 @@ internal class ChatCommands
 
                         string msg = "";
 
-                        Color32 clr = new(47, 234, 45, 255); //Main.PlayerColors.First(x => x.Key == PlayerControl.LocalPlayer.PlayerId).Value;
+                        Color32 clr = new(47, 234, 45, 255);
                         var tytul = Utils.ColorString(clr, GetString("PollResultTitle"));
 
                         if (winners.Count() == 1)
@@ -1886,6 +1870,14 @@ internal class ChatCommands
                     SpectateCommand(PlayerControl.LocalPlayer, text, args);
                     break;
 
+                case "/ear":
+                case "/enableallroles":
+                case "/启用全部职业":
+                case "/启用所有职业":
+                    canceled = true;
+                    EnableAllRolesCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
                 default:
                     Main.isChatCommand = false;
                     break;
@@ -2208,7 +2200,6 @@ internal class ChatCommands
         if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
         if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
         if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
-        if (RoundUp.DeputyCommand(player, text)) { canceled = true; Logger.Info($"Is RoundUp Command", "OnReceiveChat"); return; }
 
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
@@ -2541,7 +2532,6 @@ internal class ChatCommands
                 switch (Options.CurrentGameMode)
                 {
                     case CustomGameMode.Standard:
-                    case CustomGameMode.RoundUp:
                         var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                         int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                         int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
@@ -3180,11 +3170,6 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), player.PlayerId);
                     break;
                 }
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && player.PlayerId == RoundUp.Deputy)
-                {
-                    Utils.SendMessage(GetString("RoundUp_Help"), player.PlayerId);
-                    break;
-                }
 
                 if (arg != 253) // skip
                 {
@@ -3651,7 +3636,7 @@ internal class ChatCommands
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
             return;
         }
-        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp)
+        if (Options.CurrentGameMode != CustomGameMode.Standard)
         {
             Utils.SendMessage(GetString("StartDraftWrongGameMode"), player.PlayerId);
             return;
@@ -3688,7 +3673,7 @@ internal class ChatCommands
 
     private static void FixCommand(PlayerControl player, string text, string[] args)
     {
-        if (!AmongUsClient.Instance.AmHost)
+        if (!player.IsHost())
         {
             if (!Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
         }
@@ -3706,7 +3691,7 @@ internal class ChatCommands
 
     private static void AFKExemptCommand(PlayerControl player, string text, string[] args)
     {
-        if (!AmongUsClient.Instance.AmHost)
+        if (!player.IsHost())
         {
             if (!Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
         }
@@ -3738,6 +3723,12 @@ internal class ChatCommands
             Utils.SendMessage(GetString("PlayerDeleteFromSpectateList"), player.PlayerId);
             if (pc.FriendCode.GetDevUser().IsDev) Utils.SendMessage(GetString("YouDeleteFromSpectateList"), pc.PlayerId);
         }
+    }
+
+    private static void EnableAllRolesCommand(PlayerControl player, string text, string[] args)
+    {
+        Options.CustomRoleSpawnChances.Values.DoIf(x => x.GetValue() == 0, x => x.SetValue(1));
+        Utils.SendMessage(GetString("AllRolesEnabled"), player.PlayerId);
     }
 
     private static bool ImpostorChannel(PlayerControl pc, string msg, bool check = true)

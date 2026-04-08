@@ -83,29 +83,8 @@ internal class Wraith : RoleBase
                 var cleared = conf.ToString();
                 conf.Clear().Append($"<size={ChatCommands.Csize}>" + $"<color={rlHex}>{GetString(role.ToString())} {GetString("Settings:")}</color>\n" + cleared + "</size>");
 
-                var writer = CustomRpcSender.Create("SendGhostRoleInfo", SendOption.None);
-                writer.StartMessage(player.GetClientId());
-                {
-                    writer.StartRpc(host.NetId, (byte)RpcCalls.SetName)
-                        .Write(host.Data.NetId)
-                        .Write(Utils.ColorString(Utils.GetRoleColor(role), GetString("GhostTransformTitle")))
-                        .EndRpc();
-                    writer.StartRpc(host.NetId, (byte)RpcCalls.SendChat)
-                        .Write(sb.ToString())
-                        .EndRpc();
-                    writer.StartRpc(host.NetId, (byte)RpcCalls.SendChat)
-                        .Write(conf.ToString())
-                        .EndRpc();
-                    writer.StartRpc(host.NetId, (byte)RpcCalls.SetName)
-                        .Write(host.Data.NetId)
-                        .Write(name)
-                        .EndRpc();
-                }
-                writer.EndMessage();
-                writer.SendMessage();
-
-                // Utils.SendMessage(sb.ToString(), player.PlayerId, Utils.ColorString(Utils.GetRoleColor(role), GetString("GhostTransformTitle")));
-
+                Utils.SendMessage(sb.ToString(), lp.PlayerId, Utils.ColorString(Utils.GetRoleColor(role), GetString("GhostTransformTitle")));
+                Utils.SendMessage(conf.ToString(), lp.PlayerId, Utils.ColorString(Utils.GetRoleColor(role), GetString("GhostTransformTitle")));
             }
 
         }, 0.1f, $"SetGuardianAngel for playerId: {player.PlayerId}");

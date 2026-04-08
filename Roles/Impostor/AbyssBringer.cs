@@ -99,6 +99,7 @@ internal class AbyssBringer : RoleBase
         string roomName = room == null ? string.Empty : Translator.GetString($"{room.RoomId}");
         BlackHoles.Add(shapeshifter.PlayerId, new(new(pos), Utils.TimeStamp, pos, roomName, 0));
         SendCreateBlackholeRPC();
+        shapeshifter.SetKillCooldown();
         // Utils.SendRPC(CustomRPC.SyncRoleSkill, shapeshifter.PlayerId, 1, pos, roomName);
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)

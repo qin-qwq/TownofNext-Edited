@@ -58,11 +58,13 @@ internal class Arrogance : RoleBase
     }
     public override string GetProgressText(byte playerId, bool comms)
     {
+        if (!NowCooldown.ContainsKey(playerId)) return string.Empty;
         var reduce = Math.Round(DefaultKillCooldown.GetFloat() - NowCooldown[playerId], 1);
         return NowCooldown[playerId] != DefaultKillCooldown.GetFloat() ? Utils.ColorString(Palette.ImpostorRed.ShadeColor(0.5f), $" -{reduce}s") : string.Empty;
     }
     public void SendRPC(PlayerControl pc)
     {
+        if (!NowCooldown.ContainsKey(pc.PlayerId)) return;
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(NowCooldown[pc.PlayerId]);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));

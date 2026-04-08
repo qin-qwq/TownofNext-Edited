@@ -114,7 +114,7 @@ class EndGamePatch
         var sb2 = new StringBuilder(GetString("MainRoleLog") + ":");
         foreach (var kvp in Main.PlayerStates.OrderBy(x => x.Key))
         {
-            if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) break;
+            if (Options.CurrentGameMode != CustomGameMode.Standard) break;
             if (kvp.Value.MainRoleLogs.Where(x => !x.Item2.IsVanilla()).ToList().Count <= 1) continue;
             sb2.Append($"\n[{kvp.Key}] {Main.AllPlayerNames[kvp.Key]} {Utils.GetDisplayRoleAndSubName(kvp.Key, kvp.Key, false, false)}");
             foreach (var item in kvp.Value.MainRoleLogs.OrderBy(x => x.Item1.Ticks))
@@ -215,7 +215,7 @@ class SetEverythingUpPatch
                     var winnerId = CustomWinnerHolder.WinnerIds.FirstOrDefault();
                     __instance.BackgroundBar.material.color = new Color32(0, 255, 255, 255);
                     WinnerText.text = Main.AllPlayerNames[winnerId] + " Wins!";
-                    WinnerText.color = Main.PlayerColors[winnerId];
+                    WinnerText.color = winnerId.GetPlayerColor();
                     goto EndOfText;
                 }
             case CustomGameMode.SpeedRun:
@@ -223,7 +223,7 @@ class SetEverythingUpPatch
                     var winnerId = CustomWinnerHolder.WinnerIds.FirstOrDefault();
                     __instance.BackgroundBar.material.color = new Color32(255, 251, 0, 255);
                     WinnerText.text = Main.AllPlayerNames[winnerId] + " Wins!";
-                    WinnerText.color = Main.PlayerColors[winnerId];
+                    WinnerText.color = winnerId.GetPlayerColor();
                     goto EndOfText;
                 }
         }
@@ -334,11 +334,15 @@ class SetEverythingUpPatch
 
         LastWinsText = WinnerText.text/*.RemoveHtmlTags()*/;
 
+        GC.Collect();
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //########################################
         //     ==The final result indicates==
         //########################################
+
+        Resources.UnloadUnusedAssets();
 
         var Pos = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, Camera.main.nearClipPlane));
         var RoleSummaryObject = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);

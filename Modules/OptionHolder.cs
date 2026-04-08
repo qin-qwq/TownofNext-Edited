@@ -15,7 +15,6 @@ public enum CustomGameMode
     FFA = 0x02,
     SpeedRun = 0x03,
     TagMode = 0x04,
-    RoundUp = 0x05,
 
     HidenSeekTONE = 0x08, // HidenSeekTONE must be after other game modes
     All = int.MaxValue
@@ -57,8 +56,7 @@ public static class Options
 
             2 => CustomGameMode.SpeedRun,
             3 => CustomGameMode.TagMode,
-            4 => CustomGameMode.RoundUp,
-            5 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
+            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
             _ => CustomGameMode.Standard
         };
     public static int prevGameMode = 0;
@@ -69,7 +67,6 @@ public static class Options
 
         "SpeedRun",
         "TagMode",
-        "RoundUp",
 
         "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
     ];
@@ -1389,9 +1386,6 @@ public static class Options
 
         //Tag Mode
         TagMode.SetupCustomOption();
-
-        //Round Up
-        RoundUp.SetupCustomOption();
 
         // Hide & Seek
         TextOptionItem.Create(10000055, "MenuTitle.Hide&Seek", TabGroup.ModSettings)

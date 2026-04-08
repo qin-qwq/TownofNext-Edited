@@ -16,7 +16,7 @@ public class MapBehaviourPatch
     public static void ShowNormalMapPostfix(MapBehaviour __instance)
     {
         InitializeCustomHerePoints(__instance);
-        if (Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
+        if (Options.CurrentGameMode is CustomGameMode.Standard)
         {
             var player = PlayerControl.LocalPlayer;
             var role = player.GetCustomRole();
@@ -28,7 +28,7 @@ public class MapBehaviourPatch
     public static void ShowSabotageMapPostfix(MapBehaviour __instance)
     {
         InitializeCustomHerePoints(__instance);
-        if (Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
+        if (Options.CurrentGameMode is CustomGameMode.Standard)
         {
             var player = PlayerControl.LocalPlayer;
             var role = player.GetCustomRole();

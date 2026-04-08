@@ -12,7 +12,6 @@ public static class AddonAssign
 
     private static bool NotAssignAddOnInGameStarted(CustomRoles role)
     {
-        if (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp) return true;
         switch (role)
         {
             case CustomRoles.Workhorse:
@@ -31,7 +30,7 @@ public static class AddonAssign
 
     public static void StartSelect()
     {
-        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) return;
+        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
 
         AddonRolesList.Clear();
         foreach (var cr in CustomRolesHelper.AllRoles)
@@ -46,7 +45,7 @@ public static class AddonAssign
     }
     public static void StartSortAndAssign()
     {
-        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) return;
+        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
 
         var rd = IRandom.Instance;
         List<CustomRoles> addonsList = [];

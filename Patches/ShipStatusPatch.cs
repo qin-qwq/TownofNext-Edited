@@ -185,8 +185,7 @@ class StartPatch
 
         Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
 
-        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || (Options.CurrentGameMode != CustomGameMode.Standard &&
-            Options.CurrentGameMode != CustomGameMode.RoundUp))
+        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || Options.CurrentGameMode != CustomGameMode.Standard)
         {
             __instance.BreakEmergencyButton();
         }
@@ -275,13 +274,17 @@ class StartMeetingPatch
 [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.Begin))]
 class ShipStatusBeginPatch
 {
-    public static void Prefix()
+    public static bool hasBegun;
+
+    public static bool Prefix()
     {
         RpcSetTasksPatch.decidedCommonTasks.Clear();
+        return hasBegun;
     }
+
     public static void Postfix()
     {
-        Logger.CurrentMethod();
+        if (hasBegun && !Main.IntroDestroyed) Logger.CurrentMethod();
     }
 }
 
