@@ -4205,7 +4205,7 @@
   "DetectiveTONEInfo": "Gather info. Solve murders.",
   "ViperTONEInfo": "Kill to dissolve bodies",
   "DetectiveTONEInfoLong": "(Crewmates):\nThe Detective is a Crewmate who excels in solving murders! With their Notes, they can record important info about each kill.\nThe Detective can then Interrogate other Crewmates to learn their whereabouts at the time of the kill. Connect the dots and find the killer!\n<color=#ff0000>This role currently does not work due to a basis reset issue.</color>",
-  "ViperTONEInfoLong": "(内鬼阵营):\n毒蛇使用致命的酸液击杀船员。尸体经过三个阶段的缓慢溶解后彻底消失\n聪明的毒蛇会确保受害者的尸体永远不被发现。充分发挥破坏的作用吧！\n<color=#ff0000>由于不同步，警长等职业可以看到被溶解的尸体</size></color>",
+  "ViperTONEInfoLong": "(Impostors):\nThe Viper uses a deadly acid to kill Crewmates. Bodies slowly dissolve in three stages before fully disappearing.\nA clever Viper ensures all their kills are never found. Use sabotages to your maximum advantage!\n<color=#ff0000>Currently, roles such as Sheriff may still be able to see dissolved bodies from their POV due to desync.</color>",
   "DetectiveBase_DetectiveSuspectLimit": "Suspects per Case",
   "ViperBase_ViperDissolveTime": "Dissolve Time",
   "MenuTitle.Draft": "Draft Mode",
