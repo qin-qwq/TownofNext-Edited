@@ -36,7 +36,7 @@ public abstract class GameOptionsSender
             ? opt.AprilFoolsOnMode : opt.GameMode; //Change game mode, same as well as in "RpcSyncSettings()"
 
         // option => byte[]
-        MessageWriter writer = MessageWriter.Get();
+        MessageWriter writer = MessageWriter.Get(SendOption.None);
         writer.Write(opt.Version);
         writer.StartMessage(0);
         writer.Write((byte)currentGameMode);
@@ -51,7 +51,10 @@ public abstract class GameOptionsSender
         }
         writer.EndMessage();
 
-        var byteArray = writer.ToByteArray(false);
+        // Create into array
+        var byteArray = new Il2CppStructArray<byte>(writer.Length - 1);
+        // MessageWriter.ToByteArray
+        Buffer.BlockCopy(writer.Buffer.CastFast<Array>(), 1, byteArray.CastFast<Array>(), 0, writer.Length - 1);
 
         SendOptionsArray(byteArray);
         writer.Recycle();

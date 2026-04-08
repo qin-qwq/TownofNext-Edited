@@ -241,6 +241,7 @@ internal class Doomsayer : RoleBase
             else if (DoesNotSuicideWhenMisguessing.GetBool() && guesser.PlayerId == target.PlayerId)
             {
                 guesser.ShowInfoMessage(isUI, GetString("DoomsayerNotCorrectlyGuessRole"));
+                if (guesser.IsHost()) FlashColor(GetRoleColor(CustomRoles.Doomsayer));
 
                 if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
                 {

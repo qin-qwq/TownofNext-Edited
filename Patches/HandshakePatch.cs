@@ -93,7 +93,7 @@ public static class HandshakePatch
         // ModdedHandshakeC2S
         handshake.WritePacked(1);
         handshake.Write(Main.PluginGuid);
-        handshake.Write(Main.PluginVersion);
+        handshake.Write(Main.PluginDisplayVersion);
         handshake.Write((ushort) (ModFlags.RequireOnHost | ModFlags.DisableServerAuthority));
 
         __result = handshake.ToByteArray(true);

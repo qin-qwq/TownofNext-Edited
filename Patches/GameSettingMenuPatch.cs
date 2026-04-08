@@ -447,6 +447,8 @@ public class GameSettingMenuPatch
             Object.Destroy(tab);
         ModSettingsButtons = [];
         ModSettingsTabs = [];
+        GC.Collect();
+        Resources.UnloadUnusedAssets();
     }
 }
 [HarmonyPatch(typeof(FreeChatInputField), nameof(FreeChatInputField.UpdateCharCount))]

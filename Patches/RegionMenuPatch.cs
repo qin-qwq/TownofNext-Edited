@@ -124,7 +124,7 @@ public static class ServerDropDownPatch
     // Used for find a game manager  
     internal static void FillServerOptions_Postfix(ServerDropdown __instance)
     {
-        if (SceneManager.GetActiveScene().name != "FindAGame") return;
+        if (SceneManager.GetActiveScene().name != "FindAGame" || OperatingSystem.IsAndroid()) return;
         float buttonSpacing = 0.6f;
         float columnSpacing = 4.15f;
 

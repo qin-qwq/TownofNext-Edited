@@ -92,6 +92,8 @@ internal class ChangeRoleSettings
             Main.FirstDiedPrevious = Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp
             && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
 
+            LobbyViewSettingsPanePatch.ClearReferences();
+
             Main.FirstDied = "";
             Main.MadmateNum = 0;
             Main.BardCreations = 0;
@@ -290,6 +292,9 @@ internal class ChangeRoleSettings
 
             SetEverythingUpPatch.LastWinsText = "";
             SetEverythingUpPatch.LastWinsReason = "";
+
+            GC.Collect();
+            Resources.UnloadUnusedAssets();
 
             Logger.Msg("End", "Initialization");
         }

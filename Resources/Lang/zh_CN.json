@@ -721,7 +721,7 @@
   "NoisemakerTONEInfoLong": "(船员阵营):\n大嗓门死亡时会发出声音，屏幕上也会出现大嗓门死亡的提示",
   "TrackerTONEInfoLong": "(船员阵营):\n侦查员对玩家使用追踪按钮，能在有限的时间内通过地图追踪其位置",
   "ShapeshifterTONEInfoLong": "(内鬼阵营):\n变形者可以变形为其它玩家。当变形者使用变形或取消变形时，会乱下痕迹",
-  "PhantomTONEInfoLong": "(内鬼阵营):\n幻象师通过消失按钮隐身，以逃离案发现场。如果幻象师想在倒计时结束前显形，可以点击显形按钮\n注意：每当幻象师隐身和显形时，都会产生烟雾",
+  "PhantomTONEInfoLong": "(内鬼阵营):\n幻象师通过消失按钮隐身，以逃离案发现场。如果幻象师想在倒计时结束前显形，可以点击显形按钮",
   "GuardianAngelTONEInfoLong": "(船员阵营):\n守护天使可以为船员提供临时护盾",
   "ImpostorTONEInfoLong": "(内鬼阵营):\n内鬼的目标是击杀所有船员。可以破坏和使用通风管",
   "CrewmateTONEInfoLong": "(船员阵营):\n船员的目标是找到并驱逐所有内鬼和其它非船员带刀玩家或完成所有任务",
@@ -4465,5 +4465,9 @@
   "ShowExileMsgAfterMeeting": "会议后显示原版驱逐结果",
   "VanillaImpRemain": "剩下 {0} 个伪装者",
   "AllRolesEnabled": "所有职业已启用",
-  "Cupid.TargetDead": "请选择一个在场的存活的玩家作为目标"
+  "Cupid.TargetDead": "请选择一个在场的存活的玩家作为目标",
+  "ViperKillButtonText": "酸液",
+  "SafeGuess": "启用安全猜测",
+  "SafeGuessLimit": "安全猜测次数",
+  "SafeGuessNotCorrectlyGuessRole": "你没有猜对这个身份！\n但你有安全猜测！"
 }

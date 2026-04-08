@@ -18,7 +18,7 @@ public static class Zoom
             if (Camera.main.orthographicSize > 3.0f)
                 ResetButtons = true;
 
-            if (Input.touchSupported)
+            if (Input.touchSupported && !MapBehaviour.Instance.IsOpen)
             {
                 if (Input.touchCount == 2)
                 {

@@ -154,9 +154,10 @@ public class Lovers : IAddon
         return false;
     }
 
-    public static void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
+    public static void OnPlayerExiled(NetworkedPlayerInfo exiled)
     {
         if (!IsEnable) return;
+        if (!exiled) return;
 
         List<byte> toKill = [];
         foreach (var pair in loverPairs)

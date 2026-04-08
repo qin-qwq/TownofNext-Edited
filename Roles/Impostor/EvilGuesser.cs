@@ -1,3 +1,6 @@
+using TONE.Modules;
+using static TONE.Translator;
+
 namespace TONE.Roles.Impostor;
 
 internal class EvilGuesser : RoleBase
@@ -12,7 +15,11 @@ internal class EvilGuesser : RoleBase
     private static OptionItem EGCanGuessTime;
     private static OptionItem EGCanGuessImp;
     private static OptionItem EGCanGuessAdt;
-    //private static OptionItem EGCanGuessTaskDoneSnitch; Not used
+    private static OptionItem SafeGuess;
+    private static OptionItem SafeGuessLimit;
+    private static OptionItem MisguessRolePrevGuessRoleUntilNextMeeting;
+
+    private bool CantGuess;
 
     public override void SetupCustomOption()
     {
@@ -24,9 +31,23 @@ internal class EvilGuesser : RoleBase
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
         EGCanGuessAdt = BooleanOptionItem.Create(Id + 4, "GCanGuessAdt", false, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
-        //EGCanGuessTaskDoneSnitch = BooleanOptionItem.Create(Id + 5, "EGCanGuessTaskDoneSnitch", true, TabGroup.ImpostorRoles, false)
-        //    .SetParent(Options.CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
+        SafeGuess = BooleanOptionItem.Create(Id + 5, "SafeGuess", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.EvilGuesser]);
+        SafeGuessLimit = IntegerOptionItem.Create(Id + 14, "SafeGuessLimit", new(1, 15, 1), 2, TabGroup.ImpostorRoles, false).SetParent(SafeGuess)
+            .SetValueFormat(OptionFormat.Times);
+        MisguessRolePrevGuessRoleUntilNextMeeting = BooleanOptionItem.Create(Id + 15, "DoomsayerMisguessRolePrevGuessRoleUntilNextMeeting", true, TabGroup.ImpostorRoles, false).SetParent(SafeGuess);
     }
+
+    public override void Init()
+    {
+        CantGuess = false;
+    }
+
+    public override void Add(byte playerId)
+    {
+        if (SafeGuess.GetBool()) playerId.SetAbilityUseLimit(SafeGuessLimit.GetInt());
+    }
+
+    public static bool CanSafeGuess(byte playerId) => SafeGuess.GetBool() && playerId.GetAbilityUseLimit() > 0;
 
     public static bool HideTabInGuesserUI(int TabId)
     {
@@ -38,27 +59,63 @@ internal class EvilGuesser : RoleBase
 
     public override bool GuessCheck(bool isUI, PlayerControl guesser, PlayerControl target, CustomRoles role, ref bool guesserSuicide)
     {
+        if (CantGuess)
+        {
+            guesser.ShowInfoMessage(isUI, GetString("DoomsayerCantGuess"));
+            return true;
+        }
+
         // Check limit
         if (GuessManager.GuesserGuessed[guesser.PlayerId] >= EGCanGuessTime.GetInt())
         {
-            guesser.ShowInfoMessage(isUI, Translator.GetString("GuessMax"));
+            guesser.ShowInfoMessage(isUI, GetString("GuessMax"));
             return true;
         }
 
         // Evil Guesser Can't Guess Addons
         if (role.IsAdditionRole() && !EGCanGuessAdt.GetBool())
         {
-            guesser.ShowInfoMessage(isUI, Translator.GetString("GuessAdtRole"));
+            guesser.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
             return true;
         }
 
         // Evil Guesser Can't Guess Impostors
         if ((role.IsImpostor() || role.IsMadmate()) && !EGCanGuessImp.GetBool())
         {
-            guesser.ShowInfoMessage(isUI, Translator.GetString("GuessImpRole"));
+            guesser.ShowInfoMessage(isUI, GetString("GuessImpRole"));
             return true;
         }
 
         return false;
+    }
+
+    public override bool CheckMisGuessed(bool isUI, PlayerControl guesser, PlayerControl target, CustomRoles role, ref bool guesserSuicide)
+    {
+        if (target.Is(CustomRoles.Rebound) && guesser.Is(CustomRoles.EvilGuesser) && !CanSafeGuess(guesser.PlayerId))
+        {
+            guesserSuicide = true;
+            Logger.Info($"{guesser.GetNameWithRole().RemoveHtmlTags()} guessed {target.GetNameWithRole().RemoveHtmlTags()}, doomsayer suicide because rebound", "GuessManager");
+        }
+
+        if (CanSafeGuess(guesser.PlayerId) && guesser.PlayerId == target.PlayerId)
+        {
+            guesser.ShowInfoMessage(isUI, GetString("SafeGuessNotCorrectlyGuessRole"));
+            guesser.RpcRemoveAbilityUse();
+            if (guesser.IsHost()) Utils.FlashColor(Utils.GetRoleColor(CustomRoles.EvilGuesser));
+
+            if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
+            {
+                CantGuess = true;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public override void OnReportDeadBody(PlayerControl goku, NetworkedPlayerInfo solos)
+    {
+        CantGuess = false;
     }
 }

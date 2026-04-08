@@ -56,7 +56,7 @@ public static class DraftAssign
     {
         if (!Options.UseVariableImp.GetBool())
         {
-            ResultImpnum = Main.RealOptionsData.GetInt(Int32OptionNames.NumImpostors);
+            ResultImpnum = Main.NormalOptions.NumImpostors;
             ResultImpnum -= RoleAssign.SetRoles.Values.Count(x => x.IsImpostor());
             if (ResultImpnum < 0) ResultImpnum = 0;
             return;

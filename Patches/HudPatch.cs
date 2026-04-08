@@ -76,7 +76,7 @@ class HudManagerUpdatePatch
             if (player.IsAlive())
             {
                 // Set default
-                __instance.KillButton?.OverrideText(GetString("KillButtonText"));
+                __instance.KillButton?.OverrideText(player.GetCustomRole().GetRoleTypes() is RoleTypes.Viper ? GetString("ViperKillButtonText") : GetString("KillButtonText"));
                 __instance.ReportButton?.OverrideText(GetString("ReportButtonText"));
                 __instance.SabotageButton?.OverrideText(GetString("SabotageButtonText"));
 
@@ -326,7 +326,7 @@ class TaskPanelBehaviourPatch
                         AllText += $"\r\n\r\n<size=85%>{text}</size>";
                     }
 
-                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
+                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp && !OperatingSystem.IsAndroid())
                     {
                         AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
                         AllText += "</size>";

@@ -56,8 +56,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.04.05";
-    public const string PluginDisplayVersion = "1.9.2";
+    public const string PluginVersion = "26.04.08";
+    public const string PluginDisplayVersion = "1.9.3";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 3, 31, 0) // 2026.3.31 & 17.3
@@ -69,7 +69,7 @@ public class Main : BasePlugin
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 2
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
-    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.9.2
+    public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.9.3
 #pragma warning restore IDE1006 // Naming Styles
 
     public enum Release

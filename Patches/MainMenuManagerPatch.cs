@@ -125,7 +125,7 @@ public static class MainMenuManagerPatch
         string[] fileNames = assembly.GetManifestResourceNames().Where(resourceName => resourceName.StartsWith(folder) && resourceName.EndsWith(".png")).ToArray();
         int choice = rand.Next(0, fileNames.Length);
 
-        spriteRenderer.sprite = Utils.LoadSprite(fileNames[choice], 150f);
+        spriteRenderer.sprite = Utils.LoadSprite(fileNames[choice], OperatingSystem.IsAndroid() ? 119f : 150f);
 
         if (template == null) return;
 
