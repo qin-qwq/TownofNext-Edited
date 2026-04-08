@@ -1,6 +1,7 @@
 using AmongUs.Data;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
+using BepInEx;
 using Hazel;
 using Il2CppInterop.Generator.Extensions;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
@@ -1767,8 +1768,6 @@ public static class Utils
                 name = $"<color=#fffb00><size=1.7>{GetString("ModeSpeedRun")}</size></color>\r\n" + name;
             if (Options.CurrentGameMode == CustomGameMode.TagMode)
                 name = $"<color=#2ccc00><size=1.7>{GetString("ModeTagMode")}</size></color>\r\n" + name;
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp)
-                name = $"<color=#f8d86e><size=1.7>{GetString("ModeRoundUp")}</size></color>\r\n" + name;
         }
 
 
@@ -3116,8 +3115,6 @@ public static class Utils
                 playerState.RoleClass.LastBlockedMoveInVentVents.Clear();
             }
 
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.AfterMeetingTasks();
-
             //Set kill timer
             foreach (var player in Main.EnumerateAlivePlayerControls())
             {
@@ -3237,7 +3234,7 @@ public static class Utils
         string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
         string filename = $"{f}TONE-v{Main.PluginVersion}-{t}.log";
         if (!Directory.Exists(f)) Directory.CreateDirectory(f);
-        FileInfo file = new(@$"{Environment.CurrentDirectory}/BepInEx/LogOutput.log");
+        FileInfo file = new(Path.Combine(Paths.BepInExRootPath, "LogOutput.log"));
         file.CopyTo(@filename);
 
         if (!open) return;

@@ -86,7 +86,6 @@ internal class ChatCommands
         if (ImpostorChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
-        if (RoundUp.DeputyCommand(PlayerControl.LocalPlayer, text)) goto Canceled;
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
         Directory.CreateDirectory(sponsorTagsFiles);
@@ -513,7 +512,6 @@ internal class ChatCommands
                     switch (Options.CurrentGameMode)
                     {
                         case CustomGameMode.Standard:
-                        case CustomGameMode.RoundUp:
                             var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                             int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                             int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
@@ -576,11 +574,6 @@ internal class ChatCommands
                     if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
                     {
                         Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), PlayerControl.LocalPlayer.PlayerId);
-                        break;
-                    }
-                    if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && PlayerControl.LocalPlayer.PlayerId == RoundUp.Deputy)
-                    {
-                        Utils.SendMessage(GetString("RoundUp_Help"), PlayerControl.LocalPlayer.PlayerId);
                         break;
                     }
 
@@ -2207,7 +2200,6 @@ internal class ChatCommands
         if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
         if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
         if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
-        if (RoundUp.DeputyCommand(player, text)) { canceled = true; Logger.Info($"Is RoundUp Command", "OnReceiveChat"); return; }
 
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
@@ -2540,7 +2532,6 @@ internal class ChatCommands
                 switch (Options.CurrentGameMode)
                 {
                     case CustomGameMode.Standard:
-                    case CustomGameMode.RoundUp:
                         var allAlivePlayers = Main.EnumerateAlivePlayerControls();
                         int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
                         int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
@@ -3179,11 +3170,6 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), player.PlayerId);
                     break;
                 }
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && player.PlayerId == RoundUp.Deputy)
-                {
-                    Utils.SendMessage(GetString("RoundUp_Help"), player.PlayerId);
-                    break;
-                }
 
                 if (arg != 253) // skip
                 {
@@ -3650,7 +3636,7 @@ internal class ChatCommands
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
             return;
         }
-        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp)
+        if (Options.CurrentGameMode != CustomGameMode.Standard)
         {
             Utils.SendMessage(GetString("StartDraftWrongGameMode"), player.PlayerId);
             return;

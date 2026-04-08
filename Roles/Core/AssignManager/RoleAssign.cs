@@ -203,8 +203,7 @@ public class RoleAssign
         foreach (var role in EnumHelper.GetAllValues<CustomRoles>())
         {
             int chance = role.GetMode();
-            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool()) ||
-               (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) continue;
+            if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) continue;
             switch (role)
             {
                 case CustomRoles.Stalker when GameStates.FungleIsActive:

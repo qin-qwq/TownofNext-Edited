@@ -144,11 +144,6 @@ internal class Retributionist : RoleBase
             pc.ShowInfoMessage(isUI, GetString("ApocalypseImmune"));
             return true;
         }
-        else if (CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
-        {
-            pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
-            return true;
-        }
         else if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
         {
             pc.ShowInfoMessage(isUI, GetString("GuessMini"));

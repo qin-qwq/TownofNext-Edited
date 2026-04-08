@@ -297,8 +297,7 @@ public static class DraftAssign
     public static bool NoAssignRoles(CustomRoles role)
     {
         int chance = role.GetMode();
-        if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool()) ||
-           (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) return true;
+        if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) return true;
         if (RoleAssign.SetRoles.ContainsValue(role)) return true;
         switch (role)
         {

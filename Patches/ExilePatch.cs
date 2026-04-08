@@ -15,7 +15,7 @@ class ExileControllerWrapUpPatch
         // This patch is to show exile string for modded players
         public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
         {
-            if (Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp && init != null && init.outfit != null)
+            if (Options.CurrentGameMode is CustomGameMode.Standard && init != null && init.outfit != null)
                 __instance.completeString = CheckForEndVotingPatch.TempExileMsg;
             // TempExileMsg for client is sent in RpcClose
         }
@@ -145,7 +145,7 @@ class ExileControllerWrapUpPatch
         Main.MeetingIsStarted = false;
         Main.MeetingsPassed++;
 
-        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp);
+        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: Options.CurrentGameMode is CustomGameMode.Standard);
     }
 
     public static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
@@ -167,7 +167,7 @@ class ExileControllerWrapUpPatch
                 {
                     exiled.Object.RpcExileV2();
                 }
-            }, Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp ? 0.5f : 1.4f, "Restore IsDead Task");
+            }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
 
             _ = new LateTask(AntiBlackout.ResetAfterMeeting, 0.6f, "ResetAfterMeeting");
 

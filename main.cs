@@ -173,7 +173,6 @@ public class Main : BasePlugin
         [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
-        [CustomGameMode.RoundUp] = new Color32(248, 216, 110, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
     };
 
@@ -1044,9 +1043,6 @@ public enum CustomRoles
     // Tag Mode
     TZombie,
     TCrewmate,
-
-    // Round Up
-    RDeputy,
 
     // Sub-role after 500
     NotAssigned = 500,

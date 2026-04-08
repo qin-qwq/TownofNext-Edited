@@ -22,8 +22,7 @@ public static class CustomRoleManager
         var roleClass = RoleClass.FirstOrDefault(x => x.Key == role).Value;
 
         if (!role.IsVanilla() && !role.IsAdditionRole()
-            && role is not CustomRoles.Apocalypse and not CustomRoles.Mini and not CustomRoles.NotAssigned and not CustomRoles.SpeedBooster and not CustomRoles.Killer and not CustomRoles.GM
-                   and not CustomRoles.RDeputy)
+            && role is not CustomRoles.Apocalypse and not CustomRoles.Mini and not CustomRoles.NotAssigned and not CustomRoles.SpeedBooster and not CustomRoles.Killer and not CustomRoles.GM)
         {
             if (RoleClass.Count(x => x.Value.Role == role) > 1)
                 Logger.Error($"RoleClass for {role} is not unique.", "GetStaticRoleClass");
@@ -351,7 +350,6 @@ public static class CustomRoleManager
         // Check Suicide
         var isSuicide = killer.PlayerId == target.PlayerId;
 
-        if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
         // Target was murdered by Killer
         targetRoleClass.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
 

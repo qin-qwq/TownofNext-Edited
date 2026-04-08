@@ -316,13 +316,6 @@ public class GameStartManagerBeginGamePatch
             return false;
         }
 
-        if (Options.CurrentGameMode == CustomGameMode.RoundUp && !Main.IsAprilFools && !PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
-        {
-            Options.GameMode.SetValue(0);
-            Logger.SendInGame(string.Format(GetString("Warning.GameModeNotEnabled"), GetString("RoundUp")));
-            return false;
-        }
-
         DoTasksForBeginGame();
 
         __instance.ReallyBegin(false);

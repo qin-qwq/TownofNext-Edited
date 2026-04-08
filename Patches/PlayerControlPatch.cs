@@ -767,7 +767,7 @@ class ReportDeadBodyPatch
             return false;
         }
         if (Options.DisableMeeting.GetBool()) return false;
-        if (Options.CurrentGameMode != CustomGameMode.Standard && Options.CurrentGameMode != CustomGameMode.RoundUp) return false;
+        if (Options.CurrentGameMode != CustomGameMode.Standard) return false;
 
         if (!CanReport[__instance.PlayerId])
         {
@@ -963,7 +963,6 @@ class ReportDeadBodyPatch
                     Logger.SendInGame($"Error: {error}");
                 }
             }
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnReportDeadBody();
 
             Rebirth.OnReportDeadBody();
 

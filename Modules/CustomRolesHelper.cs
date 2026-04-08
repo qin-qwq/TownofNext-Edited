@@ -22,15 +22,6 @@ public static class CustomRolesHelper
     {
         return role is CustomRoles.Transporter;
     }
-    public static bool NotSpawnInRoundUp(this CustomRoles role)
-    {
-        return role is CustomRoles.Instigator or CustomRoles.Vindicator or CustomRoles.Mayor or
-                       CustomRoles.Dictator or CustomRoles.Jailer or CustomRoles.Pickpocket or
-                       CustomRoles.Stealer or CustomRoles.Watcher or CustomRoles.Tiebreaker or
-                       CustomRoles.Silent or CustomRoles.Evader or CustomRoles.VoidBallot or
-                       CustomRoles.Influenced or CustomRoles.Swapper or CustomRoles.Collector or
-                       CustomRoles.Speaker;
-    }
     public static CustomRoles GetVNRole(this CustomRoles role) // RoleBase: Impostor, Shapeshifter, Crewmate, Engineer, Scientist
     {
         // Vanilla roles

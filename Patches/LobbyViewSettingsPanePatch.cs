@@ -534,7 +534,6 @@ public static class LobbyViewSettingsPanePatch
             switch (currentGameMode)
             {
                 case CustomGameMode.Standard:
-                case CustomGameMode.RoundUp:
                     buttonTab.gameObject.SetActive(true);
                     break;
                 default:
@@ -786,7 +785,7 @@ public static class LobbyViewSettingsPanePatch
                 if (option.Tab != tabName) continue;
                 if (option.GameMode is not CustomGameMode.All && option.GameMode != LastGameModeSelected)
                 {
-                    if (!(LastGameModeSelected == CustomGameMode.RoundUp && option.GameMode == CustomGameMode.Standard))
+                    if (!(option.GameMode == CustomGameMode.Standard))
                         continue;
                 }
 
@@ -877,7 +876,6 @@ public static class LobbyViewSettingsPanePatch
 
                             titleName = titleName.RemoveHtmlTags();
 
-                            if (LastGameModeSelected == CustomGameMode.RoundUp && role.NotSpawnInRoundUp()) titleName += GetString("NotSpawnRole");
                             if (role.OnlySpawnsWithPetsRole()) titleName += GetString("RequiresPet");
                             if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) titleName += GetString("SupportsPet");
 

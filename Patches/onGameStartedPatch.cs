@@ -89,8 +89,7 @@ internal class ChangeRoleSettings
 
             Main.LastNotifyNames.Clear();
 
-            Main.FirstDiedPrevious = Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp
-            && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
+            Main.FirstDiedPrevious = Options.CurrentGameMode is CustomGameMode.Standard && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
 
             LobbyViewSettingsPanePatch.ClearReferences();
 
@@ -147,7 +146,6 @@ internal class ChangeRoleSettings
 
             if (AmongUsClient.Instance.AmHost)
             {
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && !Main.IsAprilFools && !PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev) Options.GameMode.SetValue(0);
                 var invalidColor = Main.EnumeratePlayerControls().Where(p => p.Data.DefaultOutfit.ColorId < 0 || Palette.PlayerColors.Length <= p.Data.DefaultOutfit.ColorId);
                 if (invalidColor.Any())
                 {
@@ -160,7 +158,6 @@ internal class ChangeRoleSettings
                     CriticalErrorManager.SetCriticalError("Player Have Invalid Color", true);
                     Logger.Error(msg, "CoStartGame");
                 }
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && !Options.UseMeetingShapeshift.GetBool()) Options.UseMeetingShapeshift.SetValue(1);
             }
 
             foreach (var pc in Main.EnumeratePlayerControls())
@@ -193,7 +190,7 @@ internal class ChangeRoleSettings
                     Main.LastNotifyNames[pair] = currentName;
                 }
 
-                if (Options.UsePets.GetBool() && Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp && AmongUsClient.Instance.AmHost)
+                if (Options.UsePets.GetBool() && Options.CurrentGameMode is CustomGameMode.Standard && AmongUsClient.Instance.AmHost)
                 {
                     foreach (var player in Main.EnumeratePlayerControls())
                     {
@@ -260,9 +257,6 @@ internal class ChangeRoleSettings
 
             //Tag Mode
             TagMode.Init();
-
-            //Round Up
-            RoundUp.Init();
 
             try
             {
@@ -523,7 +517,7 @@ internal class StartGameHostPatch
 
             try
             {
-                if (Options.CurrentGameMode is CustomGameMode.Standard or CustomGameMode.RoundUp)
+                if (Options.CurrentGameMode is CustomGameMode.Standard)
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
@@ -584,7 +578,6 @@ internal class StartGameHostPatch
             switch (Options.CurrentGameMode)
             {
                 case CustomGameMode.Standard:
-                case CustomGameMode.RoundUp:
                     GameEndCheckerForNormal.SetPredicateToNormal();
                     break;
                 case CustomGameMode.FFA:

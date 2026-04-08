@@ -1,7 +1,9 @@
 using AmongUs.GameOptions;
+using Hazel;
 using System;
 using System.Text;
 using TONE.Modules;
+using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
@@ -242,6 +244,7 @@ internal class Doomsayer : RoleBase
             {
                 guesser.ShowInfoMessage(isUI, GetString("DoomsayerNotCorrectlyGuessRole"));
                 if (guesser.IsHost()) FlashColor(GetRoleColor(CustomRoles.Doomsayer));
+                else SendRPC(guesser);
 
                 if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
                 {
@@ -370,4 +373,16 @@ internal class Doomsayer : RoleBase
         DoomsayerTarget[_Player.PlayerId] = byte.MaxValue;
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("prophecies");
+
+    public void SendRPC(PlayerControl pc)
+    {
+        if (!pc.IsNonHostModdedClient()) return;
+        var writer = MessageWriter.Get(SendOption.Reliable);
+        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+    }
+
+    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
+    {
+        FlashColor(GetRoleColor(CustomRoles.Doomsayer));
+    }
 }
