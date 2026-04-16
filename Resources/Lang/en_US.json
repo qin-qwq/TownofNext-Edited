@@ -4452,5 +4452,7 @@
   "ViperKillButtonText": "Acid",
   "SafeGuess": "Enable Security Guess",
   "SafeGuessLimit": "Security Guess Count",
-  "SafeGuessNotCorrectlyGuessRole": "You didn't correctly guess the Role!\nBut you didn't die because you hava security guess!"
+  "SafeGuessNotCorrectlyGuessRole": "You didn't correctly guess the Role!\nBut you didn't die because you hava security guess!",
+  "NotifyWraith": "如果存在幽魂则在会议上通知所有人",
+  "WraithNotice": "死亡不再是终结，而是噩梦的开端！小心<color=#ff1919>幽魂</color>！"
 }
