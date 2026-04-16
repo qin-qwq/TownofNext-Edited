@@ -4110,6 +4110,7 @@
   "Message.isButton": "The meeting starts with the use of the emergency button",
   "Message.isReport": "The meeting began with the discovery of a body\nReported corpse : {0}",
   "GodfatherCloseMeeting": "The Godfather stopped the meeting",
+  "PresidentCloseMeeting": "The President stopped the meeting",
   "Tunny": "Tunny",
   "TunnyInfo": "Keep moving to stay alive",
   "TunnyInfoLong": "(Neutral)\nTunny must keep moving to stay alive. Survive to the end to follow the victory.\nNote： staying still is allowed before the first meeting",
@@ -4303,7 +4304,7 @@
   "SpeakerInfo": "Manipulate minds, control the vote",
   "SpeakerInfoLong": "(Impostors):\nOrator can use the Kill Button to deliver a speech to a target player. The influenced player will uncontrollably vote for whomever the Orator votes for during meetings.\n— Click: Influence a player with speech\n— Double-click: Perform a normal kill",
   "Iceologer": "Cryomancer",
-  "IceologerInfo": "Ice anzhen,Ice ganyu",
+  "IceologerInfo": "Freeze the crewmate!",
   "IceologerInfoLong": "(Impostors):\nCryomancer can use the Shapeshift Button to freeze a target player, preventing movement for a short duration.\nHost setting: Frozen players may be immune if holding a Torch, or may die after multiple freezes",
   "FreezeCooldown": "Freeze cooldown",
   "FreezeDuration": "Freeze duration",
@@ -4335,7 +4336,7 @@
   "TimeMasterPetButtonText": "Time backtracking",
   "Dreamer": "Meditator",
   "DreamerInfo": "Kill in meditate",
-  "DreamerInfoLong": "(Neutral Faction)\nMeditator can use the invincible button to enter meditate status, increase movement speed and mark the standing position. The other players will see the meditator stay rooted, but meditator actually moving. While meditate status end,meditator will return to the original position",
+  "DreamerInfoLong": "(Neutrals):\nMeditator can use the invincible button to enter meditate status, increase movement speed and mark the standing position. The other players will see the meditator stay rooted, but meditator actually moving. While meditate status end,meditator will return to the original position",
   "FantasyCooldown": "Meditate cooldown",
   "FantasyDuration": "Meditate duration",
   "FantasySpeed": "Meditate moving speed",
@@ -4375,7 +4376,7 @@
   "Plunderer.CantGetRecruiting": "Can't plunder recruitment type add on role",
   "IdentityThief": "Identity Theif",
   "IdentityThiefInfo": "steal identity of other people",
-  "IdentityThiefInfoLong": "(Imposter Faction):\nIdentity thief can steal a player's identity(name and skin)by using kill's button, then kill the target player, the stolen identity is restored when a meeting is called\nNote: Identity cannot be stolen when activated in stealth",
+  "IdentityThiefInfoLong": "(Impostors):\nIdentity thief can steal a player's identity(name and skin)by using kill's button, then kill the target player, the stolen identity is restored when a meeting is called\nNote: Identity cannot be stolen when activated in stealth",
   "Sniper.UsePhantomBasis": "Headshot Auxiliary",
   "SniperCooldown": "Spiner Cooldown",
   "SniperRadius": "Spiner range",
@@ -4451,5 +4452,7 @@
   "ViperKillButtonText": "Acid",
   "SafeGuess": "Enable Security Guess",
   "SafeGuessLimit": "Security Guess Count",
-  "SafeGuessNotCorrectlyGuessRole": "You didn't correctly guess the Role!\nBut you didn't die because you hava security guess!"
+  "SafeGuessNotCorrectlyGuessRole": "You didn't correctly guess the Role!\nBut you didn't die because you hava security guess!",
+  "NotifyWraith": "Inform players at meetings that Wraith is still exist",
+  "WraithNotice": "Death is not the end, the nightmare begins! Beware the <color=#ff1919>Wraith</color>!"
 }
