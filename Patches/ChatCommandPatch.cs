@@ -1852,9 +1852,9 @@ internal class ChatCommands
                     ChatManager.SendPreviousMessagesToAll();
                     break;
 
-                case "/fix"
-                or "/blackscreenfix"
-                or "/fixblackscreen":
+                case "/fix":
+                case "/blackscreenfix":
+                case "/fixblackscreen":
                     canceled = true;
                     FixCommand(PlayerControl.LocalPlayer, text, args);
                     break;
@@ -3603,9 +3603,9 @@ internal class ChatCommands
                 }
                 break;
 
-            case "/fix"
-            or "/blackscreenfix"
-            or "/fixblackscreen":
+            case "/fix":
+            case "/blackscreenfix":
+            case "/fixblackscreen":
                 FixCommand(player, text, args);
                 break;
 

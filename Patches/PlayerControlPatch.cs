@@ -758,7 +758,6 @@ class ReportDeadBodyPatch
     public static Dictionary<byte, List<NetworkedPlayerInfo>> WaitReport = [];
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo target)
     {
-        ReportTarget = target;
         if (GameStates.IsMeeting || GameStates.IsHideNSeek) return false;
 
         if (EAC.RpcReportDeadBodyCheck(__instance, target))
@@ -797,6 +796,8 @@ class ReportDeadBodyPatch
 
             var killer = target?.Object?.GetRealKiller();
             var killerRole = killer?.GetCustomRole();
+
+            ReportTarget = target;
 
             if (target == null) //Meeting
             {
@@ -2081,6 +2082,41 @@ public static class PlayerControlDiePatch
         }
 
         __instance.RpcRemovePet();
+
+        if (Main.NormalOptions.MapId != 7) return;
+
+        _ = new LateTask(() =>
+        {
+            if (Main.PlayerStates.TryGetValue(__instance.PlayerId, out var state) && !state.IsDead)
+            {
+                state.IsDead = true;
+                var sender = CustomRpcSender.Create($"LIDeathSync:{__instance.GetRealName()}", SendOption.Reliable);
+                var hasValue = __instance.SyncGeneralOptions();
+                sender.SendMessage(dispose: !hasValue);
+            }
+        }, 0.2f);
+    }
+}
+// Credit: EHR
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Revive))]
+static class PlayerControlRevivePatch
+{
+    public static void Postfix(PlayerControl __instance)
+    {
+        if (!AmongUsClient.Instance.AmHost || Main.NormalOptions.MapId != 7) return;
+
+        _ = new LateTask(() =>
+        {
+            if (Main.PlayerStates.TryGetValue(__instance.PlayerId, out var state) && state.IsDead)
+            {
+                state.IsDead = false;
+                var sender = CustomRpcSender.Create($"LIReviveSync:{__instance.GetRealName()}", SendOption.Reliable);
+                var hasValue = __instance.SyncGeneralOptions();
+                sender.SendMessage(dispose: !hasValue);
+                Vector2 pos = __instance.GetCustomPosition();
+                __instance.RpcTeleport(Main.EnumerateAlivePlayerControls().Without(__instance).Select(x => x.GetCustomPosition()).Concat(ShipStatus.Instance.AllVents.Select(x => new Vector2(x.transform.position.x, x.transform.position.y + 0.3636f))).MinBy(x => Vector2.Distance(pos, x)));
+            }
+        }, 0.2f);
     }
 }
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSetRole))]

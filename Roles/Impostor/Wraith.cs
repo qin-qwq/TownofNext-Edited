@@ -21,6 +21,7 @@ internal class Wraith : RoleBase
     private static OptionItem SuicideCooldown;
     public static OptionItem KillCooldown;
     public static OptionItem PreventSeeRolesDeath;
+    public static OptionItem NotifyWraith;
 
     public override void SetupCustomOption()
     {
@@ -33,6 +34,8 @@ internal class Wraith : RoleBase
                 .SetValueFormat(OptionFormat.Seconds);
         PreventSeeRolesDeath = BooleanOptionItem.Create(Id + 12, "PreventSeeRolesDeath", true, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Wraith]);
+        NotifyWraith = BooleanOptionItem.Create(Id + 13, "NotifyWraith", true, TabGroup.ImpostorRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Wraith]);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -44,6 +47,12 @@ internal class Wraith : RoleBase
     {
         phantom.RpcMurderPlayer(phantom);
         return false;
+    }
+
+    public override void OnMeetingHudStart(PlayerControl pc)
+    {
+        if (CustomRoles.Wraith.RoleExist(true) && NotifyWraith.GetBool())
+            MeetingHudStartPatch.AddMsg(GetString("WraithNotice"), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Wraith), GetString("Wraith").ToUpper()));
     }
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
@@ -120,6 +129,12 @@ internal class Wraithh : RoleBase
         if (Wraith.PreventSeeRolesDeath.GetBool())
             return true;
         return false;
+    }
+
+    public override void OnMeetingHudStart(PlayerControl pc)
+    {
+        if (CustomRoles.Wraithh.RoleExist(true) && Wraith.NotifyWraith.GetBool())
+            MeetingHudStartPatch.AddMsg(GetString("WraithNotice"), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Wraith), GetString("Wraith").ToUpper()));
     }
 
     public override bool OnCheckProtect(PlayerControl killer, PlayerControl target)

@@ -139,10 +139,6 @@ internal class Doomsayer : RoleBase
         GuessesCountPerMeeting = 0;
     }
 
-    public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
-        => IsForMeeting && seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Doomsayer), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
-
-
     public static bool HideTabInGuesserUI(int TabId)
     {
         if (!DCanGuessCrewmates.GetBool() && TabId == 0) return true;

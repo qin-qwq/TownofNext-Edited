@@ -80,13 +80,14 @@ public class ModNewsHistory
     [HarmonyPatch(typeof(PlayerAnnouncementData), nameof(PlayerAnnouncementData.SetAnnouncements)), HarmonyPrefix]
     public static bool SetModAnnouncements(PlayerAnnouncementData __instance, [HarmonyArgument(0)] ref Il2CppReferenceArray<Announcement> aRange)
     {
+        if (OperatingSystem.IsAndroid()) return true;
         if (AllModNews.Count < 1)
         {
             var lang = DataManager.Settings.Language.CurrentLanguage.ToString();
-            if (!Assembly.GetExecutingAssembly().GetManifestResourceNames().Any(x => x.StartsWith($"TONE.Resources.ModNews.{lang}.")))
+            if (!Assembly.GetExecutingAssembly().GetManifestResourceNames().Any(x => x.StartsWith($"TONE.Resources.Announcements.{lang}.")))
                 lang = SupportedLangs.English.ToString();
 
-            var fileNames = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith($"TONE.Resources.ModNews.{lang}."));
+            var fileNames = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.StartsWith($"TONE.Resources.Announcements.{lang}."));
             foreach (var file in fileNames)
                 AllModNews.Add(GetContentFromRes(file));
 

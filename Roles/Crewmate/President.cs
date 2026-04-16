@@ -199,6 +199,10 @@ internal class President : RoleBase
 
     public override void AfterMeetingTasks()
     {
-        _ = new LateTask(() => { EndMeeting = false; }, 1f);
+        if (EndMeeting)
+        {
+            Main.EnumeratePlayerControls().Do(x => x.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.President), GetString("PresidentCloseMeeting"))));
+            _ = new LateTask(() => { EndMeeting = false; }, 1f);
+        }
     }
 }

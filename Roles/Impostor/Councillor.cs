@@ -59,9 +59,6 @@ internal class Councillor : RoleBase
         MurderLimitMeeting = MurderLimitPerMeeting.GetInt();
     }
 
-    public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
-        => IsForMeeting && seer.IsAlive() && target.IsAlive() ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Councillor), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
-
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
         MurderMsg(pc, $"/tl {target.PlayerId}");

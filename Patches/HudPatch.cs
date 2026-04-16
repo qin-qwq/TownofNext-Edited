@@ -431,6 +431,7 @@ class RepairSender
         return SystemType.ToString() + "(" + ((SystemTypes)SystemType).ToString() + ")\r\n" + amount;
     }
 }
+// Credit: EHR
 [HarmonyPatch(typeof(ActionButton), nameof(ActionButton.SetFillUp))]
 internal static class ActionButtonSetFillUpPatch
 {
@@ -453,7 +454,6 @@ internal static class ActionButtonSetFillUpPatch
         }
     }
 }
-// Credit: EHR
 [HarmonyPatch(typeof(InfectedOverlay), nameof(InfectedOverlay.FixedUpdate))]
 internal static class SabotageMapPatch
 {

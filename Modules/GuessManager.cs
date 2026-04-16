@@ -1107,35 +1107,6 @@ public static class GuessManager
                 return;
             }
             UnityEngine.Object.Destroy(textTemplate.gameObject);
-            // 参考：https://github.com/Gurge44/EndlessHostRoles/blob/main/Modules/GuessManager.cs
-            if (guesserUI) UnityEngine.Object.Destroy(guesserUI);
-
-            foreach (var roleButtonsValue in RoleButtons.Values)
-            {
-                foreach (var transform in roleButtonsValue)
-                {
-                    if (transform.gameObject)
-                        UnityEngine.Object.Destroy(transform.gameObject);
-                }
-            }
-
-            foreach (var spriteRenderer in RoleSelectButtons.Values)
-            {
-                if (spriteRenderer.gameObject)
-                    UnityEngine.Object.Destroy(spriteRenderer.gameObject);
-            }
-
-            foreach (var spriteRenderer in PageButtons)
-            {
-                if (spriteRenderer.gameObject)
-                    UnityEngine.Object.Destroy(spriteRenderer.gameObject);
-            }
-            
-            textTemplate = null;
-            guesserUI = null;
-            RoleButtons.Clear();
-            RoleSelectButtons.Clear();
-            PageButtons.Clear();
         }
     }
 

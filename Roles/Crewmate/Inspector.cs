@@ -371,7 +371,4 @@ internal class Inspector : RoleBase
         }
         return false;
     }
-
-    public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
-        => IsForMeeting ? ColorString(GetRoleColor(CustomRoles.Inspector), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
 }

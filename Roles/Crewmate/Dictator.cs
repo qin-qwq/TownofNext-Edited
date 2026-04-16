@@ -133,8 +133,6 @@ internal class Dictator : RoleBase
         }
         return true;
     }
-    public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
-        => IsForMeeting && ChangeCommandToExpel.GetBool() ? ColorString(GetRoleColor(CustomRoles.Dictator), target.PlayerId.ToString()) + " " + TargetPlayerName : "";
 
     private void SendDictatorRPC(byte playerId)
     {

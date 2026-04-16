@@ -1352,8 +1352,7 @@ class MeetingHudStartPatch
                 }
             }
         }
-        if (Main.CurrentServerIsVanilla && TranslationController.Instance.currentLanguage.languageID is SupportedLangs.SChinese) TemplateManager.SendTemplate("OnMeetingVanilla", noErr: true);
-        else TemplateManager.SendTemplate("OnMeeting", noErr: true);
+        TemplateManager.SendTemplate("OnMeeting", noErr: true);
 
         try
         {

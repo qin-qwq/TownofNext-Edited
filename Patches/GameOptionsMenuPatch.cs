@@ -531,7 +531,7 @@ public static class NumberOptionPatch
                 __instance.Value = (float)Math.Round(__instance.Value, 2);
                 break;
             case StringNames.GameNumImpostors:
-                __instance.ValidRange = new(0f, GameOptionsManager.Instance.CurrentGameOptions.MaxPlayers / 2);
+                __instance.ValidRange = GameStates.IsVanillaServer && !GameStates.IsLocalGame ? new(1, 3) : new(0f, GameOptionsManager.Instance.CurrentGameOptions.MaxPlayers / 2);
                 break;
             case StringNames.CapacityLabel:
                 __instance.ValidRange = new(4, 127);

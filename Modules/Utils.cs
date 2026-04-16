@@ -403,13 +403,13 @@ public static class Utils
         return GetString("DeathReason." + Enum.GetName(typeof(PlayerState.DeathReason), status));
     }
 
-    public static void SyncGeneralOptions(this PlayerControl player)
+    public static bool SyncGeneralOptions(this PlayerControl player)
     {
-        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame) return;
+        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame) return false;
         var playerId = player.PlayerId;
         var msg = new RpcSyncGeneralOptions(PlayerControl.LocalPlayer.NetId, playerId, player.GetCustomRole(), Main.PlayerStates[playerId].IsDead, Main.PlayerStates[playerId].Disconnected, Main.PlayerStates[playerId].deathReason, Main.AllPlayerKillCooldown[playerId], Main.AllPlayerSpeed[playerId]);
         RpcUtils.LateBroadcastReliableMessage(msg);
-
+        return true;
     }
     public static void SyncSpeed(this PlayerControl player)
     {
@@ -2383,57 +2383,11 @@ public static class Utils
                         // ========= Only During Meeting =========
                         if (isForMeeting)
                         {
-                            // Guesser Mode is On ID
-                            if (Options.GuesserMode.GetBool())
+                            if (seer.IsAlive() && target.IsAlive() && CanSeeTargetId(seer))
                             {
-                                // seer & target is alive
-                                if (seer.IsAlive() && target.IsAlive())
-                                {
-                                    var GetTragetId = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
+                                var GetTragetId = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
 
-                                    //Crewmates
-                                    if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Swapper))
-                                        TargetPlayerName = GetTragetId;
-
-                                    else if (seer.Is(CustomRoles.NiceGuesser) && !Options.CrewmatesCanGuess.GetBool())
-                                        TargetPlayerName = GetTragetId;
-
-
-
-                                    //Impostors
-                                    if (Options.ImpostorsCanGuess.GetBool() && (seer.GetCustomRole().IsImpostor() || seer.GetCustomRole().IsMadmate()) && !seer.Is(CustomRoles.Councillor) && !seer.Is(CustomRoles.Nemesis))
-                                        TargetPlayerName = GetTragetId;
-
-                                    else if (seer.Is(CustomRoles.EvilGuesser) && !Options.ImpostorsCanGuess.GetBool())
-                                        TargetPlayerName = GetTragetId;
-
-
-
-                                    // Neutrals
-                                    if (Options.NeutralKillersCanGuess.GetBool() && seer.GetCustomRole().IsNK())
-                                        TargetPlayerName = GetTragetId;
-
-                                    if (Options.NeutralApocalypseCanGuess.GetBool() && seer.GetCustomRole().IsNA())
-                                        TargetPlayerName = GetTragetId;
-
-                                    if (Options.PassiveNeutralsCanGuess.GetBool() && seer.GetCustomRole().IsNonNK() && !seer.Is(CustomRoles.Doomsayer))
-                                        TargetPlayerName = GetTragetId;
-
-                                    if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven() && !seer.Is(CustomRoles.Ritualist))
-                                        TargetPlayerName = GetTragetId;
-
-                                    if (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Ritualist))
-                                        TargetPlayerName = GetTragetId;
-                                }
-                            }
-                            else // Guesser Mode is Off ID
-                            {
-                                if (seer.IsAlive() && target.IsAlive())
-                                {
-                                    if (seer.Is(CustomRoles.NiceGuesser) || seer.Is(CustomRoles.EvilGuesser) ||
-                                        (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Ritualist)))
-                                        TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
-                                }
+                                TargetPlayerName = GetTragetId;
                             }
                             // Summoner Dead players ID
                             if (seer.IsAlive() && !target.IsAlive())
@@ -2779,60 +2733,20 @@ public static class Utils
                             // ========= Only During Meeting =========
                             if (isForMeeting)
                             {
-                                // Guesser Mode is On ID
-                                if (Options.GuesserMode.GetBool())
+                                if (isForMeeting)
                                 {
-                                    // seer & target is alive
-                                    if (seer.IsAlive() && target.IsAlive())
+                                    if (seer.IsAlive() && target.IsAlive() && CanSeeTargetId(seer))
                                     {
                                         var GetTragetId = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
 
-                                        //Crewmates
-                                        if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate() && !seer.Is(CustomRoles.Judge) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Swapper))
-                                            TargetPlayerName = GetTragetId;
-
-                                        else if (seer.Is(CustomRoles.NiceGuesser) && !Options.CrewmatesCanGuess.GetBool())
-                                            TargetPlayerName = GetTragetId;
-
-
-
-                                        //Impostors
-                                        if (Options.ImpostorsCanGuess.GetBool() && (seer.GetCustomRole().IsImpostor() || seer.GetCustomRole().IsMadmate()) && !seer.Is(CustomRoles.Councillor) && !seer.Is(CustomRoles.Nemesis))
-                                            TargetPlayerName = GetTragetId;
-
-                                        else if (seer.Is(CustomRoles.EvilGuesser) && !Options.ImpostorsCanGuess.GetBool())
-                                            TargetPlayerName = GetTragetId;
-
-
-
-                                        // Neutrals
-                                        if (Options.NeutralKillersCanGuess.GetBool() && seer.GetCustomRole().IsNK())
-                                            TargetPlayerName = GetTragetId;
-
-                                        if (Options.NeutralApocalypseCanGuess.GetBool() && seer.GetCustomRole().IsNA())
-                                            TargetPlayerName = GetTragetId;
-
-                                        if (Options.PassiveNeutralsCanGuess.GetBool() && seer.GetCustomRole().IsNonNK() && !seer.Is(CustomRoles.Doomsayer))
-                                            TargetPlayerName = GetTragetId;
-
-                                        if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven() && !seer.Is(CustomRoles.Ritualist))
-                                            TargetPlayerName = GetTragetId;
+                                        TargetPlayerName = GetTragetId;
                                     }
-                                }
-                                else // Guesser Mode is Off ID
-                                {
-                                    if (seer.IsAlive() && target.IsAlive())
+                                    // Summoner Dead players ID
+                                    if (seer.IsAlive() && !target.IsAlive())
                                     {
-                                        if (seer.Is(CustomRoles.NiceGuesser) || seer.Is(CustomRoles.EvilGuesser) ||
-                                            (seer.Is(CustomRoles.Guesser) && !seer.Is(CustomRoles.Inspector) && !seer.Is(CustomRoles.Swapper) && !seer.Is(CustomRoles.Lookout) && !seer.Is(CustomRoles.Ritualist)))
+                                        if (seer.Is(CustomRoles.Summoner))
                                             TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
                                     }
-                                }
-                                // Summoner Dead players ID
-                                if (seer.IsAlive() && !target.IsAlive())
-                                {
-                                    if (seer.Is(CustomRoles.Summoner))
-                                        TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
                                 }
                             }
 
@@ -3244,8 +3158,11 @@ public static class Utils
 
         SendMessage(string.Format(GetString("Message.DumpcmdUsed"), PlayerControl.LocalPlayer.GetNameWithRole()));
 
-        ProcessStartInfo psi = new("Explorer.exe") { Arguments = "/e,/select," + @filename.Replace("/", "\\") };
-        Process.Start(psi);
+        if (!OperatingSystem.IsAndroid())
+        {
+            ProcessStartInfo psi = new("Explorer.exe") { Arguments = "/e,/select," + @filename.Replace("/", "\\") };
+            Process.Start(psi);
+        }
     }
 
 
@@ -3635,5 +3552,41 @@ public static class Utils
         UnityEngine.Object.Destroy(playerControl.gameObject);
         sender.EndMessage();
         sender.SendMessage();
+    }
+
+    public static bool CanSeeTargetId(PlayerControl seer)
+    {
+        if (Options.GuesserMode.GetBool())
+        {
+            //Crewmates
+            if (Options.CrewmatesCanGuess.GetBool() && seer.GetCustomRole().IsCrewmate()) return true;
+
+            //Impostors
+            if (Options.ImpostorsCanGuess.GetBool() && (seer.GetCustomRole().IsImpostor() || seer.GetCustomRole().IsMadmate())) return true;
+
+            // Neutrals
+            if (Options.NeutralKillersCanGuess.GetBool() && seer.GetCustomRole().IsNK()) return true;
+
+            if (Options.NeutralApocalypseCanGuess.GetBool() && seer.GetCustomRole().IsNA()) return true;
+
+            if (Options.PassiveNeutralsCanGuess.GetBool() && seer.GetCustomRole().IsNonNK()) return true;
+
+            // Covens
+            if (Options.CovenCanGuess.GetBool() && seer.GetCustomRole().IsCoven()) return true;
+        }
+
+        //Crewmates
+        if (seer.Is(CustomRoles.Judge) || seer.Is(CustomRoles.Inspector) || seer.Is(CustomRoles.Lookout) || seer.Is(CustomRoles.Swapper) || 
+            (seer.Is(CustomRoles.Dictator) && Dictator.ChangeCommandToExpel.GetBool()) || seer.Is(CustomRoles.NiceGuesser)) return true;
+
+        //Impostors
+        if (seer.Is(CustomRoles.Councillor) || seer.Is(CustomRoles.Nemesis) || seer.Is(CustomRoles.EvilGuesser)) return true;
+
+        // Neutrals & Covens
+        if (seer.Is(CustomRoles.Doomsayer) || seer.Is(CustomRoles.Ritualist)) return true;
+
+        if (seer.Is(CustomRoles.Guesser)) return true;
+
+        return false;
     }
 }

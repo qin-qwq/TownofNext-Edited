@@ -66,7 +66,7 @@ public abstract class GameOptionsSender
             byte logicOptionsIndex = 0;
             foreach (var logicComponent in GameManager.Instance.LogicComponents.GetFastEnumerator())
             {
-                if (logicComponent.CastFast<LogicOptions>() != null)
+                if (logicComponent.TryCast<LogicOptions>(out _))
                 {
                     SendOptionsArray(optionArray, logicOptionsIndex, -1);
                 }

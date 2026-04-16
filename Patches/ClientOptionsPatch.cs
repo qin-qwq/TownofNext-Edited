@@ -44,6 +44,7 @@ public static class OptionsMenuBehaviourStartPatch
 
 #if ANDROID
         Main.UnlockFPS.Value = false;
+        Main.EnableCustomSoundEffect.Value = false;
 #endif
 
 #if !ANDROID
@@ -161,10 +162,13 @@ public static class OptionsMenuBehaviourStartPatch
         {
             EnableCustomButton = ClientOptionItem.Create("EnableCustomButton", Main.EnableCustomButton, __instance);
         }
+#if !ANDROID
         if (EnableCustomSoundEffect == null || EnableCustomSoundEffect.ToggleButton == null)
         {
             EnableCustomSoundEffect = ClientOptionItem.Create("EnableCustomSoundEffect", Main.EnableCustomSoundEffect, __instance);
         }
+#endif
+
         if (EnableCustomDecorations == null || EnableCustomDecorations.ToggleButton == null)
         {
             EnableCustomDecorations = ClientOptionItem.Create("EnableCustomDecorations", Main.EnableCustomDecorations, __instance);

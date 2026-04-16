@@ -235,9 +235,9 @@ public class ModUpdater
             string[] versionString = Main.PluginDisplayVersion?.ToString().Split(".");
             string[] tag = data["tag_name"]?.ToString()[1..].Split(".");
 
-            var pluginNum = int.Parse(versionString[0]) * 10000 + int.Parse(versionString[1]) * 1000 + int.Parse($"{versionString[2][0]}") * 100
-                + (versionString[2].Length > 2 && versionString[2][2] == 'B' ? int.Parse($"{versionString[2][7]}") * 10 : versionString[2].Length > 2 && versionString[2][2] == 'A' ? int.Parse($"{versionString[2][8]}") : 999);
-            var versionNum = int.Parse(tag[0]) * 10000 + int.Parse(tag[1]) * 1000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) * 10 : 999);
+            var pluginNum = int.Parse(versionString[0]) * 1000000 + int.Parse(versionString[1]) * 10000 + int.Parse($"{versionString[2][0]}") * 100
+                + (versionString[2].Length > 2 && versionString[2][2] == 'B' ? int.Parse($"{versionString[2][7]}") * 10 : versionString[2].Length > 2 && versionString[2][2] == 'A' ? int.Parse($"{versionString[2][8]}") : 99);
+            var versionNum = int.Parse(tag[0]) * 1000000 + int.Parse(tag[1]) * 10000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) * 10 : 99);
 
             Logger.Info($"Found local version: {pluginNum}; github version: {versionNum}", "CheckRelease");
 

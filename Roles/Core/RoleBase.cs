@@ -440,7 +440,7 @@ public abstract class RoleBase
     public virtual Sprite SabotageButtonSprite { get; }
 
     /// <summary>
-    /// Set PlayerName text for the Role
+    /// Set PlayerName text for the Role, can use Utils.CanSeeTargetId instead, with a few exceptions
     /// </summary>
     public virtual string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false) => string.Empty;
     // Add Mark/LowerText/Suffix for player

@@ -138,12 +138,14 @@ public static class DraftAssign
             .Shuffle()
             .ToList();
 
-        if (AllRoles.Count < (playerCount - RoleAssign.SetRoles.Values.Count) * draftCount)
+        if (AllRoles.Count + 1 == (playerCount - RoleAssign.SetRoles.Values.Count) * draftCount)
         {
-            for (var i = 0; i < (playerCount - RoleAssign.SetRoles.Values.Count) * draftCount - AllRoles.Count; i++)
-            {
-                AllRoles.Add(CustomRoles.CrewmateTONE);
-            }
+            AllRoles.Add(CustomRoles.CrewmateTONE);
+        }
+        else if (AllRoles.Count + 1 < (playerCount - RoleAssign.SetRoles.Values.Count) * draftCount)
+        {
+            Logger.SendInGame(GetString("DraftNotEnoughRoles"));
+            return; 
         }
 
         if (Sunnyboy.CheckSpawn() && AllRoles.Remove(CustomRoles.Jester)) AllRoles.Add(CustomRoles.Sunnyboy);

@@ -80,7 +80,7 @@ internal static class Crowded
                     playerButton.OnClick.AddListener((Action)(() =>
                     {
                         var maxPlayers = byte.Parse(text.text);
-                        var maxImp = Mathf.Min(__instance.GetTargetOptions().NumImpostors, maxPlayers / 2);
+                        var maxImp = GameStates.IsVanillaServer && !GameStates.IsLocalGame ? Math.Clamp(Mathf.Min(__instance.GetTargetOptions().NumImpostors, maxPlayers / 2), 1, 3) : Mathf.Min(__instance.GetTargetOptions().NumImpostors, maxPlayers / 2);
                         __instance.GetTargetOptions().SetInt(Int32OptionNames.NumImpostors, maxImp);
                         __instance.ImpostorButtons[1].TextMesh.text = maxImp.ToString();
                         __instance.SetMaxPlayersButtons(maxPlayers);
@@ -356,26 +356,43 @@ internal static class Crowded
 
     [HarmonyPatch(typeof(PSManager), nameof(PSManager.CreateGame))]
     [HarmonyPatch(typeof(CreateGameOptions), nameof(CreateGameOptions.ContinueStart))]
+    [HarmonyPatch(typeof(CreateGameOptions), nameof(CreateGameOptions.Confirm))]
     public static class BeforeHostGamePatch
     {
         public static void Prefix()
         {
             Logger.Info("Host Game is being called!", "CrowdedPatch");
+            if (!GameStates.IsVanillaServer || GameStates.IsLocalGame) return;
 
-            if (GameStates.IsVanillaServer && !GameStates.IsLocalGame)
+            var GameHostOptions = GameOptionsManager.Instance.GameHostOptions;
+            var CurrentGameOptions = GameOptionsManager.Instance.CurrentGameOptions;
+            if (GameHostOptions != null)
             {
-                if (GameOptionsManager.Instance.GameHostOptions != null)
-                {
-                    if (GameOptionsManager.Instance.GameHostOptions.MaxPlayers > 15)
-                    {
-                        GameOptionsManager.Instance.GameHostOptions.SetInt(Int32OptionNames.MaxPlayers, 15);
-                    }
+                if (GameHostOptions.MaxPlayers > 15)
+                    GameHostOptions.SetInt(Int32OptionNames.MaxPlayers, 15);
 
-                    if (GameOptionsManager.Instance.GameHostOptions.NumImpostors > 3)
-                    {
-                        GameOptionsManager.Instance.GameHostOptions.SetInt(Int32OptionNames.NumImpostors, 3);
-                    }
-                }
+                if (GameHostOptions.NumImpostors > 3)
+                    GameHostOptions.SetInt(Int32OptionNames.NumImpostors, 3);
+
+                if (GameHostOptions.NumImpostors < 1)
+                    GameHostOptions.SetInt(Int32OptionNames.NumImpostors, 1);
+            }
+            if (CurrentGameOptions != null)
+            {
+                if (CurrentGameOptions.MaxPlayers > 15)
+                    CurrentGameOptions.SetInt(Int32OptionNames.MaxPlayers, 15);
+
+                if (CurrentGameOptions.NumImpostors > 3)
+                    CurrentGameOptions.SetInt(Int32OptionNames.NumImpostors, 3);
+
+                if (CurrentGameOptions.NumImpostors < 1)
+                    CurrentGameOptions.SetInt(Int32OptionNames.NumImpostors, 1);
+            }
+
+            if (GameHostOptions != null)
+            {
+                Logger.Info($"Capacity: {GameHostOptions.MaxPlayers}", "CrowdedPatch");
+                Logger.Info($"Impostors: {GameHostOptions.NumImpostors}", "CrowdedPatch");
             }
         }
 
