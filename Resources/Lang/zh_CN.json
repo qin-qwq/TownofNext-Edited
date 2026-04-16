@@ -4452,5 +4452,7 @@
   "ViperKillButtonText": "酸液",
   "SafeGuess": "启用安全猜测",
   "SafeGuessLimit": "安全猜测次数",
-  "SafeGuessNotCorrectlyGuessRole": "你没有猜对这个身份！\n但你有安全猜测！"
+  "SafeGuessNotCorrectlyGuessRole": "你没有猜对这个身份！\n但你有安全猜测！",
+  "NotifyWraith": "如果存在幽魂则在会议上通知所有人",
+  "WraithNotice": "死亡不再是终结，而是噩梦的开端！小心<color=#ff1919>幽魂</color>！"
 }
