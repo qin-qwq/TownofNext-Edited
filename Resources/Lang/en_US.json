@@ -975,7 +975,7 @@
   "GuesserInfoLong": "(Add-ons):\nAs a Guesser, guess the roles of players in meetings to kill them.\nGuessing the incorrect role kills you instead.\nThe guessing command is: /cmd bt [player id] [role]\nYou can see the player's id before the player's name or use the /id command to view the id of all players.",
   "NecroviewInfoLong": "(Add-ons):\nThe Necroview can see the teams of dead players. The following info will be displayed on the dead player's name while in a meeting:\n- The Red name indicates the Impostors.\n- The Cyan name indicates the Crewmates.\n- The Gray name indicates the Neutrals.\n- The Purple name indicates the Coven.",
   "ReachInfoLong": "(Add-on)\nOnly roles with a Kill button can get this Add-on. Unlike everyone else, you have the longest kill range possible in the game.",
-  "BaitInfoLong": "(附加职业):\n诱饵被击杀时，击杀诱饵的玩家将被迫报告诱饵的尸体。但诱饵被清道夫、清理工、隐匿者或杀戮机器击杀时技能会失效",
+  "BaitInfoLong": "(Add-ons):\nWhen the Bait dies, the murderer who killed the Bait will self-report the Bait's body. However, this won't happen when a Scavenger, Cleaner, Swooper or Killing Machine kills the Bait. The report may have a delay according to the Host's settings.",
   "TrapperInfoLong": "(Add-ons):\nWhen Beartrap dies, Beartrap immobilizes killer for a configurable amount of time.",
   "CharmedInfoLong": "(Betrayal Add-ons):\nThe Charmed Add-on is obtained by being charmed by the Cultist.\nOnce charmed, you are now on the Cultist's team and no longer on your original team.",
   "CleansedInfoLong": "(Add-ons):\nCleansed Add-on can only be obtained if cleanser erases all your Add-ons. Depending on the cleanser settings, you may not be able to obtain any more Add-ons in the future.",
