@@ -196,7 +196,7 @@ internal class Witch : RoleBase
     public override void AfterMeetingTasks()
     {
         if (!_Player.IsAlive() || President.EndMeeting)
-            SpelledPlayer[_Player.PlayerId].Clear();
+            RemoveSpelledPlayer();
 
         foreach (var pc in Main.EnumerateAlivePlayerControls())
         {

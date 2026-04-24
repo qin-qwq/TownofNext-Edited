@@ -340,11 +340,11 @@ public class GameStartManagerBeginGamePatch
             }
 
             if (mapId == 3) // Dleks map
-                CreateOptionsPickerPatch.SetDleks = true;
+                GameOptionsMapPickerPatch.SetDleks = true;
             else
-                CreateOptionsPickerPatch.SetDleks = false;
+                GameOptionsMapPickerPatch.SetDleks = false;
         }
-        else if (CreateOptionsPickerPatch.SetDleks)
+        else if (GameOptionsMapPickerPatch.SetDleks)
         {
             if (GameStates.IsNormalGame)
                 Main.NormalOptions.MapId = 3;

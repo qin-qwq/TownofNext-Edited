@@ -70,6 +70,7 @@ public enum CustomRPC : byte // 183/255 USED
     PlayGuardAndKill,
     SyncAbilityCD,
     BreakEmergencyButton,
+    SetChatVisible,
 
     //Roles 
     SyncRoleSkill,
@@ -83,11 +84,11 @@ public enum CustomRPC : byte // 183/255 USED
     //SetLoversPlayers,
     SetLoverPairs,
     SendFireworkerState,
-    SetCurrentDousingTarget,
 
     // BetterAmongUs (BAU) RPC, This is sent to allow other BAU users know who's using BAU!
     BetterCheck = 150,
 
+    SetCurrentDousingTarget,
     SetEvilTrackerTarget,
     SetDrawPlayer,
     SetCrewpostorTasksDone,
@@ -431,6 +432,12 @@ internal class RPCHandlerPatch
             case CustomRPC.BreakEmergencyButton:
                 ShipStatus.Instance.BreakEmergencyButton();
                 break;
+            case CustomRPC.SetChatVisible:
+                {
+                    HudManager.Instance.Chat.SetVisible(reader.ReadBoolean());
+                    HudManager.Instance.Chat.HideBanButton();
+                    break;
+                }
             case CustomRPC.SetBountyTarget:
                 BountyHunter.ReceiveRPC(reader);
                 break;

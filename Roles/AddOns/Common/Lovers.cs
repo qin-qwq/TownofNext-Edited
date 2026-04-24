@@ -25,7 +25,7 @@ public class Lovers : IAddon
             .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard) as StringOptionItem;
 
-        var countOption = IntegerOptionItem.Create(Id + 1, "NumberOfLovers", new(2, 16, 2), 2, TabGroup.Addons, false)
+        var countOption = IntegerOptionItem.Create(Id + 1, "NumberOfLovers", new(2, 2, 2), 2, TabGroup.Addons, false)
             .SetParent(spawnOption)
             .SetValueFormat(OptionFormat.Players)
             .SetGameMode(CustomGameMode.Standard);

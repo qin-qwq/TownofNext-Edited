@@ -138,10 +138,10 @@ public static class MainMenuManagerPatch
                 new(-1.8f, -1.1f, 1f),
                 new(0, 255, 255, byte.MaxValue),
                 new(75, 255, 255, byte.MaxValue),
-                (UnityEngine.Events.UnityAction)(() => Application.OpenURL(Main.DonationInviteUrl)),
+                (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.DonationInviteUrl)),
                 GetString("SupportUs")); //"Donation"
         }
-        donationButton.gameObject.SetActive(Main.ShowDonationButton && !OperatingSystem.IsAndroid());
+        donationButton.gameObject.SetActive(Main.ShowDonationButton);
 
         // GitHub Button
         if (gitHubButton == null)
@@ -151,10 +151,10 @@ public static class MainMenuManagerPatch
                 new(-1.8f, -1.5f, 1f),
                 new(153, 153, 153, byte.MaxValue),
                 new(209, 209, 209, byte.MaxValue),
-                (UnityEngine.Events.UnityAction)(() => Application.OpenURL(Main.GitHubInviteUrl)),
+                (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.GitHubInviteUrl)),
                 GetString("GitHub")); //"GitHub"
         }
-        gitHubButton.gameObject.SetActive(Main.ShowGitHubButton && !OperatingSystem.IsAndroid());
+        gitHubButton.gameObject.SetActive(Main.ShowGitHubButton);
 
         // Discord Button
         if (discordButton == null)
@@ -164,10 +164,10 @@ public static class MainMenuManagerPatch
                 new(-1.8f, -1.9f, 1f),
                 new(88, 101, 242, byte.MaxValue),
                 new(148, 161, byte.MaxValue, byte.MaxValue),
-                (UnityEngine.Events.UnityAction)(() => Application.OpenURL(Main.DiscordInviteUrl)),
+                (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.DiscordInviteUrl)),
                 GetString("Discord")); //"Discord"
         }
-        discordButton.gameObject.SetActive(Main.ShowDiscordButton && !OperatingSystem.IsAndroid());
+        discordButton.gameObject.SetActive(Main.ShowDiscordButton);
 
         // Website Button
         if (websiteButton == null)
@@ -177,10 +177,10 @@ public static class MainMenuManagerPatch
                 new(-1.8f, -2.3f, 1f),
                 new(251, 81, 44, byte.MaxValue),
                 new(211, 77, 48, byte.MaxValue),
-                (UnityEngine.Events.UnityAction)(() => Application.OpenURL(Main.WebsiteInviteUrl)),
+                (UnityEngine.Events.UnityAction)(() => Constants.OpenURL(Main.WebsiteInviteUrl)),
                 GetString("Website")); //"Website"
         }
-        websiteButton.gameObject.SetActive(Main.ShowWebsiteButton && !OperatingSystem.IsAndroid());
+        websiteButton.gameObject.SetActive(Main.ShowWebsiteButton);
 
         var howToPlayButton = __instance.howToPlayButton;
         var freeplayButton = howToPlayButton.transform.parent.Find("FreePlayButton");

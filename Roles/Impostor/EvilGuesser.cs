@@ -104,7 +104,7 @@ internal class EvilGuesser : RoleBase
             guesser.ShowInfoMessage(isUI, GetString("SafeGuessNotCorrectlyGuessRole"));
             guesser.RpcRemoveAbilityUse();
             if (guesser.IsHost()) Utils.FlashColor(Utils.GetRoleColor(CustomRoles.EvilGuesser));
-            else SendRPC(guesser);
+            //else SendRPC(guesser);
 
             if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
             {

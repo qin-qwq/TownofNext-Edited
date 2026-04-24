@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using TMPro;
 using TONE.Patches;
+using TONE.Patches.Crowded;
 using TONE.Roles.Core;
 using UnityEngine;
 using UnityEngine.Events;
@@ -495,6 +496,8 @@ public static class ToggleOptionPatch
 [HarmonyPatch(typeof(NumberOption))]
 public static class NumberOptionPatch
 {
+    private static bool IsVanillaServer => GameStates.IsVanillaServer && !GameStates.IsLocalGame;
+
     private static int IncrementMultiplier
     {
         get
@@ -525,16 +528,26 @@ public static class NumberOptionPatch
                 __instance.Value = (float)Math.Round(__instance.Value, 2);
                 break;
             case StringNames.GamePlayerSpeed:
+                if (IsVanillaServer)
+                    __instance.ValidRange = new(Main.MinSpeed, 3f);
+
+                __instance.Increment = 0.05f;
+                __instance.Value = Mathf.Clamp((float)Math.Round(__instance.Value, 2), __instance.ValidRange.min, __instance.ValidRange.max);
+                break;
             case StringNames.GameCrewLight:
             case StringNames.GameImpostorLight:
                 __instance.Increment = 0.05f;
                 __instance.Value = (float)Math.Round(__instance.Value, 2);
                 break;
             case StringNames.GameNumImpostors:
-                __instance.ValidRange = GameStates.IsVanillaServer && !GameStates.IsLocalGame ? new(1, 3) : new(0f, GameOptionsManager.Instance.CurrentGameOptions.MaxPlayers / 2);
+                __instance.ValidRange = !IsVanillaServer
+                    ? new(0, Crowded.MaxImpostors) : new(1, 3);
+                __instance.Value = Mathf.Clamp((float)Math.Round(__instance.Value, 2), __instance.ValidRange.min, __instance.ValidRange.max);
+                if (DebugModeManager.AmDebugger) __instance.ValidRange.min = 0;
                 break;
             case StringNames.CapacityLabel:
-                __instance.ValidRange = new(4, 127);
+                __instance.ValidRange = IsVanillaServer ? new(4, 15) : new(4, 127);
+                __instance.Value = Mathf.Clamp(__instance.Value, __instance.ValidRange.min, __instance.ValidRange.max);
                 break;
         }
 
@@ -645,9 +658,25 @@ public static class NumberOptionPatch
 [HarmonyPatch(typeof(StringOption))]
 public static class StringOptionPatch
 {
+    private static bool IsVanillaServer => GameStates.IsVanillaServer && !GameStates.IsLocalGame;
+
+    private static void ClampOfficialStringOption(StringOption option)
+    {
+        if (!IsVanillaServer) return;
+
+        switch (option.Title)
+        {
+            case StringNames.GameKillDistance:
+                option.Value = Mathf.Clamp(option.Value, 0, Math.Min(2, option.Values.Length - 1));
+                break;
+        }
+    }
+
     [HarmonyPatch(nameof(StringOption.Initialize)), HarmonyPrefix]
     private static bool InitializePrefix(StringOption __instance)
     {
+        ClampOfficialStringOption(__instance);
+
         if (ModGameOptionsMenu.OptionList.TryGetValue(__instance.GetInstanceID(), out var index))
         {
             var item = OptionItem.AllOptions[index];
@@ -752,6 +781,8 @@ public static class StringOptionPatch
     [HarmonyPatch(nameof(StringOption.FixedUpdate)), HarmonyPrefix]
     private static bool FixedUpdatePrefix(StringOption __instance)
     {
+        ClampOfficialStringOption(__instance);
+
         if (ModGameOptionsMenu.OptionList.TryGetValue(__instance.GetInstanceID(), out var index))
         {
             var item = OptionItem.AllOptions[index];

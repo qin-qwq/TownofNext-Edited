@@ -7,6 +7,7 @@ using UnityEngine;
 
 // https://github.com/CrowdedMods/CrowdedMod/blob/master/src/CrowdedMod
 // Niko adjusted mono behavior patches to fit into non-reactor mods
+// 参考：https://github.com/Gurge44/EndlessHostRoles/blob/main/Patches/Crowded.cs
 
 namespace TONE.Patches.Crowded;
 
@@ -437,6 +438,28 @@ public class AbstractPagingBehaviour : MonoBehaviour
     public virtual void Update()
     {
         bool chatIsOpen = HudManager.Instance.Chat.IsOpenOrOpening;
+        bool gameMenuIsOpen = HudManager.Instance.GameMenu.IsOpen;
+
+        if (Input.touchSupported)
+        {
+            foreach (var touch in Input.touches)
+            {
+                if (touch.phase != TouchPhase.Moved) continue;
+                if (chatIsOpen || gameMenuIsOpen) break;
+
+                if (touch.deltaPosition.y > 0f)
+                {
+                    Cycle(false);
+                    break;
+                }
+                if (touch.deltaPosition.y < 0f)
+                {
+                    Cycle(true);
+                    break;
+                }
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || (!chatIsOpen && Input.mouseScrollDelta.y > 0f))
             Cycle(false);
         else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow) || (!chatIsOpen && Input.mouseScrollDelta.y < 0f))

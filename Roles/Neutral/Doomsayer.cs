@@ -240,7 +240,7 @@ internal class Doomsayer : RoleBase
             {
                 guesser.ShowInfoMessage(isUI, GetString("DoomsayerNotCorrectlyGuessRole"));
                 if (guesser.IsHost()) FlashColor(GetRoleColor(CustomRoles.Doomsayer));
-                else SendRPC(guesser);
+                //else SendRPC(guesser);
 
                 if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
                 {

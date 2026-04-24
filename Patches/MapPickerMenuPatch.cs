@@ -1,205 +1,117 @@
-using UnityEngine;
+using System;
 using UnityEngine.SceneManagement;
 
 namespace TONE.Patches;
 
 // Thanks: https://github.com/SubmergedAmongUs/Submerged/blob/4a5a6b47cbed526670ae4b7eae76acd7c42e35de/Submerged/UI/Patches/MapSelectButtonPatches.cs#L49
-class CreateOptionsPickerPatch
+// And thanks: https://github.com/AU-Avengers/TOU-Mira/blob/main/TownOfUs/Patches/AprilFools/DleksMapOptionPickerPatches.cs
+[HarmonyPatch]
+public static class GameOptionsMapPickerPatch
 {
-    public static bool SetDleks = false;
-    private static MapSelectButton DleksButton;
-    [HarmonyPatch]
-    public static class GameOptionsMapPickerPatch
+    public static bool SetDleks;
+
+    [HarmonyPatch(typeof(GameOptionsMapPicker), nameof(GameOptionsMapPicker.SelectMap), typeof(int))]
+    [HarmonyPrefix]
+    public static void Prefix_SelectMap([HarmonyArgument(0)] ref int mapId)
     {
-        [HarmonyPatch(typeof(GameOptionsMapPicker), nameof(GameOptionsMapPicker.SetupMapButtons))]
-        [HarmonyPostfix]
-        [Obfuscation(Exclude = true)]
-        public static void Postfix_Initialize(CreateGameMapPicker __instance)
+        if (!SetDleks && mapId == 3)
+            mapId = 0;
+    }
+    [HarmonyPatch(typeof(GameOptionsMapPicker), nameof(GameOptionsMapPicker.SetupMapButtons))]
+    [HarmonyPrefix]
+    public static void Postfix_Prefix(GameOptionsMapPicker __instance)
+    {
+        if (!__instance.AllMapIcons.ToArray().Any(x => x.Name == MapNames.Dleks))
         {
-            if (SceneManager.GetActiveScene().name == "FindAGame") return;
-
-            int DleksPos = 3;
-
-            MapSelectButton[] AllMapButton = __instance.transform.GetComponentsInChildren<MapSelectButton>();
-
-            if (AllMapButton != null)
+            __instance.AllMapIcons.Insert((int)MapNames.Dleks, new MapIconByName
             {
-                GameObject dlekS_ehT = UnityEngine.Object.Instantiate(AllMapButton[0].gameObject, __instance.transform);
-                dlekS_ehT.transform.position = AllMapButton[DleksPos].transform.position;
-                dlekS_ehT.transform.SetSiblingIndex(DleksPos + 2);
-                MapSelectButton dlekS_ehT_MapButton = dlekS_ehT.GetComponent<MapSelectButton>();
-                DleksButton = dlekS_ehT_MapButton;
-                foreach (var icon in dlekS_ehT_MapButton.MapIcon)
-                {
-                    if (icon == null || icon.transform == null) continue;
-                    icon.flipX = true;
-                }
-                dlekS_ehT_MapButton.Button.OnClick.RemoveAllListeners();
-                dlekS_ehT_MapButton.Button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
-                {
-                    __instance.SelectMap(__instance.AllMapIcons[0]);
-
-                    if (__instance.selectedButton)
-                    {
-                        __instance.selectedButton.Button.SelectButton(false);
-                    }
-                    __instance.selectedButton = dlekS_ehT_MapButton;
-                    __instance.selectedButton.Button.SelectButton(true);
-                    __instance.selectedMapId = 3;
-
-                    if (GameStates.IsNormalGame)
-                        Main.NormalOptions.MapId = 0;
-                    else if (GameStates.IsHideNSeek)
-                        Main.HideNSeekOptions.MapId = 0;
-
-                    //__instance.MapImage.transform.localScale = new Vector3(-1f, 1f, 1f);
-                    //__instance.MapName.transform.localScale = new Vector3(-1f, 1f, 1f);
-
-                    __instance.MapImage.sprite = Utils.LoadSprite($"TONE.Resources.Images.DleksBanner.png", 100f);
-                    __instance.MapName.sprite = Utils.LoadSprite($"TONE.Resources.Images.DleksBanner-Wordart.png", 100f);
-                }));
-
-                for (int i = DleksPos; i < AllMapButton.Length; i++)
-                {
-                    AllMapButton[i].transform.localPosition += new Vector3(0.625f, 0f, 0f);
-                }
-
-                if (DleksButton != null)
-                {
-                    if (SetDleks)
-                    {
-                        if (__instance.selectedButton)
-                        {
-                            __instance.selectedButton.Button.SelectButton(false);
-                        }
-                        DleksButton.Button.SelectButton(true);
-                        __instance.selectedButton = DleksButton;
-                        __instance.selectedMapId = 3;
-
-                        //__instance.MapImage.transform.localScale = new Vector3(-1f, 1f, 1f);
-                        //__instance.MapName.transform.localScale = new Vector3(-1f, 1f, 1f);
-
-                        __instance.MapImage.sprite = Utils.LoadSprite($"TONE.Resources.Images.DleksBanner.png", 100f);
-                        __instance.MapName.sprite = Utils.LoadSprite($"TONE.Resources.Images.DleksBanner-Wordart.png", 100f);
-                    }
-                    else
-                    {
-                        DleksButton.Button.SelectButton(false);
-                    }
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(GameOptionsMapPicker), nameof(GameOptionsMapPicker.FixedUpdate))]
-        [HarmonyPrefix]
-        [Obfuscation(Exclude = true)]
-        public static bool Prefix_FixedUpdate(GameOptionsMapPicker __instance)
-        {
-            if (__instance == null) return true;
-
-            if (__instance.MapName == null) return false;
-
-            if (DleksButton != null)
-            {
-                if (__instance.selectedMapId == 3)
-                {
-                    SetDleks = true;
-                }
-                else
-                {
-                    SetDleks = false;
-                }
-            }
-
-            if (__instance.selectedMapId == 3)
-            {
-                if (SceneManager.GetActiveScene().name == "FindAGame")
-                {
-                    __instance.SelectMap(0);
-                    SetDleks = false;
-                }
-                return false;
-            }
-
-            return true;
+                Name = MapNames.Dleks,
+                MapImage = Utils.LoadSprite("TONE.Resources.Images.DleksBanner.png", 100f),
+                MapIcon = Utils.LoadSprite("TONE.Resources.Images.DleksBanner-Icon.png", 95f),
+                NameImage = Utils.LoadSprite("TONE.Resources.Images.DleksBanner-Wordart.png", 160f),
+            });
         }
     }
-
-    [HarmonyPatch(typeof(CreateOptionsPicker), nameof(CreateOptionsPicker.Awake))]
-    class MenuMapPickerPatch
+    [HarmonyPatch(typeof(GameOptionsMapPicker), nameof(GameOptionsMapPicker.SetupMapButtons))]
+    [HarmonyPostfix]
+    public static void Postfix_Initialize(CreateGameMapPicker __instance)
     {
-        public static void Postfix(CreateOptionsPicker __instance)
+        if (SceneManager.GetActiveScene().name == "FindAGame") return;
+
+        const int dleksPos = 3;
+
+        var AllMapButton = __instance.transform.GetComponentsInChildren<MapSelectButton>();
+
+        try
         {
-            Transform mapPickerTransform = __instance.transform.Find("MapPicker");
-            MapPickerMenu mapPickerMenu = mapPickerTransform.Find("Map Picker Menu").GetComponent<MapPickerMenu>();
-
-            MapFilterButton airhipIconInMenu = __instance.MapMenu.MapButtons[3];
-            MapFilterButton fungleIconInMenu = __instance.MapMenu.MapButtons[4];
-            MapFilterButton skeldIconInMenu = __instance.MapMenu.MapButtons[0];
-            MapFilterButton dleksIconInMenuCopy = UnityEngine.Object.Instantiate(airhipIconInMenu, airhipIconInMenu.transform.parent);
-
-            Transform skeldMenuButton = mapPickerMenu.transform.Find("Skeld");
-            Transform polusMenuButton = mapPickerMenu.transform.Find("Polus");
-            Transform airshipMenuButton = mapPickerMenu.transform.Find("Airship");
-            Transform fungleMenuButton = mapPickerMenu.transform.Find("Fungle");
-            Transform dleksMenuButtonCopy = UnityEngine.Object.Instantiate(airshipMenuButton, airshipMenuButton.parent);
-
-            // Set mapid for Dleks button
-            PassiveButton dleksButton = dleksMenuButtonCopy.GetComponent<PassiveButton>();
-            dleksButton.OnClick.m_PersistentCalls.m_Calls._items[0].arguments.intArgument = (int)MapNames.Dleks;
-
-            SpriteRenderer dleksImage = dleksMenuButtonCopy.Find("Image").GetComponent<SpriteRenderer>();
-            dleksImage.sprite = skeldMenuButton.Find("Image").GetComponent<SpriteRenderer>().sprite;
-
-            dleksIconInMenuCopy.name = "Dleks";
-            dleksIconInMenuCopy.transform.localPosition = new Vector3(0.8f, airhipIconInMenu.transform.localPosition.y, airhipIconInMenu.transform.localPosition.z);
-            dleksIconInMenuCopy.MapId = MapNames.Dleks;
-            dleksIconInMenuCopy.Button = dleksButton;
-            dleksIconInMenuCopy.ButtonCheck = dleksMenuButtonCopy.Find("selectedCheck").GetComponent<SpriteRenderer>();
-            dleksIconInMenuCopy.ButtonImage = dleksImage;
-            dleksIconInMenuCopy.ButtonOutline = dleksImage.transform.parent.GetComponent<SpriteRenderer>();
-            dleksIconInMenuCopy.Icon.sprite = skeldIconInMenu.Icon.sprite;
-
-            dleksMenuButtonCopy.name = "Dleks";
-            dleksMenuButtonCopy.position = new Vector3(dleksMenuButtonCopy.position.x, 2f * dleksMenuButtonCopy.position.y - polusMenuButton.transform.position.y, dleksMenuButtonCopy.position.z);
-            fungleMenuButton.position = new Vector3(fungleMenuButton.position.x, dleksMenuButtonCopy.transform.position.y - 0.6f, fungleMenuButton.position.z);
-
-            __instance.MapMenu.MapButtons = HarmonyLib.CollectionExtensions.AddItem(__instance.MapMenu.MapButtons, dleksIconInMenuCopy).ToArray();
-
-            float xPos = -1f;
-            for (int index = 0; index < 6; ++index)
+            if (AllMapButton != null)
             {
-                __instance.MapMenu.MapButtons[index].transform.SetLocalX(xPos);
-                xPos += 0.34f;
+                // Dleks Button
+                {
+                    var dleksButton_MapButton = __instance.mapButtons[dleksPos];
+                    dleksButton_MapButton.Button.OnClick.RemoveAllListeners();
+                    dleksButton_MapButton.Button.OnClick.AddListener((Action)(() =>
+                    {
+                        __instance.SelectMap(__instance.AllMapIcons[0]);
+
+                        if (__instance.selectedButton)
+                            __instance.selectedButton.Button.SelectButton(false);
+
+                        __instance.selectedButton = dleksButton_MapButton;
+                        __instance.selectedButton.Button.SelectButton(true);
+                        __instance.selectedMapId = dleksPos;
+
+                        SetDleks = true;
+
+                        Main.NormalOptions.MapId = 0;
+
+                        __instance.MapImage.sprite = Utils.LoadSprite("TONE.Resources.Images.DleksBanner.png", 100f);
+                        __instance.MapName.sprite = Utils.LoadSprite("TONE.Resources.Images.DleksBanner-Wordart.png", 100f);
+                    }));
+
+                    if (dleksButton_MapButton != null)
+                    {
+                        if (SetDleks)
+                        {
+                            if (__instance.selectedButton)
+                                __instance.selectedButton.Button.SelectButton(false);
+
+                            __instance.selectedButton = dleksButton_MapButton;
+                            __instance.selectedButton.Button.SelectButton(true);
+                            __instance.selectedMapId = dleksPos;
+
+                            __instance.MapImage.sprite = Utils.LoadSprite("TONE.Resources.Images.DleksBanner.png", 100f);
+                            __instance.MapName.sprite = Utils.LoadSprite("TONE.Resources.Images.DleksBanner-Wordart.png", 100f);
+                        }
+                        else
+                            dleksButton_MapButton.Button.SelectButton(false);
+                    }
+                }
+            }
+        }
+        catch (Exception e) { Utils.ThrowException(e); }
+    }
+
+    [HarmonyPatch(typeof(GameOptionsMapPicker), nameof(GameOptionsMapPicker.FixedUpdate))]
+    [HarmonyPrefix]
+    public static bool Prefix_FixedUpdate(GameOptionsMapPicker __instance)
+    {
+        if (__instance == null) return true;
+        if (__instance.MapName == null) return false;
+
+        SetDleks = __instance.selectedMapId == 3;
+
+        if (__instance.selectedMapId == 3)
+        {
+            if (SceneManager.GetActiveScene().name == "FindAGame")
+            {
+                __instance.SelectMap(0);
+                SetDleks = false;
             }
 
-            if (__instance.mode == SettingsMode.Host)
-            {
-                mapPickerMenu.transform.localPosition = new Vector3(mapPickerMenu.transform.localPosition.x, 0.85f, mapPickerMenu.transform.localPosition.z);
-
-                mapPickerTransform.localScale = new Vector3(0.86f, 0.85f, 1f);
-                mapPickerTransform.transform.localPosition = new Vector3(mapPickerTransform.transform.localPosition.x + 0.05f, mapPickerTransform.transform.localPosition.y + 0.03f, mapPickerTransform.transform.localPosition.z);
-            }
-
-            SwapIconOrButtomsPositions(airhipIconInMenu, dleksIconInMenuCopy);
-            SwapIconOrButtomsPositions(fungleIconInMenu, airhipIconInMenu);
-
-            SwapIconOrButtomsPositions(airshipMenuButton, dleksMenuButtonCopy);
-
-            // set flipped dleks map Icon/button
-            __instance.MapMenu.MapButtons[5].SetFlipped(true);
-
-            mapPickerMenu.transform.Find("Backdrop").localScale *= 5;
+            return false;
         }
-        private static void SwapIconOrButtomsPositions(Component one, Component two)
-        {
-            Transform transform1 = one.transform;
-            Transform transform2 = two.transform;
-            Vector3 position1 = two.transform.position;
-            Vector3 position2 = one.transform.position;
-            transform1.position = position1;
-            Vector3 vector3 = position2;
-            transform2.position = vector3;
-        }
+
+        return true;
     }
 }

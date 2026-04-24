@@ -55,7 +55,7 @@ internal class SerialKiller : RoleBase
         if (!CanKill2)
         {
             CanKill2 = true;
-            killer.SetKillCooldown(0f);
+            killer.SetKillCooldown(0.1f);
 
             _ = new LateTask(() =>
             {

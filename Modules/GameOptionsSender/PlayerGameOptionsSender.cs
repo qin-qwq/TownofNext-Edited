@@ -39,7 +39,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
     {
         if (player.AmOwner)
         {
-            var opt = BuildGameOptions();
+            var opt = BuildSendableGameOptions();
             foreach (var com in GameManager.Instance.LogicComponents.GetFastEnumerator())
             {
                 if (com.TryCast<LogicOptions>(out var lo))

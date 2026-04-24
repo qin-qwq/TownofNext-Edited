@@ -522,18 +522,25 @@ class GameEndCheckerForNormal
                     //Lovers follow winner
                     if (WinnerTeam is not CustomWinner.Lovers)
                     {
-                        if (((Lovers.loverPairs.All(p => p.Item1.GetPlayer().IsPlayerCrewmateTeam() && p.Item2.GetPlayer().IsPlayerCrewmateTeam()) && WinnerTeam is CustomWinner.Crewmate)
-                        || (Lovers.loverPairs.All(p => p.Item1.GetPlayer().IsPlayerImpostorTeam() && p.Item2.GetPlayer().IsPlayerImpostorTeam()) && WinnerTeam is CustomWinner.Impostor)
-                        || (Lovers.loverPairs.All(p => p.Item1.GetPlayer().IsPlayerCovenTeam() && p.Item2.GetPlayer().IsPlayerCovenTeam()) && WinnerTeam is CustomWinner.Coven))
-                        && CustomRoles.Lovers.RoleExist(true))
+                        if (CustomRoles.Lovers.RoleExist(true))
                         {
-                            foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)))
+                            var crewLovers = WinnerTeam is CustomWinner.Crewmate && Lovers.loverPairs.All(p => p.Item1.GetPlayer()?.IsPlayerCrewmateTeam() == true && 
+                                            p.Item2.GetPlayer()?.IsPlayerCrewmateTeam() == true);
+                            var impLovers = WinnerTeam is CustomWinner.Impostor && Lovers.loverPairs.All(p => p.Item1.GetPlayer()?.IsPlayerImpostorTeam() == true &&
+                                            p.Item2.GetPlayer()?.IsPlayerImpostorTeam() == true);
+                            var covenLovers = WinnerTeam is CustomWinner.Coven && Lovers.loverPairs.All(p => p.Item1.GetPlayer()?.IsPlayerCovenTeam() == true &&
+                                            p.Item2.GetPlayer()?.IsPlayerCovenTeam() == true);
+                            
+                            if (crewLovers || impLovers || covenLovers)
                             {
-                                WinnerIds.Add(pc.PlayerId);
-                                AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
+                                foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)))
+                                {
+                                    WinnerIds.Add(pc.PlayerId);
+                                    AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
+                                }
                             }
                         }
-                        if (Lovers.loverPairs.Count(p => p.Item1.GetPlayer().IsPlayerNeutralTeam() || p.Item2.GetPlayer().IsPlayerNeutralTeam()) != 0) Lovers.CheckAdditionalWin();
+                        if (Lovers.loverPairs.Count(p => p.Item1.GetPlayer()?.IsPlayerNeutralTeam() == true || p.Item2.GetPlayer()?.IsPlayerNeutralTeam() == true) != 0) Lovers.CheckAdditionalWin();
                         // var loverArray = Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)).ToArray();
 
                         // foreach (var lover in loverArray)

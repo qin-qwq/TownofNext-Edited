@@ -107,7 +107,7 @@ internal class QuickShooter : RoleBase
     {
         if (killer.GetAbilityUseLimit() > 0)
         {
-            killer.SetKillCooldown(0f);
+            killer.SetKillCooldown(0.1f);
             killer.RpcRemoveAbilityUse();
         }
     }

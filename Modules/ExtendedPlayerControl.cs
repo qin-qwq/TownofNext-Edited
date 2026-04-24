@@ -1992,7 +1992,15 @@ static class ExtendedPlayerControl
             HudManager.Instance.Chat.HideBanButton();
             return;
         }
-        bool isDead = player.Data.IsDead;
+
+        if (player.IsModded())
+        {
+            var message = new RpcSetChatVisible(PlayerControl.LocalPlayer.NetId, visible);
+            RpcUtils.LateSpecificSendMessage(message, player.OwnerId);
+            return;
+        }
+
+        var isDead = player.Data.IsDead;
         MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
         writer.StartMessage(6);
         writer.Write(AmongUsClient.Instance.GameId);

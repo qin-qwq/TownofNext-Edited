@@ -189,6 +189,19 @@ internal class Logos : RoleBase
         }
     }
 
+    public override void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
+    {
+        if (!exiled) return;
+
+        foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Philosopher)))
+        {
+            pc.RpcExileV3();
+
+            pc.SetRealKiller(player);
+            pc.SetDeathReason(PlayerState.DeathReason.Philosophy);
+        }
+    }
+
     public static void AssignNewLogos()
     {
         var candidates = Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Philosopher)).ToList();
