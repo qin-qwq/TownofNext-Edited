@@ -118,10 +118,7 @@ internal class HexMaster : CovenManager
         }
     }
 
-    //public override void ApplyGameOptions(IGameOptions opt, byte id) => opt.SetVision(HasImpostorVision.GetBool());
-
     public override bool CanUseKillButton(PlayerControl pc) => true;
-    // public override bool CanUseImpostorVentButton(PlayerControl pc) => true;
     public override void SetKillCooldown(byte id) => HexCooldown.GetFloat();
 
     /*

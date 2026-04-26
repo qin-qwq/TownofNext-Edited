@@ -74,7 +74,6 @@ internal class Jinx : CovenManager
         return false;
     }
     */
-    //public override void ApplyGameOptions(IGameOptions opt, byte babushka) => opt.SetVision(HasImpostorVision.GetBool());
     private static bool IsJinxed(byte target)
     {
         if (JinxedPlayers.Count < 1) return false;
@@ -189,5 +188,4 @@ internal class Jinx : CovenManager
     {
         hud.KillButton.OverrideText(GetString("Jinx"));
     }
-    //public override bool CanUseImpostorVentButton(PlayerControl player) => CanVent.GetBool();
 }
