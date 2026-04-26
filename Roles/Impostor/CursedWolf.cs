@@ -16,6 +16,7 @@ internal class CursedWolf : RoleBase
 
     private static OptionItem GuardSpellTimes;
     private static OptionItem KillAttacker;
+    private static OptionItem OnlyKillTriggerGuardSpell;
 
     public override void SetupCustomOption()
     {
@@ -24,6 +25,8 @@ internal class CursedWolf : RoleBase
             .SetParent(CustomRoleSpawnChances[CustomRoles.CursedWolf])
             .SetValueFormat(OptionFormat.Times);
         KillAttacker = BooleanOptionItem.Create(Id + 3, GeneralOption.KillAttackerWhenAbilityRemaining, true, TabGroup.ImpostorRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.CursedWolf]);
+        OnlyKillTriggerGuardSpell = BooleanOptionItem.Create(Id + 4, "CursedWolfOnlyKillTriggerGuardSpell", false, TabGroup.ImpostorRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.CursedWolf]);
     }
     public override void Add(byte playerId)
@@ -34,6 +37,7 @@ internal class CursedWolf : RoleBase
     {
         if (killer == target || target.GetAbilityUseLimit() <= 0) return true;
         if (killer.IsTransformedNeutralApocalypse()) return true;
+        if (killer.GetRoleClass()?.OnCheckMurderAsKiller(killer, target) == false && OnlyKillTriggerGuardSpell.GetBool()) return true;
 
         killer.RpcGuardAndKill(target);
         target.RpcGuardAndKill(target);

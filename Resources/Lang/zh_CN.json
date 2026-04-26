@@ -1778,6 +1778,7 @@
   "WorkaholicGiveAdviceAlive": "第一次见面时的建议活着，死后可以获胜，幽灵任务开启",
   "DoctorVisibleToEveryone": "每个人都知道谁是<color=#80ffdd>法医</color>",
   "CursedWolfGuardSpellTimes": "反杀次数上限",
+  "CursedWolfOnlyKillTriggerGuardSpell": "仅在被击杀时触发反杀",
   "KillAttackerWhenAbilityRemaining": "技能剩余时击杀攻击者",
   "CollectorCollectAmount": "需要集票数量",
   "GlitchCanVote": "可以投票",
