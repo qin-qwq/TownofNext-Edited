@@ -2328,7 +2328,7 @@
   "WarlockNoTargetYet": "You haven't marked a target.",
   "WarlockTargetDead": "Manipulation failed due to target dead",
   "WarlockControlKill": "Target died",
-  "OnSuperStarDead": "紧急通知：大明星死亡！",
+  "OnSuperStarDead": "Warning: Super Star death!",
   "OnCyberDead": "Warning: Cyber died!",
   "TeleportedInRndVentByDisperser": "Everyone was teleported to Vents",
   "TeleportedByTransporter": "Swapping places with: {0}",
