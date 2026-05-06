@@ -551,7 +551,7 @@ class BeginCrewmatePatch
             case CustomRoles.Scavenger:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Viper);
                 break;
-            case CustomRoles.Celebrity:
+            case CustomRoles.SuperStar:
             case CustomRoles.Sacrifist:
             case CustomRoles.Poisoner:
             case CustomRoles.NoisemakerTONE:

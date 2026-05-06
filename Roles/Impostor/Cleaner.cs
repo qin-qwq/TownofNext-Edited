@@ -16,6 +16,7 @@ internal class Cleaner : RoleBase
 
     private static OptionItem KillCooldown;
     public static OptionItem CleanCooldown;
+    public static OptionItem SharedCooldown;
 
     public override void SetupCustomOption()
     {
@@ -26,6 +27,8 @@ internal class Cleaner : RoleBase
         CleanCooldown = FloatOptionItem.Create(Id + 3, "CleanCooldown", new(5f, 180f, 2.5f), 30f, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Cleaner])
             .SetValueFormat(OptionFormat.Seconds);
+        SharedCooldown = BooleanOptionItem.Create(Id + 4, "SharedCooldown", true, TabGroup.ImpostorRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Cleaner]);
     }
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
@@ -42,11 +45,24 @@ internal class Cleaner : RoleBase
 
             reporter.RpcAddAbilityCD();
 
+            if (SharedCooldown.GetBool()) reporter.SetKillCooldown();
+
             Logger.Info($"Cleaner: {reporter.GetRealName()} clear body: {deadBody.PlayerName}", "Cleaner");
             return false;
         }
 
         return true;
+    }
+
+    public override void OnMurderPlayerAsKiller(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    {
+        if (inMeeting || isSuicide) return;
+
+        if (SharedCooldown.GetBool())
+        {
+            killer.RpcRemoveAbilityCD();
+            killer.RpcAddAbilityCD();
+        }
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)

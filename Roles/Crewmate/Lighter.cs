@@ -24,7 +24,7 @@ internal class Lighter : RoleBase
     public static OptionItem LighterSkillDuration;
     private static OptionItem LighterSkillMaxOfUseage;
 
-    private long Timer;
+    public long Timer;
 
     public override void SetupCustomOption()
     {

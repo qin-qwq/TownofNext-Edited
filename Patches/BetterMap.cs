@@ -1,4 +1,5 @@
 using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -10,11 +11,17 @@ public class MapBehaviourPatch
 {
     private static Dictionary<PlayerControl, SpriteRenderer> herePoints = new Dictionary<PlayerControl, SpriteRenderer>();
     private static Dictionary<PlayerControl, Vector3> preMeetingPostions = new Dictionary<PlayerControl, Vector3>();
-    private static bool ShouldShowRealTime => !PlayerControl.LocalPlayer.IsAlive() || Main.GodMode.Value
-    || Options.CurrentGameMode == CustomGameMode.TagMode && PlayerControl.LocalPlayer.GetRoleClass() is TCrewmate tc && tc.DetectState.Item1;
+    private static bool ShouldShowRealTime => !PlayerControl.LocalPlayer.IsAlive() || Main.GodMode.Value || 
+    Options.CurrentGameMode == CustomGameMode.TagMode && PlayerControl.LocalPlayer.GetRoleClass() is TCrewmate tc && tc.DetectState.Item1;
+
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowNormalMap)), HarmonyPostfix]
     public static void ShowNormalMapPostfix(MapBehaviour __instance)
     {
+        if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetRoleClass() is NiceHacker nh && nh.InAbility.Item1)
+        {
+            __instance.ShowCountOverlay(true, true, true);
+            return;
+        }
         InitializeCustomHerePoints(__instance);
         if (Options.CurrentGameMode is CustomGameMode.Standard)
         {
@@ -27,6 +34,11 @@ public class MapBehaviourPatch
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap)), HarmonyPostfix]
     public static void ShowSabotageMapPostfix(MapBehaviour __instance)
     {
+        if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetRoleClass() is NiceHacker nh && nh.InAbility.Item1)
+        {
+            __instance.ShowCountOverlay(true, true, true);
+            return;
+        }
         InitializeCustomHerePoints(__instance);
         if (Options.CurrentGameMode is CustomGameMode.Standard)
         {

@@ -1,5 +1,7 @@
 using Hazel;
 using System.Text;
+using TONE.Modules;
+using TONE.Roles.Neutral;
 
 namespace TONE.Roles.Core.AssignManager;
 
@@ -69,7 +71,12 @@ public static class GhostRoleAssign
             or CustomRoles.Jackal
             or CustomRoles.Sidekick
             or CustomRoles.PlagueDoctor
-            or CustomRoles.Wraith) return;
+            or CustomRoles.Wraith
+            or CustomRoles.Cupid
+            or CustomRoles.Inquisitor) return;
+
+        if ((getplrRole is CustomRoles.Hater && Hater.playerIdList.Contains(player.PlayerId)) ||
+            (getplrRole is CustomRoles.Pixie && player.GetAbilityUseLimit() >= Pixie.PixiePointsToWin.GetInt())) return;
 
         var IsNeutralAllowed = !player.IsAnySubRole(x => x.IsConverted()) || Options.ConvertedCanBecomeGhost.GetBool();
         var CheckNeutral = player.GetCustomRole().IsNeutral() && Options.NeutralCanBecomeGhost.GetBool();

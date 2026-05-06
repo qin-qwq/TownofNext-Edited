@@ -41,7 +41,6 @@ internal class Miner : RoleBase
     {
         hud.AbilityButton.OverrideText(GetString("MinerTeleButtonText"));
     }
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Retreat");
     public override bool OnCheckVanish(PlayerControl player)
     {
         if (MinerMode.GetInt() == 0)

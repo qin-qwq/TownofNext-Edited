@@ -396,13 +396,7 @@ class OnPlayerLeftPatch
             {
                 if (data.Character.Is(CustomRoles.Lovers) && !data.Character.Data.IsDead)
                 {
-                    Lovers.OnPartnerLeft(data.Character.PlayerId);
-                    // foreach (var lovers in Main.LoversPlayers.ToArray())
-                    // {
-                    //     Main.isLoversDead = true;
-                    //     Main.LoversPlayers.Remove(lovers);
-                    //     Main.PlayerStates[lovers.PlayerId].RemoveSubRole(CustomRoles.Lovers);
-                    // }
+                    Lovers.OnPartnerLeft();
                 }
 
                 if (data.Character.Is(CustomRoles.Jackal) && !data.Character.Data.IsDead)

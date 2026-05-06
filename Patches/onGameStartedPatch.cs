@@ -521,7 +521,7 @@ internal class StartGameHostPatch
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
-                    //AddonAssign.InitAndStartAssignLovers();
+                    AddonAssign.InitAndStartAssignLovers();
                     AddonAssign.StartSortAndAssign();
                 }
             }
@@ -684,7 +684,11 @@ internal class SelectRolesPatch
             if (Main.HideNSeekOptions.ImpostorPlayerID != -1)
             {
                 var player = Utils.GetPlayerById(Main.HideNSeekOptions.ImpostorPlayerID);
-                if (player) Impostor.Add(player);
+                if (player)
+                {
+                    Impostor.Add(player);
+                    ImpostorNum--;
+                }
             }
 
             var Player = Main.EnumeratePlayerControls().Shuffle(IRandom.Instance).ToList();
@@ -710,7 +714,6 @@ internal class SelectRolesPatch
                 else if (Impostor.Contains(player))
                 {
                     player.RpcSetRole(RoleTypes.Impostor);
-                    ImpostorNum--;
                     continue;
                 }
                 else if (ImpostorNum > 0)

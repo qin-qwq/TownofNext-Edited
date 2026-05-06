@@ -250,9 +250,8 @@ public static class Utils
         }
         else if (player.IsNonHostModdedClient())
         {
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.KillFlash, SendOption.Reliable, player.GetClientId());
-            writer.Write(playKillSound);
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            var msg = new RpcKillFlash(PlayerControl.LocalPlayer.NetId, playKillSound);
+            RpcUtils.LateSpecificSendMessage(msg, player.GetClientId());
         }
         else if (!ReactorCheck) player.ReactorFlash(0f); //Reactor flash for vanilla
         player.MarkDirtySettings();
@@ -2257,6 +2256,13 @@ public static class Utils
                         SelfName = tname;
                 }
 
+                // Lightning
+                if (CustomRoles.Lightning.HasEnabled())
+                {
+                    if (Lightning.IsGhost(seer) && !CamouflageIsForMeeting)
+                        SelfName = Lightning.Sprite;
+                }
+
                 // Dollmaster, Prevent seeing self in mushroom cloud
                 if (CustomRoles.DollMaster.HasEnabled() && seerRole != CustomRoles.DollMaster)
                 {
@@ -2434,6 +2440,13 @@ public static class Utils
                                 TargetPlayerName = tname;
                         }
 
+                        // Lightning
+                        if (CustomRoles.Lightning.HasEnabled())
+                        {
+                            if (Lightning.IsGhost(target) && !CamouflageIsForMeeting)
+                                TargetPlayerName = Lightning.Sprite;
+                        }
+
                         // Camouflage
                         if (!CamouflageIsForMeeting && Camouflage.IsCamouflage)
                             TargetPlayerName = $"<size=0%>{TargetPlayerName}</size>";
@@ -2589,6 +2602,13 @@ public static class Utils
                 {
                     if (IdentityThief.ChangeName.TryGetValue(seer.PlayerId, out var tname) && !CamouflageIsForMeeting)
                         SelfName = tname;
+                }
+
+                // Lightning
+                if (CustomRoles.Lightning.HasEnabled())
+                {
+                    if (Lightning.IsGhost(seer) && !CamouflageIsForMeeting)
+                        SelfName = Lightning.Sprite;
                 }
 
                 // Dollmaster, Prevent seeing self in mushroom cloud
@@ -2785,6 +2805,13 @@ public static class Utils
                             {
                                 if (IdentityThief.ChangeName.TryGetValue(target.PlayerId, out var tname) && !CamouflageIsForMeeting)
                                     TargetPlayerName = tname;
+                            }
+
+                            // Lightning
+                            if (CustomRoles.Lightning.HasEnabled())
+                            {
+                                if (Lightning.IsGhost(target) && !CamouflageIsForMeeting)
+                                    TargetPlayerName = Lightning.Sprite;
                             }
 
                             // Camouflage
@@ -3418,31 +3445,6 @@ public static class Utils
     public static bool IsAllAlive => Main.PlayerStates.Values.All(state => state.countTypes == CountTypes.OutOfGame || !state.IsDead);
     public static int PlayersCount(CountTypes countTypes) => Main.PlayerStates.Values.Count(state => state.countTypes == countTypes);
     public static int AlivePlayersCount(CountTypes countTypes) => Main.AllAlivePlayerControls.Count(pc => pc.Is(countTypes));
-
-    public static Dictionary<string, int> GetAllPlayerLocationsCount()
-    {
-        Dictionary<string, int> playerRooms = [];
-
-        foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
-        {
-            if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId)) return null;
-
-            Il2CppReferenceArray<PlainShipRoom> rooms = ShipStatus.Instance.AllRooms;
-            if (rooms == null) return null;
-
-            foreach (PlainShipRoom room in rooms)
-            {
-                if (!room.roomArea) continue;
-
-                if (!pc.Collider.IsTouching(room.roomArea)) continue;
-
-                string roomName = GetString($"{room.RoomId}");
-                if (!playerRooms.TryAdd(roomName, 1)) playerRooms[roomName]++;
-            }
-        }
-
-        return playerRooms;
-    }
 
     public static Vector2 GetAllRandomSpawnLocation()
     {

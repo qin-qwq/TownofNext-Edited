@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
+using InnerNet;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -748,6 +749,13 @@ class ShapeshiftPatch
             }, time, shapeshifting ? "ShapeShiftNotify" : "UnShiftNotify");
         }
     }
+
+    public static void Postfix(PlayerControl __instance)
+    {
+        // Set CNO name visible for modded clients after shapeshift
+        if (__instance.PlayerId >= 254)
+            __instance.transform.FindChild("Names").FindChild("NameText_TMP").gameObject.SetActive(true);
+    }
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
@@ -967,7 +975,31 @@ class ReportDeadBodyPatch
 
             Rebirth.OnReportDeadBody();
 
-            CustomNetObject.OnMeetingTasks();
+            var allCNO = CustomNetObject.AllObjects.ToArray();
+        
+            foreach (var cno in allCNO)
+            {
+                try
+                {
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(cno.playerControl.NetId, (byte)RpcCalls.Shapeshift, SendOption.Reliable);
+                    writer.WriteNetObject(cno.playerControl);
+                    writer.Write(false);
+                    AmongUsClient.Instance.FinishRpcImmediately(writer);
+                }
+                catch (Exception e) { Utils.ThrowException(e); }
+            }
+        
+            _ = new LateTask(() =>
+            {
+                foreach (var cno in allCNO)
+                {
+                    try
+                    {
+                        cno?.OnMeetingTasks();
+                    }
+                    catch (Exception e) { Utils.ThrowException(e); }
+                }
+            }, 5f, "CNO OnMeeting");
 
             // Alchemist & Bloodlust
             Alchemist.OnReportDeadBodyGlobal();
@@ -1252,7 +1284,7 @@ class FixedUpdateInNormalGamePatch
                         CovenManager.NecronomiconCheck();
 
                         if (CustomRoles.Lovers.IsEnable())
-                            Lovers.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
+                            Lovers.LoversSuicide();
 
                         if (Rainbow.IsEnabled && Main.IntroDestroyed)
                             Rainbow.OnFixedUpdate();
@@ -1529,6 +1561,15 @@ class FixedUpdateInNormalGamePatch
                 if (IdentityThief.ChangeName.TryGetValue(playerId, out var tname))
                 {
                     RealName.Clear().Append(tname);
+                }
+            }
+
+            // Lightning
+            if (Lightning.HasEnabled)
+            {
+                if (Lightning.IsGhost(player))
+                {
+                    RealName.Clear().Append(Lightning.Sprite);
                 }
             }
 

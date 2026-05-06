@@ -133,7 +133,6 @@ class ExileControllerWrapUpPatch
         foreach (var player in Main.EnumeratePlayerControls())
         {
             player.GetRoleClass()?.OnPlayerExiled(player, exiled);
-            Lovers.OnPlayerExiled(exiled);
 
             // Check for remove Pet
             player.RpcRemovePet();

@@ -1,11 +1,9 @@
 using AmongUs.GameOptions;
 using System.Text;
 using TONE.Modules;
-using TONE.Roles.Core;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
-using static TONE.Utils;
 
 namespace TONE.Roles.Crewmate;
 
@@ -84,46 +82,35 @@ internal class NiceHacker : RoleBase
         {
             InAbility.Item2 -= Time.fixedDeltaTime;
 
-            Dictionary<string, int> list = GetAllPlayerLocationsCount();
-            var sb = new StringBuilder();
+            var admins = AdminProvider.CalculateAdmin();
+            var builder = new StringBuilder(512);
 
-            foreach (KeyValuePair<string, int> location in list)
-                sb.Append($"\n<color=#75fa4c>{location.Key}:</color> {location.Value}");
-
-            player.Notify(sb.ToString(), 1f, hasPriority: true, sendInLog: false);
-
-            if (InAbility.Item2 <= 0)
+            foreach (var admin in admins)
             {
+                var entry = admin.Value;
+                if (entry.TotalPlayers <= 0)
+                {
+                    continue;
+                }
+
+                builder.Append(DestroyableSingleton<TranslationController>.Instance.GetString(entry.Room));
+                builder.Append(": ");
+                builder.Append(entry.TotalPlayers);
+
+                builder.Append('\n');
+            }
+
+            if (!builder.ToString().IsNullOrWhiteSpace()) player.Notify(builder.ToString(), 1f, hasPriority: true, sendInLog: false);
+
+            if (InAbility.Item2 <= 0 || !player.IsAlive())
+            {
+                if (player.IsModded() && MapBehaviour.Instance)
+                {
+                    if (MapBehaviour.Instance.IsOpen) MapBehaviour.Instance.Close();
+                }
                 InAbility = (false, 0f);
             }
         }
-    }
-
-    public static void MapHandle(PlayerControl pc, MapBehaviour map, MapOptions opts)
-    {
-        map.countOverlayAllowsMovement = true;
-
-        if (pc.GetRoleClass() is NiceHacker nh && nh.InAbility.Item1)
-        {
-            opts.Mode = MapOptions.Modes.CountOverlay;
-            _ = new LateTask(() => { MapCountdown(pc, map, opts, nh.InAbility.Item2); }, 1f, "Hacker.StartCountdown");
-        }
-    }
-
-    private static void MapCountdown(PlayerControl pc, MapBehaviour map, MapOptions opts, float seconds)
-    {
-        map.countOverlayAllowsMovement = true;
-
-        if (!map.IsOpen) return;
-
-        if (seconds <= 0)
-        {
-            map.Close();
-            opts.Mode = pc.GetCustomRole().IsMadmate() ? MapOptions.Modes.Sabotage : MapOptions.Modes.Normal;
-            return;
-        }
-
-        _ = new LateTask(() => { MapCountdown(pc, map, opts, seconds - 1); }, 1f, "HackerAbilityCountdown");
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte id)

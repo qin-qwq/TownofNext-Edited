@@ -35,7 +35,7 @@ static class VentSystemDeterioratePatch
     public static Dictionary<byte, bool> PlayerHadBlockedVentLastTime = [];
     public static bool ForceUpadate;
 
-    public static void Postfix()
+    /*public static void Postfix()
     {
         if (!AmongUsClient.Instance.AmHost || !Main.IntroDestroyed || GameStates.IsMeeting) return;
 
@@ -65,7 +65,7 @@ static class VentSystemDeterioratePatch
             if (needUpdate)
                 ShipStatus.Instance.Systems[SystemTypes.Ventilation].CastFast<VentilationSystem>().IsDirty = true;
         }
-    }
+    }*/
     /// <summary>
     /// Check blocking vents
     /// </summary>

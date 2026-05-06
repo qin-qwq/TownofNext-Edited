@@ -71,8 +71,9 @@ public static class CustomRolesHelper
     {
         if (role.GetStaticRoleClass().ThisRoleType is
             Custom_RoleType.CrewmateGhosts or
-            Custom_RoleType.CrewmateVanillaGhosts or
-            Custom_RoleType.ImpostorGhosts)
+            Custom_RoleType.ImpostorGhosts or
+            Custom_RoleType.NeutralGhost or
+            Custom_RoleType.CovenGhost)
             return true;
 
         return role is
@@ -168,7 +169,6 @@ public static class CustomRolesHelper
                 CustomRoles.ChiefOfPolice or
                 CustomRoles.LazyGuy or
                 CustomRoles.SuperStar or
-                CustomRoles.Celebrity or
                 CustomRoles.Mayor or
                 CustomRoles.Dictator or
                 CustomRoles.NiceGuesser or
@@ -442,7 +442,8 @@ public static class CustomRolesHelper
         || role is CustomRoles.Knighted
                 or CustomRoles.Cleansed
                 or CustomRoles.Workhorse
-                or CustomRoles.LastImpostor;
+                or CustomRoles.LastImpostor
+                or CustomRoles.Lovers;
 
     public static bool IsImpOnlyAddon(this CustomRoles role)
     {
@@ -772,7 +773,6 @@ public static class CustomRolesHelper
 
             case CustomRoles.Cyber:
                 if (pc.Is(CustomRoles.Doppelganger)
-                    || pc.Is(CustomRoles.Celebrity)
                     || pc.Is(CustomRoles.SchrodingersCat)
                     || pc.Is(CustomRoles.SuperStar))
                     return false;
@@ -1730,7 +1730,6 @@ public enum Custom_RoleType
 
     // Crewmate
     CrewmateVanilla,
-    CrewmateVanillaGhosts,
     CrewmateBasic,
     CrewmateSupport,
     CrewmateKilling,
@@ -1744,12 +1743,14 @@ public enum Custom_RoleType
     NeutralChaos,
     NeutralKilling,
     NeutralApocalypse,
+    NeutralGhost,
 
     // Coven
     CovenPower,
     CovenKilling,
     CovenTrickery,
     CovenUtility,
+    CovenGhost,
 
     None
 }

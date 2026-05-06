@@ -41,7 +41,6 @@ internal class Lawyer : RoleBase
         CustomRoles.Amnesiac,
         CustomRoles.Jester,
         CustomRoles.Opportunist,
-        CustomRoles.Celebrity,
         CustomRoles.Bodyguard,
         CustomRoles.Dictator,
         CustomRoles.Mayor,
@@ -216,9 +215,6 @@ internal class Lawyer : RoleBase
         {
             case CustomRoles.Amnesiac:
                 Main.PlayerStates[lawyer.PlayerId].RemoveSubRole(CustomRoles.Oblivious);
-                break;
-            case CustomRoles.Celebrity:
-                Main.PlayerStates[lawyer.PlayerId].RemoveSubRole(CustomRoles.Cyber);
                 break;
             case CustomRoles.Dictator:
                 new[] { CustomRoles.Tiebreaker, CustomRoles.Paranoia, CustomRoles.Knighted, CustomRoles.VoidBallot, CustomRoles.Silent, CustomRoles.Influenced }.Do(x => Main.PlayerStates[lawyer.PlayerId].RemoveSubRole(x));

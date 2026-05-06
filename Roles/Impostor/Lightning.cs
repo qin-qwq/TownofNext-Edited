@@ -1,6 +1,7 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.Core;
 using TONE.Roles.Neutral;
 using static TONE.Options;
 
@@ -12,9 +13,12 @@ internal class Lightning : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Lightning;
     private const int Id = 24100;
+    public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Lightning);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
+
+    public const string Sprite = "<voffset=7em><alpha=#00>.</alpha></voffset><size=150%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#169fff>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<#169fff>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#52b8f4>█<#52b8f4>█<#52b8f4>█<#52b8f4>█<alpha=#00>█<#169fff>█<br><alpha=#00>█<#50adff>█<#b1e6ff>█<#b1e6ff>█<#b1e6ff>█<#b1e6ff>█<#52b8f4>█<#169fff>█<br><alpha=#00>█<#6898df>█<#7fd6ff>█<#b1e6ff>█<#b1e6ff>█<#b1e6ff>█<#169fff>█<alpha=#00>█<br><#007fff>█<#8cb2ec>█<#7fd6ff>█<#7fd6ff>█<#169fff>█<#169fff>█<#abc4df>█<alpha=#00>█<br><alpha=#00>█<#007fff>█<#169fff>█<#169fff>█<#169fff>█<#b1e6ff>█<#169fff>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#abc4df>█<#8cb2ec>█<#6898df>█<#50adff>█<alpha=#00>█<#169fff>█<br><alpha=#00>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<br></color></line-height></font></size>";
 
     private static OptionItem KillCooldown;
     private static OptionItem ConvertTime;
@@ -161,10 +165,10 @@ internal class Lightning : RoleBase
         SendRPC(byte.MaxValue);
     }
 
-    public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
-    {
-        return (!seer.IsAlive() && seer != target && IsGhost(target)) || IsGhost(target) ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lightning), "■") : string.Empty;
-    }
+    //public override string GetMarkOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
+    //{
+        //return (!seer.IsAlive() && seer != target && IsGhost(target)) || IsGhost(target) ? Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lightning), "■") : string.Empty;
+    //}
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {

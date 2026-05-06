@@ -56,18 +56,18 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.04.25";
-    public const string PluginDisplayVersion = "1.10.0";
+    public const string PluginVersion = "26.05.06";
+    public const string PluginDisplayVersion = "2.0.0 Alpha 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 3, 31, 0) // 2026.3.31 & 17.3
         ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.RELEASE;
+    public static readonly Release RELEASE = Release.ALPHA;
 
 #pragma warning disable IDE1006 // Naming Styles
-    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 2
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 1
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
     public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.10.0
 #pragma warning restore IDE1006 // Naming Styles
@@ -215,9 +215,6 @@ public class Main : BasePlugin
     public static readonly HashSet<byte> DeadPassedMeetingPlayers = [];
 
     public static bool GameIsLoaded { get; set; } = false;
-
-    // public static bool isLoversDead = true;
-    // public static readonly HashSet<PlayerControl> LoversPlayers = [];
 
     public static bool DoBlockNameChange = false;
     public static int updateTime;
@@ -784,6 +781,7 @@ public enum CustomRoles
     Deathpact,
     Devourer,
     Disperser,
+    Disturber,
     DollMaster,
     DoubleAgent,
     Eraser,
@@ -864,7 +862,6 @@ public enum CustomRoles
     Brave,
     Captain,
     Catalyst,
-    Celebrity,
     Chameleon,
     ChiefOfPolice,
     Cleanser,
@@ -1209,7 +1206,6 @@ public enum CustomWinner
     Coven = CustomRoles.Coven,
     Tunny = CustomRoles.Tunny,
     TZombie = CustomRoles.TZombie,
-    TCrewmate = CustomRoles.TCrewmate,
     Dreamer = CustomRoles.Dreamer,
     TreasureHunter = CustomRoles.TreasureHunter,
     Logos = CustomRoles.Logos,

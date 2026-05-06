@@ -486,10 +486,8 @@ static class ExtendedPlayerControl
         var clientId = seer.GetClientId();
         if (clientId == -1) return;
 
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetName, RpcSendOption, clientId);
-        writer.Write(seer.Data.NetId);
-        writer.Write(name);
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        var message = new RpcSetNameMessage(player.NetId, seer.Data.NetId, name);
+        RpcUtils.LateSpecificSendMessage(message, clientId, RpcSendOption);
     }
 
     public static void RpcEnterVentDesync(this PlayerPhysics physics, int ventId, PlayerControl seer)

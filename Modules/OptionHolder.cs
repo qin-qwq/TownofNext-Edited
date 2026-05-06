@@ -735,7 +735,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 34300 last id for roles/add-ons (Next use 34400)
+        // 34400 last id for roles/add-ons (Next use 34500)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -968,7 +968,6 @@ public static class Options
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateVanilla).ForEach(r => r.SetupCustomOption());
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateVanillaGhosts).ForEach(r => r.SetupCustomOption());
 
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCrewmate()).Any(r => r.Value.IsExperimental))
         {
@@ -1095,6 +1094,12 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard);
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralApocalypse).ForEach(r => r.SetupCustomOption());
+
+        TextOptionItem.Create(10000116, "RoleType.NeutralGhost", TabGroup.NeutralRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(127, 140, 141, byte.MaxValue));
+
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralGhost).ForEach(r => r.SetupCustomOption());
         #endregion
         Logger.Info("Neutral settings setup", "Load Options");
         yield return null;
@@ -1102,7 +1107,7 @@ public static class Options
         #region Coven Settings
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCoven()).Any(r => r.Value.IsExperimental))
         {
-            TextOptionItem.Create(10000023, "Experimental.Roles", TabGroup.NeutralRoles)
+            TextOptionItem.Create(10000023, "Experimental.Roles", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
@@ -1134,6 +1139,12 @@ public static class Options
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenUtility).ForEach(r => r.SetupCustomOption());
+
+        TextOptionItem.Create(10000117, "RoleType.CovenGhost", TabGroup.CovenRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(172, 66, 242, byte.MaxValue));
+
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenGhost).ForEach(r => r.SetupCustomOption());
         #endregion
         Logger.Info("Coven settings setup", "Load Options");
         yield return null;

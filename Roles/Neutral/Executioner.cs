@@ -35,7 +35,6 @@ internal class Executioner : RoleBase
         CustomRoles.Amnesiac,
         CustomRoles.Maverick,
         CustomRoles.CrewmateTONE,
-        CustomRoles.Celebrity,
         CustomRoles.Bodyguard,
         CustomRoles.Dictator,
         CustomRoles.Mayor,
@@ -179,9 +178,6 @@ internal class Executioner : RoleBase
         {
             case CustomRoles.Amnesiac:
                 Main.PlayerStates[executionerId].RemoveSubRole(CustomRoles.Oblivious);
-                break;
-            case CustomRoles.Celebrity:
-                Main.PlayerStates[executionerId].RemoveSubRole(CustomRoles.Cyber);
                 break;
             case CustomRoles.Dictator:
                 new[] { CustomRoles.Tiebreaker, CustomRoles.Paranoia, CustomRoles.Knighted, CustomRoles.VoidBallot, CustomRoles.Silent, CustomRoles.Influenced }.Do(x => Main.PlayerStates[executionerId].RemoveSubRole(x));

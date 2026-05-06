@@ -18,7 +18,7 @@ public static class Zoom
             if (Camera.main.orthographicSize > 3.0f)
                 ResetButtons = true;
 
-            if (Input.touchSupported)
+            /*if (Input.touchSupported)
             {
                 if (Input.touchCount == 2)
                 {
@@ -52,7 +52,7 @@ public static class Zoom
                         }
                     }
                 }
-            }
+            }*/
 
             if (Input.mouseScrollDelta.y > 0)
             {

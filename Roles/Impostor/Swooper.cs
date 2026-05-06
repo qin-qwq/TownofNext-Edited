@@ -83,7 +83,7 @@ internal class Swooper : RoleBase
             InvisDuration.Add(player.PlayerId, Utils.GetTimeStamp());
 
             SendRPC(player);
-            player.Notify(GetString("SwooperInvisState"), SwooperDuration.GetFloat(), hasPriority: true);
+            player.Notify(GetString("SwooperInvisState"), SwooperDuration.GetFloat(), hasPriority: true, sendInLog: false);
         }
 
         return false;
@@ -98,7 +98,7 @@ internal class Swooper : RoleBase
         if (InvisCooldown.TryGetValue(playerId, out var oldTime) && (oldTime + (long)SwooperCooldown.GetFloat() - nowTime) < 0)
         {
             InvisCooldown.Remove(playerId);
-            if (!player.IsModded()) player.Notify(GetString("SwooperCanVent"), hasPriority: true);
+            if (!player.IsModded()) player.Notify(GetString("SwooperCanVent"), hasPriority: true, sendInLog: false);
             needSync = true;
         }
 
@@ -115,7 +115,7 @@ internal class Swooper : RoleBase
                 InvisCooldown.Remove(swooperId);
                 InvisCooldown.Add(swooperId, nowTime);
 
-                swooper.Notify(GetString("SwooperInvisStateOut"), hasPriority: true);
+                swooper.Notify(GetString("SwooperInvisStateOut"), hasPriority: true, sendInLog: false);
                 swooper.RpcMakeVisible();
                 swooper.RpcResetAbilityCooldown();
 

@@ -725,14 +725,12 @@ class CheckForEndVotingPatch
             }
         }
 
-        //Lovers.OnCheckForEndVoting(deathReason, playerIds);
-
         foreach (var playerId in playerIds)
         {
-            // if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Main.isLoversDead && Main.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
-            // {
-            //     FixedUpdateInNormalGamePatch.LoversSuicide(playerId, true);
-            // }
+            if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Lovers.isLoversDead && Lovers.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
+            {
+                Lovers.LoversSuicide(playerId, true);
+            }
 
             RevengeOnExile(playerId);
         }

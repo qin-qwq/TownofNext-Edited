@@ -425,7 +425,7 @@ public static class CustomRoleManager
         CheckDeadBody(killer, target, inMeeting);
 
         // Check Lovers Suicide, including edge cases for suicide and disconnection
-        if (killer.PlayerId != target.PlayerId || !target.IsDisconnected())
+        if (!(killer.PlayerId == target.PlayerId && target.IsDisconnected()))
         {
             Lovers.LoversSuicide(target.PlayerId, inMeeting);
         }

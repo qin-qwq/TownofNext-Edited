@@ -258,11 +258,6 @@ class MapBehaviourShowPatch
 
         var player = PlayerControl.LocalPlayer;
 
-        if (player.GetCustomRole() == CustomRoles.NiceHacker && opts.Mode is not MapOptions.Modes.CountOverlay)
-        {
-            Logger.Info("Modded Client uses Map", "Hacker");
-            NiceHacker.MapHandle(player, __instance, opts);
-        }
         if (opts.Mode is MapOptions.Modes.Normal or MapOptions.Modes.Sabotage)
         {
             if (player.CanUseSabotage())

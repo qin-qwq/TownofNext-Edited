@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using TONE.Modules;
 using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.Translator;
@@ -96,6 +97,7 @@ internal class Blaster : RoleBase
                     }
                 }
             }
+            CustomSoundsManager.RPCPlayCustomSoundAll("Boom");
             pc.RpcResetAbilityCooldown();
             BombPosition[pc.PlayerId].Clear();
             WaitBomb.Remove(pc.PlayerId);

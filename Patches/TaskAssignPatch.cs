@@ -171,7 +171,7 @@ class RpcSetTasksPatch
         {
             hasCommonTasks = true;
             NumLongTasks = 1;
-            NumShortTasks = 1;
+            NumShortTasks = Main.NormalOptions.NumCommonTasks == 0 ? 2 : 1;
         }
 
         // GM - no have tasks, Lazy Gay and Lazy have 1 task, FFA all are killers so need to assign any tasks

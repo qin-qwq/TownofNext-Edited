@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using UnityEngine;
 
 namespace TONE.Roles.Vanilla;
 
@@ -30,5 +31,12 @@ internal class ViperTONE : RoleBase
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.ViperDissolveTime = ViperDissolveTime.GetInt();
+    }
+
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting)
+    {
+        var ViperRole = RoleManager.Instance.GetRole(RoleTypes.Viper);
+        var NewSprite = ViperRole.TryCast<ViperRole>()!.killSprite;
+        return NewSprite;
     }
 }

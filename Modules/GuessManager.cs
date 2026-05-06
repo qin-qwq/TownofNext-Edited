@@ -18,6 +18,8 @@ namespace TONE;
 
 public static class GuessManager
 {
+    public static GameObject guesserUI;
+
     public static string GetFormatString()
     {
         string text = GetString("PlayerIdList");
@@ -663,7 +665,6 @@ public static class GuessManager
     public const int MaxOneScreenRole = 40;
     public static int Page;
     public static PassiveButton ExitButton;
-    public static GameObject guesserUI;
     private static Dictionary<Custom_Team, List<Transform>> RoleButtons;
     private static Dictionary<Custom_Team, SpriteRenderer> RoleSelectButtons;
     private static List<SpriteRenderer> PageButtons;
@@ -1102,21 +1103,20 @@ public static class GuessManager
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (__instance == null || textTemplate == null)
+            if (__instance == null)
             {
                 return;
             }
-            UnityEngine.Object.Destroy(textTemplate.gameObject);
+            if (textTemplate) UnityEngine.Object.Destroy(textTemplate.gameObject);
+            if (guesserUI) UnityEngine.Object.Destroy(guesserUI.gameObject);
         }
     }
 
     // Modded non-host client guess role/add-on
     private static void SendRPC(int playerId, CustomRoles role)
     {
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (int)CustomRPC.Guess, SendOption.Reliable, -1);
-        writer.Write(playerId);
-        writer.Write((int)role);
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        var msg = new RpcGuess(PlayerControl.LocalPlayer.NetId, playerId, (int)role);
+        RpcUtils.LateBroadcastReliableMessage(msg);
     }
     public static void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {

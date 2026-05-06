@@ -279,6 +279,7 @@ class ShipStatusBeginPatch
     public static bool Prefix()
     {
         RpcSetTasksPatch.decidedCommonTasks.Clear();
+        if (GameStates.IsHideNSeek) return true;
         return hasBegun;
     }
 
