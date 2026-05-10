@@ -6,7 +6,6 @@ using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;
 
-// 部分代码参考：https://github.com/TOHOptimized/TownofHost-Optimized
 internal class Fury : RoleBase
 {
     //===========================SETUP================================\\

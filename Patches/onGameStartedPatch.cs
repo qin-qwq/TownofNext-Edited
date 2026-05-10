@@ -112,6 +112,8 @@ internal class ChangeRoleSettings
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
+            ShipStatusFixedUpdatePatch.ClosestVent = [];
+            ShipStatusFixedUpdatePatch.CanUseClosestVent = [];
 
             ChatManager.ResetHistory();
             ReportDeadBodyPatch.CanReport.Clear();

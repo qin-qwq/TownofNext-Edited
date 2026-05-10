@@ -1066,6 +1066,8 @@ class IntroCutsceneDestroyPatch
             {
                 Utils.NotifyRoles();
             }
+
+            Main.Instance.StartCoroutine(ShipStatusFixedUpdatePatch.Postfix());
         }
 
         try

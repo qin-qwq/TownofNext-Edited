@@ -3,6 +3,7 @@ using Hazel;
 using InnerNet;
 using System;
 using System.Collections;
+using TONE.Modules.Rpc;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -143,7 +144,7 @@ namespace TONE.Modules
                 }, 0.4f);
             }
 
-            MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+            /*MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
             writer.StartMessage(6);
             writer.Write(AmongUsClient.Instance.GameId);
             writer.WritePacked(player.OwnerId);
@@ -152,7 +153,9 @@ namespace TONE.Modules
             writer.EndMessage();
             writer.EndMessage();
             AmongUsClient.Instance.SendOrDisconnect(writer);
-            writer.Recycle();
+            writer.Recycle();*/
+            var message = new DespawnGameDataMessage(playerControl.NetId);
+            RpcUtils.LateSpecificSendMessage(message, player.GetClientId());
         }
 
         protected virtual void OnFixedUpdate()

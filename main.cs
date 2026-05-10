@@ -56,8 +56,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.05.06";
-    public const string PluginDisplayVersion = "2.0.0 Alpha 1";
+    public const string PluginVersion = "26.05.10";
+    public const string PluginDisplayVersion = "2.0.0 Alpha 2";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 3, 31, 0) // 2026.3.31 & 17.3
@@ -127,6 +127,7 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> EnableCustomButton { get; private set; }
     public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
     public static ConfigEntry<bool> EnableCustomDecorations { get; private set; }
+    public static ConfigEntry<bool> EnableMapVentIcon { get; private set; }
     public static ConfigEntry<bool> SwitchVanilla { get; private set; }
 
     // Debug
@@ -357,6 +358,15 @@ public class Main : BasePlugin
         coroutines.StartCoroutine(coroutine.WrapToIl2Cpp());
     }
 
+    public UnityEngine.Coroutine StartCoroutineV2(System.Collections.IEnumerator coroutine)
+    {
+        if (coroutine == null)
+        {
+            return null;
+        }
+        return coroutines.StartCoroutine(coroutine.WrapToIl2Cpp());
+    }
+
     public void StopCoroutine(System.Collections.IEnumerator coroutine)
     {
         if (coroutine == null)
@@ -364,6 +374,12 @@ public class Main : BasePlugin
             return;
         }
         coroutines.StopCoroutine(coroutine.WrapToIl2Cpp());
+    }
+
+    public void StopCoroutineV2(Coroutine coroutine)
+    {
+        if (coroutine == null) return;
+        coroutines.StopCoroutine(coroutine);
     }
 
     public void StopAllCoroutines()
@@ -596,6 +612,7 @@ public class Main : BasePlugin
         EnableCustomButton = Config.Bind("Client Options", "EnableCustomButton", true);
         EnableCustomSoundEffect = Config.Bind("Client Options", "EnableCustomSoundEffect", true);
         EnableCustomDecorations = Config.Bind("Client Options", "EnableCustomDecorations", true);
+        EnableMapVentIcon = Config.Bind("Client Options", "EnableMapVentIcon", true);
         SwitchVanilla = Config.Bind("Client Options", "SwitchVanilla", false);
 
         // Debug

@@ -188,6 +188,12 @@ static class ExtendedPlayerControl
         var newVanillaRole = newCustomRole.GetVNRole();
         var newDesyncRole = newCustomRole.GetDYRole();
 
+        if (newCustomRole is CustomRoles.GM)
+        {
+            player.RpcExileV3();
+            return;
+        }
+
         switch (oldRoleIsDesync, newRoleIsDesync)
         {
             // Desync role to normal role

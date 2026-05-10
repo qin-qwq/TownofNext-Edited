@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using TONE.Modules;
 using TONE.Modules.ChatManager;
@@ -18,6 +19,7 @@ using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using UnityEngine;
+using UnityEngine.Networking;
 using static TONE.Translator;
 
 
@@ -36,6 +38,7 @@ internal class ChatCommands
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
     private static readonly List<byte> PollVoted = [];
+    private static Dictionary<int, int> TempCurrentOptions = [];
     private static float Polltimer = 120f;
     private static string PollMSG = "";
 
@@ -1876,6 +1879,12 @@ internal class ChatCommands
                 case "/启用所有职业":
                     canceled = true;
                     EnableAllRolesCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
+                case "/preset":
+                case "/预设":
+                    canceled = true;
+                    PresetCommand(PlayerControl.LocalPlayer, text, args);
                     break;
 
                 default:
@@ -3731,6 +3740,130 @@ internal class ChatCommands
         Utils.SendMessage(GetString("AllRolesEnabled"), player.PlayerId);
     }
 
+    private static void PresetCommand(PlayerControl player, string text, string[] args)
+    {
+        if (args.Length < 2 || args.Length > 3) return;
+        switch (args[1])
+        {
+            case "up":
+            case "upload":
+                var checkOptions = TempCurrentOptions;
+                TempCurrentOptions = OptionItem.AllOptions.ToDictionary(x => x.Id, x => x.GetValue());
+                if (checkOptions == TempCurrentOptions)
+                {
+                    Utils.SendMessage(GetString("UploadSamePreset"), player.PlayerId);
+                    break;
+                }
+                Main.Instance.StartCoroutine(UploadCurrentPreset(player));
+                Logger.Info("Upload Preset", "PresetCommand");
+                break;
+            case "load":
+                Main.Instance.StartCoroutine(DownloadPreset(player, args[2]));
+                break;
+        }
+    }
+
+    private static IEnumerator UploadCurrentPreset(PlayerControl player)
+    {
+        var body = new PresetRequest
+        {
+            friend_code = player.Data.FriendCode,
+            puid = player.GetClient().GetHashedPuid(),
+            preset = TempCurrentOptions
+        };
+        var json = JsonSerializer.Serialize(body);
+        var bodyRaw = Encoding.UTF8.GetBytes(json);
+        var request = new UnityWebRequest("https://tone2.top/preset/upload", "POST")
+        {
+            uploadHandler = new UploadHandlerRaw(bodyRaw),
+            downloadHandler = new DownloadHandlerBuffer()
+        };
+        request.SetRequestHeader("Content-Type", "application/json");
+        yield return request.SendWebRequest();
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Logger.SendInGame(string.Format(GetString("PresetUploadError"), request.error));
+            yield break;
+        }
+        PresetResponse response;
+        try
+        {
+            response = JsonSerializer.Deserialize<PresetResponse>(request.downloadHandler.text);
+        }
+        catch
+        {
+            Logger.SendInGame(GetString("PresetUploadFailed"));
+            yield break;
+        }
+        if (!string.IsNullOrEmpty(response.error))
+        {
+            Logger.SendInGame(string.Format(GetString("PresetUploadRejected"), request.error));
+            yield break;
+        }
+        if (string.IsNullOrEmpty(response.preset_id))
+        {
+            Logger.SendInGame(GetString("PresetUploadNoId"));
+            yield break;
+        }
+        Utils.SendMessage(string.Format(GetString("PresetUploadSuccess"), response.preset_id), player.PlayerId);
+    }
+
+    private static IEnumerator DownloadPreset(PlayerControl player, string preset_id)
+    {
+        var request = UnityWebRequest.Get($"https://tone2.top/preset/{preset_id}");
+        request.timeout = 5;
+        yield return request.SendWebRequest();
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Logger.SendInGame(string.Format(GetString("PresetDownloadError"), request.error));
+            yield break;
+        }
+        PresetDownloadResponse response;
+        try
+        {
+            response = JsonSerializer.Deserialize<PresetDownloadResponse>(request.downloadHandler.text);
+        }
+        catch
+        {
+            Logger.SendInGame(GetString("PresetParseFailed"));
+            yield break;
+        }
+        if (!string.IsNullOrEmpty(response.error))
+        {
+            Logger.SendInGame(string.Format(GetString("PresetDownloadRejected"), response.error));
+            yield break;
+        }
+        if (response.preset == null || string.IsNullOrEmpty(response.friend_code))
+        {
+            Logger.SendInGame(GetString("PresetInvalidResponse"));
+            yield break;
+        }
+        TempCurrentOptions = response.preset;
+        Main.Instance.StartCoroutine(LoadNewPreset(player));
+    }
+
+    public static IEnumerator LoadNewPreset(PlayerControl player)
+    {
+        int count = 0;
+        foreach (var optionItem in OptionItem.AllOptions.ToArray())
+        {
+            if (TempCurrentOptions.TryGetValue(optionItem.Id, out var value))
+            {
+                if (optionItem.GetValue() == value) continue;
+
+                optionItem.SetValue(value);
+                count++;
+                if (count >= 100)
+                {
+                    count = 0;
+                    yield return null;
+                }
+            }
+        }
+        RPC.SyncCustomSettingsRPC();
+        Utils.SendMessage(GetString("PresetDownloadSuccess"), player.PlayerId);
+    }
+
     private static bool ImpostorChannel(PlayerControl pc, string msg, bool check = true)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -3756,6 +3889,26 @@ internal class ChatCommands
             .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
 
         return true;
+    }
+
+    public class PresetRequest
+    {
+        public string friend_code { get; set; }
+        public string puid { get; set; }
+        public Dictionary<int, int> preset { get; set; }
+    }
+
+    public class PresetResponse
+    {
+        public string preset_id { get; set; }
+        public string error { get; set; }
+    }
+
+    public class PresetDownloadResponse
+    {
+        public Dictionary<int, int> preset { get; set; }
+        public string friend_code { get; set; }
+        public string error { get; set; }
     }
 }
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]

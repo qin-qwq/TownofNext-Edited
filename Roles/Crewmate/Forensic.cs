@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using TONE.Roles.Core;
 using TONE.Roles.Neutral;
@@ -19,7 +20,7 @@ internal class Forensic : RoleBase
     private static OptionItem DetectiveCanknowKiller;
     private static OptionItem DetectiveCanknowDeathReason;
     private static OptionItem DetectiveCanknowRealKiller;
-    private static OptionItem FindKillerProbability;
+    private static OptionItem FindKillerSeconds;
 
     private string Notify;
     private readonly Dictionary<byte, string> InfoAboutDeadPlayerAndKiller = [];
@@ -33,9 +34,9 @@ internal class Forensic : RoleBase
             .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
         DetectiveCanknowRealKiller = BooleanOptionItem.Create(Id + 13, "DetectiveCanknowRealKiller", true, TabGroup.CrewmateRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Forensic]);
-        FindKillerProbability = IntegerOptionItem.Create(Id + 14, "FindKillerProbability", new(0, 100, 5), 50, TabGroup.CrewmateRoles, false)
+        FindKillerSeconds = IntegerOptionItem.Create(Id + 14, "FindKillerSeconds", new(0, 60, 1), 10, TabGroup.CrewmateRoles, false)
             .SetParent(DetectiveCanknowRealKiller)
-            .SetValueFormat(OptionFormat.Percent);
+            .SetValueFormat(OptionFormat.Seconds);
     }
 
     public override void Init()
@@ -79,8 +80,11 @@ internal class Forensic : RoleBase
             {
                 var realKiller = deadBody.PlayerId.GetRealKillerById();
 
-                var rd = IRandom.Instance;
-                if (DetectiveCanknowRealKiller.GetBool() && rd.Next(0, 101) < FindKillerProbability.GetInt() && realKiller != null
+                var deathTimeStamp = Main.PlayerStates[deadBody.PlayerId].RealKiller.TimeStamp;
+                var now = DateTime.Now;
+                var timeSpanSeconds = (now - deathTimeStamp).TotalSeconds;
+
+                if (DetectiveCanknowRealKiller.GetBool() && timeSpanSeconds <= FindKillerSeconds.GetInt() && realKiller != null
                     && realKiller.Data != null)
                 {
                     var killerName = realKiller.GetRealName();
