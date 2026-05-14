@@ -976,7 +976,7 @@ class ReportDeadBodyPatch
             Rebirth.OnReportDeadBody();
 
             var allCNO = CustomNetObject.AllObjects.ToArray();
-        
+
             foreach (var cno in allCNO)
             {
                 try
@@ -988,7 +988,7 @@ class ReportDeadBodyPatch
                 }
                 catch (Exception e) { Utils.ThrowException(e); }
             }
-        
+
             _ = new LateTask(() =>
             {
                 foreach (var cno in allCNO)

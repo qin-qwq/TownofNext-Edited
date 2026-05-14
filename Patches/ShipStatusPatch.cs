@@ -464,7 +464,7 @@ internal static class ShipStatusFixedUpdatePatch
     public static System.Collections.IEnumerator Postfix()
     {
         Stopwatch = Stopwatch.StartNew();
-        
+
         while (ShipStatus.Instance)
         {
             if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks)
@@ -476,7 +476,7 @@ internal static class ShipStatusFixedUpdatePatch
             }
 
             var ventilationSystem = ShipStatus.Instance.Systems[SystemTypes.Ventilation].CastFast<VentilationSystem>();
-            
+
             if (ventilationSystem == null)
             {
                 Stopwatch.Reset();
@@ -507,7 +507,7 @@ internal static class ShipStatusFixedUpdatePatch
                     CanUseClosestVent[pc.PlayerId] = canUseVent;
                 }
                 catch (Exception e) { Utils.ThrowException(e); }
-                
+
                 if (Stopwatch.ElapsedMilliseconds > 3)
                 {
                     Stopwatch.Reset();
@@ -520,7 +520,7 @@ internal static class ShipStatusFixedUpdatePatch
             yield return new WaitForSecondsRealtime(1f);
             Stopwatch.Start();
         }
-        
+
         if (ShipStatus.Instance)
             Main.Instance.StartCoroutine(Postfix());
     }

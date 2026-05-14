@@ -1,4 +1,3 @@
-using Hazel;
 using System.Text;
 using TONE.Modules;
 using TONE.Roles.Neutral;

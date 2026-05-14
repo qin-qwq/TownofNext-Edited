@@ -527,7 +527,7 @@ class GameEndCheckerForNormal
                             var crewLovers = WinnerTeam is CustomWinner.Crewmate && Lovers.LoversPlayers.ToArray().All(p => p?.IsPlayerCrewmateTeam() == true);
                             var impLovers = WinnerTeam is CustomWinner.Impostor && Lovers.LoversPlayers.ToArray().All(p => p?.IsPlayerImpostorTeam() == true);
                             var covenLovers = WinnerTeam is CustomWinner.Coven && Lovers.LoversPlayers.ToArray().All(p => p?.IsPlayerCovenTeam() == true);
-                            
+
                             if (crewLovers || impLovers || covenLovers)
                             {
                                 foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)))

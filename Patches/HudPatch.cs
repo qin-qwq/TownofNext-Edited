@@ -4,7 +4,6 @@ using System.Text;
 using TMPro;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.SabotageSystemPatch;
 using static TONE.Translator;

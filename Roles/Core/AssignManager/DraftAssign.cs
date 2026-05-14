@@ -1,4 +1,3 @@
-using AmongUs.GameOptions;
 using System.Text;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Crewmate;
@@ -145,7 +144,7 @@ public static class DraftAssign
         else if (AllRoles.Count + 1 < (playerCount - RoleAssign.SetRoles.Values.Count) * draftCount)
         {
             Logger.SendInGame(GetString("DraftNotEnoughRoles"));
-            return; 
+            return;
         }
 
         if (Sunnyboy.CheckSpawn() && AllRoles.Remove(CustomRoles.Jester)) AllRoles.Add(CustomRoles.Sunnyboy);

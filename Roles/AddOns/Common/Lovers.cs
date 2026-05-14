@@ -1,5 +1,4 @@
 using Hazel;
-using TONE.Modules.Rpc;
 using TONE.Roles.Neutral;
 using static TONE.Options;
 
@@ -112,16 +111,16 @@ public class Lovers : IAddon
                             {
                                 //if (Main.PlayersDiedInMeeting.Contains(deathId))
                                 //{
-                                    partnerPlayer.RpcExileV3();
-                                    if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
-                                    {
-                                        MeetingHud.Instance?.CheckForEndVoting();
-                                    }
-                                    _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
+                                partnerPlayer.RpcExileV3();
+                                if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                                {
+                                    MeetingHud.Instance?.CheckForEndVoting();
+                                }
+                                _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
                                 //}
                                 //else
                                 //{
-                                    //CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
+                                //CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
                                 //}
                             }
                             else

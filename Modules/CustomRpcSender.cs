@@ -3,13 +3,9 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
 using System;
-using System.Text;
-using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
-using TONE.Roles.Neutral;
-using TONE.Modules;
-using UnityEngine;
 using System.Runtime.CompilerServices;
+using System.Text;
+using UnityEngine;
 
 namespace TONE;
 
@@ -60,7 +56,7 @@ public class CustomRpcSender
         this.shouldLog = log;
         this.currentRpcTarget = -2;
         this.packed = false;
-        onSendDelegate = () => {};
+        onSendDelegate = () => { };
 
         currentState = State.Ready;
         messages = 0;
@@ -192,13 +188,13 @@ public class CustomRpcSender
             doneStreams.Add(stream);
             stream = MessageWriter.Get(sendOption);
             messages = 0;
-            
+
             currentState = State.Ready;
             currentRpcTarget = -2;
 
             if (wasPackedContext)
                 StartPackedMessage();
-            
+
             return this;
         }
 
@@ -333,7 +329,7 @@ public class CustomRpcSender
     public void SendMessage(bool dispose = false)
     {
         if (currentState == State.InRootMessage) EndMessage();
-        
+
         if (currentState == State.InRootPackedMessage) EndMessage();
 
         if (currentState != State.Ready && !dispose)

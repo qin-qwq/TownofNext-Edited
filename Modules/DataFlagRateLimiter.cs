@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Hazel;
+using System;
+using System.Diagnostics;
 
 namespace TONE.Modules;
 
@@ -15,7 +14,7 @@ public static class DataFlagRateLimiter
         public int Cost;
         public bool Done;
         public bool Dropped;
-        
+
         public System.Collections.IEnumerator Wait()
         {
             while (!Done)

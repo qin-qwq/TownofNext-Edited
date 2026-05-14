@@ -3,7 +3,6 @@ using Hazel;
 using InnerNet;
 using System;
 using System.Collections;
-using TONE.Modules.Rpc;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -38,7 +37,7 @@ namespace TONE.Modules
 
             bool notImportant = false;
             SendOption channel = notImportant ? SendOption.None : SendOption.Reliable;
-            
+
             DataFlagRateLimiter.Enqueue(() =>
             {
                 Sprite = sprite;
@@ -120,7 +119,7 @@ namespace TONE.Modules
                     AmongUsClient.Instance.RemoveNetObject(playerControl);
                     Object.Destroy(playerControl.gameObject);
                 }
-                
+
                 AllObjects.Remove(this);
             }
             catch (Exception e) { Utils.ThrowException(e); }
@@ -133,7 +132,7 @@ namespace TONE.Modules
             MessageWriter packedWriter = MessageWriter.Get(SendOption.Reliable);
             packedWriter.StartMessage(26);
             packedWriter.WritePacked(AmongUsClient.Instance.GameId);
-            
+
             foreach (PlayerControl player in players)
             {
                 if (packedWriter.Length > 500 || messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
@@ -155,7 +154,7 @@ namespace TONE.Modules
                 packedWriter.EndMessage();
                 AmongUsClient.Instance.SendOrDisconnect(packedWriter);
             }
-            
+
             packedWriter.Recycle();
         }
 
@@ -202,10 +201,10 @@ namespace TONE.Modules
             try
             {
                 if (!AmongUsClient.Instance.AmHost) return;
-                
+
                 if (SnapToSendFrameCount++ < 5) return;
                 SnapToSendFrameCount = 0;
-            
+
                 if (AmongUsClient.Instance.AmClient)
                 {
                     try { playerControl.NetTransform.SnapTo(Position, (ushort)(playerControl.NetTransform.lastSequenceId + 1U)); }
@@ -224,15 +223,15 @@ namespace TONE.Modules
         protected void CreateNetObject(string sprite, Vector2 position)
         {
             if (GameStates.IsEnded || !AmongUsClient.Instance.AmHost) return;
-            
+
             Logger.Info($" Create Custom Net Object {GetType().Name} (ID {MaxId + 1}) at {position} - Time since game start: {Utils.TimeStamp - IntroCutsceneDestroyPatch.IntroDestroyTS}s", "CNO.CreateNetObject");
             Main.Instance.StartCoroutine(CoRoutine());
             return;
-            
+
             IEnumerator CoRoutine()
             {
                 bool tooEarly = !Main.IntroDestroyed || Utils.TimeStamp - IntroCutsceneDestroyPatch.IntroDestroyTS < 10;
-                
+
                 if (Options.CurrentGameMode == CustomGameMode.Standard && (!GameStates.InGame || tooEarly))
                 {
                     if (GameStates.InGame && tooEarly)
@@ -359,7 +358,7 @@ namespace TONE.Modules
                 playerControl.CachedPlayerData = PlayerControl.LocalPlayer.Data;
 
                 yield return new WaitForSecondsRealtime(0.15f);
-                
+
                 if (this is not ShapeshiftMenuElement)
                 {
                     yield return DataFlagRateLimiter.Enqueue(() =>
@@ -421,13 +420,13 @@ namespace TONE.Modules
                 }
             }
         }
-        
+
         public virtual void OnMeetingTasks()
         {
             if (!AmongUsClient.Instance.AmHost) return;
-            
+
             Despawn();
-            
+
             Main.Instance.StartCoroutine(WaitForMeetingEnd());
             return;
 
@@ -567,7 +566,7 @@ namespace TONE.Modules
     {
         internal Fog(Vector2 position, byte OwnerId)
         {
-            if (!AmongUsClient.Instance.AmHost) return; 
+            if (!AmongUsClient.Instance.AmHost) return;
             CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#e6e6e6>█<#e6e6e6>█<#e6e6e6>█<#e6e6e6>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#e6e6e6>█<#e6e6e6>█<#bfbfbf>█<#bfbfbf>█<#e6e6e6>█<#e6e6e6>█<alpha=#00>█<br><#e6e6e6>█<#e6e6e6>█<#bfbfbf>█<#bfbfbf>█<#bfbfbf>█<#bfbfbf>█<#e6e6e6>█<#e6e6e6>█<br><#e6e6e6>█<#bfbfbf>█<#bfbfbf>█<#8c8c8c>█<#8c8c8c>█<#bfbfbf>█<#bfbfbf>█<#e6e6e6>█<br><#e6e6e6>█<#bfbfbf>█<#bfbfbf>█<#8c8c8c>█<#8c8c8c>█<#bfbfbf>█<#bfbfbf>█<#e6e6e6>█<br><#e6e6e6>█<#e6e6e6>█<#bfbfbf>█<#bfbfbf>█<#bfbfbf>█<#bfbfbf>█<#e6e6e6>█<#e6e6e6>█<br><alpha=#00>█<#e6e6e6>█<#e6e6e6>█<#bfbfbf>█<#bfbfbf>█<#e6e6e6>█<#e6e6e6>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#e6e6e6>█<#e6e6e6>█<#e6e6e6>█<#e6e6e6>█<alpha=#00>█<alpha=#00>█<br></color></line-height></font></size>", position);
             // this.OwnerId = OwnerId;
         }

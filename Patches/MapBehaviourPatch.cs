@@ -15,7 +15,7 @@ public class MapBehaviourPatch
     public static readonly List<List<Vent>> VentNetworks = [];
     public static readonly Dictionary<int, GameObject> VentIcons = [];
     private static Dictionary<PlayerControl, Vector3> preMeetingPostions = new Dictionary<PlayerControl, Vector3>();
-    private static bool ShouldShowRealTime => !PlayerControl.LocalPlayer.IsAlive() || Main.GodMode.Value || 
+    private static bool ShouldShowRealTime => !PlayerControl.LocalPlayer.IsAlive() || Main.GodMode.Value ||
     Options.CurrentGameMode == CustomGameMode.TagMode && PlayerControl.LocalPlayer.GetRoleClass() is TCrewmate tc && tc.DetectState.Item1;
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowNormalMap))]
@@ -91,7 +91,7 @@ public class MapBehaviourPatch
                 var network = GetNetworkFor(vent);
                 if (network == null)
                 {
-                    VentNetworks.Add([..vent.NearbyVents.Where(x => x != null), vent]);
+                    VentNetworks.Add([.. vent.NearbyVents.Where(x => x != null), vent]);
                 }
                 else
                 {

@@ -3524,7 +3524,7 @@ public static class Utils
     public static void RpcCreateDeadBody(Vector3 position, byte colorId, PlayerControl deadBodyParent, SendOption sendOption = SendOption.Reliable)
     {
         if (!deadBodyParent || !Main.IntroDestroyed || !AmongUsClient.Instance.AmHost) return;
-        
+
         DataFlagRateLimiter.Enqueue(() =>
         {
             CreateDeadBody(position, colorId, deadBodyParent);
@@ -3610,7 +3610,7 @@ public static class Utils
         }
 
         //Crewmates
-        if (seer.Is(CustomRoles.Judge) || seer.Is(CustomRoles.Inspector) || seer.Is(CustomRoles.Lookout) || seer.Is(CustomRoles.Swapper) || 
+        if (seer.Is(CustomRoles.Judge) || seer.Is(CustomRoles.Inspector) || seer.Is(CustomRoles.Lookout) || seer.Is(CustomRoles.Swapper) ||
             (seer.Is(CustomRoles.Dictator) && Dictator.ChangeCommandToExpel.GetBool()) || seer.Is(CustomRoles.NiceGuesser)) return true;
 
         //Impostors

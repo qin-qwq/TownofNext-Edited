@@ -19,7 +19,7 @@ public sealed class CountdownTimer : IDisposable
     private event Action OnElapsed;
     private event Action OnTick;
     private event Action OnCanceled;
-    
+
     private readonly bool _hasTickEvent;
 
     public CountdownTimer(float durationSeconds, Action onElapsed = null, bool autoStart = true, bool cancelOnMeeting = true, bool cancelOnGameEnd = true, Action onTick = null, Action onCanceled = null)
@@ -37,13 +37,13 @@ public sealed class CountdownTimer : IDisposable
             OnElapsed += onElapsed;
 
         _hasTickEvent = onTick != null;
-        
+
         if (_hasTickEvent)
             OnTick += onTick;
-        
+
         if (onCanceled != null)
             OnCanceled += onCanceled;
-        
+
         if (autoStart)
             Start();
     }
@@ -92,10 +92,10 @@ public sealed class CountdownTimer : IDisposable
             if (lastRemaining != remaining)
             {
                 if (IsCanceled()) break;
-            
+
                 try { OnTick?.Invoke(); }
                 catch (Exception e) { Utils.ThrowException(e); }
-                
+
                 lastRemaining = remaining;
             }
 

@@ -1,6 +1,4 @@
-using Hazel;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;

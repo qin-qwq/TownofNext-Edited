@@ -1,10 +1,10 @@
-using System;
-using System.Collections;
 using AmongUs.GameOptions;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Linq;
 using InnerNet;
+using System;
+using System.Collections;
 using TONE.Roles.Core;
 using Mathf = UnityEngine.Mathf;
 
@@ -52,7 +52,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
     public static void SendAllImmediately()
     {
         ForceWaitFrame = true;
-        
+
         for (var index = 0; index < AllSenders.Count; index++)
         {
             GameOptionsSender allSender = AllSenders[index];
@@ -124,13 +124,13 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
         else
             yield return base.SendGameOptionsAsync();
     }
-    
+
     protected override void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
     {
         if (PackedWriter == null) return;
-        
+
         PackedWriterMessages++;
-        
+
         PackedWriter.StartMessage(Tags.GameDataTo);
         {
             PackedWriter.Write(AmongUsClient.Instance.GameId);

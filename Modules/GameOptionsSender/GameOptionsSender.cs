@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Diagnostics;
 using AmongUs.GameOptions;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using InnerNet;
+using System.Collections;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace TONE.Modules;
@@ -101,7 +100,7 @@ public abstract class GameOptionsSender
                     PackedWriter.StartMessage(26);
                     PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
                 }
-                
+
                 for (var index = 0; index < AllSenders.Count; index++)
                 {
                     yield return WaitFrameIfNecessary();
@@ -117,9 +116,9 @@ public abstract class GameOptionsSender
                         PackedWriter.StartMessage(26);
                         PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
                     }
-                    
+
                     yield return WaitFrameIfNecessary();
-                    
+
                     if (index >= AllSenders.Count) break;
                     GameOptionsSender sender = AllSenders[index];
 

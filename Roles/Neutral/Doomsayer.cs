@@ -1,9 +1,7 @@
 using AmongUs.GameOptions;
-using Hazel;
 using System;
 using System.Text;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;

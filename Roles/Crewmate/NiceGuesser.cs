@@ -1,6 +1,4 @@
-using Hazel;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using static TONE.Options;
 using static TONE.Translator;
 

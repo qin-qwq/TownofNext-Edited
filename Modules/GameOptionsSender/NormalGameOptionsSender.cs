@@ -40,7 +40,7 @@ public class NormalGameOptionsSender : GameOptionsSender
     {
         return BasedGameOptions;
     }
-    
+
     protected override void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
     {
         DataFlagRateLimiter.Enqueue(() =>
