@@ -577,6 +577,8 @@ class GameEndCheckerForNormal
     }
     public static void StartEndGame(GameOverReason reason)
     {
+        DataFlagRateLimiter.DropQueue();
+
         // Sync of CustomWinnerHolder info
         var msg = new RpcEndGame(PlayerControl.LocalPlayer.NetId, WinnerTeam, AdditionalWinnerTeams, WinnerRoles, WinnerIds);
         RpcUtils.LateBroadcastReliableMessage(msg);

@@ -1610,7 +1610,7 @@ class MeetingHudOnDestroyPatch
             EAC.ReportTimes = [];
         }
 
-        if (Main.NormalOptions.MapId == 7) Main.Instance.StartCoroutine(WaitForExileFinish());
+        if (Main.LIMap) Main.Instance.StartCoroutine(WaitForExileFinish());
         return;
 
         System.Collections.IEnumerator WaitForExileFinish()

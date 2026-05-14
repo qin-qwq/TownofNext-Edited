@@ -70,7 +70,6 @@ public enum CustomRPC : byte // 184/255 USED
     PlayGuardAndKill,
     SyncAbilityCD,
     BreakEmergencyButton,
-    SetChatVisible,
 
     //Roles 
     SyncRoleSkill,
@@ -431,12 +430,6 @@ internal class RPCHandlerPatch
             case CustomRPC.BreakEmergencyButton:
                 ShipStatus.Instance.BreakEmergencyButton();
                 break;
-            case CustomRPC.SetChatVisible:
-                {
-                    HudManager.Instance.Chat.SetVisible(reader.ReadBoolean());
-                    HudManager.Instance.Chat.HideBanButton();
-                    break;
-                }
             case CustomRPC.SetBountyTarget:
                 BountyHunter.ReceiveRPC(reader);
                 break;
@@ -685,7 +678,7 @@ internal class RPCHandlerPatch
             case CustomRPC.FixModdedClientCNO:
                 var CNO = reader.ReadNetObject<PlayerControl>();
                 bool active = reader.ReadBoolean();
-                if (CNO != null)
+                if (CNO)
                 {
                     CNO.transform.FindChild("Names").FindChild("NameText_TMP").gameObject.SetActive(active);
                     CNO.Collider.enabled = false;

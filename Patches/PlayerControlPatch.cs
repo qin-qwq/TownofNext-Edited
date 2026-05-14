@@ -1268,6 +1268,8 @@ class FixedUpdateInNormalGamePatch
                 AFKDetector.OnFixedUpdate(player);
                 DoubleTrigger.OnFixedUpdate(player);
                 KillTimerManager.FixedUpdate(player);
+                try { DataFlagRateLimiter.OnFixedUpdate(); }
+                catch (Exception e) { Utils.ThrowException(e); }
 
                 if (playerAmOwner)
                 {
@@ -1356,7 +1358,7 @@ class FixedUpdateInNormalGamePatch
 
                         if (timerLowLoad % 6 == 0)
                         {
-                            GameOptionsSender.SendAllGameOptions();
+                            PlayerGameOptionsSender.SendAllImmediately();
                             // Of course we should be updating dirty game options
                             // This will be triggered by host playerControl every 0.2s
                         }

@@ -121,7 +121,8 @@ public class SetUpRoleTextPatch
 
             var mapName = Utils.GetActiveMapName();
             Logger.Msg($"{mapName}", "Map");
-            if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode)
+            if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode &&
+                !Main.LIMap)
             {
                 RandomSpawn.SpawnMap spawnMap = mapName switch
                 {

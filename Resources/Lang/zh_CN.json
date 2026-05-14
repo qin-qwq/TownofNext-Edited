@@ -3863,6 +3863,8 @@
   "BypassRateLimitAC": "绕过速率限制反作弊（仅官方服务器需启用）",
   "MaxSpiltReliablePacketsPerTick": "每帧最大可靠调用发送次数",
   "MaxSpiltNonePacketsPerTick": "每帧最大非可靠调用发送次数（无用）",
+  "MaxSpiltReliableDataFlagPerSecond": "每秒最大可靠数据标志发送次数",
+  "MaxSpiltNoneDataFlagPerSecond": "每秒最大非可靠数据标志发送次数",
   "AntiBlackNotEnoughPlayersWarning": "至少需要4名玩家才能防止黑屏！\n你的游戏没有足够的玩家，将使原版玩家黑屏。",
   "Runner": "奔跑者",
   "ModeSpeedRun": "游戏模式: 疾速赛跑",

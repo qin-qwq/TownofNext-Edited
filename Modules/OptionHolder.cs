@@ -197,6 +197,8 @@ public static class Options
     public static OptionItem BypassRateLimitAC;
     public static OptionItem MaxSpiltReliablePacketsPerTick;
     public static OptionItem MaxSpiltNonePacketsPerTick;
+    public static OptionItem MaxSpiltReliableDataFlagPerSecond;
+    public static OptionItem MaxSpiltNoneDataFlagPerSecond;
 
     public static OptionItem GradientTagsOpt;
     public static OptionItem EnableKillerLeftCommand;
@@ -1219,6 +1221,12 @@ public static class Options
             .SetValueFormat(OptionFormat.Pieces)
             .SetParent(BypassRateLimitAC);
         MaxSpiltNonePacketsPerTick = IntegerOptionItem.Create(60047, "MaxSpiltNonePacketsPerTick", new(1, 100, 1), 5, TabGroup.SystemSettings, false)
+            .SetValueFormat(OptionFormat.Pieces)
+            .SetParent(BypassRateLimitAC);
+        MaxSpiltReliableDataFlagPerSecond = IntegerOptionItem.Create(60046, "MaxSpiltReliableDataFlagPerSecond", new(20, 100, 1), 23, TabGroup.SystemSettings, false)
+            .SetValueFormat(OptionFormat.Pieces)
+            .SetParent(BypassRateLimitAC);
+        MaxSpiltNoneDataFlagPerSecond = IntegerOptionItem.Create(61003, "MaxSpiltNoneDataFlagPerSecond", new(20, 100, 1), 23, TabGroup.SystemSettings, false)
             .SetValueFormat(OptionFormat.Pieces)
             .SetParent(BypassRateLimitAC);
 

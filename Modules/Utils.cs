@@ -1604,7 +1604,7 @@ public static class Utils
                 if (c is >= '0' and <= '9')
                 {
                     count++;
-                    if (count >= 5) return true;
+                    if (count > 5) return true;
                 }
             }
 
@@ -2880,7 +2880,7 @@ public static class Utils
     public static void SyncAllSettings()
     {
         PlayerGameOptionsSender.SetDirtyToAll();
-        GameOptionsSender.SendAllGameOptions();
+        PlayerGameOptionsSender.SendAllImmediately();
     }
 
     public static bool CheckFirstDied(this PlayerControl pc)
@@ -2897,12 +2897,22 @@ public static class Utils
 
     public static void SendGameData()
     {
-        foreach (var playerinfo in GameData.Instance.AllPlayers)
+        if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
         {
-            playerinfo.MarkDirty();
+            foreach (var playerinfo in GameData.Instance.AllPlayers)
+            {
+                playerinfo.SendGameData();
+            }
         }
+        else
+        {
+            foreach (var playerinfo in GameData.Instance.AllPlayers)
+            {
+                playerinfo.MarkDirty();
+            }
 
-        AmongUsClient.Instance.SendAllStreamedObjects();
+            AmongUsClient.Instance.SendAllStreamedObjects();
+        }
     }
     public static void SetAllVentInteractions()
     {
@@ -3383,9 +3393,11 @@ public static class Utils
         MeetingHud.Instance.RpcClose();
     }
 
-    public static void SetChatVisibleSpecific(this PlayerControl player)
+    public static void SetChatVisibleSpecific(this PlayerControl player, MessageWriter packedWriter = null)
     {
         if (!GameStates.IsInGame || !AmongUsClient.Instance.AmHost || GameStates.IsMeeting) return;
+
+        Logger.Info($"Setting the chat visible for {player.GetNameWithRole()}", "SetChatVisible");
 
         if (player.IsHost())
         {
@@ -3400,35 +3412,51 @@ public static class Utils
             return;
         }
 
-        var customNetId = AmongUsClient.Instance.NetIdCnt++;
-        var vanillasend = MessageWriter.Get(SendOption.Reliable);
+        if (packedWriter == null) DataFlagRateLimiter.Enqueue(Action, calls: 3);
+        else Action();
+        return;
 
-        vanillasend.StartMessage(6);
-        vanillasend.Write(AmongUsClient.Instance.GameId);
-        vanillasend.Write(player.OwnerId);
-
-        vanillasend.StartMessage((byte)GameDataTag.SpawnFlag);
-        vanillasend.WritePacked(1); // 1 Meeting Hud Spawn id
-        vanillasend.WritePacked(-2); // Owned by host
-        vanillasend.Write((byte)SpawnFlags.None);
-        vanillasend.WritePacked(1);
-        vanillasend.WritePacked(customNetId);
-
-        vanillasend.StartMessage(1);
-        vanillasend.WritePacked(0);
-        vanillasend.EndMessage();
-
-        vanillasend.EndMessage();
-
-        vanillasend.StartMessage((byte)GameDataTag.RpcFlag);
-        vanillasend.WritePacked(customNetId);
-        vanillasend.Write((byte)RpcCalls.CloseMeeting);
-        vanillasend.EndMessage();
-
-        vanillasend.EndMessage();
-
-        AmongUsClient.Instance.SendOrDisconnect(vanillasend);
-        vanillasend.Recycle();
+        void Action()
+        {
+            bool dead = player.Data.IsDead;
+            MessageWriter writer = packedWriter ?? MessageWriter.Get(SendOption.Reliable);
+            writer.StartMessage(6);
+            writer.Write(AmongUsClient.Instance.GameId);
+            writer.WritePacked(player.OwnerId);
+            writer.StartMessage(4);
+            writer.WritePacked(HudManager.Instance.MeetingPrefab.SpawnId);
+            writer.WritePacked(-2);
+            writer.Write((byte)SpawnFlags.None);
+            writer.WritePacked(1);
+            uint netIdCnt = AmongUsClient.Instance.NetIdCnt;
+            AmongUsClient.Instance.NetIdCnt = netIdCnt + 1U;
+            writer.WritePacked(netIdCnt);
+            writer.StartMessage(1);
+            writer.WritePacked(0);
+            writer.EndMessage();
+            writer.EndMessage();
+            player.Data.IsDead = true;
+            writer.StartMessage(1);
+            writer.WritePacked(player.Data.NetId);
+            player.Data.Serialize(writer, true);
+            writer.EndMessage();
+            writer.StartMessage(2);
+            writer.WritePacked(netIdCnt);
+            writer.Write((byte)RpcCalls.CloseMeeting);
+            writer.EndMessage();
+            player.Data.IsDead = dead;
+            writer.StartMessage(1);
+            writer.WritePacked(player.Data.NetId);
+            player.Data.Serialize(writer, true);
+            writer.EndMessage();
+            writer.StartMessage(5);
+            writer.WritePacked(netIdCnt);
+            writer.EndMessage();
+            writer.EndMessage();
+            if (packedWriter != null) return;
+            AmongUsClient.Instance.SendOrDisconnect(writer);
+            writer.Recycle();
+        }
     }
 
     public static float CalculatePingDelay()
@@ -3477,7 +3505,7 @@ public static class Utils
 
     // Next 2: From MoreGamemodes by Rabek009
 
-    public static void CreateDeadBody(Vector3 position, byte colorId, PlayerControl deadBodyParent)
+    private static void CreateDeadBody(Vector3 position, byte colorId, PlayerControl deadBodyParent)
     {
         int baseColorId = deadBodyParent.Data.DefaultOutfit.ColorId;
         deadBodyParent.Data.DefaultOutfit.ColorId = colorId;
@@ -3495,65 +3523,69 @@ public static class Utils
 
     public static void RpcCreateDeadBody(Vector3 position, byte colorId, PlayerControl deadBodyParent, SendOption sendOption = SendOption.Reliable)
     {
-        if (deadBodyParent == null || !Main.IntroDestroyed || !AmongUsClient.Instance.AmHost) return;
-        CreateDeadBody(position, colorId, deadBodyParent);
-        PlayerControl playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab, Vector2.zero, Quaternion.identity);
-        playerControl.PlayerId = deadBodyParent.PlayerId;
-        playerControl.isNew = false;
-        playerControl.notRealPlayer = true;
-        playerControl.NetTransform.SnapTo(position);
-        AmongUsClient.Instance.NetIdCnt += 1U;
-        var sender = CustomRpcSender.Create("Utils.RpcCreateDeadBody", sendOption, true);
-        MessageWriter writer = sender.stream;
-        sender.StartMessage();
-        writer.StartMessage(4);
-        SpawnGameDataMessage item = AmongUsClient.Instance.CreateSpawnMessage(playerControl, -2, SpawnFlags.None);
-        item.SerializeValues(writer);
-        writer.EndMessage();
-
-        if (Main.CurrentServerIsVanilla)
+        if (!deadBodyParent || !Main.IntroDestroyed || !AmongUsClient.Instance.AmHost) return;
+        
+        DataFlagRateLimiter.Enqueue(() =>
         {
-            for (uint i = 1; i <= 3; ++i)
+            CreateDeadBody(position, colorId, deadBodyParent);
+            PlayerControl playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab, Vector2.zero, Quaternion.identity);
+            playerControl.PlayerId = deadBodyParent.PlayerId;
+            playerControl.isNew = false;
+            playerControl.notRealPlayer = true;
+            playerControl.NetTransform.SnapTo(position);
+            AmongUsClient.Instance.NetIdCnt += 1U;
+            var sender = CustomRpcSender.Create("Utils.RpcCreateDeadBody", sendOption, true, false);
+            MessageWriter writer = sender.stream;
+            sender.StartMessage();
+            writer.StartMessage(4);
+            SpawnGameDataMessage item = AmongUsClient.Instance.CreateSpawnMessage(playerControl, -2, SpawnFlags.None);
+            item.SerializeValues(writer);
+            writer.EndMessage();
+
+            if (Main.CurrentServerIsVanilla)
             {
-                writer.StartMessage(4);
-                writer.WritePacked(2U);
-                writer.WritePacked(-2);
-                writer.Write((byte)SpawnFlags.None);
-                writer.WritePacked(1);
-                writer.WritePacked(AmongUsClient.Instance.NetIdCnt - i);
-                writer.StartMessage(1);
-                writer.EndMessage();
-                writer.EndMessage();
+                for (uint i = 1; i <= 3; ++i)
+                {
+                    writer.StartMessage(4);
+                    writer.WritePacked(2U);
+                    writer.WritePacked(-2);
+                    writer.Write((byte)SpawnFlags.None);
+                    writer.WritePacked(1);
+                    writer.WritePacked(AmongUsClient.Instance.NetIdCnt - i);
+                    writer.StartMessage(1);
+                    writer.EndMessage();
+                    writer.EndMessage();
+                }
             }
-        }
 
-        if (PlayerControl.AllPlayerControls.Contains(playerControl))
-            PlayerControl.AllPlayerControls.Remove(playerControl);
+            if (PlayerControl.AllPlayerControls.Contains(playerControl))
+                PlayerControl.AllPlayerControls.Remove(playerControl);
 
-        int baseColorId = playerControl.Data.DefaultOutfit.ColorId;
-        sender.StartRpc(playerControl.NetId, RpcCalls.SetColor)
-            .Write(playerControl.Data.NetId)
-            .Write(colorId)
-            .EndRpc();
-        sender.StartRpc(playerControl.NetId, RpcCalls.MurderPlayer)
-            .WriteNetObject(playerControl)
-            .Write((int)MurderResultFlags.Succeeded)
-            .EndRpc();
-        sender.StartRpc(playerControl.NetId, RpcCalls.SetColor)
-            .Write(playerControl.Data.NetId)
-            .Write(baseColorId)
-            .EndRpc();
-        writer.StartMessage(1);
-        writer.WritePacked(playerControl.Data.NetId);
-        playerControl.Data.Serialize(writer, false);
-        writer.EndMessage();
-        writer.StartMessage(5);
-        writer.WritePacked(playerControl.NetId);
-        writer.EndMessage();
-        AmongUsClient.Instance.RemoveNetObject(playerControl);
-        UnityEngine.Object.Destroy(playerControl.gameObject);
-        sender.EndMessage();
-        sender.SendMessage();
+            int baseColorId = playerControl.Data.DefaultOutfit.ColorId;
+            sender.StartRpc(playerControl.NetId, RpcCalls.SetColor)
+                .Write(playerControl.Data.NetId)
+                .Write(colorId)
+                .EndRpc();
+            sender.StartRpc(playerControl.NetId, RpcCalls.MurderPlayer)
+                .WriteNetObject(playerControl)
+                .Write((int)MurderResultFlags.Succeeded)
+                .EndRpc();
+            sender.StartRpc(playerControl.NetId, RpcCalls.SetColor)
+                .Write(playerControl.Data.NetId)
+                .Write(baseColorId)
+                .EndRpc();
+            writer.StartMessage(1);
+            writer.WritePacked(playerControl.Data.NetId);
+            playerControl.Data.Serialize(writer, false);
+            writer.EndMessage();
+            writer.StartMessage(5);
+            writer.WritePacked(playerControl.NetId);
+            writer.EndMessage();
+            AmongUsClient.Instance.RemoveNetObject(playerControl);
+            UnityEngine.Object.Destroy(playerControl.gameObject);
+            sender.EndMessage();
+            sender.SendMessage();
+        });
     }
 
     public static bool CanSeeTargetId(PlayerControl seer)

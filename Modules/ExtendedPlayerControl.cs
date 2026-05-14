@@ -1157,8 +1157,7 @@ static class ExtendedPlayerControl
     }
     public static void SyncSettings(this PlayerControl player)
     {
-        PlayerGameOptionsSender.SetDirty(player.PlayerId);
-        GameOptionsSender.SendAllGameOptions();
+        PlayerGameOptionsSender.ForceSendImmediately(player.PlayerId);
     }
     public static void WriteSettingsInWriter(this MessageWriter writer, PlayerControl player)
     {
@@ -1865,11 +1864,14 @@ static class ExtendedPlayerControl
             Utils.NotifyRoles(SpecifyTarget: player, ForceLoop: false);
         }
 
+        bool hasValue = false;
+        var sender = CustomRpcSender.Create("RpcMakeInvisible", SendOption.Reliable);
+        sender.StartPackedMessage();
+
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
-            var sender = CustomRpcSender.Create("RpcMakeInvisible", SendOption.Reliable);
             sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
                 .WriteVector2(new Vector2(50f, 50f))
@@ -1880,9 +1882,10 @@ static class ExtendedPlayerControl
                 .Write((ushort)(player.NetTransform.lastSequenceId + 16383))
                 .EndRpc();
             sender.EndMessage();
-            sender.SendMessage();
+            hasValue = true;
         }
 
+        sender.SendMessage(dispose: !hasValue);
         Logger.Info($"Made {player.GetNameWithRole()} invisible", "RpcMakeInvisible");
     }
 
@@ -1914,11 +1917,14 @@ static class ExtendedPlayerControl
             Utils.NotifyRoles(SpecifyTarget: player, ForceLoop: false);
         }
 
+        bool hasValue = false;
+        var sender = CustomRpcSender.Create("RpcMakeVisible", SendOption.Reliable);
+        sender.StartPackedMessage();
+
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
-            var sender = CustomRpcSender.Create("RpcMakeVisible", SendOption.Reliable);
             sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
                 .WriteVector2(new Vector2(50f, 50f))
@@ -1933,9 +1939,10 @@ static class ExtendedPlayerControl
                 .Write(player.NetTransform.lastSequenceId)
                 .EndRpc();
             sender.EndMessage();
-            sender.SendMessage();
+            hasValue = true;
         }
 
+        sender.SendMessage(dispose: !hasValue);
         Logger.Info($"Made {player.GetNameWithRole()} visible", "RpcMakeVisible");
     }
 
@@ -1945,11 +1952,14 @@ static class ExtendedPlayerControl
         if (!Main.Invisible.Contains(player.PlayerId)) return;
         if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
 
+        bool hasValue = false;
+        var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);
+        sender.StartPackedMessage();
+
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
             if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
-            var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);
             sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetId, RpcCalls.Exiled)
                 .EndRpc();
@@ -1977,70 +1987,15 @@ static class ExtendedPlayerControl
                 .Write((ushort)(player.NetTransform.lastSequenceId + 16383))
                 .EndRpc();
             sender.EndMessage();
-            sender.SendMessage();
+            hasValue = true;
         }
 
+        sender.SendMessage(dispose: !hasValue);
         Logger.Info($"Reset invisibility for {player.GetNameWithRole()}", "RpcResetInvisibility");
     }
     public static string ColoredPlayerName(this byte id)
     {
         return Utils.ColorString(id.GetPlayerColor(), Main.AllPlayerNames.GetValueOrDefault(id, Utils.GetPlayerById(id)?.GetRealName() ?? $"Someone (ID {id})"));
-    }
-    public static void SetChatVisible(this PlayerControl player, bool visible)
-    {
-        if (!AmongUsClient.Instance.AmHost) return;
-
-        if (player.AmOwner)
-        {
-            HudManager.Instance.Chat.SetVisible(visible);
-            HudManager.Instance.Chat.HideBanButton();
-            return;
-        }
-
-        if (player.IsModded())
-        {
-            var message = new RpcSetChatVisible(PlayerControl.LocalPlayer.NetId, visible);
-            RpcUtils.LateSpecificSendMessage(message, player.OwnerId);
-            return;
-        }
-
-        var isDead = player.Data.IsDead;
-        MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
-        writer.StartMessage(6);
-        writer.Write(AmongUsClient.Instance.GameId);
-        writer.WritePacked(player.GetClientId());
-        writer.StartMessage(4);
-        writer.WritePacked(HudManager.Instance.MeetingPrefab.SpawnId);
-        writer.WritePacked(-2);
-        writer.Write((byte)SpawnFlags.None);
-        writer.WritePacked(1);
-        uint netIdCnt = AmongUsClient.Instance.NetIdCnt;
-        AmongUsClient.Instance.NetIdCnt = netIdCnt + 1U;
-        writer.WritePacked(netIdCnt);
-        writer.StartMessage(1);
-        writer.WritePacked(0);
-        writer.EndMessage();
-        writer.EndMessage();
-        player.Data.IsDead = visible;
-        writer.StartMessage(1);
-        writer.WritePacked(player.Data.NetId);
-        player.Data.Serialize(writer, true);
-        writer.EndMessage();
-        writer.StartMessage(2);
-        writer.WritePacked(netIdCnt);
-        writer.Write((byte)RpcCalls.CloseMeeting);
-        writer.EndMessage();
-        player.Data.IsDead = isDead;
-        writer.StartMessage(1);
-        writer.WritePacked(player.Data.NetId);
-        player.Data.Serialize(writer, true);
-        writer.EndMessage();
-        writer.StartMessage(5);
-        writer.WritePacked(netIdCnt);
-        writer.EndMessage();
-        writer.EndMessage();
-        AmongUsClient.Instance.SendOrDisconnect(writer);
-        writer.Recycle();
     }
 
     // If you use vanilla RpcSetRole, it will block further SetRole calls until the next game starts.
@@ -2122,10 +2077,13 @@ static class ExtendedPlayerControl
     {
         if (!AmongUsClient.Instance.AmHost) return;
 
+        bool hasValue = false;
+        CustomRpcSender sender = CustomRpcSender.Create($"SnapTo Freeze ({player.GetNameWithRole()})", SendOption.Reliable);
+        sender.StartPackedMessage();
+
         foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
         {
             if (pc == player || pc.AmOwner) continue;
-            CustomRpcSender sender = CustomRpcSender.Create($"SnapTo Freeze ({player.GetNameWithRole()})", SendOption.Reliable);
             sender.StartMessage(pc.GetClientId());
             sender.StartRpc(player.NetTransform.NetId, (byte)RpcCalls.SnapTo)
                 .WriteVector2(player.transform.position)
@@ -2136,8 +2094,10 @@ static class ExtendedPlayerControl
                 .Write((ushort)(player.NetTransform.lastSequenceId + 16383))
                 .EndRpc();
             sender.EndMessage();
-            sender.SendMessage();
+            hasValue = true;
         }
+
+        sender.SendMessage(dispose: !hasValue);
 
         player.Visible = false;
     }
@@ -2238,18 +2198,21 @@ static class ExtendedPlayerControl
         }, 1f + (AmongUsClient.Instance.Ping / 1000f));
     }
 
-    public static void SendGameData(this NetworkedPlayerInfo playerInfo)
+    public static void SendGameData(this NetworkedPlayerInfo player)
     {
-        MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
-        writer.StartMessage(5);
-        writer.Write(AmongUsClient.Instance.GameId);
-        writer.StartMessage(1);
-        writer.WritePacked(playerInfo.NetId);
-        playerInfo.Serialize(writer, false);
-        writer.EndMessage();
-        writer.EndMessage();
-        AmongUsClient.Instance.SendOrDisconnect(writer);
-        writer.Recycle();
+        DataFlagRateLimiter.Enqueue(() =>
+        {
+            MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+            writer.StartMessage(5);
+            writer.Write(AmongUsClient.Instance.GameId);
+            writer.StartMessage(1);
+            writer.WritePacked(player.NetId);
+            player.Serialize(writer, false);
+            writer.EndMessage();
+            writer.EndMessage();
+            AmongUsClient.Instance.SendOrDisconnect(writer);
+            writer.Recycle();
+        });
     }
 
     public static Color32 GetPlayerColor(this byte playerId)

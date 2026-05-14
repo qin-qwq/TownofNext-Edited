@@ -31,7 +31,7 @@ class ExileControllerWrapUpPatch
         }
         public static void Postfix(ExileController __instance)
         {
-            if (Main.NormalOptions.MapId == 7) return;
+            if (Main.LIMap) return;
 
             try
             {
@@ -53,7 +53,7 @@ class ExileControllerWrapUpPatch
     {
         public static void Postfix(AirshipExileController __instance)
         {
-            if (Main.NormalOptions.MapId == 7) return;
+            if (Main.LIMap) return;
 
             Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
             try
@@ -72,7 +72,7 @@ class ExileControllerWrapUpPatch
     }
     private static void CheckAndDoRandomSpawn()
     {
-        if (!AmongUsClient.Instance.AmHost) return;
+        if (!AmongUsClient.Instance.AmHost || Main.LIMap) return;
         if (RandomSpawn.IsRandomSpawn() || Options.CurrentGameMode == CustomGameMode.FFA)
         {
             RandomSpawn.SpawnMap spawnMap = Utils.GetActiveMapName() switch

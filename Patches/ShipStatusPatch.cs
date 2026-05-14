@@ -1,6 +1,7 @@
 using Hazel;
 using System;
 using System.Diagnostics;
+using TONE.Modules;
 using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
@@ -426,22 +427,25 @@ class ShipStatusSerializePatch
                 else
                 {
                     // Logger.Info("vanilla update vents", "ShipStatusSerializePatch");
-                    var subwriter = MessageWriter.Get(SendOption.Reliable);
-                    subwriter.StartMessage(5);
+                    DataFlagRateLimiter.Enqueue(() =>
                     {
-                        subwriter.Write(AmongUsClient.Instance.GameId);
-                        subwriter.StartMessage(1);
+                        var subwriter = MessageWriter.Get(SendOption.Reliable);
+                        subwriter.StartMessage(5);
                         {
-                            subwriter.WritePacked(__instance.NetId);
-                            subwriter.StartMessage((byte)SystemTypes.Ventilation);
-                            ventilationSystem.Serialize(subwriter, false);
+                            subwriter.Write(AmongUsClient.Instance.GameId);
+                            subwriter.StartMessage(1);
+                            {
+                                subwriter.WritePacked(__instance.NetId);
+                                subwriter.StartMessage((byte)SystemTypes.Ventilation);
+                                ventilationSystem.Serialize(subwriter, false);
+                                subwriter.EndMessage();
+                            }
                             subwriter.EndMessage();
                         }
                         subwriter.EndMessage();
-                    }
-                    subwriter.EndMessage();
-                    AmongUsClient.Instance.SendOrDisconnect(subwriter);
-                    subwriter.Recycle();
+                        AmongUsClient.Instance.SendOrDisconnect(subwriter);
+                        subwriter.Recycle();
+                    });
                 }
                 ventilationSystem.IsDirty = false;
             }
