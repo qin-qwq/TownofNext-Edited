@@ -2366,7 +2366,7 @@
   "InfectiousBittenPlayer": "Você infectou com sucesso o jogador",
   "GuessNotAllowed": "Desculpe, sua função não tem acesso a adivinhação.",
   "GuessOnbound": "This player has the Onbound Add-on, so your guess on them was canceled.",
-  "GuessSpecter": "Você não consegue adivinhar um Espectro, isso permite que eles ganhem!",
+  "GuessSpecter": "你无法猜测幻影，这会让他胜利！",
   "PacifistOnGuard": "Habilidade usada, {0} usos restantes",
   "PacifistSkillNotify": "Pacifist reset your Kill Cooldown",
   "BeRecruitedByJackal": "O Chacal lhe recrutou",
