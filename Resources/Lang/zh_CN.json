@@ -2366,7 +2366,7 @@
   "InfectiousBittenPlayer": "你成功感染了一名玩家",
   "GuessNotAllowed": "你的身份无权进行猜测",
   "GuessOnbound": "该玩家附加职业是不可被赌，因此你对他们的猜测被取消",
-  "GuessSpecter": "你无法猜测幽灵，这会让他胜利！",
+  "GuessSpecter": "你无法猜测幻影，这会让他胜利！",
   "PacifistOnGuard": "技能已生效，剩余<b>{0}</b>次",
   "PacifistSkillNotify": "和平之鸽重置了你的击杀/技能冷却",
   "BeRecruitedByJackal": "豺狼招募了你",
