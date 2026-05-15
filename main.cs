@@ -93,7 +93,7 @@ public class Main : BasePlugin
     public static readonly string WebsiteInviteUrl = "https://tone2.top/";
 
     public static readonly bool ShowDonationButton = false;
-    public static readonly string DonationInviteUrl = "https://weareten.ca/TONE";
+    public static readonly string DonationInviteUrl = "https://afdian.com/a/dolly1016";
 
     public Harmony Harmony { get; } = new Harmony(PluginGuid);
     public static Version version = Version.Parse(PluginVersion);

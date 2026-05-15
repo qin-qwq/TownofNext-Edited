@@ -1305,14 +1305,6 @@ internal class ChatCommands
                     break;
                 */
 
-                case "/setrole":
-                case "/设置的职业":
-                case "/指定的职业":
-                    canceled = true;
-                    subArgs = text.Remove(0, 8);
-                    SendRolesInfo(subArgs, PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug);
-                    break;
-
                 case "/changerole":
                 case "/mudarfunção":
                 case "/改变职业":
@@ -1885,6 +1877,14 @@ internal class ChatCommands
                 case "/预设":
                     canceled = true;
                     PresetCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
+                case "/sr":
+                case "/setrole":
+                case "/setroles":
+                case "/指定职业":
+                    canceled = true;
+                    SetRoleCommand(PlayerControl.LocalPlayer, text, args);
                     break;
 
                 default:
@@ -3742,7 +3742,7 @@ internal class ChatCommands
 
     private static void PresetCommand(PlayerControl player, string text, string[] args)
     {
-        if (args.Length < 2 || args.Length > 3) return;
+        if (args.Length < 2) return;
         switch (args[1])
         {
             case "up":
@@ -3760,6 +3760,58 @@ internal class ChatCommands
             case "load":
                 Main.Instance.StartCoroutine(DownloadPreset(player, args[2]));
                 break;
+        }
+    }
+
+    private static void SetRoleCommand(PlayerControl player, string text, string[] args)
+    {
+        if (args.Length < 2) return;
+
+        var subArgs = string.Join(' ', args[1..]);
+
+        if (!GuessManager.MsgToPlayerAndRole(subArgs, out byte resultId, out CustomRoles roleToSet, out _))
+        {
+            Utils.SendMessage(GetString("Message.SetRoleHelp"), player.PlayerId);
+            return;
+        }
+
+        if (!player.FriendCode.GetDevUser().IsUp)
+        {
+            Utils.SendMessage($"{GetString("InvalidPermissionCMD")}", player.PlayerId);
+            return;
+        }
+
+        var targetPc = Utils.GetPlayerById(resultId);
+        if (!targetPc) return;
+
+        var shouldDevAssign = true;
+
+        if (roleToSet is CustomRoles.GM or CustomRoles.Mini || roleToSet.GetCount() < 1 || roleToSet.GetMode() == 0)
+        {
+            shouldDevAssign = false;
+        }
+
+        if (roleToSet.IsGhostRole() || !shouldDevAssign || roleToSet.IsAddonAssignedMidGame())
+        {
+            Utils.SendMessage(string.Format(GetString("Message.SetRoleSelectFailed"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId);
+            return;
+        }
+
+        if (roleToSet.IsAdditionRole())
+        {
+            if (!AddonAssign.SetAddOns.ContainsKey(resultId)) AddonAssign.SetAddOns[resultId] = [];
+
+            if (!AddonAssign.SetAddOns[resultId].Contains(roleToSet))
+                AddonAssign.SetAddOns[resultId].Add(roleToSet);
+        }
+        else
+            RoleAssign.SetRoles[resultId] = roleToSet;
+
+        Utils.SendMessage(string.Format(GetString("Message.SetRoleSelected"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId);
+
+        if (targetPc.FriendCode.GetDevUser().IsDev && player.PlayerId != resultId)
+        {
+            Utils.SendMessage(string.Format(GetString("Message.SetRoleTestTip"), roleToSet.ToColoredString()), resultId);
         }
     }
 

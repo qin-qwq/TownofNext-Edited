@@ -1566,15 +1566,6 @@ class FixedUpdateInNormalGamePatch
                 }
             }
 
-            // Lightning
-            if (Lightning.HasEnabled)
-            {
-                if (Lightning.IsGhost(player))
-                {
-                    RealName.Clear().Append(Lightning.Sprite);
-                }
-            }
-
             // Dollmaster, Prevent seeing self in mushroom cloud
             if (DollMaster.HasEnabled && localPlayerRole != CustomRoles.DollMaster)
             {
@@ -1651,6 +1642,11 @@ class PlayerStartPatch
         roleText.text = "RoleText";
         roleText.gameObject.name = "RoleText";
         roleText.enabled = false;
+    }
+
+    public static Exception Finalizer()
+    {
+        return null;
     }
 }
 // Player press vent button

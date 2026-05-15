@@ -36,7 +36,7 @@ public class CustomRpcSender
             else Logger.Warn("CurrentStateはisUnsafeがtrueの時のみ上書きできます", "CustomRpcSender");
         }
     }
-    private State currentState = State.BeforeInit;
+    private State currentState/* = State.BeforeInit*/;
 
     // 0~: targetClientId (GameDataTo)
     // -1: All players (GameData)
@@ -45,7 +45,6 @@ public class CustomRpcSender
 
     private bool packed;
 
-    private CustomRpcSender() { }
     public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe, bool log)
     {
         stream = MessageWriter.Get(sendOption);
@@ -299,7 +298,7 @@ public class CustomRpcSender
         {
             // StartMessage processing
             if (currentState == State.InRootMessage)
-                EndMessage(startNew: true);
+                EndMessage(startNew: !packed);
             else if (messages > 0) // state is Ready or InRootPackedMessage
             {
                 if (currentState == State.InRootPackedMessage)
@@ -342,7 +341,7 @@ public class CustomRpcSender
                 throw new InvalidOperationException(errorMsg);
         }
 
-        if (stream.Length >= 1400 && sendOption == SendOption.Reliable && !dispose) Logger.Warn($"Large reliable packet \"{name}\" is sending ({stream.Length} bytes)", "CustomRpcSender");
+        if (stream.Length > 1200 && !dispose) Logger.Msg($"Large packet \"{name}\" is sending ({stream.Length} bytes)", "CustomRpcSender");
         else if (shouldLog || stream.Length > 3) Logger.Info($"\"{name}\" is finished (Length: {stream.Length}, dispose: {dispose}, sendOption: {sendOption})", "CustomRpcSender");
 
         if (!dispose)
@@ -353,7 +352,7 @@ public class CustomRpcSender
 
                 doneStreams.ForEach(x =>
                 {
-                    if (x.Length >= 1400 && sendOption == SendOption.Reliable) Logger.Warn($"Large reliable packet \"{name}\" is sending ({x.Length} bytes)", "CustomRpcSender");
+                    if (x.Length > 1200) Logger.Msg($"Large reliable packet \"{name}\" is sending ({x.Length} bytes)", "CustomRpcSender");
                     else if (shouldLog || x.Length > 3) sb.Append($" | {x.Length}");
 
                     AmongUsClient.Instance.SendOrDisconnect(x);
@@ -470,5 +469,25 @@ public static class CustomRpcSenderExtensions
             .Write(name)
             .Write(false)
             .EndRpc();
+    }
+}
+
+// Rather not send the packet than get kicked immediately after sending it
+// Packet sizes: The maximum MessageReader messasge size allowed (header included) is 1200 bytes.
+// can be found here: https://github.com/innersloth-LLC/AmongUsModdingInformation
+[HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.SendOrDisconnect))]
+static class PreventLargePacketKickPatch
+{
+    public static bool Prefix([HarmonyArgument(0)] MessageWriter msg)
+    {
+        if (msg.Length <= 1200) return true;
+
+        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame)
+        {
+            Logger.Warn($"Blocked large packet from sending (size: {msg.Length})", nameof(PreventLargePacketKickPatch));
+            return false;
+        }
+
+        return true;
     }
 }

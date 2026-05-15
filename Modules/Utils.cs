@@ -2256,13 +2256,6 @@ public static class Utils
                         SelfName = tname;
                 }
 
-                // Lightning
-                if (CustomRoles.Lightning.HasEnabled())
-                {
-                    if (Lightning.IsGhost(seer) && !CamouflageIsForMeeting)
-                        SelfName = Lightning.Sprite;
-                }
-
                 // Dollmaster, Prevent seeing self in mushroom cloud
                 if (CustomRoles.DollMaster.HasEnabled() && seerRole != CustomRoles.DollMaster)
                 {
@@ -2440,13 +2433,6 @@ public static class Utils
                                 TargetPlayerName = tname;
                         }
 
-                        // Lightning
-                        if (CustomRoles.Lightning.HasEnabled())
-                        {
-                            if (Lightning.IsGhost(target) && !CamouflageIsForMeeting)
-                                TargetPlayerName = Lightning.Sprite;
-                        }
-
                         // Camouflage
                         if (!CamouflageIsForMeeting && Camouflage.IsCamouflage)
                             TargetPlayerName = $"<size=0%>{TargetPlayerName}</size>";
@@ -2602,13 +2588,6 @@ public static class Utils
                 {
                     if (IdentityThief.ChangeName.TryGetValue(seer.PlayerId, out var tname) && !CamouflageIsForMeeting)
                         SelfName = tname;
-                }
-
-                // Lightning
-                if (CustomRoles.Lightning.HasEnabled())
-                {
-                    if (Lightning.IsGhost(seer) && !CamouflageIsForMeeting)
-                        SelfName = Lightning.Sprite;
                 }
 
                 // Dollmaster, Prevent seeing self in mushroom cloud
@@ -2805,13 +2784,6 @@ public static class Utils
                             {
                                 if (IdentityThief.ChangeName.TryGetValue(target.PlayerId, out var tname) && !CamouflageIsForMeeting)
                                     TargetPlayerName = tname;
-                            }
-
-                            // Lightning
-                            if (CustomRoles.Lightning.HasEnabled())
-                            {
-                                if (Lightning.IsGhost(target) && !CamouflageIsForMeeting)
-                                    TargetPlayerName = Lightning.Sprite;
                             }
 
                             // Camouflage

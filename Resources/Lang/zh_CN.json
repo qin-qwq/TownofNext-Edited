@@ -4454,5 +4454,9 @@
   "PresetParseFailed": "预设下载响应解析失败",
   "PresetDownloadRejected": "无法下载该预设：{0}",
   "PresetInvalidResponse": "预设下载失败",
-  "PresetDownloadSuccess": "成功应用预设"
+  "PresetDownloadSuccess": "成功应用预设",
+  "Message.SetRoleSelected": "<b>{0}</b>下一局将被分配为<b>{1}</b>",
+  "Message.SetRoleSelectFailed": "无法将<b>{0}</b>分配为<b>{1}</b>\n可能是因为你没有启用该职业或该职业不支持被指定",
+  "Message.SetRoleHelp": "指令格式：/setrole [玩家编号] [职业名]\n示例：「/setrole 3 告密者」\n你可以使用/id查看玩家编号列表",
+  "Message.SetRoleTestTip": "房主将你下一局职业分配为<b>{0}</b>"
 }
