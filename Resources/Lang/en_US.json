@@ -2366,7 +2366,7 @@
   "InfectiousBittenPlayer": "You successfully infected a player",
   "GuessNotAllowed": "Sorry, your role does not have access to guessing.",
   "GuessOnbound": "This player has the Onbound Add-on, so your guess on them was canceled.",
-  "GuessSpecter": "You can't guess a Specter. That allows them to win!",
+  "GuessSpecter": "你无法猜测幻影，这会让他胜利！",
   "PacifistOnGuard": "Ability used, {0} uses remain",
   "PacifistSkillNotify": "Pacifist reset your Kill Cooldown",
   "BeRecruitedByJackal": "The Jackal has recruited you",
