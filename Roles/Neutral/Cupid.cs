@@ -236,7 +236,7 @@ internal class Cupid : RoleBase
 
     public static void CheckAdditionalWin()
     {
-        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers));
+        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers)).ToList();
 
         foreach (var lover in loverWinners)
         {
