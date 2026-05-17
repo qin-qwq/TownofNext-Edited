@@ -471,7 +471,7 @@ internal class ChatCommands
                 case "/符号":
                 case "/标志":
                     {
-                        Utils.SendMessage(GetString("Command.icons"), PlayerControl.LocalPlayer.PlayerId, GetString("IconsTitle"));
+                        Utils.SendMessage(GetString("Command.icons"), PlayerControl.LocalPlayer.PlayerId, GetString("IconsTitle"), ShouldSplit: true);
                         break;
                     }
 
@@ -2517,7 +2517,7 @@ internal class ChatCommands
             case "/符号":
             case "/标志":
                 {
-                    Utils.SendMessage(GetString("Command.icons"), player.PlayerId, GetString("IconsTitle"));
+                    Utils.SendMessage(GetString("Command.icons"), player.PlayerId, GetString("IconsTitle"), ShouldSplit: true);
                     break;
                 }
 

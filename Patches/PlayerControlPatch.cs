@@ -532,7 +532,7 @@ class MurderPlayerPatch
             Utils.SyncAllSettings();
         }
 
-        Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 4));
+        Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(false));
     }
     public static void AfterPlayerDeathTasks(PlayerControl killer, PlayerControl target, bool inMeeting, bool fromRole = false)
     {
@@ -1054,7 +1054,7 @@ class ReportDeadBodyPatch
         NameNotifyManager.Reset();
 
         // Update Notify Roles for Meeting
-        Utils.DoNotifyRoles(isForMeeting: true, CamouflageIsForMeeting: true);
+        Utils.NotifyRoles(isForMeeting: true, CamouflageIsForMeeting: true);
 
         // Sync all settings on meeting start
         _ = new LateTask(Utils.SyncAllSettings, 3f, "Sync all settings after report");

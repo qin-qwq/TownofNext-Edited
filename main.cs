@@ -56,8 +56,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.05.15";
-    public const string PluginDisplayVersion = "2.0.0 Alpha 2";
+    public const string PluginVersion = "26.05.17";
+    public const string PluginDisplayVersion = "2.0.0 Alpha 3";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 3, 31, 0) // 2026.3.31 & 17.3
@@ -274,7 +274,7 @@ public class Main : BasePlugin
         for (int index = PlayerControl.AllPlayerControls.Count - 1; index >= 0; index--)
         {
             var pc = PlayerControl.AllPlayerControls[index];
-            if (pc == null || pc.PlayerId >= 254) continue;
+            if (!pc || pc.PlayerId >= 254) continue;
             yield return pc;
         }
     }
@@ -283,7 +283,7 @@ public class Main : BasePlugin
     {
         return EnumeratePlayerControls()
             .Where(pc => pc.IsAlive()
-                        && pc.Data != null
+                        && pc.Data
                         && (!pc.Data.Disconnected || !IntroDestroyed)
                         && !Pelican.IsEaten(pc.PlayerId));
     }

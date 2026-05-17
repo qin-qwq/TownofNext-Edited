@@ -360,7 +360,7 @@ internal class Philosopher : RoleBase
             SendRPC();
             if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
             {
-                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
             }
             else
             {

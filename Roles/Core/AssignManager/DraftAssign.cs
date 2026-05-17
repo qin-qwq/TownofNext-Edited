@@ -151,7 +151,7 @@ public static class DraftAssign
         if (Bard.CheckSpawn() && AllRoles.Remove(CustomRoles.Arrogance)) AllRoles.Add(CustomRoles.Bard);
         if (Requiter.CheckSpawn() && AllRoles.Remove(CustomRoles.Knight)) AllRoles.Add(CustomRoles.Requiter);
 
-        List<PlayerControl> AllPlayers = Main.EnumeratePlayerControls().Shuffle(rd).ToList();
+        var AllPlayers = Main.EnumeratePlayerControls().Shuffle(rd).ToList();
 
         foreach (var pc in AllPlayers)
         {

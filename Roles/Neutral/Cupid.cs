@@ -201,7 +201,7 @@ internal class Cupid : RoleBase
 
             if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
             {
-                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
             }
             else
             {

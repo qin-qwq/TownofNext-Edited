@@ -198,7 +198,7 @@ class ExileControllerWrapUpPatch
 
                 if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
                 {
-                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
                 }
                 else
                 {

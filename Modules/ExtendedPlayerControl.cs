@@ -465,7 +465,12 @@ static class ExtendedPlayerControl
         }
 
         Logger.Info($"Set:{player?.Data?.PlayerName}:{name} for All", "RpcSetNameEx");
-        player.RpcSetName(name);
+        var sender = CustomRpcSender.Create("RpcSetNameEx on meeting start", SendOption.Reliable);
+        sender.AutoStartRpc(player.NetId, 6);
+        sender.Write(player.Data.NetId);
+        sender.Write(name);
+        sender.EndRpc();
+        sender.SendMessage();
     }
 
     public static void RpcSetNamePrivate(this PlayerControl player, string name, PlayerControl seer = null, bool force = false)
@@ -493,7 +498,7 @@ static class ExtendedPlayerControl
         if (clientId == -1) return;
 
         var message = new RpcSetNameMessage(player.NetId, seer.Data.NetId, name);
-        RpcUtils.LateSpecificSendMessage(message, clientId, RpcSendOption);
+        RpcUtils.LateSpecificSendMessage(message, clientId);
     }
 
     public static void RpcEnterVentDesync(this PlayerPhysics physics, int ventId, PlayerControl seer)

@@ -1046,7 +1046,7 @@ public static class Utils
         {
             try
             {
-                SendMessage("\n", PlayerId, $"<size=75%>{sb}</size>");
+                SendMessage("\n", PlayerId, $"<size=75%>{sb}</size>", ShouldSplit: true);
             }
             catch (Exception err)
             {
@@ -1385,6 +1385,11 @@ public static class Utils
             if (ShouldSplit && text.Length > 750)
             {
                 text.SplitMessage().Do(x => SendMessage(x, sendTo, title, logforChatManager, noReplay, false));
+                return;
+            }
+            if (ShouldSplit && title.Length > 750)
+            {
+                title.SplitMessage().Do(x => SendMessage(text, sendTo, x, logforChatManager, noReplay, false));
                 return;
             }
         }
@@ -1738,18 +1743,29 @@ public static class Utils
 
         return baseMethod.DeclaringType != derivedMethod.DeclaringType;
     }
-    public static System.Collections.IEnumerator NotifyEveryoneAsync(int speed = 2)
+    public static System.Collections.IEnumerator NotifyEveryoneAsync(bool noCache = true, SendOption sendOption = SendOption.Reliable)
     {
-        var count = 0;
+        if (!AmongUsClient.Instance.AmHost || GameStates.IsMeeting) yield break;
 
-        var aapc = Main.EnumerateAlivePlayerControls();
+        const int frameBudget = 3; // milliseconds per frame
+        var stopwatch = new Stopwatch();
+        var aapc = Main.AllAlivePlayerControls;
 
         foreach (PlayerControl seer in aapc)
         {
             foreach (PlayerControl target in aapc)
             {
-                NotifyRoles(SpecifySeer: seer, SpecifyTarget: target);
-                if (count++ % speed == 0) yield return null;
+                if (GameStates.IsMeeting) yield break;
+                var sender = CustomRpcSender.Create("Utils.NotifyEveryoneAsync", sendOption, log: false);
+                var hasValue = WriteSetNameRpcsToSender(ref sender, false, noCache, false, false, false, false, seer, [seer], [target], out bool senderWasCleared, sendOption) && !senderWasCleared;
+                sender.SendMessage(!hasValue || sender.stream.Length <= 3);
+                
+                if (stopwatch.ElapsedMilliseconds >= frameBudget)
+                {
+                    stopwatch.Reset();
+                    yield return null;
+                    stopwatch.Start();
+                }
             }
         }
     }
@@ -1830,7 +1846,7 @@ public static class Utils
     private static readonly StringBuilder TargetDeathReason = new();
     private static readonly StringBuilder TargetSuffix = new();
     private static readonly StringBuilder TargetMark = new(20);
-    /*public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.Reliable)
+    public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.Reliable)
     {
         try
         {
@@ -1870,8 +1886,8 @@ public static class Utils
             Logger.Info($" Seers: {seers} ---- Targets: {targets}", "NR");
         }
         catch (Exception e) { ThrowException(e); }
-    }*/
-    public static async void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false)
+    }
+    /*public static async void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false)
     {
         if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || Main.EnumeratePlayerControls() == null || SetUpRoleTextPatch.IsInIntro) return;
         if (MeetingHud.Instance)
@@ -2248,7 +2264,7 @@ public static class Utils
         Logger.Info($" Loop for Targets: {string.Join(", ", targetList.Select(x => x.GetRealName() + x.PlayerId))}; Seers: {string.Join(", ", seerList.Select(x => x.GetRealName() + x.PlayerId))}", "DoNotifyRoles");
         // Logger.Info($" END", "DoNotifyRoles");
         return Task.CompletedTask;
-    }
+    }*/
 
     public static bool WriteSetNameRpcsToSender(ref CustomRpcSender sender, bool isForMeeting, bool NoCache, bool forceLoop, bool CamouflageIsForMeeting, bool guesserIsForMeeting, bool MushroomMixupIsActive, PlayerControl seer, IEnumerable<PlayerControl> seerList, IEnumerable<PlayerControl> targetList, out bool senderWasCleared, SendOption sendOption = SendOption.Reliable)
     {
