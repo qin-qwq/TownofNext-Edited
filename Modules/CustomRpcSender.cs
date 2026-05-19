@@ -325,18 +325,42 @@ public class CustomRpcSender
     }
     public void SendMessage(bool dispose = false)
     {
-        if (currentState == State.InRootMessage) EndMessage();
-
-        if (currentState == State.InRootPackedMessage) EndMessage();
-
-        if (currentState != State.Ready && !dispose)
+        if (!dispose)
         {
-            var errorMsg = $"Tried to send RPC but State is not Ready (in: \"{name}\", state: {currentState})";
+            if (currentState == State.InRootMessage) EndMessage();
 
-            if (isUnsafe)
-                Logger.Warn(errorMsg, "CustomRpcSender.Warn");
-            else
-                throw new InvalidOperationException(errorMsg);
+            if (currentState == State.InRootPackedMessage)
+            {
+                static int GetPackedIntSize(int value)
+                {
+                    uint v = (uint)value;
+                    int count = 0;
+
+                    do
+                    {
+                        v >>= 7;
+                        count++;
+                    }
+                    while (v != 0);
+
+                    return count;
+                }
+
+                if (1 + GetPackedIntSize(AmongUsClient.Instance.GameId) >= stream.Length)
+                    dispose = true;
+                else
+                    EndMessage();
+            }
+
+            if (currentState != State.Ready)
+            {
+                var errorMsg = $"Tried to send RPC but State is not Ready (in: \"{name}\", state: {currentState})";
+
+                if (isUnsafe)
+                    Logger.Warn(errorMsg, "CustomRpcSender.Warn");
+                else
+                    throw new InvalidOperationException(errorMsg);
+            }
         }
 
         if (stream.Length > 1200 && !dispose) Logger.Msg($"Large packet \"{name}\" is sending ({stream.Length} bytes)", "CustomRpcSender");

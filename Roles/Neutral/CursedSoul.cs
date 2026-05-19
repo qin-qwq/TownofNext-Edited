@@ -1,6 +1,6 @@
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -47,7 +47,7 @@ internal class CursedSoul : RoleBase
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (killer.GetAbilityUseLimit() < 1) return false;
-        if (Mini.Age < 18 && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)))
+        if (Mini.Age < 18 && target.Is(CustomRoles.Mini))
         {
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cultist), GetString("CantRecruit")));
             return false;

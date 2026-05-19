@@ -226,9 +226,7 @@ internal class Necromancer : CovenManager
             CustomRoles.Captain or
             CustomRoles.Retributionist or
             CustomRoles.Nemesis or
-            CustomRoles.NiceMini or
             CustomRoles.Mini or
-            CustomRoles.EvilMini or
             CustomRoles.SuperStar or
             CustomRoles.RuthlessRomantic or
             CustomRoles.VengefulRomantic or

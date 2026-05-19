@@ -59,7 +59,7 @@ internal class TreasureHunter : RoleBase
         if (!_Player.IsAlive()) return;
         var location = GetAllRandomSpawnLocation();
         TreasurePlace = location;
-        TreasureLocation.Add(location, new(location, [_state.PlayerId], _state.PlayerId));
+        TreasureLocation.Add(location, new(location, _Player));
     }
 
     public static void GetTreasure(PlayerControl pc, bool get = true)

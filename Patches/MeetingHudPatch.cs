@@ -1455,6 +1455,9 @@ class MeetingHudStartPatch
                         // }
                         sb.Append(Lovers.GetMarkOthers(seer, target));
                         break;
+                    case CustomRoles.Mini:
+                        sb.Append(Mini.GetMarkOthers(seer, target));
+                        break;
                     case CustomRoles.Cyber when Cyber.CyberKnown.GetBool():
                         sb.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
                         break;

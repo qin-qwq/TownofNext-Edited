@@ -1,5 +1,6 @@
 using AmongUs.Data;
 using System;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Neutral;
 
@@ -47,25 +48,29 @@ class ExileControllerWrapUpPatch
         }
     }
 
-    [HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
+    [HarmonyPatch(typeof(AirshipExileController._WrapUpAndSpawn_d__11), "MoveNext")]
     class AirshipExileControllerPatch
     {
-        public static void Postfix(AirshipExileController __instance)
+        public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
         {
-            if (Main.LIMap) return;
+            if (Main.NormalOptions.MapId == 7) return;
 
-            Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
-            try
+            var instance = __instance.__4__this;
+            if (!__result)
             {
-                WrapUpPostfix(__instance.initData.networkedPlayer);
-            }
-            catch (Exception error)
-            {
-                Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
-            }
-            finally
-            {
-                WrapUpFinalizer(__instance.initData.networkedPlayer);
+                Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
+                try
+                {
+                    WrapUpPostfix(instance.initData.networkedPlayer);
+                }
+                catch (Exception error)
+                {
+                    Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
+                }
+                finally
+                {
+                    WrapUpFinalizer(instance.initData.networkedPlayer);
+                }
             }
         }
     }
@@ -118,6 +123,7 @@ class ExileControllerWrapUpPatch
             var emptyString = string.Empty;
 
             exiledRoleClass?.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString);
+            if (exiled.Object.Is(CustomRoles.Mini)) Mini.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString);
             CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString));
 
             if (CustomWinnerHolder.WinnerTeam != CustomWinner.Terrorist) Main.PlayerStates[exiled.PlayerId].SetDead();

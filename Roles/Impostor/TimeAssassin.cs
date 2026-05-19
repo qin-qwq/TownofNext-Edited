@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Neutral;
 using static TONE.Options;
@@ -68,6 +69,7 @@ internal class TimeAssassin : RoleBase
                 player.RpcResetAbilityCooldown();
                 if (PelicanList.Contains(target)) Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + Pelican.originalSpeed[target.PlayerId];
                 else Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + tmpSpeed;
+                Mini.RecoverySpeed(target);
                 Main.PlayerStates[target.PlayerId].IsBlackOut = false;
                 RPC.PlaySoundRPC(Sounds.TaskComplete, target.PlayerId);
                 ReportDeadBodyPatch.CanReport[target.PlayerId] = true;

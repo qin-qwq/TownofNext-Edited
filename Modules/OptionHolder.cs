@@ -992,7 +992,7 @@ public static class Options
         /*
          * MINI 
          */
-        CustomRoles.Mini.GetStaticRoleClass().SetupCustomOption();
+        //CustomRoles.Mini.GetStaticRoleClass().SetupCustomOption();
 
         /*
          * SUPPORT ROLES

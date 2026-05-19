@@ -101,7 +101,7 @@ internal class RiftMaker : RoleBase
             float xLoc = reader.ReadSingle();
             float yLoc = reader.ReadSingle();
             if (MarkedLocation.Count >= 2) MarkedLocation.Remove(MarkedLocation.ElementAt(0).Key);
-            MarkedLocation.Add(new Vector2(xLoc, yLoc), new(pc.GetCustomPosition(), [], pc.PlayerId));
+            MarkedLocation.Add(new Vector2(xLoc, yLoc), new(pc.GetCustomPosition(), pc));
 
             string stimeStamp = reader.ReadString();
             if (long.TryParse(stimeStamp, out long timeStamp)) LastTP[riftID] = timeStamp;
@@ -146,7 +146,7 @@ internal class RiftMaker : RoleBase
             MarkedLocation.Remove(MarkedLocation.First(x => x.Key != Lastadded).Key);
         }
 
-        MarkedLocation.Add(shapeshifter.GetCustomPosition(), new(shapeshifter.GetCustomPosition(), [_state.PlayerId], _state.PlayerId));
+        MarkedLocation.Add(shapeshifter.GetCustomPosition(), new(shapeshifter.GetCustomPosition(), shapeshifter));
         Lastadded = shapeshifter.GetCustomPosition();
         if (MarkedLocation.Count == 2) LastTP[shapeshifterId] = Utils.GetTimeStamp();
         shapeshifter.Notify(GetString("RiftCreated"));

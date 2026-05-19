@@ -279,9 +279,9 @@ class SetEverythingUpPatch
                 break;
             case CustomWinner.NiceMini:
                 //    __instance.WinText.color = Utils.GetRoleColor(CustomRoles.Mini);
-                __instance.BackgroundBar.material.color = Utils.GetRoleColor(CustomRoles.NiceMini);
+                __instance.BackgroundBar.material.color = Utils.HexToColor("edc240");
                 //    WinnerText.text = GetString("NiceMiniDied");
-                WinnerText.color = Utils.GetRoleColor(CustomRoles.NiceMini);
+                WinnerText.color = Utils.HexToColor("edc240");
                 break;
             case CustomWinner.Neutrals:
                 __instance.WinText.text = GetString("DefeatText");

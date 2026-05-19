@@ -4,7 +4,7 @@ using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.AddOns;
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Neutral;
 using static TONE.Options;
 using static TONE.SabotageSystemPatch;
@@ -322,7 +322,7 @@ internal class Archaeologist : RoleBase
         if (LifeConnection)
         {
             var pcList = Main.EnumerateAlivePlayerControls().Where(pc => pc.PlayerId != target.PlayerId && !Pelican.IsEaten(pc.PlayerId) && !Guardian.CannotBeKilled(pc) && !Medic.IsProtected(pc.PlayerId)
-            && !pc.Is(CustomRoles.Pestilence) && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)).ToList();
+            && !pc.Is(CustomRoles.Pestilence) && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !(pc.Is(CustomRoles.Mini) && Mini.Age < 18)).ToList();
 
             if (pcList.Any())
             {

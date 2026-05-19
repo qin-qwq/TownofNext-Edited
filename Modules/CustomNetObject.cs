@@ -220,7 +220,7 @@ namespace TONE.Modules
             catch { }
         }
 
-        protected void CreateNetObject(string sprite, Vector2 position)
+        protected void CreateNetObject(string sprite, Vector2 position, IEnumerable<PlayerControl> hideFrom = null, PlayerControl onlyVisibleTo = null)
         {
             if (GameStates.IsEnded || !AmongUsClient.Instance.AmHost) return;
 
@@ -357,6 +357,12 @@ namespace TONE.Modules
 
                 playerControl.CachedPlayerData = PlayerControl.LocalPlayer.Data;
 
+                if (hideFrom != null || onlyVisibleTo)
+                {
+                    yield return new WaitForSecondsRealtime(0.3f);
+                    Hide(onlyVisibleTo ? Main.EnumerateAlivePlayerControls().Without(onlyVisibleTo) : hideFrom);
+                }
+
                 yield return new WaitForSecondsRealtime(0.15f);
 
                 if (this is not ShapeshiftMenuElement)
@@ -371,7 +377,7 @@ namespace TONE.Modules
                         string visorId = PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].VisorId;
                         var sender = CustomRpcSender.Create("CustomNetObject.CreateNetObject", SendOption.Reliable, log: false);
                         MessageWriter writer = sender.stream;
-                        sender.StartMessage();
+                        sender.StartMessage(onlyVisibleTo ? onlyVisibleTo.OwnerId : -1);
                         PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].PlayerName = "<size=14><br></size>" + sprite;
                         PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].ColorId = 0;
                         PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].HatId = "";
@@ -524,27 +530,25 @@ namespace TONE.Modules
 
     internal sealed class Firework : CustomNetObject
     {
-        internal Firework(Vector2 position, List<byte> visibleList, byte OwnerId)
+        internal Firework(Vector2 position, PlayerControl firework)
         {
             if (!AmongUsClient.Instance.AmHost) return;
-            //CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<alpha=#00>█<#f2ce1c>█<#f2eb0d>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#f2eb0d>█<#f2eb0d>█<#f2ce1c>█<#f2eb0d>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#f2eb0d>█<#f2eb0d>█<#f2eb0d>█<#f2eb0d>█<#f2ce1c>█<#f2eb0d>█<alpha=#00>█<br><alpha=#00>█<#e60000>█<#e60000>█<#f2f2f2>█<#e60000>█<#e60000>█<#f2f2f2>█<alpha=#00>█<br><alpha=#00>█<#f2f2f2>█<#f20d0d>█<#f20d0d>█<#f2f2f2>█<#f20d0d>█<#e60000>█<alpha=#00>█<br><#f2740d>█<#f2740d>█<#f2f2f2>█<#f20d0d>█<#f20d0d>█<#f2f2f2>█<#e60000>█<#f2740d>█<br><#f2740d>█<#f2740d>█<#f2740d>█<#f2f2f2>█<#f20d0d>█<#f20d0d>█<#f2740d>█<#f2740d>█<br><#cb5f06>█<#cb5f06>█<#cb5f06>█<#f20d0d>█<#f2f2f2>█<#cb5f06>█<#cb5f06>█<#cb5f06>█<br></color></line-height></font></size>", position);
-            _ = new LateTask(() => Hide(Main.EnumerateAlivePlayerControls().ExceptBy(visibleList, x => x.PlayerId)), 0.4f);
+            //CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<alpha=#00>█<#f2ce1c>█<#f2eb0d>█<alpha=#00>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#f2eb0d>█<#f2eb0d>█<#f2ce1c>█<#f2eb0d>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#f2eb0d>█<#f2eb0d>█<#f2eb0d>█<#f2eb0d>█<#f2ce1c>█<#f2eb0d>█<alpha=#00>█<br><alpha=#00>█<#e60000>█<#e60000>█<#f2f2f2>█<#e60000>█<#e60000>█<#f2f2f2>█<alpha=#00>█<br><alpha=#00>█<#f2f2f2>█<#f20d0d>█<#f20d0d>█<#f2f2f2>█<#f20d0d>█<#e60000>█<alpha=#00>█<br><#f2740d>█<#f2740d>█<#f2f2f2>█<#f20d0d>█<#f20d0d>█<#f2f2f2>█<#e60000>█<#f2740d>█<br><#f2740d>█<#f2740d>█<#f2740d>█<#f2f2f2>█<#f20d0d>█<#f20d0d>█<#f2740d>█<#f2740d>█<br><#cb5f06>█<#cb5f06>█<#cb5f06>█<#f20d0d>█<#f2f2f2>█<#cb5f06>█<#cb5f06>█<#cb5f06>█<br></color></line-height></font></size>", position, onlyVisibleTo: firework);
             // this.OwnerId = OwnerId;
         }
     }
     internal sealed class RiftPortal : CustomNetObject
     {
-        internal RiftPortal(Vector2 position, List<byte> visibleList, byte OwnerId)
+        internal RiftPortal(Vector2 position, PlayerControl riftportal)
         {
             if (!AmongUsClient.Instance.AmHost) return; // Spawning gets ignored for rift maker RPC, because it already does an rpc as Host
-            CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WW</color><mark=#e81111>WWWW</mark><#0000>WW</color>\n<#0000>W</color><mark=#e81111>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>WW</mark><#0000>W</color>\n<mark=#e81111>WW</mark><mark=#ac2020>WWWW</mark><mark=#e81111>WW</mark>\n<mark=#e81111>W</mark><mark=#ac2020>WW</mark><mark=#db5c5c>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>W</mark>\n<mark=#e81111>W</mark><mark=#ac2020>WW</mark><mark=#db5c5c>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>W</mark>\n<mark=#e81111>WW</mark><mark=#ac2020>WWWW</mark><mark=#e81111>WW</mark>\n<#0000>W</color><mark=#e81111>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>WW</mark><#0000>W</color>\n<#0000>WW</color><mark=#e81111>WWWW</mark><#0000>WW</color>", position);
-            _ = new LateTask(() => Hide(Main.EnumerateAlivePlayerControls().ExceptBy(visibleList, x => x.PlayerId)), 0.4f);
+            CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WW</color><mark=#e81111>WWWW</mark><#0000>WW</color>\n<#0000>W</color><mark=#e81111>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>WW</mark><#0000>W</color>\n<mark=#e81111>WW</mark><mark=#ac2020>WWWW</mark><mark=#e81111>WW</mark>\n<mark=#e81111>W</mark><mark=#ac2020>WW</mark><mark=#db5c5c>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>W</mark>\n<mark=#e81111>W</mark><mark=#ac2020>WW</mark><mark=#db5c5c>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>W</mark>\n<mark=#e81111>WW</mark><mark=#ac2020>WWWW</mark><mark=#e81111>WW</mark>\n<#0000>W</color><mark=#e81111>WW</mark><mark=#ac2020>WW</mark><mark=#e81111>WW</mark><#0000>W</color>\n<#0000>WW</color><mark=#e81111>WWWW</mark><#0000>WW</color>", position, onlyVisibleTo: riftportal);
             // this.OwnerId = OwnerId;
         }
     }
     internal sealed class Portal : CustomNetObject
     {
-        internal Portal(Vector2 position, byte OwnerId)
+        internal Portal(Vector2 position)
         {
             if (!AmongUsClient.Instance.AmHost) return;
             CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WW</color><mark=#20efef>WWWW</mark><#0000>WW</color>\n<#0000>W</color><mark=#20efef>WW</mark><mark=#5ae0e0>WW</mark><mark=#20efef>WW</mark><#0000>W</color>\n<mark=#20efef>WW</mark><mark=#5ae0e0>WWWW</mark><mark=#20efef>WW</mark>\n<mark=#20efef>W</mark><mark=#5ae0e0>WW</mark><mark=#2da7a7>WW</mark><mark=#5ae0e0>WW</mark><mark=#20efef>W</mark>\n<mark=#20efef>W</mark><mark=#5ae0e0>WW</mark><mark=#2da7a7>WW</mark><mark=#5ae0e0>WW</mark><mark=#20efef>W</mark>\n<mark=#20efef>WW</mark><mark=#5ae0e0>WWWW</mark><mark=#20efef>WW</mark>\n<#0000>W</color><mark=#20efef>WW</mark><mark=#5ae0e0>WW</mark><mark=#20efef>WW</mark><#0000>W</color>\n<#0000>WW</color><mark=#20efef>WWWW</mark><#0000>WW</color>", position);
@@ -553,17 +557,16 @@ namespace TONE.Modules
     }
     internal sealed class Treasure : CustomNetObject
     {
-        internal Treasure(Vector2 position, List<byte> visibleList, byte OwnerId)
+        internal Treasure(Vector2 position, PlayerControl treasure)
         {
             if (!AmongUsClient.Instance.AmHost) return;
-            CreateNetObject("<line-height=97%><cspace=0.16em><#0000>W</color><mark=#ffeda8>WWWWWW</mark><#0000>W</color>\n<mark=#ffeda8>WWW</mark><mark=#f6bd57>WWWW</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>WW</mark><mark=#ffda63>WWWW</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>W</mark><mark=#f6bd57>W</mark><mark=#ffda63>W</mark><mark=#ffd886>WW</mark><mark=#ec9d49>W</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>W</mark><mark=#f6bd57>W</mark><mark=#ffda63>W</mark><mark=#ffd886>WW</mark><mark=#ec9d49>W</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>W</mark><mark=#f6bd57>W</mark><mark=#ffda63>W</mark><mark=#ec9d49>WWW</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#f6bd57>WWWWWWW</mark><mark=#ec9d49>W</mark>\n<#0000>W</color><mark=#ec9d49>WWWWWW</mark><#0000>W</color>", position);
-            _ = new LateTask(() => Hide(Main.EnumerateAlivePlayerControls().ExceptBy(visibleList, x => x.PlayerId)), 0.4f);
+            CreateNetObject("<line-height=97%><cspace=0.16em><#0000>W</color><mark=#ffeda8>WWWWWW</mark><#0000>W</color>\n<mark=#ffeda8>WWW</mark><mark=#f6bd57>WWWW</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>WW</mark><mark=#ffda63>WWWW</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>W</mark><mark=#f6bd57>W</mark><mark=#ffda63>W</mark><mark=#ffd886>WW</mark><mark=#ec9d49>W</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>W</mark><mark=#f6bd57>W</mark><mark=#ffda63>W</mark><mark=#ffd886>WW</mark><mark=#ec9d49>W</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#ffeda8>W</mark><mark=#f6bd57>W</mark><mark=#ffda63>W</mark><mark=#ec9d49>WWW</mark><mark=#f6bd57>W</mark><mark=#ec9d49>W</mark>\n<mark=#f6bd57>WWWWWWW</mark><mark=#ec9d49>W</mark>\n<#0000>W</color><mark=#ec9d49>WWWWWW</mark><#0000>W</color>", position, onlyVisibleTo: treasure);
             // this.OwnerId = OwnerId;
         }
     }
     internal sealed class Fog : CustomNetObject
     {
-        internal Fog(Vector2 position, byte OwnerId)
+        internal Fog(Vector2 position)
         {
             if (!AmongUsClient.Instance.AmHost) return;
             CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WW</color><mark=#e6e6e6>WWWW</mark><#0000>WW</color>\n<#0000>W</color><mark=#e6e6e6>WW</mark><mark=#bfbfbf>WW</mark><mark=#e6e6e6>WW</mark><#0000>W</color>\n<mark=#e6e6e6>WW</mark><mark=#bfbfbf>WWWW</mark><mark=#e6e6e6>WW</mark>\n<mark=#e6e6e6>W</mark><mark=#bfbfbf>WW</mark><mark=#8c8c8c>WW</mark><mark=#bfbfbf>WW</mark><mark=#e6e6e6>W</mark>\n<mark=#e6e6e6>W</mark><mark=#bfbfbf>WW</mark><mark=#8c8c8c>WW</mark><mark=#bfbfbf>WW</mark><mark=#e6e6e6>W</mark>\n<mark=#e6e6e6>WW</mark><mark=#bfbfbf>WWWW</mark><mark=#e6e6e6>WW</mark>\n<#0000>W</color><mark=#e6e6e6>WW</mark><mark=#bfbfbf>WW</mark><mark=#e6e6e6>WW</mark><#0000>W</color>\n<#0000>WW</color><mark=#e6e6e6>WWWW</mark><#0000>WW</color>", position);
@@ -572,10 +575,9 @@ namespace TONE.Modules
     }
     internal sealed class ShapeshiftMenuElement : CustomNetObject
     {
-        public ShapeshiftMenuElement(byte visibleTo)
+        public ShapeshiftMenuElement(PlayerControl guesser)
         {
-            CreateNetObject(string.Empty, new Vector2(0f, 0f));
-            _ = new LateTask(() => Hide(Main.EnumeratePlayerControls().Where(x => x.PlayerId != visibleTo)), 0.4f);
+            CreateNetObject(string.Empty, new Vector2(0f, 0f), onlyVisibleTo: guesser);
         }
     }
 }

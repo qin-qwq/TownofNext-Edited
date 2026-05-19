@@ -13,7 +13,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using TONE.Modules;
 using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
@@ -1759,7 +1758,7 @@ public static class Utils
                 var sender = CustomRpcSender.Create("Utils.NotifyEveryoneAsync", sendOption, log: false);
                 var hasValue = WriteSetNameRpcsToSender(ref sender, false, noCache, false, false, false, false, seer, [seer], [target], out bool senderWasCleared, sendOption) && !senderWasCleared;
                 sender.SendMessage(!hasValue || sender.stream.Length <= 3);
-                
+
                 if (stopwatch.ElapsedMilliseconds >= frameBudget)
                 {
                     stopwatch.Reset();
@@ -1980,6 +1979,9 @@ public static class Utils
                 if (seer.Is(CustomRoles.Cyber) && Cyber.CyberKnown.GetBool())
                     SelfMark.Append(ColorString(GetRoleColor(CustomRoles.Cyber), "★"));
 
+                if (seer.Is(CustomRoles.Mini))
+                    SelfMark.Append(Mini.GetMarkOthers(seer, seer, isForMeeting: isForMeeting));
+
 
                 // ====== Add SelfSuffix for seer ======
 
@@ -2143,6 +2145,8 @@ public static class Utils
 
 
                         TargetMark.Append(Lovers.GetMarkOthers(seer, target));
+
+                        TargetMark.Append(Mini.GetMarkOthers(seer, target));
 
                         // ====== Seer know target role ======
 
@@ -2313,6 +2317,8 @@ public static class Utils
                 if (seer.Is(CustomRoles.Cyber) && Cyber.CyberKnown.GetBool())
                     SelfMark.Append(ColorString(GetRoleColor(CustomRoles.Cyber), "★"));
 
+                if (seer.Is(CustomRoles.Mini))
+                    SelfMark.Append(Mini.GetMarkOthers(seer, seer, isForMeeting: isForMeeting));
 
                 // ====== Add SelfSuffix for seer ======
 
@@ -2493,6 +2499,8 @@ public static class Utils
 
 
                             TargetMark.Append(Lovers.GetMarkOthers(seer, target));
+
+                            TargetMark.Append(Mini.GetMarkOthers(seer, target));
 
                             // ====== Seer know target role ======
 

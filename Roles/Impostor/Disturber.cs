@@ -70,7 +70,7 @@ internal class Disturber : RoleBase
         var location = phantom.GetCustomPosition();
 
         phantom.RpcRemoveAbilityUse();
-        FogLocation.Add(location, new(location, phantom.PlayerId));
+        FogLocation.Add(location, new(location));
         phantom.Notify(Translator.GetString("FogCreated"));
 
         _ = new LateTask(() =>

@@ -116,6 +116,7 @@ public enum CustomRPC : byte // 184/255 USED
     ExorcistExorcise,
     Invisibility,
     Balancer,
+    SyncMiniAge,
 
     //FFA
     SyncFFAPlayer,
@@ -739,6 +740,9 @@ internal class RPCHandlerPatch
                 }
             case CustomRPC.Balancer:
                 Balancer.ReceiveRPC_Custom(reader, __instance);
+                break;
+            case CustomRPC.SyncMiniAge:
+                Mini.ReceiveRPC(reader, __instance);
                 break;
         }
     }

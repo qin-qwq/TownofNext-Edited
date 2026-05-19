@@ -16,8 +16,6 @@ using TONE.Modules.Rpc;
 using TONE.Patches.Crowded;
 using TONE.Roles.AddOns;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
-using TONE.Roles.Neutral;
 using UnityEngine;
 using DateTime = Il2CppSystem.DateTime;
 using DateTimeKind = Il2CppSystem.DateTimeKind;
@@ -281,11 +279,12 @@ public class Main : BasePlugin
 
     public static IEnumerable<PlayerControl> EnumerateAlivePlayerControls()
     {
-        return EnumeratePlayerControls()
-            .Where(pc => pc.IsAlive()
-                        && pc.Data
-                        && (!pc.Data.Disconnected || !IntroDestroyed)
-                        && !Pelican.IsEaten(pc.PlayerId));
+        for (int index = PlayerControl.AllPlayerControls.Count - 1; index >= 0; index--)
+        {
+            PlayerControl pc = PlayerControl.AllPlayerControls[index];
+            if (!pc.IsAliveWithConditions() || pc.PlayerId >= 254) continue;
+            yield return pc;
+        }
     }
 
     public static Main Instance;
@@ -484,8 +483,8 @@ public class Main : BasePlugin
 
             CustomRolesHelper.DuplicatedRoles = new Dictionary<CustomRoles, Type>
             {
-                { CustomRoles.NiceMini, typeof(Mini) },
-                { CustomRoles.EvilMini, typeof(Mini) }
+                //{ CustomRoles.NiceMini, typeof(Mini) },
+                //{ CustomRoles.EvilMini, typeof(Mini) }
             };
 
             foreach (var role in CustomRolesHelper.AllRoles.Where(x => x < CustomRoles.NotAssigned))
@@ -809,7 +808,6 @@ public enum CustomRoles
     Escapist,
     EvilGuesser,
     EvilHacker,
-    EvilMini,
     EvilTracker,
     Exorcist,
     Fireworker,
@@ -918,7 +916,6 @@ public enum CustomRoles
     Mortician,
     NiceGuesser,
     NiceHacker,
-    NiceMini,
     Observer,
     Oracle,
     Overseer,
@@ -1050,9 +1047,6 @@ public enum CustomRoles
     Summoned,
     VoodooMaster,
 
-    //two-way camp
-    Mini,
-
     //FFA
     Killer,
 
@@ -1116,6 +1110,7 @@ public enum CustomRoles
     Randomizer,
     Rebirth,
     Mimic,
+    Mini,
     Mundane,
     Narc,
     Necroview,

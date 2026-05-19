@@ -1,7 +1,7 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
 using static TONE.MeetingHudStartPatch;
 using static TONE.Options;
@@ -144,7 +144,7 @@ internal class Retributionist : RoleBase
             pc.ShowInfoMessage(isUI, GetString("ApocalypseImmune"));
             return true;
         }
-        else if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+        else if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
         {
             pc.ShowInfoMessage(isUI, GetString("GuessMini"));
             return true;

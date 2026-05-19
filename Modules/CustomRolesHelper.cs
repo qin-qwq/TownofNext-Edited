@@ -6,7 +6,6 @@ using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using static TONE.Roles.Core.CustomRoleManager;
@@ -389,7 +388,8 @@ public static class CustomRolesHelper
             CustomRoles.Fury or
             CustomRoles.Zombie or
             CustomRoles.Dreamer or
-            CustomRoles.Drunkard;
+            CustomRoles.Drunkard or
+            CustomRoles.Mini;
     }
     public static bool IsRevealingRole(this CustomRoles role, PlayerControl target)
     {
@@ -402,7 +402,7 @@ public static class CustomRolesHelper
             || (role is CustomRoles.President && President.CheckReveal(target.PlayerId))
             || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
             || (role is CustomRoles.Solsticer)
-            || (role is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.EveryoneCanKnowMini.GetBool());
+            || (role is CustomRoles.Mini && Mini.EveryoneCanKnowMini.GetBool());
     }
     public static bool IsRevealingRole2(this CustomRoles role)
     {
@@ -415,7 +415,7 @@ public static class CustomRolesHelper
             || (role is CustomRoles.President)
             || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
             || (role is CustomRoles.Solsticer)
-            || (role is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.EveryoneCanKnowMini.GetBool());
+            || (role is CustomRoles.Mini && Mini.EveryoneCanKnowMini.GetBool());
     }
     public static bool IsBetrayalAddon(this CustomRoles role)
     {
@@ -508,7 +508,7 @@ public static class CustomRolesHelper
     {
         var addon = recruiter.GetBetrayalAddon(forRecruiter: true);
         //Mini shouldn't be recruited
-        if (target.GetCustomRole() is CustomRoles.NiceMini or CustomRoles.EvilMini && Mini.Age < 18) return false;
+        if (target.GetCustomRole() is CustomRoles.Mini && Mini.Age < 18) return false;
 
         //loyal can't be recruited
         if (target.Is(CustomRoles.Loyal)) return false;
@@ -631,7 +631,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Provocateur)
                     || pc.Is(CustomRoles.Unreportable)
                     || pc.Is(CustomRoles.Burst)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Randomizer)
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.PunchingBag)
@@ -714,7 +714,7 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.SuperStar)
                     || Doctor.VisibleToEveryone(pc)
                     || (pc.Is(CustomRoles.Bait) && Bait.BaitNotification.GetBool())
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Mare)
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.Rebound)
@@ -727,7 +727,7 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.SuperStar)
                     || Doctor.VisibleToEveryone(pc)
                     || (pc.Is(CustomRoles.Bait) && Bait.BaitNotification.GetBool())
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Mare)
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.Onbound)
@@ -800,7 +800,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.LazyGuy)
                     || pc.Is(CustomRoles.Mundane)
                     || pc.Is(CustomRoles.Burst)
-                    || pc.Is(CustomRoles.NiceMini))
+                    || pc.Is(CustomRoles.Mini))
                     return false;
                 if (pc.GetCustomRole().IsNeutral() || pc.GetCustomRole().IsImpostor() || pc.GetCustomRole().IsCoven() || pc.GetCustomRole().IsTasklessCrewmate() || pc.GetCustomRole().IsTaskBasedCrewmate())
                     return false;
@@ -813,7 +813,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.LazyGuy)
                     || pc.Is(CustomRoles.Crewpostor)
                     || pc.Is(CustomRoles.Bodyguard)
-                    || pc.Is(CustomRoles.NiceMini))
+                    || pc.Is(CustomRoles.Mini))
                     return false;
                 if (!pc.GetCustomRole().IsCrewmate() || pc.GetCustomRole().IsTasklessCrewmate())
                     return false;
@@ -847,7 +847,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Demon)
                     || pc.Is(CustomRoles.Shaman)
                     || pc.Is(CustomRoles.Monarch)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Opportunist) && Opportunist.OppoImmuneToAttacksWhenTasksDone.GetBool())
                     return false;
                 break;
@@ -940,7 +940,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Vector)
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.Taskinator)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.PunchingBag)
                     || pc.IsTransformedNeutralApocalypse())
                     return false;
@@ -951,7 +951,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.SuperStar)
                     || pc.Is(CustomRoles.Egoist)
                     || pc.Is(CustomRoles.Rascal)
-                    || pc.Is(CustomRoles.NiceMini))
+                    || pc.Is(CustomRoles.Mini))
                     return false;
                 if (!pc.CanBeMadmate() || pc.IsAnySubRole(sub => sub.IsConverted()))
                     return false;
@@ -989,7 +989,7 @@ public static class CustomRolesHelper
 
             case CustomRoles.Youtuber:
                 if (pc.Is(CustomRoles.Madmate)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Randomizer)
                     || pc.Is(CustomRoles.Sheriff)
                     || pc.Is(CustomRoles.Hurried)
@@ -1006,7 +1006,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Hurried)
                     || pc.Is(CustomRoles.Gangster)
                     || pc.Is(CustomRoles.Admirer)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.GuardianAngelTONE)
                     || pc.Is(CustomRoles.Godfather)
                     || pc.Is(CustomRoles.Narc))
@@ -1027,7 +1027,7 @@ public static class CustomRolesHelper
 
             case CustomRoles.Rascal:
                 if (pc.Is(CustomRoles.SuperStar)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Madmate)
                     || pc.Is(CustomRoles.ChiefOfPolice))
                     return false;
@@ -1166,7 +1166,7 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.Burst)
                     || pc.Is(CustomRoles.Randomizer)
                     || pc.Is(CustomRoles.Solsticer)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.PunchingBag))
                     return false;
                 break;
@@ -1191,8 +1191,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.GuardianAngelTONE)
                     || pc.Is(CustomRoles.Influenced)
                     || pc.Is(CustomRoles.Solsticer)
-                    || pc.Is(CustomRoles.NiceMini)
-                    || pc.Is(CustomRoles.EvilMini)
+                    || pc.Is(CustomRoles.Mini)
                     || (pc.Is(CustomRoles.CopyCat) && CopyCat.CanCopyTeamChangingAddon()))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor() && !pc.GetCustomRole().IsCrewmate() && !pc.GetCustomRole().IsCoven())
@@ -1205,7 +1204,7 @@ public static class CustomRolesHelper
                 if (pc.Is(CustomRoles.SuperStar)
                     || pc.Is(CustomRoles.Innocent)
                     || pc.Is(CustomRoles.Solsticer)
-                    || pc.Is(CustomRoles.NiceMini)
+                    || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Marshall))
                     return false;
                 break;
@@ -1358,8 +1357,6 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Workaholic)
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.Mini)
-                    || pc.Is(CustomRoles.NiceMini)
-                    || pc.Is(CustomRoles.EvilMini)
                     || pc.Is(CustomRoles.Cupid)
                 )
                     return false;
@@ -1408,6 +1405,43 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.ShapeMaster)
                     || pc.Is(CustomRoles.ShapeshifterTONE)
                     || pc.Is(CustomRoles.Morphling))
+                    return false;
+                break;
+
+            case CustomRoles.Mini:
+                if (pc.Is(CustomRoles.DollMaster)
+                    || pc.Is(CustomRoles.Doppelganger)
+                    || pc.Is(CustomRoles.ShapeMaster)
+                    || pc.Is(CustomRoles.ShapeshifterTONE)
+                    || pc.Is(CustomRoles.Morphling)
+                    || pc.Is(CustomRoles.Randomizer)
+                    || pc.Is(CustomRoles.Wraith)
+                    || pc.Is(CustomRoles.Nemesis)
+                    || pc.Is(CustomRoles.SuperStar)
+                    || pc.Is(CustomRoles.Altruist)
+                    || pc.Is(CustomRoles.Pyrophoric)
+                    || pc.Is(CustomRoles.Bodyguard)
+                    || pc.Is(CustomRoles.Retributionist)
+                    || pc.Is(CustomRoles.Dictator)
+                    || pc.Is(CustomRoles.Revenant)
+                    || pc.Is(CustomRoles.SchrodingersCat)
+                    || pc.Is(CustomRoles.Innocent)
+                    || pc.Is(CustomRoles.PunchingBag)
+                    || pc.Is(CustomRoles.Specter)
+                    || pc.Is(CustomRoles.Terrorist)
+                    || pc.Is(CustomRoles.Glitch)
+                    || pc.Is(CustomRoles.Traitor)
+                    || pc.Is(CustomRoles.Veteran)
+                    || pc.Is(CustomRoles.Sheriff)
+                    || pc.Is(CustomRoles.Addict)
+                    || pc.Is(CustomRoles.NoisemakerTONE)
+                    || pc.Is(CustomRoles.Spy)
+                    || pc.Is(CustomRoles.Judge)
+                    || pc.Is(CustomRoles.Councillor)
+                    || pc.Is(CustomRoles.ChiefOfPolice)
+                    || pc.Is(CustomRoles.Shaman)
+                    || pc.Is(CustomRoles.VoodooMaster)
+                    || pc.Is(CustomRoles.Archaeologist))
                     return false;
                 break;
         }

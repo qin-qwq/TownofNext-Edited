@@ -8,7 +8,6 @@ using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using UnityEngine;
@@ -211,6 +210,10 @@ public static class GuessManager
                 if (pc.GetRoleClass().GuessCheck(isUI, pc, target, role, ref guesserSuicide)) return true;
 
                 if (target.GetRoleClass().OnRoleGuess(isUI, target, pc, role, ref guesserSuicide)) return true;
+
+                if (pc.Is(CustomRoles.Mini) && Mini.GuessCheck(isUI, pc, target, role, ref guesserSuicide)) return true;
+
+                if (target.Is(CustomRoles.Mini) && Mini.OnRoleGuess(isUI, target, pc, role, ref guesserSuicide)) return true;
                 // Used to be a exploit. Guess may be canceled even misguessed
                 // You need to manually check whether guessed correct and then perform role abilities
 
@@ -418,6 +421,8 @@ public static class GuessManager
                 GuesserGuessed[pc.PlayerId]++;
 
                 if (pc.GetRoleClass().CheckMisGuessed(isUI, pc, target, role, ref guesserSuicide)) return true;
+
+                if (pc.Is(CustomRoles.Mini) && Mini.CheckMisGuessed(isUI, pc, target, role, ref guesserSuicide)) return true;
 
                 string Name = dp.GetRealName();
                 if (!Options.DisableKillAnimationOnGuess.GetBool()) CustomSoundsManager.RPCPlayCustomSoundAll("Gunfire");
@@ -1019,9 +1024,6 @@ public static class GuessManager
                     or CustomRoles.Apocalypse
                     or CustomRoles.Coven
                     || (role.IsTNA() && !Options.TransformedNeutralApocalypseCanBeGuessed.GetBool())) continue;
-
-                if (role is CustomRoles.NiceMini && Mini.Age < 18) continue;
-                if (role is CustomRoles.EvilMini && Mini.Age < 18 && !Mini.CanGuessEvil.GetBool()) continue;
 
                 CreateRole(role);
             }

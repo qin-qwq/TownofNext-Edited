@@ -1,6 +1,6 @@
 using AmongUs.GameOptions;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using static TONE.Options;
 
@@ -110,7 +110,7 @@ public static class Madmate
             pc.Is(CustomRoles.Egoist) ||
             pc.Is(CustomRoles.Paranoia) ||
             pc.Is(CustomRoles.Vigilante) ||
-            (pc.Is(CustomRoles.NiceMini) && Mini.Age >= 18) ||
+            (pc.Is(CustomRoles.Mini) && Mini.Age >= 18) ||
             (pc.Is(CustomRoles.Hurried) && !Hurried.CanBeOnMadMate.GetBool()) ||
             (CovenManager.HasNecronomicon(pc.PlayerId) && pc.Is(CustomRoles.CovenLeader))
             );

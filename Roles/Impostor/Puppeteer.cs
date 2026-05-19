@@ -1,8 +1,8 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using TONE.Roles.Neutral;
 using UnityEngine;
 using static TONE.Options;
@@ -81,7 +81,7 @@ internal class Puppeteer : RoleBase
     {
         if (target.Is(CustomRoles.LazyGuy)
             || target.Is(CustomRoles.Lazy)
-            || target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+            || target.Is(CustomRoles.Mini) && Mini.Age < 18)
             return false;
 
         return killer.CheckDoubleTrigger(target, () =>

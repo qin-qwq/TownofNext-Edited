@@ -66,12 +66,13 @@ public abstract class GameOptionsSender
         for (byte i = 0; i < count; i++)
         {
             Il2CppSystem.Object logicComponent = GameManager.Instance.LogicComponents[i];
-            if (logicComponent.TryCast<LogicOptions>(out _)) SendOptionsArray(optionArray, i);
+            if (logicComponent.TryCast<LogicOptions>(out _)) yield return SendOptionsArrayAsync(optionArray, i);
             yield return WaitFrameIfNecessary();
         }
     }
 
     protected abstract void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex);
+    protected abstract IEnumerator SendOptionsArrayAsync(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex);
 
     public abstract IGameOptions BuildGameOptions();
 
@@ -86,6 +87,9 @@ public abstract class GameOptionsSender
 
     protected static MessageWriter PackedWriter;
     protected static int PackedWriterMessages;
+
+    // Currently, a LogicOptions serialize is 155-156 bytes. 11 bytes are needed for the packet headers.
+    // Safe to pack until the length is over 1000, as it's impossible to exceed 1200 with 156 bytes per message.
 
     public static IEnumerator SendDirtyGameOptionsContinuously()
     {
@@ -103,20 +107,6 @@ public abstract class GameOptionsSender
 
                 for (var index = 0; index < AllSenders.Count; index++)
                 {
-                    yield return WaitFrameIfNecessary();
-
-                    if (PackedWriter != null && (PackedWriter.Length > 500 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit()))
-                    {
-                        PackedWriter.EndMessage();
-                        var qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(PackedWriter));
-                        yield return qa.Wait();
-                        PackedWriterMessages = 0;
-                        if (qa.Dropped) break;
-                        PackedWriter.Clear(SendOption.Reliable);
-                        PackedWriter.StartMessage(26);
-                        PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
-                    }
-
                     yield return WaitFrameIfNecessary();
 
                     if (index >= AllSenders.Count) break;

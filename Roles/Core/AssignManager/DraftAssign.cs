@@ -310,11 +310,8 @@ public static class DraftAssign
             case CustomRoles.RuthlessRomantic:
             case CustomRoles.GM:
             case CustomRoles.NotAssigned:
-            case CustomRoles.NiceMini:
-            case CustomRoles.EvilMini:
             case CustomRoles.Runner:
             case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
-            case CustomRoles.Mini:
             case CustomRoles.NiceGuesser when Options.GuesserMode.GetBool() && Options.CrewmatesCanGuess.GetBool():
             case CustomRoles.EvilGuesser when Options.GuesserMode.GetBool() && Options.ImpostorsCanGuess.GetBool():
                 return true;

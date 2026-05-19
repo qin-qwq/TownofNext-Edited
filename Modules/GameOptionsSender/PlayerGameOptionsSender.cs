@@ -75,21 +75,6 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
             if (allSender is PlayerGameOptionsSender { IsDirty: true } sender)
             {
-                if (PackedWriter != null && (PackedWriter.Length > 500 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit()))
-                {
-                    PackedWriter.EndMessage();
-                    var capturedWriter = PackedWriter;
-                    DataFlagRateLimiter.Enqueue(() =>
-                    {
-                        AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
-                        capturedWriter.Recycle();
-                    }, cleanup: capturedWriter.Recycle);
-                    PackedWriterMessages = 0;
-                    PackedWriter = MessageWriter.Get(SendOption.Reliable);
-                    PackedWriter.StartMessage(26);
-                    PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
-                }
-
                 sender.SendGameOptions();
                 sender.IsDirty = false;
             }
@@ -177,9 +162,58 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             yield return base.SendGameOptionsAsync();
     }
 
+    protected override IEnumerator SendOptionsArrayAsync(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
+    {
+        if (PackedWriter.Length > 1000 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
+        {
+            PackedWriter.EndMessage();
+            var qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(PackedWriter));
+            yield return qa.Wait();
+            PackedWriterMessages = 0;
+
+            if (qa.Dropped)
+            {
+                Main.Instance.StopCoroutineV2(ActiveCoroutine);
+                ActiveCoroutine = null;
+                PackedWriter.Recycle();
+                PackedWriter = null;
+                yield return null;
+                yield break;
+            }
+
+            PackedWriter.Clear(SendOption.Reliable);
+            PackedWriter.StartMessage(26);
+            PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+        }
+
+        yield return WaitFrameIfNecessary();
+
+        PackedWriterMessages++;
+
+        PackedWriter.StartMessage(6);
+        {
+            PackedWriter.Write(AmongUsClient.Instance.GameId);
+            PackedWriter.WritePacked(player.OwnerId);
+
+            PackedWriter.StartMessage(1);
+            {
+                PackedWriter.WritePacked(GameManager.Instance.NetId);
+                PackedWriter.StartMessage(logicOptionsIndex);
+                {
+                    PackedWriter.WriteBytesAndSize(optionArray);
+                }
+                PackedWriter.EndMessage();
+            }
+            PackedWriter.EndMessage();
+        }
+        PackedWriter.EndMessage();
+
+        Logger.Info($"PackedWriter message write complete - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArrayAsync");
+    }
+
     protected override void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
     {
-        if (PackedWriter == null)
+        if (PackedWriter == null) // Single write
         {
             DataFlagRateLimiter.Enqueue(() =>
             {
@@ -210,6 +244,21 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             return;
         }
 
+        if (PackedWriter.Length > 1000 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
+        {
+            PackedWriter.EndMessage();
+            var capturedWriter = PackedWriter;
+            DataFlagRateLimiter.Enqueue(() =>
+            {
+                AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
+                capturedWriter.Recycle();
+            }, cleanup: capturedWriter.Recycle);
+            PackedWriterMessages = 0;
+            PackedWriter = MessageWriter.Get(SendOption.Reliable);
+            PackedWriter.StartMessage(26);
+            PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+        }
+
         PackedWriterMessages++;
 
         PackedWriter.StartMessage(6);
@@ -230,7 +279,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
         }
         PackedWriter.EndMessage();
 
-        Logger.Info($"PackedWriter message write complete - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "GameOptionsSender");
+        Logger.Info($"PackedWriter message write complete - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArray");
     }
 
     public static void RemoveSender(PlayerControl player)

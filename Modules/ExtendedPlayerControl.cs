@@ -1875,7 +1875,7 @@ static class ExtendedPlayerControl
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
-            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
+            if (pc.AmOwner || pc.OwnerId < 0 || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
@@ -1928,7 +1928,7 @@ static class ExtendedPlayerControl
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
-            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
+            if (pc.AmOwner || pc.OwnerId < 0 || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetTransform.NetId, RpcCalls.SnapTo)
@@ -1963,7 +1963,7 @@ static class ExtendedPlayerControl
 
         foreach (PlayerControl pc in PlayerControl.AllPlayerControls)
         {
-            if (pc.AmOwner || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
+            if (pc.AmOwner || pc.OwnerId < 0 || pc == player || (!phantom && pc.IsModded()) || (phantom && pc.GetCustomRole().IsImpostor())) continue;
 
             sender.StartMessage(pc.OwnerId);
             sender.StartRpc(player.NetId, RpcCalls.Exiled)
@@ -2088,7 +2088,7 @@ static class ExtendedPlayerControl
 
         foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
         {
-            if (pc == player || pc.AmOwner) continue;
+            if (pc == player || pc.AmOwner || pc.OwnerId < 0) continue;
             sender.StartMessage(pc.GetClientId());
             sender.StartRpc(player.NetTransform.NetId, (byte)RpcCalls.SnapTo)
                 .WriteVector2(player.transform.position)
@@ -2226,5 +2226,13 @@ static class ExtendedPlayerControl
         if (!player) return Color.white;
         if (Main.PlayerColors.TryGetValue(playerId, out var color)) return color;
         return Palette.PlayerColors[player.Data.DefaultOutfit.ColorId];
+    }
+
+    public static bool IsAliveWithConditions(this PlayerControl player)
+    {
+        return player.IsAlive()
+            && player.Data
+            && (!player.Data.Disconnected || !Main.IntroDestroyed)
+            && !Pelican.IsEaten(player.PlayerId);
     }
 }

@@ -3,9 +3,9 @@ using Hazel;
 using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using UnityEngine;
 using static TONE.Translator;
@@ -146,9 +146,9 @@ internal class Pelican : RoleBase
     private void EatPlayer(PlayerControl pc, PlayerControl target)
     {
         if (pc == null || target == null || !target.CanBeTeleported()) return;
-        if (Mini.Age < 18 && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)))
+        if (Mini.Age < 18 && target.Is(CustomRoles.Mini))
         {
-            pc.Notify(ColorString(GetRoleColor(CustomRoles.NiceMini), GetString("CantEat")));
+            pc.Notify(ColorString(GetRoleColor(CustomRoles.Mini), GetString("CantEat")));
             return;
         }
 

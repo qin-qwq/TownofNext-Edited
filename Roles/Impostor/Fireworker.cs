@@ -122,7 +122,10 @@ internal class Fireworker : RoleBase
                 Logger.Info("One firework set up", "Fireworker");
 
                 FireworkerPosition[shapeshifterId].Add(shapeshifter.transform.position);
-                Fireworks.Add(new(shapeshifter.GetCustomPosition(), [.. Main.EnumeratePlayerControls().Where(x => x.GetCountTypes() == CountTypes.Impostor).Select(x => x.PlayerId)], _state.PlayerId));
+                foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.GetCountTypes() == CountTypes.Impostor))
+                {
+                    Fireworks.Add(new(shapeshifter.GetCustomPosition(), pc));
+                }
                 nowFireworkerCount[shapeshifterId]--;
                 state[shapeshifterId] = nowFireworkerCount[shapeshifterId] == 0
                     ? Main.AliveImpostorCount <= 1 ? FireworkerState.ReadyFire : FireworkerState.WaitTime

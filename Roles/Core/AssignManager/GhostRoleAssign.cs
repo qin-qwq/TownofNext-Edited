@@ -57,7 +57,7 @@ public static class GhostRoleAssign
         if (getplrRole is CustomRoles.GM
             or CustomRoles.Nemesis
             or CustomRoles.Retributionist
-            or CustomRoles.NiceMini
+            or CustomRoles.Mini
             or CustomRoles.Romantic
             or CustomRoles.Jester
             or CustomRoles.Follower

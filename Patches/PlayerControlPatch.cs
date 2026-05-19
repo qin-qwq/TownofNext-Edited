@@ -15,7 +15,6 @@ using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using UnityEngine;
@@ -346,6 +345,11 @@ class CheckMurderPatch
                                     return false;
                             }
                         }
+                        break;
+
+                    case CustomRoles.Mini:
+                        if (!Mini.OnCheckMurder(killer, target))
+                            return false;
                         break;
                 }
             }
@@ -1305,10 +1309,10 @@ class FixedUpdateInNormalGamePatch
                     }
 
                     //Mini's count down needs to be done outside if intask if we are counting meeting time
-                    if (player.GetRoleClass() is Mini min)
+                    if (player.Is(CustomRoles.Mini))
                     {
                         if (!playerData.Disconnected)
-                            min.OnFixedUpdates(player, nowTime);
+                            Mini.OnFixedUpdates(player, nowTime);
                     }
                 }
 
@@ -1542,6 +1546,8 @@ class FixedUpdateInNormalGamePatch
                         Mark.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
 
                     Mark.Append(Lovers.GetMarkOthers(localPlayer, player));
+
+                    Mark.Append(Mini.GetMarkOthers(localPlayer, player));
                     break;
             }
 
