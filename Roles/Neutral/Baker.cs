@@ -22,7 +22,7 @@ internal class Baker : RoleBase
 
     private static OptionItem BreadNeededToTransform;
     public static OptionItem FamineStarveCooldown;
-    private static OptionItem BTOS2Baker;
+    public static OptionItem BTOS2Baker;
     private static OptionItem ApocCanSeeReveals;
     private static OptionItem RevealsPersist;
     private static OptionItem TransformNoMoreBread;

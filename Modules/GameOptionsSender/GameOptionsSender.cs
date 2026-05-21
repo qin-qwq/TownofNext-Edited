@@ -131,6 +131,7 @@ public abstract class GameOptionsSender
                 {
                     PackedWriter.EndMessage();
                     yield return DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(PackedWriter)).Wait();
+                    Logger.Info($"PackedWriter flush finished - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendDirtyGameOptionsContinuously");
                 }
 
                 PackedWriter?.Recycle();

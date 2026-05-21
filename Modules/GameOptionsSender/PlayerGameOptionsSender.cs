@@ -61,7 +61,9 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             {
                 AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
                 capturedWriter.Recycle();
+                Logger.Info("PackedWriter flush queue finished and sent", "SendOptionsArray");
             }, cleanup: capturedWriter.Recycle);
+            Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArray");
         }
 
         PackedWriter = MessageWriter.Get(SendOption.Reliable);
@@ -90,7 +92,9 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
                 {
                     AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
                     capturedWriter.Recycle();
+                    Logger.Info("PackedWriter flush queue finished and sent", "SendAllImmediately");
                 }, cleanup: capturedWriter.Recycle);
+                Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendAllImmediately");
             }
             else
             {
@@ -169,14 +173,15 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             PackedWriter.EndMessage();
             var qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(PackedWriter));
             yield return qa.Wait();
+            Logger.Info($"PackedWriter flush finished - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArrayAsync");
             PackedWriterMessages = 0;
 
             if (qa.Dropped)
             {
-                Main.Instance.StopCoroutineV2(ActiveCoroutine);
-                ActiveCoroutine = null;
                 PackedWriter.Recycle();
                 PackedWriter = null;
+                Main.Instance.StopCoroutineV2(ActiveCoroutine);
+                ActiveCoroutine = null;
                 yield return null;
                 yield break;
             }
@@ -240,7 +245,9 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
                 AmongUsClient.Instance.SendOrDisconnect(writer);
                 writer.Recycle();
+                Logger.Info("Queue finished and sent for single write", "SendOptionsArray");
             });
+            Logger.Info("Enqueue complete for single write", "SendOptionsArray");
             return;
         }
 

@@ -287,6 +287,8 @@ public static class AddonAssign
                 continue;
             if ((pc.GetCustomRole().IsCrewmate() && !Guesser.CrewCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsNeutral() && !Guesser.NeutralCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsImpostor() && !Guesser.ImpCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsCoven() && !Guesser.CovenCanBeGuesser.GetBool()))
                 continue;
+            if (pc.GetCustomRole().IsInvestigativeRole() && Options.InvestigativeRoleCantGuess.GetBool())
+                continue;
             if (ImpNum > 0 && pc.IsPlayerImpostorTeam() && Guesser.ImpCanBeGuesser.GetBool())
             {
                 Main.PlayerStates[pc.PlayerId].SetSubRole(role);

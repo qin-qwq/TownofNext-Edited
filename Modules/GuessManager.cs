@@ -153,6 +153,11 @@ public static class GuessManager
                 pc.ShowInfoMessage(isUI, GetString("GuessDuringDiscussion"));
                 return true;
             }
+            if (pc.GetCustomRole().IsInvestigativeRole() && Options.InvestigativeRoleCantGuess.GetBool())
+            {
+                pc.ShowInfoMessage(isUI, GetString("InvestigativeRoleCantGuess"));
+                return true;
+            }
             if (!pc.Is(CustomRoles.NiceGuesser))
             {
                 if (pc.GetCustomRole().IsCrewmate() && !Options.CrewmatesCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Judge))

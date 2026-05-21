@@ -226,6 +226,17 @@ public static class CustomRolesHelper
 
         return Utils.IsMethodOverridden(pc.GetRoleClass(), "OnPet");
     }
+    public static bool IsInvestigativeRole(this CustomRoles role)
+    {
+        if (role.GetStaticRoleClass().ThisRoleType == Custom_RoleType.CrewmateInvestigative) return true;
+
+        if (role is CustomRoles.Consigliere or CustomRoles.Visionary or CustomRoles.Archaeologist or CustomRoles.Inspector or
+            CustomRoles.PotionMaster) return true;
+
+        if (role is CustomRoles.Baker && Baker.BTOS2Baker.GetBool()) return true;
+
+        return false;
+    }
     public static bool IsTaskBasedCrewmate(this CustomRoles role)
     {
         return role is

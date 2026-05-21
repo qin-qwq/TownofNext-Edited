@@ -4452,5 +4452,6 @@
   "Message.SetRoleHelp": "指令格式：/setrole [玩家编号] [职业名]\n示例：「/setrole 3 告密者」\n你可以使用/id查看玩家编号列表",
   "Message.SetRoleTestTip": "房主将你下一局职业分配为<b>{0}</b>",
   "NiceMiniCanWin": "好迷你船员死亡后抢夺胜利",
-  "MiniSpeed": "18岁之前的速度"
+  "MiniSpeed": "18岁之前的速度",
+  "InvestigativeRoleCantGuess": "<color=#8cffff>调查类</color>身份无法使用猜测"
 }

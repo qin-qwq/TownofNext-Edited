@@ -577,6 +577,7 @@ public static class Options
     public static OptionItem CanOnlyGuessEnabled;
     public static OptionItem CantGuessDuringDiscussionTime;
     public static OptionItem CanGuessCrewInvestigative;
+    public static OptionItem InvestigativeRoleCantGuess;
     public static OptionItem UseQuickChatSpamCheat;
 
     // 技能相关设定
@@ -1540,6 +1541,11 @@ public static class Options
             .SetColor(Color.cyan);
 
         CanGuessCrewInvestigative = BooleanOptionItem.Create(60698, "CanGuessCrewInvestigative", true, TabGroup.ModSettings, false)
+            .SetHeader(true)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(Color.cyan);
+
+        InvestigativeRoleCantGuess = BooleanOptionItem.Create(60699, "InvestigativeRoleCantGuess", true, TabGroup.ModSettings, false)
             .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);

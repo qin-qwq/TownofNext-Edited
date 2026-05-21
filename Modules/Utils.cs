@@ -3376,6 +3376,9 @@ public static class Utils
 
     public static bool CanSeeTargetId(PlayerControl seer)
     {
+        // Setting
+        if (seer.GetCustomRole().IsInvestigativeRole() && Options.InvestigativeRoleCantGuess.GetBool()) return false;
+
         if (Options.GuesserMode.GetBool())
         {
             //Crewmates

@@ -315,7 +315,7 @@ public static class LobbyViewSettingsPanePatch
             void OnRightPassiveClick()
             {
                 LastGameModeSelected++;
-                var enumGameModes = Enum.GetValues<CustomGameMode>().Without(CustomGameMode.All).Without(CustomGameMode.HidenSeekTONE).ToArray();
+                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^2];
                 if ((int)LastGameModeSelected > enumGameModes.Length)
                 {
                     LastGameModeSelected = CustomGameMode.Standard;
@@ -338,7 +338,7 @@ public static class LobbyViewSettingsPanePatch
             void OnLeftPassiveClick()
             {
                 LastGameModeSelected--;
-                var enumGameModes = Enum.GetValues<CustomGameMode>().Without(CustomGameMode.All).Without(CustomGameMode.HidenSeekTONE).ToArray();
+                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^2];
                 if ((int)LastGameModeSelected < 0x01)
                 {
                     LastGameModeSelected = (CustomGameMode)enumGameModes.Length;
@@ -704,10 +704,10 @@ public static class LobbyViewSettingsPanePatch
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Float:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetFloat()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Int:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetInt()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         default:
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
@@ -958,10 +958,10 @@ public static class LobbyViewSettingsPanePatch
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Float:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetFloat()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Int:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetInt()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         default:
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
@@ -1117,10 +1117,10 @@ public static class LobbyViewSettingsPanePatch
                     viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                     break;
                 case OptionTypes.Float:
-                    viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetFloat()), 61);
+                    viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                     break;
                 case OptionTypes.Int:
-                    viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetInt()), 61);
+                    viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                     break;
                 default:
                     viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);

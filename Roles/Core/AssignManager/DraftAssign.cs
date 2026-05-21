@@ -99,7 +99,42 @@ public static class DraftAssign
         GetCovenCounts(Options.CovenRolesMaxPlayer.GetInt(), Options.CovenRolesMinPlayer.GetInt(), ref optCovenNum);
         GetImpCounts(Options.ImpRolesMaxPlayer.GetInt(), Options.ImpRolesMinPlayer.GetInt(), ref optImpNum);
 
-        List<CustomRoles> allRoles = EnumHelper.GetAllValues<CustomRoles>().Where(x => !NoAssignRoles(x) && (!Options.DraftAffectedByRoleSpawnChances.GetBool() || IRandom.Instance.Next(100) < x.GetMode())).Shuffle(rd).ToList();
+        List<string> KillingFractions = [];
+
+        if (optNeutralKillingNum > 0)
+        {
+            KillingFractions.Add("NK");
+        }
+        if (optNeutralApocalypseNum > 0)
+        {
+            KillingFractions.Add("NA");
+        }
+        if (optCovenNum > 0)
+        {
+            KillingFractions.Add("Coven");
+        }
+
+        if (Options.SpawnOneRandomKillingFraction.GetBool() && KillingFractions.Any())
+        {
+            var randomType = KillingFractions.RandomElement();
+            switch (randomType)
+            {
+                case "NK":
+                    optNeutralApocalypseNum = 0;
+                    optCovenNum = 0;
+                    break;
+                case "NA":
+                    optNeutralKillingNum = 0;
+                    optCovenNum = 0;
+                    break;
+                case "Coven":
+                    optNeutralKillingNum = 0;
+                    optNeutralApocalypseNum = 0;
+                    break;
+            }
+        }
+
+        var allRoles = EnumHelper.GetAllValues<CustomRoles>().Where(x => !NoAssignRoles(x) && (!Options.DraftAffectedByRoleSpawnChances.GetBool() || IRandom.Instance.Next(100) < x.GetMode())).Shuffle(rd).ToList();
 
         if (allRoles.Count < playerCount * draftCount)
         {

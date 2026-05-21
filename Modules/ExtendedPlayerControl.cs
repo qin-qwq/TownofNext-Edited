@@ -498,7 +498,7 @@ static class ExtendedPlayerControl
         if (clientId == -1) return;
 
         var message = new RpcSetNameMessage(player.NetId, seer.Data.NetId, name);
-        RpcUtils.LateSpecificSendMessage(message, clientId);
+        RpcUtils.LateSpecificSendMessage(message, clientId, RpcSendOption);
     }
 
     public static void RpcEnterVentDesync(this PlayerPhysics physics, int ventId, PlayerControl seer)
@@ -2006,11 +2006,15 @@ static class ExtendedPlayerControl
     // If you use vanilla RpcSetRole, it will block further SetRole calls until the next game starts.
     public static void RpcSetRoleGlobal(this PlayerControl player, RoleTypes roleTypes)
     {
-        if (AmongUsClient.Instance.AmClient) player.StartCoroutine(player.CoSetRole(roleTypes, true));
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetRole, SendOption.Reliable);
-        writer.Write((ushort)roleTypes);
-        writer.Write(true);
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        try
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            if (AmongUsClient.Instance.AmClient) try { player.SetRole(roleTypes, true); } catch { }
+            var message = new RpcSetRoleMessage(player.NetId, roleTypes, true);
+            RpcUtils.LateBroadcastReliableMessage(message);
+            Logger.Info($" {player.GetNameWithRole()} => {roleTypes}", "RpcSetRoleGlobal");
+        }
+        catch (Exception e) { Utils.ThrowException(e); }
     }
 
     public static bool UsesMeetingShapeshift(this PlayerControl player)
