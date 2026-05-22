@@ -185,6 +185,7 @@ public static class AddonAssign
     private static void AssignLovers(int RawCount = -1)
     {
         if (RoleAssign.RoleResult.ContainsValue(CustomRoles.Cupid)) return;
+        if (CustomRoles.Lovers.GetMode() == 0) return;
         var allPlayers = new List<PlayerControl>();
         foreach (var pc in Main.AllPlayerControls)
         {

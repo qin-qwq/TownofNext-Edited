@@ -154,7 +154,6 @@ public static class Camouflage
             foreach (var pc in Main.EnumeratePlayerControls())
             {
                 RpcSetSkin(pc);
-                if (Options.UsePets.GetBool()) pc.RpcSetPet(PetsPatch.GetPetId());
 
                 if (!IsCamouflage && !pc.IsAlive())
                 {
@@ -230,6 +229,6 @@ public static class Camouflage
         if (newOutfit.Compare(target.Data.DefaultOutfit)) return;
 
         Logger.Info($"playerId {target.PlayerId} newOutfit={newOutfit.GetString().RemoveHtmlTags()}", "RpcSetSkin");
-        target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false);
+        target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false, setPetAbility: true);
     }
 }

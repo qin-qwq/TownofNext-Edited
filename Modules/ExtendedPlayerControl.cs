@@ -156,8 +156,7 @@ static class ExtendedPlayerControl
             player.RpcMakeVisible();
 
         var customRole = player.GetCustomRole();
-        Main.PlayerStates[player.PlayerId].IsDead = false;
-        Main.PlayerStates[player.PlayerId].deathReason = PlayerState.DeathReason.etc;
+        Main.PlayerStates[player.PlayerId].SetAlive();
 
         player.RpcChangeRoleBasis(customRole, true);
         player.ResetKillCooldown();
@@ -2227,7 +2226,6 @@ static class ExtendedPlayerControl
     public static Color32 GetPlayerColor(this byte playerId)
     {
         var player = Utils.GetPlayerById(playerId);
-        if (!player) return Color.white;
         if (Main.PlayerColors.TryGetValue(playerId, out var color)) return color;
         return Palette.PlayerColors[player.Data.DefaultOutfit.ColorId];
     }

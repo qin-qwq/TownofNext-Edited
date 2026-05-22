@@ -291,7 +291,7 @@ public class PlayerState(byte playerId)
         {
             if (AmongUsClient.Instance.AmHost)
             {
-                RPC.SendDeathReason(PlayerId, deathReason);
+                RPC.SendDeathReason(PlayerId, deathReason, IsDead);
                 if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
                 {
                     MeetingHud.Instance.CheckForEndVoting();
@@ -301,6 +301,17 @@ public class PlayerState(byte playerId)
         catch (Exception e)
         {
             Logger.Error(e.StackTrace, "SetDead()");
+        }
+    }
+
+    public void SetAlive()
+    {
+        IsDead = false;
+        deathReason = DeathReason.etc;
+
+        if (AmongUsClient.Instance.AmHost)
+        {
+            RPC.SendDeathReason(PlayerId, deathReason, IsDead);
         }
     }
     public bool IsSuicide => deathReason == DeathReason.Suicide;

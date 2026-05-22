@@ -1531,22 +1531,18 @@ public static class Options
             .SetColor(Color.cyan);
 
         CanOnlyGuessEnabled = BooleanOptionItem.Create(60696, "CanOnlyGuessEnabled", true, TabGroup.ModSettings, false)
-            .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
 
         CantGuessDuringDiscussionTime = BooleanOptionItem.Create(60697, "CantGuessDuringDiscussionTime", true, TabGroup.ModSettings, false)
-            .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
 
         CanGuessCrewInvestigative = BooleanOptionItem.Create(60698, "CanGuessCrewInvestigative", true, TabGroup.ModSettings, false)
-            .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
 
         InvestigativeRoleCantGuess = BooleanOptionItem.Create(60699, "InvestigativeRoleCantGuess", true, TabGroup.ModSettings, false)
-            .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
 

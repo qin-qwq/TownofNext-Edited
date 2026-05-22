@@ -171,7 +171,7 @@ public class Mini : IAddon
     public static bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {
         if (role is not CustomRoles.Mini) return false;
-        if (target.Is(CustomRoles.Mini))
+        if (target.Is(CustomRoles.Mini) && Age < 18)
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessMini"));
             return true;

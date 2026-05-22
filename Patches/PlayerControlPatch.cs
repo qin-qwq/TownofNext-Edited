@@ -2154,7 +2154,7 @@ static class PlayerControlRevivePatch
         {
             if (Main.PlayerStates.TryGetValue(__instance.PlayerId, out var state) && state.IsDead)
             {
-                state.IsDead = false;
+                state.SetAlive();
                 var sender = CustomRpcSender.Create($"LIReviveSync:{__instance.GetRealName()}", SendOption.Reliable);
                 var hasValue = __instance.SyncGeneralOptions();
                 sender.SendMessage(dispose: !hasValue);

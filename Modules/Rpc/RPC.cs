@@ -940,16 +940,16 @@ internal static class RPC
         while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.GetHost() == null) await Task.Delay(500);
         RpcUtils.LateBroadcastReliableMessage(new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId));
     }
-    public static void SendDeathReason(byte playerId, PlayerState.DeathReason deathReason)
+    public static void SendDeathReason(byte playerId, PlayerState.DeathReason deathReason, bool isDead)
     {
-        RpcUtils.LateBroadcastReliableMessage(new RpcSetDeathReason(PlayerControl.LocalPlayer.NetId, playerId, deathReason));
+        RpcUtils.LateBroadcastReliableMessage(new RpcSetDeathReason(PlayerControl.LocalPlayer.NetId, playerId, deathReason, isDead));
     }
     public static void GetDeathReason(MessageReader reader)
     {
         var playerId = reader.ReadByte();
         var deathReason = reader.ReadInt32();
         Main.PlayerStates[playerId].deathReason = (PlayerState.DeathReason)deathReason;
-        Main.PlayerStates[playerId].IsDead = true;
+        Main.PlayerStates[playerId].IsDead = reader.ReadBoolean();
     }
     public static void ForceEndGame(CustomWinner win)
     {
