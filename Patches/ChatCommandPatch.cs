@@ -1949,8 +1949,8 @@ internal class ChatCommands
                 WaitingToSend = true;
                 while (ChatUpdatePatch.TempReviveHostRunning && AmongUsClient.Instance.AmHost) yield return null;
                 yield return new WaitForSecondsRealtime(0.5f);
-                if (GameStates.IsEnded || GameStates.IsLobby) yield break;
                 WaitingToSend = false;
+                if (GameStates.IsEnded || GameStates.IsLobby) yield break;
                 if (HudManager.InstanceExists) HudManager.Instance.Chat.SendChat();
             }
         }

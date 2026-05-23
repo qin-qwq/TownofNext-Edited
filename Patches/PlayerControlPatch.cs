@@ -768,6 +768,7 @@ class ReportDeadBodyPatch
     public static NetworkedPlayerInfo ReportTarget;
     public static Dictionary<byte, bool> CanReport = [];
     public static Dictionary<byte, List<NetworkedPlayerInfo>> WaitReport = [];
+    public static bool PreventEAC = false;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo target)
     {
         if (GameStates.IsMeeting || GameStates.IsHideNSeek) return false;
@@ -927,6 +928,7 @@ class ReportDeadBodyPatch
             {
                 DestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(__instance);
                 __instance.RpcStartMeeting(target);
+                PreventEAC = false;
             }
         }, 0.30f, "StartMeeting");
         return false;
@@ -939,6 +941,7 @@ class ReportDeadBodyPatch
 
         try
         {
+            PreventEAC = true;
             Main.MeetingIsStarted = true;
             Main.LastVotedPlayerInfo = null;
             Main.AllKillers.Clear();

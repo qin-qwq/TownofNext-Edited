@@ -1316,13 +1316,13 @@ public static class Utils
 
         foreach (var line in lines)
         {
-            if (shortenedText.Length + line.Length < 750)
+            if (shortenedText.Length + line.Length < 720)
             {
                 shortenedText += line + "\n";
                 continue;
             }
 
-            if (shortenedText.Length >= 750) result.AddRange(shortenedText.Chunk(750).Select(x => new string(x)));
+            if (shortenedText.Length >= 720) result.AddRange(shortenedText.Chunk(720).Select(x => new string(x)));
             else result.Add(shortenedText);
 
             var sentText = shortenedText;
@@ -1344,7 +1344,7 @@ public static class Utils
     {
         // Always splits it, this is incase you want to very heavily modify msg and use the splitmsg functionality.
         bool isfirst = true;
-        if (text.Length > 750 && !GetPlayerById(sendTo).IsModded())
+        if (text.Length > 720 && !GetPlayerById(sendTo).IsModded())
         {
             foreach (var txt in text.SplitMessage())
             {
@@ -1352,7 +1352,7 @@ public static class Utils
                 var m = Regex.Replace(txt, "^<voffset=[-]?\\d+em>", ""); // replaces the first instance of voffset, if any.
                 m += $"<voffset=-1.3em><alpha=#00>.</voffset>"; // fix text clipping OOB
                 if (m.IndexOf("\n") <= 4) m = m[(m.IndexOf("\n") + 1)..m.Length];
-                SendMessage(m, sendTo, titleW, noNumberSplit: true);
+                SendMessage(m, sendTo, titleW);
                 isfirst = false;
             }
         }
@@ -1360,13 +1360,13 @@ public static class Utils
         {
             text += $"<voffset=-1.3em><alpha=#00>.</voffset>";
             if (text.IndexOf("\n") <= 4) text = text[(text.IndexOf("\n") + 1)..text.Length];
-            SendMessage(text, sendTo, title, noNumberSplit: true);
+            SendMessage(text, sendTo, title);
         }
 
 
     }
 
-    public static void SendMessage(string text, byte sendTo = byte.MaxValue, string title = "", bool logforChatManager = false, bool noReplay = false, bool ShouldSplit = false, SendOption sendOption = SendOption.None, bool noNumberSplit = false)
+    public static void SendMessage(string text, byte sendTo = byte.MaxValue, string title = "", bool logforChatManager = false, bool noReplay = false, bool ShouldSplit = false, SendOption sendOption = SendOption.None)
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (title.IsNullOrWhiteSpace()) title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
@@ -1381,7 +1381,7 @@ public static class Utils
 
         try
         {
-            if (ShouldSplit && text.Length > 750)
+            if (ShouldSplit && text.Length > 720)
             {
                 text.SplitMessage().Do(x => SendMessage(x, sendTo, title, logforChatManager, noReplay, false));
                 return;

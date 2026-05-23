@@ -54,7 +54,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.05.23";
+    public const string PluginVersion = "26.05.24";
     public const string PluginDisplayVersion = "2.0.0 Alpha 3";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
@@ -65,7 +65,7 @@ public class Main : BasePlugin
     public static readonly Release RELEASE = Release.ALPHA;
 
 #pragma warning disable IDE1006 // Naming Styles
-    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 1
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 3
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
     public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.10.0
 #pragma warning restore IDE1006 // Naming Styles
@@ -228,6 +228,7 @@ public class Main : BasePlugin
     public static float DefaultCrewmateVision;
     public static float DefaultImpostorVision;
     public static bool IsTOHEInitialRelease = DateTime.Now.Month == 1 && DateTime.Now.Day is 17;
+    public static bool IsPlan17InitialRelease = DateTime.Now.Month == 5 && DateTime.Now.Day is 24;
     public static bool IsTONEInitialRelease = DateTime.Now.Month == 6 && DateTime.Now.Day is 17;
     public static bool IsAprilFools
     {

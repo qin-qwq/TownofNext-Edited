@@ -12,7 +12,6 @@ internal class NiceHacker : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.NiceHacker;
     private const int Id = 33700;
-    public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => UsePets.GetBool() ? CustomRoles.Crewmate : CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     public override bool BlockMoveInVent(PlayerControl pc) => true;

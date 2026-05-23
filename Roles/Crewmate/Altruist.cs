@@ -104,6 +104,7 @@ internal class Altruist : RoleBase
             //AllRevivedPlayerId.Add(deadPlayerId);
 
             _Player.SetDeathReason(PlayerState.DeathReason.Sacrificed);
+            _Player.SetRealKiller(_Player);
             _Player.RpcExileV3();
 
             deadPlayer.RpcTeleport(deadBodyObject.transform.position);

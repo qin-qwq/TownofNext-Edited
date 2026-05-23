@@ -182,6 +182,14 @@ class VersionShowerStartPatch
                 SpecialEventText.color = col;
             }
         }
+        if (Main.IsPlan17InitialRelease)
+        {
+            SpecialEventText.text = $"Happy Birthday to Plan17!";
+            if (ColorUtility.TryParseHtmlString(Main.ModColor, out var col))
+            {
+                SpecialEventText.color = col;
+            }
+        }
         if (Main.IsTONEInitialRelease)
         {
             SpecialEventText.text = $"Happy Birthday to TONE!";
