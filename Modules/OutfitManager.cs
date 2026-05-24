@@ -57,7 +57,7 @@ public static class OutfitManager
         }
     }
 
-    public static void SetNewOutfit(this PlayerControl player, NetworkedPlayerInfo.PlayerOutfit newOutfit, bool setName = true, bool setNamePlate = true, uint newLevel = 500)
+    public static void SetNewOutfit(this PlayerControl player, NetworkedPlayerInfo.PlayerOutfit newOutfit, bool setName = true, bool setNamePlate = true, uint newLevel = 500, bool setPetAbility = false)
     {
         if (setName)
         {
@@ -71,7 +71,16 @@ public static class OutfitManager
         player.SetHat(newOutfit.HatId, newOutfit.ColorId);
         player.SetSkin(newOutfit.SkinId, newOutfit.ColorId);
         player.SetVisor(newOutfit.VisorId, newOutfit.ColorId);
-        player.SetPet(newOutfit.PetId);
+        if (!setPetAbility)
+        {
+            player.SetPet(newOutfit.PetId);
+        }
+        else
+        {
+            var pet = PetsPatch.GetPetId();
+            player.SetPet(pet);
+            newOutfit.PetId = pet;
+        }
 
         if (setNamePlate)
         {

@@ -21,7 +21,7 @@ internal class Pixie : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
     //==================================================================\\
 
-    private static OptionItem PixiePointsToWin;
+    public static OptionItem PixiePointsToWin;
     private static OptionItem PixieMaxTargets;
     private static OptionItem PixieMarkCD;
     private static OptionItem PixieSuicideOpt;

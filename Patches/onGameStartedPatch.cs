@@ -112,6 +112,8 @@ internal class ChangeRoleSettings
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
+            ShipStatusFixedUpdatePatch.ClosestVent = [];
+            ShipStatusFixedUpdatePatch.CanUseClosestVent = [];
 
             ChatManager.ResetHistory();
             ReportDeadBodyPatch.CanReport.Clear();
@@ -196,7 +198,11 @@ internal class ChangeRoleSettings
                     {
                         if (player.Is(CustomRoles.GM)) continue;
 
-                        _ = new LateTask(() => { player.RpcSetPet(PetsPatch.GetPetId()); }, 3f);
+                        _ = new LateTask(() =>
+                        {
+                            if (!GameStates.IsInGame || GameStates.IsEnded) return;
+                            player.RpcSetPet(PetsPatch.GetPetId());
+                        }, 3f);
                     }
                 }
 
@@ -521,7 +527,7 @@ internal class StartGameHostPatch
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
-                    //AddonAssign.InitAndStartAssignLovers();
+                    AddonAssign.InitAndStartAssignLovers();
                     AddonAssign.StartSortAndAssign();
                 }
             }
@@ -684,7 +690,11 @@ internal class SelectRolesPatch
             if (Main.HideNSeekOptions.ImpostorPlayerID != -1)
             {
                 var player = Utils.GetPlayerById(Main.HideNSeekOptions.ImpostorPlayerID);
-                if (player) Impostor.Add(player);
+                if (player)
+                {
+                    Impostor.Add(player);
+                    ImpostorNum--;
+                }
             }
 
             var Player = Main.EnumeratePlayerControls().Shuffle(IRandom.Instance).ToList();
@@ -710,7 +720,6 @@ internal class SelectRolesPatch
                 else if (Impostor.Contains(player))
                 {
                     player.RpcSetRole(RoleTypes.Impostor);
-                    ImpostorNum--;
                     continue;
                 }
                 else if (ImpostorNum > 0)

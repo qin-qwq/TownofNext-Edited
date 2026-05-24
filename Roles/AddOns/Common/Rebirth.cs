@@ -72,7 +72,7 @@ public class Rebirth : IAddon
             && !x.Is(CustomRoles.Doppelganger)
             && !x.Is(CustomRoles.ChiefOfPolice)
             && !x.Is(CustomRoles.Solsticer)
-            && !x.Is(CustomRoles.NiceMini);
+            && !x.Is(CustomRoles.Mini);
     }
 
     public static bool SwapSkins(PlayerControl pc, out NetworkedPlayerInfo NewExiledPlayer)

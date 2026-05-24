@@ -1,8 +1,7 @@
 using AmongUs.GameOptions;
-using Hazel;
 using System.Text;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -139,7 +138,7 @@ internal class Wraithh : RoleBase
 
     public override bool OnCheckProtect(PlayerControl killer, PlayerControl target)
     {
-        if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18 || !killer.RpcCheckAndMurder(target, true)) return true;
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18 || !killer.RpcCheckAndMurder(target, true)) return true;
 
         if (target.GetCustomRole().IsImpostor()) return false;
 

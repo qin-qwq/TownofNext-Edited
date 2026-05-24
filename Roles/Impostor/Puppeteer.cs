@@ -1,8 +1,8 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using TONE.Roles.Neutral;
 using UnityEngine;
 using static TONE.Options;
@@ -81,7 +81,7 @@ internal class Puppeteer : RoleBase
     {
         if (target.Is(CustomRoles.LazyGuy)
             || target.Is(CustomRoles.Lazy)
-            || target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+            || target.Is(CustomRoles.Mini) && Mini.Age < 18)
             return false;
 
         return killer.CheckDoubleTrigger(target, () =>
@@ -122,8 +122,11 @@ internal class Puppeteer : RoleBase
                 var min = targetDistance.OrderBy(c => c.Value).FirstOrDefault();
                 var target = Utils.GetPlayerById(min.Key);
                 var KillRange = ExtendedPlayerControl.GetKillDistances();
+                var playerPos = puppet.GetCustomPosition();
+                var vector = target.GetCustomPosition() - playerPos;
+                var magnitude = vector.magnitude;
 
-                if (min.Value <= KillRange && puppet.CanMove && target.CanMove)
+                if (min.Value <= KillRange && puppet.CanMove && target.CanMove && !PhysicsHelpers.AnyNonTriggersBetween(playerPos, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
                 {
                     if (puppet.RpcCheckAndMurder(target, true))
                     {

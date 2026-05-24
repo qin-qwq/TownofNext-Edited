@@ -35,7 +35,6 @@ internal class Executioner : RoleBase
         CustomRoles.Amnesiac,
         CustomRoles.Maverick,
         CustomRoles.CrewmateTONE,
-        CustomRoles.Celebrity,
         CustomRoles.Bodyguard,
         CustomRoles.Dictator,
         CustomRoles.Mayor,
@@ -97,7 +96,7 @@ internal class Executioner : RoleBase
                 else if (!CanTargetNeutralEvil.GetBool() && target.GetCustomRole().IsNE()) continue;
                 else if (!CanTargetNeutralChaos.GetBool() && target.GetCustomRole().IsNC()) continue;
                 else if (!CanTargetCoven.GetBool() && target.Is(Custom_Team.Coven)) continue;
-                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.NiceMini or CustomRoles.EvilMini or CustomRoles.Solsticer or CustomRoles.Workaholic) continue;
+                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.Mini or CustomRoles.Solsticer or CustomRoles.Workaholic) continue;
                 if (Lovers.AreLovers(executioner, target)) continue;
 
                 targetList.Add(target);
@@ -179,9 +178,6 @@ internal class Executioner : RoleBase
         {
             case CustomRoles.Amnesiac:
                 Main.PlayerStates[executionerId].RemoveSubRole(CustomRoles.Oblivious);
-                break;
-            case CustomRoles.Celebrity:
-                Main.PlayerStates[executionerId].RemoveSubRole(CustomRoles.Cyber);
                 break;
             case CustomRoles.Dictator:
                 new[] { CustomRoles.Tiebreaker, CustomRoles.Paranoia, CustomRoles.Knighted, CustomRoles.VoidBallot, CustomRoles.Silent, CustomRoles.Influenced }.Do(x => Main.PlayerStates[executionerId].RemoveSubRole(x));

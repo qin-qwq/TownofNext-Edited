@@ -81,7 +81,7 @@ internal static class Crowded
                     playerButton.OnClick.AddListener((Action)(() =>
                     {
                         var maxPlayers = byte.Parse(text.text);
-                        var maxImp = GameStates.IsVanillaServer && !GameStates.IsLocalGame ? Math.Clamp(Mathf.Min(__instance.GetTargetOptions().NumImpostors, maxPlayers / 2), 1, 3) : Mathf.Min(__instance.GetTargetOptions().NumImpostors, maxPlayers / 2);
+                        var maxImp = Mathf.Min(__instance.GetTargetOptions().NumImpostors, maxPlayers / 2);
                         __instance.GetTargetOptions().SetInt(Int32OptionNames.NumImpostors, maxImp);
                         __instance.ImpostorButtons[1].TextMesh.text = maxImp.ToString();
                         __instance.SetMaxPlayersButtons(maxPlayers);
@@ -172,11 +172,6 @@ internal static class Crowded
                     if (GameOptionsManager.Instance.GameHostOptions.MaxPlayers > 15)
                     {
                         GameOptionsManager.Instance.GameHostOptions.SetInt(Int32OptionNames.MaxPlayers, 15);
-                    }
-
-                    if (GameOptionsManager.Instance.GameHostOptions.NumImpostors > 3)
-                    {
-                        GameOptionsManager.Instance.GameHostOptions.SetInt(Int32OptionNames.NumImpostors, 3);
                     }
                 }
                 if (instance)
@@ -371,29 +366,16 @@ internal static class Crowded
             {
                 if (GameHostOptions.MaxPlayers > 15)
                     GameHostOptions.SetInt(Int32OptionNames.MaxPlayers, 15);
-
-                if (GameHostOptions.NumImpostors > 3)
-                    GameHostOptions.SetInt(Int32OptionNames.NumImpostors, 3);
-
-                if (GameHostOptions.NumImpostors < 1)
-                    GameHostOptions.SetInt(Int32OptionNames.NumImpostors, 1);
             }
             if (CurrentGameOptions != null)
             {
                 if (CurrentGameOptions.MaxPlayers > 15)
                     CurrentGameOptions.SetInt(Int32OptionNames.MaxPlayers, 15);
-
-                if (CurrentGameOptions.NumImpostors > 3)
-                    CurrentGameOptions.SetInt(Int32OptionNames.NumImpostors, 3);
-
-                if (CurrentGameOptions.NumImpostors < 1)
-                    CurrentGameOptions.SetInt(Int32OptionNames.NumImpostors, 1);
             }
 
             if (GameHostOptions != null)
             {
                 Logger.Info($"Capacity: {GameHostOptions.MaxPlayers}", "CrowdedPatch");
-                Logger.Info($"Impostors: {GameHostOptions.NumImpostors}", "CrowdedPatch");
             }
         }
 
@@ -445,7 +427,7 @@ public class AbstractPagingBehaviour : MonoBehaviour
             foreach (var touch in Input.touches)
             {
                 if (touch.phase != TouchPhase.Moved) continue;
-                if (chatIsOpen || gameMenuIsOpen) break;
+                if (chatIsOpen || gameMenuIsOpen || GuessManager.guesserUI) break;
 
                 if (touch.deltaPosition.y > 0f)
                 {
@@ -460,10 +442,13 @@ public class AbstractPagingBehaviour : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || (!chatIsOpen && Input.mouseScrollDelta.y > 0f))
-            Cycle(false);
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow) || (!chatIsOpen && Input.mouseScrollDelta.y < 0f))
-            Cycle(true);
+        if (!GuessManager.guesserUI)
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || (!chatIsOpen && Input.mouseScrollDelta.y > 0f))
+                Cycle(false);
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.RightArrow) || (!chatIsOpen && Input.mouseScrollDelta.y < 0f))
+                Cycle(true);
+        }
     }
 
     /// <summary>

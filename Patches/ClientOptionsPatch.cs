@@ -21,6 +21,7 @@ public static class OptionsMenuBehaviourStartPatch
     private static ClientOptionItem EnableCustomButton;
     private static ClientOptionItem EnableCustomSoundEffect;
     private static ClientOptionItem EnableCustomDecorations;
+    private static ClientOptionItem EnableMapVentIcon;
     private static ClientOptionItem SwitchVanilla;
 
 #if DEBUG
@@ -172,6 +173,10 @@ public static class OptionsMenuBehaviourStartPatch
         if (EnableCustomDecorations == null || EnableCustomDecorations.ToggleButton == null)
         {
             EnableCustomDecorations = ClientOptionItem.Create("EnableCustomDecorations", Main.EnableCustomDecorations, __instance);
+        }
+        if (EnableMapVentIcon == null || EnableMapVentIcon.ToggleButton == null)
+        {
+            EnableMapVentIcon = ClientOptionItem.Create("EnableMapVentIcon", Main.EnableMapVentIcon, __instance);
         }
 
 #if !ANDROID

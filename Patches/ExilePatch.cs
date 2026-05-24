@@ -31,7 +31,7 @@ class ExileControllerWrapUpPatch
         }
         public static void Postfix(ExileController __instance)
         {
-            if (Main.NormalOptions.MapId == 7) return;
+            if (Main.LIMap) return;
 
             try
             {
@@ -48,31 +48,35 @@ class ExileControllerWrapUpPatch
         }
     }
 
-    [HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
+    [HarmonyPatch(typeof(AirshipExileController._WrapUpAndSpawn_d__11), "MoveNext")]
     class AirshipExileControllerPatch
     {
-        public static void Postfix(AirshipExileController __instance)
+        public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
         {
             if (Main.NormalOptions.MapId == 7) return;
 
-            Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
-            try
+            var instance = __instance.__4__this;
+            if (!__result)
             {
-                WrapUpPostfix(__instance.initData.networkedPlayer);
-            }
-            catch (Exception error)
-            {
-                Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
-            }
-            finally
-            {
-                WrapUpFinalizer(__instance.initData.networkedPlayer);
+                Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
+                try
+                {
+                    WrapUpPostfix(instance.initData.networkedPlayer);
+                }
+                catch (Exception error)
+                {
+                    Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
+                }
+                finally
+                {
+                    WrapUpFinalizer(instance.initData.networkedPlayer);
+                }
             }
         }
     }
     private static void CheckAndDoRandomSpawn()
     {
-        if (!AmongUsClient.Instance.AmHost) return;
+        if (!AmongUsClient.Instance.AmHost || Main.LIMap) return;
         if (RandomSpawn.IsRandomSpawn() || Options.CurrentGameMode == CustomGameMode.FFA)
         {
             RandomSpawn.SpawnMap spawnMap = Utils.GetActiveMapName() switch
@@ -119,6 +123,7 @@ class ExileControllerWrapUpPatch
             var emptyString = string.Empty;
 
             exiledRoleClass?.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString);
+            if (exiled.Object.Is(CustomRoles.Mini)) Mini.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString);
             CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString));
 
             if (CustomWinnerHolder.WinnerTeam != CustomWinner.Terrorist) Main.PlayerStates[exiled.PlayerId].SetDead();
@@ -133,7 +138,6 @@ class ExileControllerWrapUpPatch
         foreach (var player in Main.EnumeratePlayerControls())
         {
             player.GetRoleClass()?.OnPlayerExiled(player, exiled);
-            Lovers.OnPlayerExiled(exiled);
 
             // Check for remove Pet
             player.RpcRemovePet();
@@ -200,7 +204,7 @@ class ExileControllerWrapUpPatch
 
                 if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
                 {
-                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
                 }
                 else
                 {

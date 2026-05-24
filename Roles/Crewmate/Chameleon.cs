@@ -144,7 +144,7 @@ internal class Chameleon : RoleBase
                 InvisCooldown.Remove(chameleonId);
                 InvisCooldown.Add(chameleonId, nowTime);
 
-                chameleon.Notify(GetString("ChameleonInvisStateOut"), hasPriority: true);
+                chameleon.Notify(GetString("ChameleonInvisStateOut"), hasPriority: true, sendInLog: false);
 
                 needSync = true;
                 InvisDuration.Remove(chameleonId);
@@ -185,7 +185,7 @@ internal class Chameleon : RoleBase
 
                     chameleon.RpcRemoveAbilityUse();
 
-                    chameleon.Notify(GetString("ChameleonInvisState"), ChameleonDuration.GetFloat(), hasPriority: true);
+                    chameleon.Notify(GetString("ChameleonInvisState"), ChameleonDuration.GetFloat(), hasPriority: true, sendInLog: false);
                 }
                 else
                 {
@@ -208,7 +208,7 @@ internal class Chameleon : RoleBase
         SendRPC(pc);
 
         pc?.MyPhysics?.RpcBootFromVent(vent.Id);
-        pc.Notify(GetString("ChameleonInvisStateOut"), hasPriority: true);
+        pc.Notify(GetString("ChameleonInvisStateOut"), hasPriority: true, sendInLog: false);
     }
     public override string GetLowerText(PlayerControl pc, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {

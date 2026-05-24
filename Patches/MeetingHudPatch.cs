@@ -725,14 +725,12 @@ class CheckForEndVotingPatch
             }
         }
 
-        //Lovers.OnCheckForEndVoting(deathReason, playerIds);
-
         foreach (var playerId in playerIds)
         {
-            // if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Main.isLoversDead && Main.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
-            // {
-            //     FixedUpdateInNormalGamePatch.LoversSuicide(playerId, true);
-            // }
+            if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Lovers.isLoversDead && Lovers.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
+            {
+                Lovers.LoversSuicide(playerId, true);
+            }
 
             RevengeOnExile(playerId);
         }
@@ -1457,6 +1455,9 @@ class MeetingHudStartPatch
                         // }
                         sb.Append(Lovers.GetMarkOthers(seer, target));
                         break;
+                    case CustomRoles.Mini:
+                        sb.Append(Mini.GetMarkOthers(seer, target));
+                        break;
                     case CustomRoles.Cyber when Cyber.CyberKnown.GetBool():
                         sb.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
                         break;
@@ -1612,7 +1613,7 @@ class MeetingHudOnDestroyPatch
             EAC.ReportTimes = [];
         }
 
-        if (Main.NormalOptions.MapId == 7) Main.Instance.StartCoroutine(WaitForExileFinish());
+        if (Main.LIMap) Main.Instance.StartCoroutine(WaitForExileFinish());
         return;
 
         System.Collections.IEnumerator WaitForExileFinish()

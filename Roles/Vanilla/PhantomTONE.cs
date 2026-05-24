@@ -62,7 +62,7 @@ internal class PhantomTONE : RoleBase
             }
         }
     }
-    
+
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         if (IsInvisible.Item1)

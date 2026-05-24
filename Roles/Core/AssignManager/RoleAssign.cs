@@ -1,6 +1,5 @@
 using AmongUs.GameOptions;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 
@@ -214,8 +213,6 @@ public class RoleAssign
                 case CustomRoles.RuthlessRomantic:
                 case CustomRoles.GM:
                 case CustomRoles.NotAssigned:
-                case CustomRoles.NiceMini:
-                case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
                 case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
                     continue;
@@ -224,7 +221,7 @@ public class RoleAssign
             int count = role.GetCount();
             RoleAssignInfo info = new(role, chance, count);
 
-            if (role is CustomRoles.Mini)
+            /*if (role is CustomRoles.Mini)
             {
                 if (Mini.CheckSpawnEvilMini())
                 {
@@ -237,7 +234,7 @@ public class RoleAssign
                     Roles[RoleAssignType.Crewmate].Add(info);
                 }
                 continue;
-            }
+            }*/
 
             if (role.IsImpostor())
             {

@@ -179,6 +179,7 @@ class DisconnectInternalPatch
         GameStates.InGame = false;
         Logger.Info($"Disconnect (Reason:{reason}:{stringReason}, ping:{__instance.Ping})", "Reason Disconnect");
         RehostManager.OnDisconnectInternal(reason);
+        DataFlagRateLimiter.DropQueue();
     }
 }
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))]
@@ -396,13 +397,7 @@ class OnPlayerLeftPatch
             {
                 if (data.Character.Is(CustomRoles.Lovers) && !data.Character.Data.IsDead)
                 {
-                    Lovers.OnPartnerLeft(data.Character.PlayerId);
-                    // foreach (var lovers in Main.LoversPlayers.ToArray())
-                    // {
-                    //     Main.isLoversDead = true;
-                    //     Main.LoversPlayers.Remove(lovers);
-                    //     Main.PlayerStates[lovers.PlayerId].RemoveSubRole(CustomRoles.Lovers);
-                    // }
+                    Lovers.OnPartnerLeft();
                 }
 
                 if (data.Character.Is(CustomRoles.Jackal) && !data.Character.Data.IsDead)
@@ -692,7 +687,7 @@ class InnerNetClientSpawnPatch
                         if (!AmongUsClient.Instance.IsGameStarted && client.Character != null)
                         {
                             Main.isChatCommand = true;
-                            Utils.SendMessage("\n", client.Character.PlayerId, Main.LastSummaryMessage);
+                            Utils.ShowLastRoles(client.Character.PlayerId);
                         }
                     }, 3.1f, "DisplayLastRoles");
                 }

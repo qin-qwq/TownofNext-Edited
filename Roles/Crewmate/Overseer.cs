@@ -37,7 +37,6 @@ internal class Overseer : RoleBase
         CustomRoles.Snitch,
         CustomRoles.LazyGuy,
         CustomRoles.SuperStar,
-        CustomRoles.Celebrity,
         CustomRoles.TaskManager,
         CustomRoles.Mayor,
         CustomRoles.Psychic,

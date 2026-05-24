@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using TONE.Modules;
 using TONE.Modules.ChatManager;
@@ -18,6 +19,7 @@ using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using UnityEngine;
+using UnityEngine.Networking;
 using static TONE.Translator;
 
 
@@ -36,6 +38,7 @@ internal class ChatCommands
     private static readonly Dictionary<char, int> Pollvotes = [];
     private static readonly Dictionary<char, string> PollQuestions = [];
     private static readonly List<byte> PollVoted = [];
+    private static Dictionary<int, int> TempCurrentOptions = [];
     private static float Polltimer = 120f;
     private static string PollMSG = "";
 
@@ -468,7 +471,7 @@ internal class ChatCommands
                 case "/符号":
                 case "/标志":
                     {
-                        Utils.SendMessage(GetString("Command.icons"), PlayerControl.LocalPlayer.PlayerId, GetString("IconsTitle"));
+                        Utils.SendMessage(GetString("Command.icons"), PlayerControl.LocalPlayer.PlayerId, GetString("IconsTitle"), ShouldSplit: true);
                         break;
                     }
 
@@ -1302,14 +1305,6 @@ internal class ChatCommands
                     break;
                 */
 
-                case "/setrole":
-                case "/设置的职业":
-                case "/指定的职业":
-                    canceled = true;
-                    subArgs = text.Remove(0, 8);
-                    SendRolesInfo(subArgs, PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug);
-                    break;
-
                 case "/changerole":
                 case "/mudarfunção":
                 case "/改变职业":
@@ -1878,6 +1873,20 @@ internal class ChatCommands
                     EnableAllRolesCommand(PlayerControl.LocalPlayer, text, args);
                     break;
 
+                case "/preset":
+                case "/预设":
+                    canceled = true;
+                    PresetCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
+                case "/sr":
+                case "/setrole":
+                case "/setroles":
+                case "/指定职业":
+                    canceled = true;
+                    SetRoleCommand(PlayerControl.LocalPlayer, text, args);
+                    break;
+
                 default:
                     Main.isChatCommand = false;
                     break;
@@ -1940,8 +1949,8 @@ internal class ChatCommands
                 WaitingToSend = true;
                 while (ChatUpdatePatch.TempReviveHostRunning && AmongUsClient.Instance.AmHost) yield return null;
                 yield return new WaitForSecondsRealtime(0.5f);
-                if (GameStates.IsEnded || GameStates.IsLobby) yield break;
                 WaitingToSend = false;
+                if (GameStates.IsEnded || GameStates.IsLobby) yield break;
                 if (HudManager.InstanceExists) HudManager.Instance.Chat.SendChat();
             }
         }
@@ -2508,7 +2517,7 @@ internal class ChatCommands
             case "/符号":
             case "/标志":
                 {
-                    Utils.SendMessage(GetString("Command.icons"), player.PlayerId, GetString("IconsTitle"));
+                    Utils.SendMessage(GetString("Command.icons"), player.PlayerId, GetString("IconsTitle"), ShouldSplit: true);
                     break;
                 }
 
@@ -3731,6 +3740,182 @@ internal class ChatCommands
         Utils.SendMessage(GetString("AllRolesEnabled"), player.PlayerId);
     }
 
+    private static void PresetCommand(PlayerControl player, string text, string[] args)
+    {
+        if (args.Length < 2) return;
+        switch (args[1])
+        {
+            case "up":
+            case "upload":
+                var checkOptions = TempCurrentOptions;
+                TempCurrentOptions = OptionItem.AllOptions.ToDictionary(x => x.Id, x => x.GetValue());
+                if (checkOptions == TempCurrentOptions)
+                {
+                    Utils.SendMessage(GetString("UploadSamePreset"), player.PlayerId);
+                    break;
+                }
+                Main.Instance.StartCoroutine(UploadCurrentPreset(player));
+                Logger.Info("Upload Preset", "PresetCommand");
+                break;
+            case "load":
+                Main.Instance.StartCoroutine(DownloadPreset(player, args[2]));
+                break;
+        }
+    }
+
+    private static void SetRoleCommand(PlayerControl player, string text, string[] args)
+    {
+        if (args.Length < 2) return;
+
+        var subArgs = string.Join(' ', args[1..]);
+
+        if (!GuessManager.MsgToPlayerAndRole(subArgs, out byte resultId, out CustomRoles roleToSet, out _))
+        {
+            Utils.SendMessage(GetString("Message.SetRoleHelp"), player.PlayerId);
+            return;
+        }
+
+        if (!player.FriendCode.GetDevUser().IsUp)
+        {
+            Utils.SendMessage($"{GetString("InvalidPermissionCMD")}", player.PlayerId);
+            return;
+        }
+
+        var targetPc = Utils.GetPlayerById(resultId);
+        if (!targetPc) return;
+
+        var shouldDevAssign = true;
+
+        if (roleToSet is CustomRoles.GM or CustomRoles.Mini || roleToSet.GetCount() < 1 || roleToSet.GetMode() == 0)
+        {
+            shouldDevAssign = false;
+        }
+
+        if (roleToSet.IsGhostRole() || !shouldDevAssign || roleToSet.IsAddonAssignedMidGame())
+        {
+            Utils.SendMessage(string.Format(GetString("Message.SetRoleSelectFailed"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId);
+            return;
+        }
+
+        if (roleToSet.IsAdditionRole())
+        {
+            if (!AddonAssign.SetAddOns.ContainsKey(resultId)) AddonAssign.SetAddOns[resultId] = [];
+
+            if (!AddonAssign.SetAddOns[resultId].Contains(roleToSet))
+                AddonAssign.SetAddOns[resultId].Add(roleToSet);
+        }
+        else
+            RoleAssign.SetRoles[resultId] = roleToSet;
+
+        Utils.SendMessage(string.Format(GetString("Message.SetRoleSelected"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId);
+
+        if (targetPc.FriendCode.GetDevUser().IsDev && player.PlayerId != resultId)
+        {
+            Utils.SendMessage(string.Format(GetString("Message.SetRoleTestTip"), roleToSet.ToColoredString()), resultId);
+        }
+    }
+
+    private static IEnumerator UploadCurrentPreset(PlayerControl player)
+    {
+        var body = new PresetRequest
+        {
+            friend_code = player.Data.FriendCode,
+            puid = player.GetClient().GetHashedPuid(),
+            preset = TempCurrentOptions
+        };
+        var json = JsonSerializer.Serialize(body);
+        var bodyRaw = Encoding.UTF8.GetBytes(json);
+        var request = new UnityWebRequest("https://tone2.top/preset/upload", "POST")
+        {
+            uploadHandler = new UploadHandlerRaw(bodyRaw),
+            downloadHandler = new DownloadHandlerBuffer()
+        };
+        request.SetRequestHeader("Content-Type", "application/json");
+        yield return request.SendWebRequest();
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Logger.SendInGame(string.Format(GetString("PresetUploadError"), request.error));
+            yield break;
+        }
+        PresetResponse response;
+        try
+        {
+            response = JsonSerializer.Deserialize<PresetResponse>(request.downloadHandler.text);
+        }
+        catch
+        {
+            Logger.SendInGame(GetString("PresetUploadFailed"));
+            yield break;
+        }
+        if (!string.IsNullOrEmpty(response.error))
+        {
+            Logger.SendInGame(string.Format(GetString("PresetUploadRejected"), request.error));
+            yield break;
+        }
+        if (string.IsNullOrEmpty(response.preset_id))
+        {
+            Logger.SendInGame(GetString("PresetUploadNoId"));
+            yield break;
+        }
+        Utils.SendMessage(string.Format(GetString("PresetUploadSuccess"), response.preset_id), player.PlayerId);
+    }
+
+    private static IEnumerator DownloadPreset(PlayerControl player, string preset_id)
+    {
+        var request = UnityWebRequest.Get($"https://tone2.top/preset/{preset_id}");
+        request.timeout = 5;
+        yield return request.SendWebRequest();
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Logger.SendInGame(string.Format(GetString("PresetDownloadError"), request.error));
+            yield break;
+        }
+        PresetDownloadResponse response;
+        try
+        {
+            response = JsonSerializer.Deserialize<PresetDownloadResponse>(request.downloadHandler.text);
+        }
+        catch
+        {
+            Logger.SendInGame(GetString("PresetParseFailed"));
+            yield break;
+        }
+        if (!string.IsNullOrEmpty(response.error))
+        {
+            Logger.SendInGame(string.Format(GetString("PresetDownloadRejected"), response.error));
+            yield break;
+        }
+        if (response.preset == null || string.IsNullOrEmpty(response.friend_code))
+        {
+            Logger.SendInGame(GetString("PresetInvalidResponse"));
+            yield break;
+        }
+        TempCurrentOptions = response.preset;
+        Main.Instance.StartCoroutine(LoadNewPreset(player));
+    }
+
+    public static IEnumerator LoadNewPreset(PlayerControl player)
+    {
+        int count = 0;
+        foreach (var optionItem in OptionItem.AllOptions.ToArray())
+        {
+            if (TempCurrentOptions.TryGetValue(optionItem.Id, out var value))
+            {
+                if (optionItem.GetValue() == value) continue;
+
+                optionItem.SetValue(value);
+                count++;
+                if (count >= 100)
+                {
+                    count = 0;
+                    yield return null;
+                }
+            }
+        }
+        RPC.SyncCustomSettingsRPC();
+        Utils.SendMessage(GetString("PresetDownloadSuccess"), player.PlayerId);
+    }
+
     private static bool ImpostorChannel(PlayerControl pc, string msg, bool check = true)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -3757,6 +3942,26 @@ internal class ChatCommands
 
         return true;
     }
+
+    public class PresetRequest
+    {
+        public string friend_code { get; set; }
+        public string puid { get; set; }
+        public Dictionary<int, int> preset { get; set; }
+    }
+
+    public class PresetResponse
+    {
+        public string preset_id { get; set; }
+        public string error { get; set; }
+    }
+
+    public class PresetDownloadResponse
+    {
+        public Dictionary<int, int> preset { get; set; }
+        public string friend_code { get; set; }
+        public string error { get; set; }
+    }
 }
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 class ChatUpdatePatch
@@ -3764,6 +3969,22 @@ class ChatUpdatePatch
     public static bool DoBlockChat = false;
     public static ChatController Instance;
     public static bool TempReviveHostRunning = false;
+    private static string[] CachedLetterOnlyHexColors = [];
+    private static readonly Regex ColorTagRegex = new(@"<\s*(?:color\s*=\s*)?#([0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)\s*>", RegexOptions.Compiled);
+    private static readonly Dictionary<(int R, int G, int B), string> CachedColorReplacements = [];
+    private static readonly char[] HexLetters = ['a', 'b', 'c', 'd', 'e', 'f'];
+    static readonly Dictionary<string, (int r, int g, int b)> NamedColors = new()
+    {
+        { "red",    (255,   0,   0) },
+        { "orange", (255, 165,   0) },
+        { "yellow", (255, 255,   0) },
+        { "green",  (  0, 255,   0) },
+        { "blue",   (  0,   0, 255) },
+        { "purple", (128,   0, 128) },
+        { "white",  (255, 255, 255) },
+        { "grey",   (128, 128, 128) },
+        { "black",  (  0,   0,   0) }
+    };
     public static void Postfix(ChatController __instance)
     {
         if (!AmongUsClient.Instance.AmHost || Main.MessagesToSend.Count == 0 || (Main.MessagesToSend[0].Item2 == byte.MaxValue && Main.MessageWait.Value > __instance.timeSinceLastMessage)) return;
@@ -3847,6 +4068,12 @@ class ChatUpdatePatch
             return;
         }
 
+        if (Main.CurrentServerIsVanilla)
+        {
+            msg = ReplaceHexColorsWithSafeColors(msg);
+            msg = ReplaceDigitsOutsideRichText(msg);
+        }
+
         var writer = CustomRpcSender.Create("MessagesToSend", sendOption);
         writer.StartMessage(clientId);
         writer.StartRpc(player.NetId, (byte)RpcCalls.SetName)
@@ -3864,6 +4091,139 @@ class ChatUpdatePatch
         writer.SendMessage();
 
         __instance.timeSinceLastMessage = 0f;
+
+        static string ReplaceHexColorsWithSafeColors(string text) => ColorTagRegex.Replace(text, match =>
+        {
+            string hex = match.Groups[1].Value.ToLowerInvariant();
+
+            string a = hex.Length == 8 ? hex[6..8] : string.Empty;
+            if (!string.IsNullOrEmpty(a)) hex = hex[..6];
+
+            if (hex.Length != 6 || !hex.Any(char.IsDigit)) return match.Value;
+
+            int r = Convert.ToInt32(hex[..2], 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+
+            var best = FindClosestSafeColor(r, g, b);
+
+            return NamedColors.ContainsKey(best)
+                ? $"<color={best}>"
+                : $"<#{best}{a}>";
+        });
+
+        static string FindClosestSafeColor(int r, int g, int b)
+        {
+            if (CachedColorReplacements.TryGetValue((r, g, b), out string cache)) return cache;
+
+            double bestDist = double.MaxValue;
+            string bestValue = "white";
+
+            foreach (var kvp in NamedColors)
+            {
+                (int cr, int cg, int cb) = kvp.Value;
+                double d = ColorDistance(r, g, b, cr, cg, cb);
+
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestValue = kvp.Key;
+                }
+            }
+
+            foreach (var hex in GenerateLetterOnlyHexColors())
+            {
+                int cr = Convert.ToInt32(hex[..2], 16);
+                int cg = Convert.ToInt32(hex.Substring(2, 2), 16);
+                int cb = Convert.ToInt32(hex.Substring(4, 2), 16);
+
+                double d = ColorDistance(r, g, b, cr, cg, cb);
+
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestValue = hex;
+                }
+            }
+
+            CachedColorReplacements[(r, g, b)] = bestValue;
+            if (CachedColorReplacements.Count > 4096) CachedColorReplacements.Clear();
+            return bestValue;
+        }
+
+        static double ColorDistance(int r1, int g1, int b1, int r2, int g2, int b2)
+        {
+            int dr = r1 - r2;
+            int dg = g1 - g2;
+            int db = b1 - b2;
+            return dr * dr + dg * dg + db * db;
+        }
+
+        static string[] GenerateLetterOnlyHexColors()
+        {
+            if (CachedLetterOnlyHexColors.Length > 0)
+                return CachedLetterOnlyHexColors;
+
+            CachedLetterOnlyHexColors = new string[46656];
+            int i = 0;
+
+            foreach (char r1 in HexLetters)
+                foreach (char r2 in HexLetters)
+                    foreach (char g1 in HexLetters)
+                        foreach (char g2 in HexLetters)
+                            foreach (char b1 in HexLetters)
+                                foreach (char b2 in HexLetters)
+                                    CachedLetterOnlyHexColors[i++] = $"{r1}{r2}{g1}{g2}{b1}{b2}";
+
+            return CachedLetterOnlyHexColors;
+        }
+
+        static string ReplaceDigitsOutsideRichText(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text) || !IsTooManyDigits(text)) return text;
+
+            StringBuilder sb = new(text.Length);
+            bool insideTag = false;
+
+            foreach (char c in text)
+            {
+                switch (c)
+                {
+                    case '<':
+                        insideTag = true;
+                        sb.Append(c);
+                        continue;
+                    case '>':
+                        insideTag = false;
+                        sb.Append(c);
+                        continue;
+                    case >= '0' and <= '9' when !insideTag:
+                        sb.Append((char)('０' + (c - '0')));
+                        break;
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        static bool IsTooManyDigits(string text)
+        {
+            int count = 0;
+
+            foreach (char c in text)
+            {
+                if (c is >= '0' and <= '9')
+                {
+                    count++;
+                    if (count > 5) return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -107,7 +107,7 @@ internal class Requiter : RoleBase
 
         // requiter should never ignore Solsticer and Mini protections
         if (target.Is(CustomRoles.Solsticer)) return true;
-        if ((target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)) && Mini.Age < 18) return true;
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18) return true;
 
         // TNAs
         if (target.GetCustomRole().IsTNA()) return true;

@@ -463,7 +463,6 @@ class UnrestrictedNumImpostorsPatch
 {
     public static bool Prefix(ref int __result)
     {
-        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame) return true;
         __result = GameOptionsManager.Instance.CurrentGameOptions.NumImpostors;
         return false;
     }

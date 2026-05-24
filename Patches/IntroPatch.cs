@@ -121,7 +121,8 @@ public class SetUpRoleTextPatch
 
             var mapName = Utils.GetActiveMapName();
             Logger.Msg($"{mapName}", "Map");
-            if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode)
+            if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode &&
+                !Main.LIMap)
             {
                 RandomSpawn.SpawnMap spawnMap = mapName switch
                 {
@@ -551,7 +552,7 @@ class BeginCrewmatePatch
             case CustomRoles.Scavenger:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Viper);
                 break;
-            case CustomRoles.Celebrity:
+            case CustomRoles.SuperStar:
             case CustomRoles.Sacrifist:
             case CustomRoles.Poisoner:
             case CustomRoles.NoisemakerTONE:
@@ -1066,6 +1067,8 @@ class IntroCutsceneDestroyPatch
             {
                 Utils.NotifyRoles();
             }
+
+            Main.Instance.StartCoroutine(ShipStatusFixedUpdatePatch.Postfix());
         }
 
         try

@@ -3,10 +3,10 @@ using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Translator;
 
@@ -136,7 +136,7 @@ internal class Councillor : RoleBase
                     goto SkipToPerform;
                 }
 
-                if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+                if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
                 {
                     pc.ShowInfoMessage(isUI, GetString("GuessMini"));
                     return true;

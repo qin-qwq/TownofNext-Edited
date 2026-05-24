@@ -3,6 +3,8 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppSystem.Linq;
 using InnerNet;
+using System;
+using System.Collections;
 using TONE.Roles.Core;
 using Mathf = UnityEngine.Mathf;
 
@@ -10,154 +12,392 @@ namespace TONE.Modules;
 
 public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 {
-    public static void SetDirty(PlayerControl player) => SetDirty(player.PlayerId);
-    public static void SetDirty(byte playerId)
-    {
-        foreach (var sender in AllSenders.OfType<PlayerGameOptionsSender>().Where(sender => sender.player.PlayerId == playerId).ToArray())
-        {
-            sender.SetDirty();
-            break; // Only one sender can have the same player id
-        }
-    }
-    public static void SetDirtyToAll()
-    {
-        foreach (var sender in AllSenders.OfType<PlayerGameOptionsSender>().ToArray())
-        {
-            sender.SetDirty();
-        }
-    }
-
-    public override IGameOptions BasedGameOptions => GameStates.IsNormalGame ?
-            Main.RealOptionsData.Restore(new NormalGameOptionsV10(new UnityLogger().Cast<ILogger>()).Cast<IGameOptions>()) : Main.RealOptionsData.Restore(new HideNSeekGameOptionsV10(new UnityLogger().Cast<ILogger>()).Cast<IGameOptions>());
-    public override bool IsDirty { get; protected set; }
-
     public PlayerControl player = player;
 
-    public void SetDirty() => IsDirty = true;
+    private static IGameOptions BasedGameOptions =>
+        Main.RealOptionsData.Restore(new NormalGameOptionsV10(new UnityLogger().CastFast<ILogger>()).CastFast<IGameOptions>());
 
-    public override void SendGameOptions()
-    {
-        if (player.AmOwner)
-        {
-            var opt = BuildSendableGameOptions();
-            foreach (var com in GameManager.Instance.LogicComponents.GetFastEnumerator())
-            {
-                if (com.TryCast<LogicOptions>(out var lo))
-                    lo.SetGameOptions(opt);
-            }
-            GameOptionsManager.Instance.CurrentGameOptions = opt;
-        }
-        else base.SendGameOptions();
-    }
+    protected override bool IsDirty { get; set; }
 
-    public override void SendOptionsArray(Il2CppStructArray<byte> optionArray)
+    public static void SetDirty(byte playerId)
     {
-        byte logicOptionsIndex = 0;
-        foreach (var logicComponent in GameManager.Instance.LogicComponents.GetFastEnumerator())
+        for (var index = 0; index < AllSenders.Count; index++)
         {
-            if (logicComponent.TryCast<LogicOptions>(out _))
+            GameOptionsSender allSender = AllSenders[index];
+
+            if (allSender is PlayerGameOptionsSender sender && sender.player.PlayerId == playerId)
             {
-                SendOptionsArray(optionArray, logicOptionsIndex, player.GetClientId());
+                sender.SetDirty();
+                break; // Only one sender can have the same player id
             }
-            logicOptionsIndex++;
         }
     }
-    public static void RemoveSender(PlayerControl player)
+
+    public static void ForceSendImmediately(byte playerId)
     {
-        var sender = AllSenders.OfType<PlayerGameOptionsSender>()
-        .FirstOrDefault(sender => sender.player.PlayerId == player.PlayerId);
-        if (sender == null) return;
-        sender.player = null;
-        AllSenders.Remove(sender);
-    }
-    public override IGameOptions BuildGameOptions()
-    {
-        Main.RealOptionsData ??= new OptionBackupData(GameOptionsManager.Instance.CurrentGameOptions);
-
-        var opt = BasedGameOptions;
-        if (GameStates.IsNormalGame) AURoleOptions.SetOpt(opt);
-        else if (GameStates.IsHideNSeek) return opt;
-
-        var state = Main.PlayerStates[player.PlayerId];
-        opt.BlackOut(state.IsBlackOut);
-
-        CustomRoles role = player.GetCustomRole();
-        if (Options.CurrentGameMode == CustomGameMode.FFA)
+        for (var index = 0; index < AllSenders.Count; index++)
         {
-            if (FFAManager.FFALowerVisionList.ContainsKey(player.PlayerId))
+            GameOptionsSender allSender = AllSenders[index];
+
+            if (allSender is PlayerGameOptionsSender sender && sender.player.PlayerId == playerId)
             {
-                opt.SetVision(true);
-                opt.SetFloat(FloatOptionNames.CrewLightMod, FFAManager.FFA_LowerVision.GetFloat());
-                opt.SetFloat(FloatOptionNames.ImpostorLightMod, FFAManager.FFA_LowerVision.GetFloat());
+                ForceWaitFrame = true;
+                sender.SendGameOptions();
+                sender.IsDirty = false;
+                break; // Only one sender can have the same player id
+            }
+        }
+    }
+
+    public static void SendAllImmediately()
+    {
+        ForceWaitFrame = true;
+
+        if (PackedWriterMessages > 0 && PackedWriter != null)
+        {
+            PackedWriter.EndMessage();
+            var capturedWriter = PackedWriter;
+            DataFlagRateLimiter.Enqueue(() =>
+            {
+                AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
+                capturedWriter.Recycle();
+                Logger.Info("PackedWriter flush queue finished and sent", "SendOptionsArray");
+            }, cleanup: capturedWriter.Recycle);
+            Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArray");
+        }
+
+        PackedWriter = MessageWriter.Get(SendOption.Reliable);
+        PackedWriter.StartMessage(26);
+        PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+        PackedWriterMessages = 0;
+
+        for (var index = 0; index < AllSenders.Count; index++)
+        {
+            GameOptionsSender allSender = AllSenders[index];
+
+            if (allSender is PlayerGameOptionsSender { IsDirty: true } sender)
+            {
+                sender.SendGameOptions();
+                sender.IsDirty = false;
+            }
+        }
+
+        if (PackedWriter != null)
+        {
+            if (PackedWriterMessages > 0)
+            {
+                PackedWriter.EndMessage();
+                var capturedWriter = PackedWriter;
+                DataFlagRateLimiter.Enqueue(() =>
+                {
+                    AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
+                    capturedWriter.Recycle();
+                    Logger.Info("PackedWriter flush queue finished and sent", "SendAllImmediately");
+                }, cleanup: capturedWriter.Recycle);
+                Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendAllImmediately");
             }
             else
             {
-                opt.SetVision(true);
-                opt.SetFloat(FloatOptionNames.CrewLightMod, 1.25f);
-                opt.SetFloat(FloatOptionNames.ImpostorLightMod, 1.25f);
+                PackedWriter.Recycle();
             }
         }
 
-        if (player.Is(Custom_Team.Impostor))
-        {
-            AURoleOptions.ShapeshifterCooldown = Options.DefaultShapeshiftCooldown.GetFloat();
-            opt.SetVision(true);
-        }
-
-        if (role.IsGhostRole())
-            AURoleOptions.GuardianAngelCooldown = Options.DefaultAngelCooldown.GetFloat();
-
-        /*
-         * Builds Modified GameOptions
-         */
-        player.BuildCustomGameOptions(ref opt);
-
-        AURoleOptions.EngineerCooldown = Mathf.Max(0.01f, AURoleOptions.EngineerCooldown);
-
-        if (Main.AllPlayerKillCooldown.TryGetValue(player.PlayerId, out var killCooldown))
-        {
-            AURoleOptions.KillCooldown = Mathf.Max(0.02f, killCooldown);
-        }
-
-        if (Main.AllPlayerSpeed.TryGetValue(player.PlayerId, out var speed))
-        {
-            AURoleOptions.PlayerSpeedMod = Mathf.Clamp(speed, -10f, 10f);
-        }
-
-        state.taskState.hasTasks = Utils.HasTasks(player.Data, false);
-
-        if (Main.UnShapeShifter.Contains(player.PlayerId))
-        {
-            AURoleOptions.ShapeshifterDuration = 1f;
-        }
-
-        if (Options.GhostCanSeeOtherVotes.GetBool() && player.Data.IsDead)
-        {
-            opt.SetBool(BoolOptionNames.AnonymousVotes, false);
-        }
-        if (Options.AdditionalEmergencyCooldown.GetBool() &&
-            Options.AdditionalEmergencyCooldownThreshold.GetInt() <= Utils.AllAlivePlayersCount)
-        {
-            opt.SetInt(
-                Int32OptionNames.EmergencyCooldown,
-                Options.AdditionalEmergencyCooldownTime.GetInt());
-        }
-        if (Options.SyncButtonMode.GetBool() && Options.SyncedButtonCount.GetValue() <= Options.UsedButtonCount)
-        {
-            opt.SetInt(Int32OptionNames.EmergencyCooldown, 3600);
-        }
-
-        MeetingTimeManager.ApplyGameOptions(opt);
-
-        AURoleOptions.ShapeshifterCooldown = Mathf.Max(1f, AURoleOptions.ShapeshifterCooldown);
-        AURoleOptions.ProtectionDurationSeconds = 0f;
-        AURoleOptions.ImpostorsCanSeeProtect = false;
-
-        return opt;
+        PackedWriter = null;
+        PackedWriterMessages = 0;
     }
 
-    public override bool AmValid()
+    public static void SetDirtyToAll()
     {
-        return base.AmValid() && player != null && !player.Data.Disconnected && Main.RealOptionsData != null;
+        for (var index = 0; index < AllSenders.Count; index++)
+        {
+            GameOptionsSender allSender = AllSenders[index];
+
+            if (allSender is PlayerGameOptionsSender sender)
+                sender.SetDirty();
+        }
+    }
+
+    private void SetDirty()
+    {
+        IsDirty = true;
+    }
+
+    protected override void SendGameOptions()
+    {
+        if (player.AmOwner)
+        {
+            IGameOptions opt = BuildGameOptions();
+
+            if (GameManager.Instance?.LogicComponents != null)
+            {
+                foreach (GameLogicComponent com in GameManager.Instance.LogicComponents)
+                {
+                    if (com.TryCast(out LogicOptions lo))
+                        lo.SetGameOptions(opt);
+                }
+            }
+
+            GameOptionsManager.Instance.CurrentGameOptions = opt;
+        }
+        else
+            base.SendGameOptions();
+    }
+
+    protected override IEnumerator SendGameOptionsAsync()
+    {
+        if (player.AmOwner)
+        {
+            IGameOptions opt = BuildGameOptions();
+
+            if (GameManager.Instance?.LogicComponents != null)
+            {
+                foreach (GameLogicComponent com in GameManager.Instance.LogicComponents)
+                {
+                    if (com.TryCast(out LogicOptions lo))
+                        lo.SetGameOptions(opt);
+
+                    yield return WaitFrameIfNecessary();
+                }
+            }
+
+            GameOptionsManager.Instance.CurrentGameOptions = opt;
+        }
+        else
+            yield return base.SendGameOptionsAsync();
+    }
+
+    protected override IEnumerator SendOptionsArrayAsync(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
+    {
+        if (PackedWriter.Length > 1000 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
+        {
+            PackedWriter.EndMessage();
+            var qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(PackedWriter));
+            yield return qa.Wait();
+            Logger.Info($"PackedWriter flush finished - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArrayAsync");
+            PackedWriterMessages = 0;
+
+            if (qa.Dropped)
+            {
+                PackedWriter.Recycle();
+                PackedWriter = null;
+                Main.Instance.StopCoroutineV2(ActiveCoroutine);
+                ActiveCoroutine = null;
+                yield return null;
+                yield break;
+            }
+
+            PackedWriter.Clear(SendOption.Reliable);
+            PackedWriter.StartMessage(26);
+            PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+        }
+
+        yield return WaitFrameIfNecessary();
+
+        PackedWriterMessages++;
+
+        PackedWriter.StartMessage(6);
+        {
+            PackedWriter.Write(AmongUsClient.Instance.GameId);
+            PackedWriter.WritePacked(player.OwnerId);
+
+            PackedWriter.StartMessage(1);
+            {
+                PackedWriter.WritePacked(GameManager.Instance.NetId);
+                PackedWriter.StartMessage(logicOptionsIndex);
+                {
+                    PackedWriter.WriteBytesAndSize(optionArray);
+                }
+                PackedWriter.EndMessage();
+            }
+            PackedWriter.EndMessage();
+        }
+        PackedWriter.EndMessage();
+
+        Logger.Info($"PackedWriter message write complete - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArrayAsync");
+    }
+
+    protected override void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
+    {
+        if (PackedWriter == null) // Single write
+        {
+            DataFlagRateLimiter.Enqueue(() =>
+            {
+                MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+
+                writer.StartMessage(6);
+                {
+                    writer.Write(AmongUsClient.Instance.GameId);
+                    writer.WritePacked(player.OwnerId);
+
+                    writer.StartMessage(1);
+                    {
+                        writer.WritePacked(GameManager.Instance.NetId);
+                        writer.StartMessage(logicOptionsIndex);
+                        {
+                            writer.WriteBytesAndSize(optionArray);
+                        }
+                        writer.EndMessage();
+                    }
+                    writer.EndMessage();
+                }
+
+                writer.EndMessage();
+
+                AmongUsClient.Instance.SendOrDisconnect(writer);
+                writer.Recycle();
+                Logger.Info("Queue finished and sent for single write", "SendOptionsArray");
+            });
+            Logger.Info("Enqueue complete for single write", "SendOptionsArray");
+            return;
+        }
+
+        if (PackedWriter.Length > 1000 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
+        {
+            PackedWriter.EndMessage();
+            var capturedWriter = PackedWriter;
+            DataFlagRateLimiter.Enqueue(() =>
+            {
+                AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
+                capturedWriter.Recycle();
+            }, cleanup: capturedWriter.Recycle);
+            PackedWriterMessages = 0;
+            PackedWriter = MessageWriter.Get(SendOption.Reliable);
+            PackedWriter.StartMessage(26);
+            PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+        }
+
+        PackedWriterMessages++;
+
+        PackedWriter.StartMessage(6);
+        {
+            PackedWriter.Write(AmongUsClient.Instance.GameId);
+            PackedWriter.WritePacked(player.OwnerId);
+
+            PackedWriter.StartMessage(1);
+            {
+                PackedWriter.WritePacked(GameManager.Instance.NetId);
+                PackedWriter.StartMessage(logicOptionsIndex);
+                {
+                    PackedWriter.WriteBytesAndSize(optionArray);
+                }
+                PackedWriter.EndMessage();
+            }
+            PackedWriter.EndMessage();
+        }
+        PackedWriter.EndMessage();
+
+        Logger.Info($"PackedWriter message write complete - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArray");
+    }
+
+    public static void RemoveSender(PlayerControl player)
+    {
+        PlayerGameOptionsSender sender = AllSenders.OfType<PlayerGameOptionsSender>()
+            .FirstOrDefault(sender => sender.player.PlayerId == player.PlayerId);
+
+        if (sender == null) return;
+
+        sender.player = null;
+        AllSenders.Remove(sender);
+    }
+
+    public override IGameOptions BuildGameOptions()
+    {
+        try
+        {
+            Main.RealOptionsData ??= new(GameOptionsManager.Instance.CurrentGameOptions);
+
+            IGameOptions opt = BasedGameOptions;
+            if (GameStates.IsNormalGame) AURoleOptions.SetOpt(opt);
+            else if (GameStates.IsHideNSeek) return opt;
+
+            PlayerState state = Main.PlayerStates[player.PlayerId];
+            opt.BlackOut(state.IsBlackOut);
+
+            CustomRoles role = player.GetCustomRole();
+            RoleTypes roleTypes = player.GetCustomRole().GetRoleTypes();
+
+            if (Options.CurrentGameMode == CustomGameMode.FFA)
+            {
+                if (FFAManager.FFALowerVisionList.ContainsKey(player.PlayerId))
+                {
+                    opt.SetVision(true);
+                    opt.SetFloat(FloatOptionNames.CrewLightMod, FFAManager.FFA_LowerVision.GetFloat());
+                    opt.SetFloat(FloatOptionNames.ImpostorLightMod, FFAManager.FFA_LowerVision.GetFloat());
+                }
+                else
+                {
+                    opt.SetVision(true);
+                    opt.SetFloat(FloatOptionNames.CrewLightMod, 1.25f);
+                    opt.SetFloat(FloatOptionNames.ImpostorLightMod, 1.25f);
+                }
+            }
+
+            if (player.Is(Custom_Team.Impostor))
+            {
+                AURoleOptions.ShapeshifterCooldown = Options.DefaultShapeshiftCooldown.GetFloat();
+                opt.SetVision(true);
+            }
+
+            if (role.IsGhostRole())
+                AURoleOptions.GuardianAngelCooldown = Options.DefaultAngelCooldown.GetFloat();
+
+            /*
+            * Builds Modified GameOptions
+            */
+            player.BuildCustomGameOptions(ref opt);
+
+            AURoleOptions.EngineerCooldown = Mathf.Max(0.01f, AURoleOptions.EngineerCooldown);
+
+            if (Main.AllPlayerKillCooldown.TryGetValue(player.PlayerId, out var killCooldown))
+            {
+                AURoleOptions.KillCooldown = Mathf.Max(0.02f, killCooldown);
+            }
+
+            if (Main.AllPlayerSpeed.TryGetValue(player.PlayerId, out var speed))
+            {
+                AURoleOptions.PlayerSpeedMod = Mathf.Clamp(speed, -10f, 10f);
+            }
+
+            state.taskState.hasTasks = Utils.HasTasks(player.Data, false);
+
+            if (Main.UnShapeShifter.Contains(player.PlayerId))
+            {
+                AURoleOptions.ShapeshifterDuration = 1f;
+            }
+
+            if (Options.GhostCanSeeOtherVotes.GetBool() && !player.IsAlive())
+            {
+                opt.SetBool(BoolOptionNames.AnonymousVotes, false);
+            }
+
+            if (Options.AdditionalEmergencyCooldown.GetBool() &&
+            Options.AdditionalEmergencyCooldownThreshold.GetInt() <= Utils.AllAlivePlayersCount)
+            {
+                opt.SetInt(
+                    Int32OptionNames.EmergencyCooldown,
+                    Options.AdditionalEmergencyCooldownTime.GetInt());
+            }
+
+            if (Options.SyncButtonMode.GetBool() && Options.SyncedButtonCount.GetValue() <= Options.UsedButtonCount)
+                opt.SetInt(Int32OptionNames.EmergencyCooldown, 3600);
+
+            MeetingTimeManager.ApplyGameOptions(opt);
+
+            AURoleOptions.ShapeshifterCooldown = Mathf.Max(1f, AURoleOptions.ShapeshifterCooldown);
+            AURoleOptions.ProtectionDurationSeconds = 0f;
+            AURoleOptions.ImpostorsCanSeeProtect = false;
+
+            return opt;
+        }
+        catch (Exception e)
+        {
+            Logger.Error($"Error for {player.GetRealName()} ({player.GetCustomRole()}): {e}", "PlayerGameOptionsSender.BuildGameOptions");
+            return BasedGameOptions;
+        }
+    }
+
+    protected override bool AmValid()
+    {
+        return base.AmValid() && player && player.Data && !player.Data.Disconnected && Main.RealOptionsData != null;
     }
 }

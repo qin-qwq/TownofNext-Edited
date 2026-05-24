@@ -6,8 +6,6 @@ using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;
 
-// 部分代码参考：https://github.com/TOHOptimized/TownofHost-Optimized
-// 贴图来源 : https://github.com/Dolly1016/Nebula-Public
 internal class Fury : RoleBase
 {
     //===========================SETUP================================\\
@@ -149,5 +147,4 @@ internal class Fury : RoleBase
     {
         hud.AbilityButton.OverrideText(GetString("FuryVanishText"));
     }
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Rage");
 }

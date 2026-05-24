@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
+using InnerNet;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,7 +15,6 @@ using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using UnityEngine;
@@ -346,6 +346,11 @@ class CheckMurderPatch
                             }
                         }
                         break;
+
+                    case CustomRoles.Mini:
+                        if (!Mini.OnCheckMurder(killer, target))
+                            return false;
+                        break;
                 }
             }
 
@@ -531,7 +536,7 @@ class MurderPlayerPatch
             Utils.SyncAllSettings();
         }
 
-        Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 4));
+        Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(false));
     }
     public static void AfterPlayerDeathTasks(PlayerControl killer, PlayerControl target, bool inMeeting, bool fromRole = false)
     {
@@ -748,6 +753,13 @@ class ShapeshiftPatch
             }, time, shapeshifting ? "ShapeShiftNotify" : "UnShiftNotify");
         }
     }
+
+    public static void Postfix(PlayerControl __instance)
+    {
+        // Set CNO name visible for modded clients after shapeshift
+        if (__instance.PlayerId >= 254)
+            __instance.transform.FindChild("Names").FindChild("NameText_TMP").gameObject.SetActive(true);
+    }
 }
 
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
@@ -756,6 +768,7 @@ class ReportDeadBodyPatch
     public static NetworkedPlayerInfo ReportTarget;
     public static Dictionary<byte, bool> CanReport = [];
     public static Dictionary<byte, List<NetworkedPlayerInfo>> WaitReport = [];
+    public static bool PreventEAC = false;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo target)
     {
         if (GameStates.IsMeeting || GameStates.IsHideNSeek) return false;
@@ -915,6 +928,7 @@ class ReportDeadBodyPatch
             {
                 DestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(__instance);
                 __instance.RpcStartMeeting(target);
+                PreventEAC = false;
             }
         }, 0.30f, "StartMeeting");
         return false;
@@ -927,6 +941,7 @@ class ReportDeadBodyPatch
 
         try
         {
+            PreventEAC = true;
             Main.MeetingIsStarted = true;
             Main.LastVotedPlayerInfo = null;
             Main.AllKillers.Clear();
@@ -967,7 +982,31 @@ class ReportDeadBodyPatch
 
             Rebirth.OnReportDeadBody();
 
-            CustomNetObject.OnMeetingTasks();
+            var allCNO = CustomNetObject.AllObjects.ToArray();
+
+            foreach (var cno in allCNO)
+            {
+                try
+                {
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(cno.playerControl.NetId, (byte)RpcCalls.Shapeshift, SendOption.Reliable);
+                    writer.WriteNetObject(cno.playerControl);
+                    writer.Write(false);
+                    AmongUsClient.Instance.FinishRpcImmediately(writer);
+                }
+                catch (Exception e) { Utils.ThrowException(e); }
+            }
+
+            _ = new LateTask(() =>
+            {
+                foreach (var cno in allCNO)
+                {
+                    try
+                    {
+                        cno?.OnMeetingTasks();
+                    }
+                    catch (Exception e) { Utils.ThrowException(e); }
+                }
+            }, 5f, "CNO OnMeeting");
 
             // Alchemist & Bloodlust
             Alchemist.OnReportDeadBodyGlobal();
@@ -1022,7 +1061,7 @@ class ReportDeadBodyPatch
         NameNotifyManager.Reset();
 
         // Update Notify Roles for Meeting
-        Utils.DoNotifyRoles(isForMeeting: true, CamouflageIsForMeeting: true);
+        Utils.NotifyRoles(isForMeeting: true, CamouflageIsForMeeting: true);
 
         // Sync all settings on meeting start
         _ = new LateTask(Utils.SyncAllSettings, 3f, "Sync all settings after report");
@@ -1236,6 +1275,8 @@ class FixedUpdateInNormalGamePatch
                 AFKDetector.OnFixedUpdate(player);
                 DoubleTrigger.OnFixedUpdate(player);
                 KillTimerManager.FixedUpdate(player);
+                try { DataFlagRateLimiter.OnFixedUpdate(); }
+                catch (Exception e) { Utils.ThrowException(e); }
 
                 if (playerAmOwner)
                 {
@@ -1252,7 +1293,7 @@ class FixedUpdateInNormalGamePatch
                         CovenManager.NecronomiconCheck();
 
                         if (CustomRoles.Lovers.IsEnable())
-                            Lovers.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
+                            Lovers.LoversSuicide();
 
                         if (Rainbow.IsEnabled && Main.IntroDestroyed)
                             Rainbow.OnFixedUpdate();
@@ -1271,10 +1312,10 @@ class FixedUpdateInNormalGamePatch
                     }
 
                     //Mini's count down needs to be done outside if intask if we are counting meeting time
-                    if (player.GetRoleClass() is Mini min)
+                    if (player.Is(CustomRoles.Mini))
                     {
                         if (!playerData.Disconnected)
-                            min.OnFixedUpdates(player, nowTime);
+                            Mini.OnFixedUpdates(player, nowTime);
                     }
                 }
 
@@ -1324,7 +1365,7 @@ class FixedUpdateInNormalGamePatch
 
                         if (timerLowLoad % 6 == 0)
                         {
-                            GameOptionsSender.SendAllGameOptions();
+                            PlayerGameOptionsSender.SendAllImmediately();
                             // Of course we should be updating dirty game options
                             // This will be triggered by host playerControl every 0.2s
                         }
@@ -1508,6 +1549,8 @@ class FixedUpdateInNormalGamePatch
                         Mark.Append(CustomRoles.Cyber.GetColoredTextByRole("★"));
 
                     Mark.Append(Lovers.GetMarkOthers(localPlayer, player));
+
+                    Mark.Append(Mini.GetMarkOthers(localPlayer, player));
                     break;
             }
 
@@ -1608,6 +1651,11 @@ class PlayerStartPatch
         roleText.text = "RoleText";
         roleText.gameObject.name = "RoleText";
         roleText.enabled = false;
+    }
+
+    public static Exception Finalizer()
+    {
+        return null;
     }
 }
 // Player press vent button
@@ -2109,7 +2157,7 @@ static class PlayerControlRevivePatch
         {
             if (Main.PlayerStates.TryGetValue(__instance.PlayerId, out var state) && state.IsDead)
             {
-                state.IsDead = false;
+                state.SetAlive();
                 var sender = CustomRpcSender.Create($"LIReviveSync:{__instance.GetRealName()}", SendOption.Reliable);
                 var hasValue = __instance.SyncGeneralOptions();
                 sender.SendMessage(dispose: !hasValue);

@@ -54,7 +54,7 @@ internal class Swapper : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        if (CNO == null) CNO = CanSwapSelf.GetBool() ? new ShapeshiftMenuElement(pc.PlayerId) : null;
+        if (CNO == null) CNO = CanSwapSelf.GetBool() ? new ShapeshiftMenuElement(pc) : null;
         else if (CNO.playerControl.NetId == target.NetId) target = pc;
         SwapMsg(pc, $"/sw {target.PlayerId}");
     }

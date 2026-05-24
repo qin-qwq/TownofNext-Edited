@@ -1,5 +1,4 @@
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Neutral;
 using static TONE.Options;
 
@@ -26,7 +25,7 @@ public class Avanger : IAddon
     public static void OnMurderPlayer(PlayerControl target)
     {
         var pcList = Main.EnumerateAlivePlayerControls().Where(pc => pc.PlayerId != target.PlayerId && !Pelican.IsEaten(pc.PlayerId) && !Guardian.CannotBeKilled(pc) && !Medic.IsProtected(pc.PlayerId)
-            && !pc.Is(CustomRoles.Pestilence) && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)).ToList();
+            && !pc.Is(CustomRoles.Pestilence) && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !(pc.Is(CustomRoles.Mini) && Mini.Age < 18)).ToList();
 
         if (pcList.Any())
         {

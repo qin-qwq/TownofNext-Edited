@@ -74,9 +74,9 @@ internal class Medusa : CovenManager
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.PhantomCooldown = 1f;
+        base.ApplyGameOptions(opt, playerId);
     }
     public override bool CanUseKillButton(PlayerControl pc) => true;
-    //public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
 
     /*
     public override bool OnCheckReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target, PlayerControl killer)

@@ -8,7 +8,6 @@ using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using UnityEngine;
@@ -18,6 +17,8 @@ namespace TONE;
 
 public static class GuessManager
 {
+    public static GameObject guesserUI;
+
     public static string GetFormatString()
     {
         string text = GetString("PlayerIdList");
@@ -152,6 +153,11 @@ public static class GuessManager
                 pc.ShowInfoMessage(isUI, GetString("GuessDuringDiscussion"));
                 return true;
             }
+            if (pc.GetCustomRole().IsInvestigativeRole() && Options.InvestigativeRoleCantGuess.GetBool())
+            {
+                pc.ShowInfoMessage(isUI, GetString("InvestigativeRoleCantGuess"));
+                return true;
+            }
             if (!pc.Is(CustomRoles.NiceGuesser))
             {
                 if (pc.GetCustomRole().IsCrewmate() && !Options.CrewmatesCanGuess.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Judge))
@@ -209,6 +215,10 @@ public static class GuessManager
                 if (pc.GetRoleClass().GuessCheck(isUI, pc, target, role, ref guesserSuicide)) return true;
 
                 if (target.GetRoleClass().OnRoleGuess(isUI, target, pc, role, ref guesserSuicide)) return true;
+
+                if (pc.Is(CustomRoles.Mini) && Mini.GuessCheck(isUI, pc, target, role, ref guesserSuicide)) return true;
+
+                if (target.Is(CustomRoles.Mini) && Mini.OnRoleGuess(isUI, target, pc, role, ref guesserSuicide)) return true;
                 // Used to be a exploit. Guess may be canceled even misguessed
                 // You need to manually check whether guessed correct and then perform role abilities
 
@@ -417,6 +427,8 @@ public static class GuessManager
 
                 if (pc.GetRoleClass().CheckMisGuessed(isUI, pc, target, role, ref guesserSuicide)) return true;
 
+                if (pc.Is(CustomRoles.Mini) && Mini.CheckMisGuessed(isUI, pc, target, role, ref guesserSuicide)) return true;
+
                 string Name = dp.GetRealName();
                 if (!Options.DisableKillAnimationOnGuess.GetBool()) CustomSoundsManager.RPCPlayCustomSoundAll("Gunfire");
 
@@ -546,7 +558,7 @@ public static class GuessManager
         hudManager.SetHudActive(false);
         _ = new LateTask(() => hudManager.SetHudActive(false), 0.3f, "SetHudActive in ClientGuess", shoudLog: false);
     }
-    private static bool MsgToPlayerAndRole(string msg, out byte id, out CustomRoles role, out string error)
+    public static bool MsgToPlayerAndRole(string msg, out byte id, out CustomRoles role, out string error)
     {
         if (msg.StartsWith("/")) msg = msg.Replace("/", string.Empty);
 
@@ -663,7 +675,6 @@ public static class GuessManager
     public const int MaxOneScreenRole = 40;
     public static int Page;
     public static PassiveButton ExitButton;
-    public static GameObject guesserUI;
     private static Dictionary<Custom_Team, List<Transform>> RoleButtons;
     private static Dictionary<Custom_Team, SpriteRenderer> RoleSelectButtons;
     private static List<SpriteRenderer> PageButtons;
@@ -1019,9 +1030,6 @@ public static class GuessManager
                     or CustomRoles.Coven
                     || (role.IsTNA() && !Options.TransformedNeutralApocalypseCanBeGuessed.GetBool())) continue;
 
-                if (role is CustomRoles.NiceMini && Mini.Age < 18) continue;
-                if (role is CustomRoles.EvilMini && Mini.Age < 18 && !Mini.CanGuessEvil.GetBool()) continue;
-
                 CreateRole(role);
             }
             void CreateRole(CustomRoles role)
@@ -1102,21 +1110,20 @@ public static class GuessManager
     {
         public static void Postfix(MeetingHud __instance)
         {
-            if (__instance == null || textTemplate == null)
+            if (__instance == null)
             {
                 return;
             }
-            UnityEngine.Object.Destroy(textTemplate.gameObject);
+            if (textTemplate) UnityEngine.Object.Destroy(textTemplate.gameObject);
+            if (guesserUI) UnityEngine.Object.Destroy(guesserUI.gameObject);
         }
     }
 
     // Modded non-host client guess role/add-on
     private static void SendRPC(int playerId, CustomRoles role)
     {
-        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (int)CustomRPC.Guess, SendOption.Reliable, -1);
-        writer.Write(playerId);
-        writer.Write((int)role);
-        AmongUsClient.Instance.FinishRpcImmediately(writer);
+        var msg = new RpcGuess(PlayerControl.LocalPlayer.NetId, playerId, (int)role);
+        RpcUtils.LateBroadcastReliableMessage(msg);
     }
     public static void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {

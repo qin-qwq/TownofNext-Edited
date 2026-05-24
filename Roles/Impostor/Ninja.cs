@@ -3,7 +3,7 @@ using Hazel;
 using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -76,7 +76,7 @@ internal class Ninja : RoleBase
 
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
         {
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Gangster), GetString("CantMark")));
             return true;

@@ -187,7 +187,7 @@ class TagModeGameEndPredicate : GameEndPredicate
         if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TZombie)) <= 0)
         {
             reason = GameOverReason.ImpostorDisconnect;
-            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TCrewmate);
+            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Crewmate);
             CustomWinnerHolder.WinnerIds.Clear();
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
@@ -206,7 +206,7 @@ class TagModeGameEndPredicate : GameEndPredicate
         if (TagMode.TaskCount.Item1 >= TagMode.TaskCount.Item2)
         {
             reason = GameOverReason.CrewmatesByTask;
-            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TCrewmate);
+            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Crewmate);
             CustomWinnerHolder.WinnerIds.Clear();
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
@@ -488,6 +488,10 @@ public class TCrewmate : RoleBase
             DetectState.Item2 -= Time.fixedDeltaTime;
             if (DetectState.Item2 <= 0)
             {
+                if (player.IsModded() && MapBehaviour.Instance)
+                {
+                    if (MapBehaviour.Instance.IsOpen) MapBehaviour.Instance.Close();
+                }
                 DetectState = (false, 0f);
                 foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
                     TargetArrow.Remove(player.PlayerId, target.PlayerId);

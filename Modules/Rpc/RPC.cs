@@ -19,7 +19,7 @@ namespace TONE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 183/255 USED
+public enum CustomRPC : byte // 184/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -70,7 +70,6 @@ public enum CustomRPC : byte // 183/255 USED
     PlayGuardAndKill,
     SyncAbilityCD,
     BreakEmergencyButton,
-    SetChatVisible,
 
     //Roles 
     SyncRoleSkill,
@@ -81,8 +80,7 @@ public enum CustomRPC : byte // 183/255 USED
     DoSpell,
     DoHex,
     SniperSync,
-    //SetLoversPlayers,
-    SetLoverPairs,
+    SetLoversPlayers,
     SendFireworkerState,
 
     // BetterAmongUs (BAU) RPC, This is sent to allow other BAU users know who's using BAU!
@@ -118,6 +116,7 @@ public enum CustomRPC : byte // 183/255 USED
     ExorcistExorcise,
     Invisibility,
     Balancer,
+    SyncMiniAge,
 
     //FFA
     SyncFFAPlayer,
@@ -432,12 +431,6 @@ internal class RPCHandlerPatch
             case CustomRPC.BreakEmergencyButton:
                 ShipStatus.Instance.BreakEmergencyButton();
                 break;
-            case CustomRPC.SetChatVisible:
-                {
-                    HudManager.Instance.Chat.SetVisible(reader.ReadBoolean());
-                    HudManager.Instance.Chat.HideBanButton();
-                    break;
-                }
             case CustomRPC.SetBountyTarget:
                 BountyHunter.ReceiveRPC(reader);
                 break;
@@ -479,13 +472,7 @@ internal class RPCHandlerPatch
             case CustomRPC.UndertakerLocationSync:
                 Undertaker.ReceiveRPC(reader);
                 break;
-            // case CustomRPC.SetLoversPlayers:
-            //     Main.LoversPlayers.Clear();
-            //     int count = reader.ReadInt32();
-            //     for (int i = 0; i < count; i++)
-            //         Main.LoversPlayers.Add(Utils.GetPlayerById(reader.ReadByte()));
-            //     break;
-            case CustomRPC.SetLoverPairs:
+            case CustomRPC.SetLoversPlayers:
                 Lovers.ReceiveRPC(reader);
                 break;
             case CustomRPC.BetterCheck: // Better Among Us RPC
@@ -657,9 +644,9 @@ internal class RPCHandlerPatch
             case CustomRPC.RetributionistRevenge:
                 Retributionist.ReceiveRPC_Custom(reader, __instance);
                 break;
-            /*case CustomRPC.SetChameleonTimer:
+            case CustomRPC.SetChameleonTimer:
                 Chameleon.ReceiveRPC_Custom(reader);
-                break;*/
+                break;
             case CustomRPC.SetAlchemistTimer:
                 Alchemist.ReceiveRPC(reader);
                 break;
@@ -692,7 +679,7 @@ internal class RPCHandlerPatch
             case CustomRPC.FixModdedClientCNO:
                 var CNO = reader.ReadNetObject<PlayerControl>();
                 bool active = reader.ReadBoolean();
-                if (CNO != null)
+                if (CNO)
                 {
                     CNO.transform.FindChild("Names").FindChild("NameText_TMP").gameObject.SetActive(active);
                     CNO.Collider.enabled = false;
@@ -753,6 +740,9 @@ internal class RPCHandlerPatch
                 }
             case CustomRPC.Balancer:
                 Balancer.ReceiveRPC_Custom(reader, __instance);
+                break;
+            case CustomRPC.SyncMiniAge:
+                Mini.ReceiveRPC(reader, __instance);
                 break;
         }
     }
@@ -893,14 +883,13 @@ internal static class RPC
         var message = new RpcSyncAllPlayerNames(PlayerControl.LocalPlayer.NetId);
         RpcUtils.LateBroadcastReliableMessage(message);
     }
-    /*
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        var msg = new RpcShowPopUp(PlayerControl.LocalPlayer.NetId, pc.PlayerId, message, title);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        var msg = new RpcShowPopUp(PlayerControl.LocalPlayer.NetId, message, title);
+        RpcUtils.LateSpecificSendMessage(msg, pc.GetClientId());
     }
-    */
+    /*
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -909,6 +898,7 @@ internal static class RPC
         writer.Write(title);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
+    */
     public static void RpcSetFriendCode(string fc)
     {
         var msg = new RpcSetFriendCode(PlayerControl.LocalPlayer.NetId, fc);
@@ -950,16 +940,16 @@ internal static class RPC
         while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.GetHost() == null) await Task.Delay(500);
         RpcUtils.LateBroadcastReliableMessage(new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId));
     }
-    public static void SendDeathReason(byte playerId, PlayerState.DeathReason deathReason)
+    public static void SendDeathReason(byte playerId, PlayerState.DeathReason deathReason, bool isDead)
     {
-        RpcUtils.LateBroadcastReliableMessage(new RpcSetDeathReason(PlayerControl.LocalPlayer.NetId, playerId, deathReason));
+        RpcUtils.LateBroadcastReliableMessage(new RpcSetDeathReason(PlayerControl.LocalPlayer.NetId, playerId, deathReason, isDead));
     }
     public static void GetDeathReason(MessageReader reader)
     {
         var playerId = reader.ReadByte();
         var deathReason = reader.ReadInt32();
         Main.PlayerStates[playerId].deathReason = (PlayerState.DeathReason)deathReason;
-        Main.PlayerStates[playerId].IsDead = true;
+        Main.PlayerStates[playerId].IsDead = reader.ReadBoolean();
     }
     public static void ForceEndGame(CustomWinner win)
     {
@@ -1055,13 +1045,13 @@ internal static class RPC
             Logger.Error($" Error RPC:{error}", "SyncRoleSkillReader");
         }
     }
-    // public static void SyncLoversPlayers()
-    // {
-    //     if (!AmongUsClient.Instance.AmHost) return;
+    public static void SyncLoversPlayers()
+    {
+        if (!AmongUsClient.Instance.AmHost) return;
 
-    //     var msg = new RpcSetLoversPlayers(PlayerControl.LocalPlayer.NetId, Main.LoversPlayers.Count, Main.LoversPlayers);
-    //     RpcUtils.LateBroadcastReliableMessage(msg);
-    // }
+        var msg = new RpcSetLoversPlayers(PlayerControl.LocalPlayer.NetId, Lovers.LoversPlayers.Count, Lovers.LoversPlayers);
+        RpcUtils.LateBroadcastReliableMessage(msg);
+    }
     public static void SyncDeadPassedMeetingList()
     {
         if (!AmongUsClient.Instance.AmHost) return;

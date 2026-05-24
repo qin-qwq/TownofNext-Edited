@@ -16,8 +16,6 @@ using TONE.Modules.Rpc;
 using TONE.Patches.Crowded;
 using TONE.Roles.AddOns;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
-using TONE.Roles.Neutral;
 using UnityEngine;
 using DateTime = Il2CppSystem.DateTime;
 using DateTimeKind = Il2CppSystem.DateTimeKind;
@@ -56,18 +54,18 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.04.25";
-    public const string PluginDisplayVersion = "1.10.0";
+    public const string PluginVersion = "26.05.24";
+    public const string PluginDisplayVersion = "2.0.0 Alpha 3";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 3, 31, 0) // 2026.3.31 & 17.3
         ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.RELEASE;
+    public static readonly Release RELEASE = Release.ALPHA;
 
 #pragma warning disable IDE1006 // Naming Styles
-    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V1.9.0 Alpha 2
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 3
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
     public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.10.0
 #pragma warning restore IDE1006 // Naming Styles
@@ -93,7 +91,7 @@ public class Main : BasePlugin
     public static readonly string WebsiteInviteUrl = "https://tone2.top/";
 
     public static readonly bool ShowDonationButton = false;
-    public static readonly string DonationInviteUrl = "https://weareten.ca/TONE";
+    public static readonly string DonationInviteUrl = "https://afdian.com/a/dolly1016";
 
     public Harmony Harmony { get; } = new Harmony(PluginGuid);
     public static Version version = Version.Parse(PluginVersion);
@@ -127,6 +125,7 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> EnableCustomButton { get; private set; }
     public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
     public static ConfigEntry<bool> EnableCustomDecorations { get; private set; }
+    public static ConfigEntry<bool> EnableMapVentIcon { get; private set; }
     public static ConfigEntry<bool> SwitchVanilla { get; private set; }
 
     // Debug
@@ -216,9 +215,6 @@ public class Main : BasePlugin
 
     public static bool GameIsLoaded { get; set; } = false;
 
-    // public static bool isLoversDead = true;
-    // public static readonly HashSet<PlayerControl> LoversPlayers = [];
-
     public static bool DoBlockNameChange = false;
     public static int updateTime;
     public const float MinSpeed = 0.0001f;
@@ -232,6 +228,7 @@ public class Main : BasePlugin
     public static float DefaultCrewmateVision;
     public static float DefaultImpostorVision;
     public static bool IsTOHEInitialRelease = DateTime.Now.Month == 1 && DateTime.Now.Day is 17;
+    public static bool IsPlan17InitialRelease = DateTime.Now.Month == 5 && DateTime.Now.Day is 24;
     public static bool IsTONEInitialRelease = DateTime.Now.Month == 6 && DateTime.Now.Day is 17;
     public static bool IsAprilFools
     {
@@ -271,20 +268,24 @@ public class Main : BasePlugin
 
     public static IEnumerable<PlayerControl> EnumeratePlayerControls()
     {
-        foreach (var pc in PlayerControl.AllPlayerControls)
+        // foreach can throw System.InvalidOperationException: Collection was modified; enumeration operation may not execute.
+        // if the code waits frames between iterations, so the safest way is to use a for loop backwards
+        for (int index = PlayerControl.AllPlayerControls.Count - 1; index >= 0; index--)
         {
-            if (pc == null || pc.PlayerId >= 254) continue;
+            var pc = PlayerControl.AllPlayerControls[index];
+            if (!pc || pc.PlayerId >= 254) continue;
             yield return pc;
         }
     }
 
     public static IEnumerable<PlayerControl> EnumerateAlivePlayerControls()
     {
-        return EnumeratePlayerControls()
-            .Where(pc => pc.IsAlive()
-                        && pc.Data != null
-                        && (!pc.Data.Disconnected || !IntroDestroyed)
-                        && !Pelican.IsEaten(pc.PlayerId));
+        for (int index = PlayerControl.AllPlayerControls.Count - 1; index >= 0; index--)
+        {
+            PlayerControl pc = PlayerControl.AllPlayerControls[index];
+            if (!pc.IsAliveWithConditions() || pc.PlayerId >= 254) continue;
+            yield return pc;
+        }
     }
 
     public static Main Instance;
@@ -296,6 +297,7 @@ public class Main : BasePlugin
     public static List<string> TName_Snacks_CN = ["冰激凌", "奶茶", "巧克力", "蛋糕", "甜甜圈", "可乐", "柠檬水", "冰糖葫芦", "果冻", "糖果", "牛奶", "抹茶", "烧仙草", "菠萝包", "布丁", "椰子冻", "曲奇", "红豆土司", "三彩团子", "艾草团子", "泡芙", "可丽饼", "桃酥", "麻薯", "鸡蛋仔", "马卡龙", "雪梅娘", "炒酸奶", "蛋挞", "松饼", "西米露", "奶冻", "奶酥", "可颂", "奶糖"];
     public static List<string> TName_Snacks_EN = ["Ice cream", "Milk tea", "Chocolate", "Cake", "Donut", "Coke", "Lemonade", "Candied haws", "Jelly", "Candy", "Milk", "Matcha", "Burning Grass Jelly", "Pineapple Bun", "Pudding", "Coconut Jelly", "Cookies", "Red Bean Toast", "Three Color Dumplings", "Wormwood Dumplings", "Puffs", "Can be Crepe", "Peach Crisp", "Mochi", "Egg Waffle", "Macaron", "Snow Plum Niang", "Fried Yogurt", "Egg Tart", "Muffin", "Sago Dew", "panna cotta", "soufflé", "croissant", "toffee"];
 
+    public static bool LIMap => NormalOptions is { MapId: 7 };
     public static bool HasReactorPlugin;
 
     public static StringNames[] how2playN = [StringNames.HowToPlayText1, StringNames.HowToPlayText2, StringNames.HowToPlayText41, StringNames.HowToPlayText42, StringNames.HowToPlayText43, StringNames.HowToPlayText44, StringNames.HowToPlayText5, StringNames.HowToPlayText6, StringNames.HowToPlayText7, StringNames.HowToPlayText81, StringNames.HowToPlayText82];
@@ -360,6 +362,15 @@ public class Main : BasePlugin
         coroutines.StartCoroutine(coroutine.WrapToIl2Cpp());
     }
 
+    public UnityEngine.Coroutine StartCoroutineV2(System.Collections.IEnumerator coroutine)
+    {
+        if (coroutine == null)
+        {
+            return null;
+        }
+        return coroutines.StartCoroutine(coroutine.WrapToIl2Cpp());
+    }
+
     public void StopCoroutine(System.Collections.IEnumerator coroutine)
     {
         if (coroutine == null)
@@ -367,6 +378,12 @@ public class Main : BasePlugin
             return;
         }
         coroutines.StopCoroutine(coroutine.WrapToIl2Cpp());
+    }
+
+    public void StopCoroutineV2(Coroutine coroutine)
+    {
+        if (coroutine == null) return;
+        coroutines.StopCoroutine(coroutine);
     }
 
     public void StopAllCoroutines()
@@ -467,8 +484,8 @@ public class Main : BasePlugin
 
             CustomRolesHelper.DuplicatedRoles = new Dictionary<CustomRoles, Type>
             {
-                { CustomRoles.NiceMini, typeof(Mini) },
-                { CustomRoles.EvilMini, typeof(Mini) }
+                //{ CustomRoles.NiceMini, typeof(Mini) },
+                //{ CustomRoles.EvilMini, typeof(Mini) }
             };
 
             foreach (var role in CustomRolesHelper.AllRoles.Where(x => x < CustomRoles.NotAssigned))
@@ -599,6 +616,7 @@ public class Main : BasePlugin
         EnableCustomButton = Config.Bind("Client Options", "EnableCustomButton", true);
         EnableCustomSoundEffect = Config.Bind("Client Options", "EnableCustomSoundEffect", true);
         EnableCustomDecorations = Config.Bind("Client Options", "EnableCustomDecorations", true);
+        EnableMapVentIcon = Config.Bind("Client Options", "EnableMapVentIcon", true);
         SwitchVanilla = Config.Bind("Client Options", "SwitchVanilla", false);
 
         // Debug
@@ -784,13 +802,13 @@ public enum CustomRoles
     Deathpact,
     Devourer,
     Disperser,
+    Disturber,
     DollMaster,
     DoubleAgent,
     Eraser,
     Escapist,
     EvilGuesser,
     EvilHacker,
-    EvilMini,
     EvilTracker,
     Exorcist,
     Fireworker,
@@ -864,7 +882,6 @@ public enum CustomRoles
     Brave,
     Captain,
     Catalyst,
-    Celebrity,
     Chameleon,
     ChiefOfPolice,
     Cleanser,
@@ -900,7 +917,6 @@ public enum CustomRoles
     Mortician,
     NiceGuesser,
     NiceHacker,
-    NiceMini,
     Observer,
     Oracle,
     Overseer,
@@ -1032,9 +1048,6 @@ public enum CustomRoles
     Summoned,
     VoodooMaster,
 
-    //two-way camp
-    Mini,
-
     //FFA
     Killer,
 
@@ -1098,6 +1111,7 @@ public enum CustomRoles
     Randomizer,
     Rebirth,
     Mimic,
+    Mini,
     Mundane,
     Narc,
     Necroview,
@@ -1209,7 +1223,6 @@ public enum CustomWinner
     Coven = CustomRoles.Coven,
     Tunny = CustomRoles.Tunny,
     TZombie = CustomRoles.TZombie,
-    TCrewmate = CustomRoles.TCrewmate,
     Dreamer = CustomRoles.Dreamer,
     TreasureHunter = CustomRoles.TreasureHunter,
     Logos = CustomRoles.Logos,

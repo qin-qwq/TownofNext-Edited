@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -67,7 +67,7 @@ internal class Anonymous : RoleBase
     }
     public override void OnShapeshift(PlayerControl shapeshifter, PlayerControl ssTarget, bool IsAnimate, bool shapeshifting)
     {
-        if (!shapeshifting || shapeshifter.GetAbilityUseLimit() <= 0 || ssTarget == null || ssTarget.Is(CustomRoles.LazyGuy) || ssTarget.Is(CustomRoles.Lazy) || ssTarget.Is(CustomRoles.NiceMini) && Mini.Age < 18) return;
+        if (!shapeshifting || shapeshifter.GetAbilityUseLimit() <= 0 || ssTarget == null || ssTarget.Is(CustomRoles.LazyGuy) || ssTarget.Is(CustomRoles.Lazy) || ssTarget.Is(CustomRoles.Mini) && Mini.Age < 18) return;
 
         shapeshifter.RpcRemoveAbilityUse();
 

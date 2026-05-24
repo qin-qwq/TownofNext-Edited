@@ -73,10 +73,10 @@ internal class Necromancer : CovenManager
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.PhantomCooldown = 1f;
+        base.ApplyGameOptions(opt, playerId);
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc) => HasNecronomicon(pc) || IsRevenge;
-    //public override bool CanUseImpostorVentButton(PlayerControl pc) => CanVent.GetBool();
 
     public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
     {
@@ -226,9 +226,7 @@ internal class Necromancer : CovenManager
             CustomRoles.Captain or
             CustomRoles.Retributionist or
             CustomRoles.Nemesis or
-            CustomRoles.NiceMini or
             CustomRoles.Mini or
-            CustomRoles.EvilMini or
             CustomRoles.SuperStar or
             CustomRoles.RuthlessRomantic or
             CustomRoles.VengefulRomantic or

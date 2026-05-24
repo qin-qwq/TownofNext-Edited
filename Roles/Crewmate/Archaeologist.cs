@@ -4,9 +4,10 @@ using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.AddOns;
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Neutral;
 using static TONE.Options;
+using static TONE.SabotageSystemPatch;
 using static TONE.Translator;
 
 namespace TONE.Roles.Crewmate;
@@ -21,9 +22,11 @@ internal class Archaeologist : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     public override bool BlockMoveInVent(PlayerControl pc) => true;
     //==================================================================\\
+
     private static List<CustomRoles> addons = [];
     private static readonly HashSet<byte> SlateRoles = [];
-    private static byte RevivedPlayerId = byte.MaxValue;
+    private static byte SlatePlayerId = byte.MaxValue;
+    private static SystemTypes CurrentActiveSabotage = SystemTypes.Hallway;
 
     public static OptionItem VentCooldown;
     private static OptionItem InvisDuration;
@@ -76,7 +79,7 @@ internal class Archaeologist : RoleBase
         LifeConnection = false;
         addons.Clear();
         addons.AddRange(GroupedAddons[AddonTypes.Helpful]);
-        RevivedPlayerId = byte.MaxValue;
+        SlatePlayerId = byte.MaxValue;
     }
     public override void Add(byte playerId)
     {
@@ -105,14 +108,15 @@ internal class Archaeologist : RoleBase
     private static void SendRPC(PlayerControl pc)
     {
         if (!pc.IsNonHostModdedClient()) return;
-        var msg = new RpcSetArchaeologist(PlayerControl.LocalPlayer.NetId, FixNextSabo, AntiqueID, RevivedPlayerId);
+        var msg = new RpcSetArchaeologist(PlayerControl.LocalPlayer.NetId, FixNextSabo, AntiqueID, SlatePlayerId);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }
     public static void ReceiveRPC(MessageReader reader)
     {
         FixNextSabo = reader.ReadBoolean();
         AntiqueID = reader.ReadByte();
-        RevivedPlayerId = reader.ReadByte();
+        SlatePlayerId = reader.ReadByte();
+        SlateRoles.Add(SlatePlayerId);
     }
 
     public override void OnPet(PlayerControl pc)
@@ -121,6 +125,11 @@ internal class Archaeologist : RoleBase
     }
     public override void OnEnterVent(PlayerControl player, Vent vent)
     {
+        if (FixNextSabo)
+        {
+            FixAllSabotage();
+            return;
+        }
         switch (AntiqueID)
         {
             case 1: // 灵魂回响镜 - 知道何时有玩家死亡
@@ -258,15 +267,18 @@ internal class Archaeologist : RoleBase
                 if (pcList.Any() && !SlateRoles.Contains(rp.PlayerId))
                 {
                     SlateRoles.Add(rp.PlayerId);
+                    SlatePlayerId = rp.PlayerId;
+                    SendRPC(player);
                 }
                 break;
             case 14: // 时光沙漏 - 重置所有玩家的击杀/技能冷却时间
                 player.RpcGuardAndKill();
                 foreach (var target in Main.EnumerateAlivePlayerControls()) target.SetKillCooldown();
                 break;
-            case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
+            case 15: // 净化水晶 - 远程修复一次破坏
                 player.RpcGuardAndKill();
                 FixNextSabo = true;
+                FixAllSabotage();
                 break;
             case 16: // 无线按钮 - 召开一次会议
                 if (!UsePets.GetBool()) player?.MyPhysics?.RpcBootFromVent(vent.Id);
@@ -276,60 +288,20 @@ internal class Archaeologist : RoleBase
                 player.Notify(GetString("ArOpenAllDoors"));
                 DoorsReset.OpenAllDoors();
                 break;
+            case 18: // 秩序之铃 - 重置破坏冷却时间
+                player.Notify(GetString("ArResetSabotageCooldown"));
+                var sabotageSystemType = ShipStatus.Instance.Systems[SystemTypes.Sabotage].CastFast<SabotageSystemType>();
+                sabotageSystemType.Timer = SabotageSystemTypeRepairDamagePatch.isCooldownModificationEnabled
+                    ? SabotageSystemTypeRepairDamagePatch.modifiedCooldownSec
+                    : 30f;
+                sabotageSystemType.IsDirty = true;
+                break;
             default: // just in case
                 break;
         }
 
         AntiqueID = 251;
         SendRPC(player);
-    }
-
-    public override void UpdateSystem(ShipStatus __instance, SystemTypes systemType, byte amount, PlayerControl player)
-    {
-        if (!FixNextSabo) return;
-        FixNextSabo = false;
-
-        switch (systemType)
-        {
-            case SystemTypes.Reactor:
-                if (amount is 64 or 65)
-                {
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Reactor, 16);
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Reactor, 17);
-                }
-                break;
-            case SystemTypes.Laboratory:
-                if (amount is 64 or 65)
-                {
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Laboratory, 67);
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Laboratory, 66);
-                }
-                break;
-            case SystemTypes.LifeSupp:
-                if (amount is 64 or 65)
-                {
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.LifeSupp, 67);
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.LifeSupp, 66);
-                }
-                break;
-            case SystemTypes.Comms:
-                if (amount is 64 or 65)
-                {
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Comms, 16);
-                    ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Comms, 17);
-                }
-                break;
-        }
-    }
-    public override void SwitchSystemUpdate(SwitchSystem __instance, byte amount, PlayerControl player)
-    {
-        if (!FixNextSabo) return;
-        FixNextSabo = false;
-
-        __instance.ActualSwitches = 0;
-        __instance.ExpectedSwitches = 0;
-
-        Logger.Info($"{player.GetNameWithRole().RemoveHtmlTags()} instant - fix-lights", "SwitchSystem");
     }
 
     public override int AddRealVotesNum(PlayerVoteArea PVA) => (int)Votes;
@@ -350,7 +322,7 @@ internal class Archaeologist : RoleBase
         if (LifeConnection)
         {
             var pcList = Main.EnumerateAlivePlayerControls().Where(pc => pc.PlayerId != target.PlayerId && !Pelican.IsEaten(pc.PlayerId) && !Guardian.CannotBeKilled(pc) && !Medic.IsProtected(pc.PlayerId)
-            && !pc.Is(CustomRoles.Pestilence) && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)).ToList();
+            && !pc.Is(CustomRoles.Pestilence) && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !(pc.Is(CustomRoles.Mini) && Mini.Age < 18)).ToList();
 
             if (pcList.Any())
             {
@@ -417,11 +389,17 @@ internal class Archaeologist : RoleBase
             case 14: // 时光沙漏
                 str.Append(GetString("PotionStore") + GetString("Arn"));
                 break;
+            case 15: // 净化水晶
+                str.Append(GetString("PotionStore") + GetString("Aro"));
+                break;
             case 16: // 无线按钮
                 str.Append(GetString("PotionStore") + GetString("Arp"));
                 break;
             case 17: // 万能钥匙
                 str.Append(GetString("PotionStore") + GetString("Arq"));
+                break;
+            case 18: // 秩序之铃
+                str.Append(GetString("PotionStore") + GetString("Arr"));
                 break;
             default: // just in case
                 break;
@@ -451,21 +429,9 @@ internal class Archaeologist : RoleBase
             var deadPlayerId = deadPlayer.PlayerId;
             var deadBodyObject = deadBody.GetDeadBody();
 
-            RevivedPlayerId = deadPlayerId;
-            //AllRevivedPlayerId.Add(deadPlayerId);
-
             deadPlayer.RpcTeleport(deadBodyObject.transform.position);
             deadPlayer.RpcRevive();
             HasGrail = false;
-            return false;
-        }
-        else if ((reporter.PlayerId == RevivedPlayerId) && deadBody.PlayerId == RevivedPlayerId)
-        {
-            var countDeadBody = UnityEngine.Object.FindObjectsOfType<DeadBody>().Count(bead => bead.ParentId == deadBody.PlayerId);
-            if (countDeadBody >= 2) return true;
-
-            reporter.Notify(GetString("Altruist_YouTriedReportRevivedDeadBody"));
-            SendRPC(reporter);
             return false;
         }
         return true;
@@ -478,7 +444,7 @@ internal class Archaeologist : RoleBase
         if (!player.IsAlive() || player == null) return;
 
         var rand = IRandom.Instance;
-        AntiqueID = (byte)rand.Next(1, 18);
+        AntiqueID = (byte)rand.Next(1, 19);
         FixNextSabo = false;
         HasGrail = false;
         LifeConnection = false;
@@ -527,7 +493,7 @@ internal class Archaeologist : RoleBase
             case 14: // 时光沙漏 - 重置所有玩家的技能冷却时间
                 player.Notify(GetString("GotHourglass"), 15f);
                 break;
-            case 15: // 预言卷轴 - 修复冒名顶替者下次破坏
+            case 15: // 净化水晶 - 远程修复一次破坏
                 player.Notify(GetString("GotProphecy"), 15f);
                 break;
             case 16: // 无线按钮 - 召开一次会议
@@ -536,10 +502,66 @@ internal class Archaeologist : RoleBase
             case 17: // 万能钥匙 - 打开所有的门
                 player.Notify(GetString("GetKey"), 15f);
                 break;
+            case 18: // 秩序之铃 - 重置破坏冷却时间
+                player.Notify(GetString("GetBell"), 15f);
+                break;
             default: // just in case
                 break;
         }
 
         SendRPC(player);
+    }
+
+    public static void FixAllSabotage()
+    {
+        if (!FixNextSabo || CurrentActiveSabotage == SystemTypes.Hallway) return;
+        FixNextSabo = false;
+        var shipStatusDisabled = ShipStatus.Instance;
+        switch (CurrentActiveSabotage)
+        {
+            case SystemTypes.Reactor:
+            case SystemTypes.Laboratory:
+                shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 16);
+                break;
+            case SystemTypes.HeliSabotage:
+                shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 16);
+                shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 17);
+                break;
+            case SystemTypes.LifeSupp:
+                shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 66);
+                shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 67);
+                break;
+            case SystemTypes.Comms:
+                var mapId = Utils.GetActiveMapId();
+
+                shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 16);
+                if (mapId is 1 or 5) // Mira HQ or The Fungle
+                    shipStatusDisabled.RpcUpdateSystem(CurrentActiveSabotage, 17);
+                break;
+            case SystemTypes.Electrical:
+                var __instance = ShipStatus.Instance.Systems[SystemTypes.Electrical].CastFast<SwitchSystem>();
+                __instance.ActualSwitches = 0;
+                __instance.ExpectedSwitches = 0;
+                __instance.IsDirty = true;
+
+                Logger.Info($"Archaeologist instant - fix-lights", "SwitchSystem");
+                break;
+        }
+        CurrentActiveSabotage = SystemTypes.Hallway;
+    }
+
+    public static void OnSabotageCall(SystemTypes systemType)
+    {
+        if (!Main.MeetingIsStarted
+            && systemType is
+                SystemTypes.HeliSabotage or
+                SystemTypes.Laboratory or
+                SystemTypes.Reactor or
+                SystemTypes.LifeSupp or
+                SystemTypes.Comms or
+                SystemTypes.Electrical)
+        {
+            CurrentActiveSabotage = systemType;
+        }
     }
 }

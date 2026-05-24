@@ -33,7 +33,7 @@ internal class TimeMaster : RoleBase
 
     private static readonly Dictionary<byte, long> TimeMasterInProtect = [];
     private static Dictionary<long, Dictionary<byte, Vector2>> BackTrack = [];
-    private static readonly Dictionary<byte, float> originalSpeed = [];
+    public static readonly Dictionary<byte, float> originalSpeed = [];
     public static bool Rewinding;
 
     public override void SetupCustomOption()

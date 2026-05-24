@@ -34,7 +34,7 @@ internal class Cupid : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Cupid);
+        SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Cupid, 1, zeroOne: false);
         CharmCooldown = FloatOptionItem.Create(Id + 10, "CupidSettings.CharmCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid])
             .SetValueFormat(OptionFormat.Seconds);
         LoversKnowCupid = BooleanOptionItem.Create(Id + 11, "CupidSettings.LoversKnowCupid", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid]);
@@ -166,7 +166,7 @@ internal class Cupid : RoleBase
 
     private void AddTarget(PlayerControl cupid, PlayerControl target)
     {
-        if (!CustomRolesHelper.CheckAddonConfilct(CustomRoles.Lovers, target, checkLimitAddons: false, checkConditions: false))
+        if (!CustomRolesHelper.CheckAddonConfilct(CustomRoles.Lovers, target, checkLimitAddons: false, checkConditions: false) || CustomRoles.Lovers.RoleExist(true))
         {
             Logger.Info($"Can't Charm {target.GetNameWithRole()}", "Cupid");
             cupid.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cultist), GetString("Cupid.CantCharm")));
@@ -176,13 +176,6 @@ internal class Cupid : RoleBase
         {
             firstArrow[cupid.PlayerId] = target.PlayerId;
             Logger.Info($"{target.GetRealName()} is Lover1", "Cupid");
-
-            if (Lovers.loverless != byte.MaxValue)
-            {
-                var newTarget = Lovers.loverless;
-                Lovers.loverless = byte.MaxValue;
-                AddTarget(cupid, newTarget.GetPlayer());
-            }
 
             cupid.Notify(string.Format(GetString("Cupid.PlayerAdded"), target.GetRealName()));
         }
@@ -194,12 +187,21 @@ internal class Cupid : RoleBase
 
             PlayerControl p = first.GetValueOrDefault(0xff).GetPlayer();
 
+            Lovers.LoversPlayers.Clear();
+            Lovers.isLoversDead = false;
+
+            Lovers.LoversPlayers.Add(p);
+            Lovers.LoversPlayers.Add(target);
+
             p.RpcSetCustomRole(CustomRoles.Lovers, false, true);
             target.RpcSetCustomRole(CustomRoles.Lovers, false, true);
 
+            if (Lovers.LoversPlayers.Any())
+                RPC.SyncLoversPlayers();
+
             if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
             {
-                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
             }
             else
             {
@@ -234,7 +236,7 @@ internal class Cupid : RoleBase
 
     public static void CheckAdditionalWin()
     {
-        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers));
+        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers)).ToList();
 
         foreach (var lover in loverWinners)
         {

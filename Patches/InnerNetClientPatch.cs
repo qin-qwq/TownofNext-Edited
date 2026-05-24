@@ -1,5 +1,4 @@
 using Hazel;
-using Il2CppInterop.Runtime.InteropTypes;
 using InnerNet;
 using System;
 using TONE.Modules;
@@ -184,7 +183,7 @@ internal class AuthTimeoutPatch
 {
     // From Reactor.gg
     // https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Patches/Miscellaneous/CustomServersPatch.cs
-    [HarmonyPatch(typeof(AuthManager), nameof(AuthManager.CoConnect))]
+    /*[HarmonyPatch(typeof(AuthManager), nameof(AuthManager.CoConnect))]
     [HarmonyPrefix]
     public static bool CoConnect_Prefix()
     {
@@ -195,7 +194,7 @@ internal class AuthTimeoutPatch
     public static bool CoWaitforNonce_Prefix()
     {
         return GameStates.IsVanillaServer || GameStates.IsFreePlay || GameStates.IsLocalGame || GameStates.IsNotJoined;
-    }
+    }*/
 
     // If you dont patch this, u still need to wait for 5s
     // I have no idea why this is happening

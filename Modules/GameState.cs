@@ -154,12 +154,12 @@ public class PlayerState(byte playerId)
         {
             if (pc != null) countTypes = pc.GetCustomRole().GetCountTypes();
 
-            // // Remove lovers on Cleansed
-            // if (pc.Is(CustomRoles.Lovers))
-            // {
-            //     var lover = Main.PlayerStates.Values.FirstOrDefault(x => x.PlayerId != pc.PlayerId && x.SubRoles.Contains(CustomRoles.Lovers));
-            //     lover?.RemoveSubRole(CustomRoles.Lovers);
-            // }
+            // Remove lovers on Cleansed
+            if (pc.Is(CustomRoles.Lovers))
+            {
+                var lover = Main.PlayerStates.Values.FirstOrDefault(x => x.PlayerId != pc.PlayerId && x.SubRoles.Contains(CustomRoles.Lovers));
+                lover?.RemoveSubRole(CustomRoles.Lovers);
+            }
 
             foreach (var subRole in SubRoles.ToArray())
             {
@@ -291,7 +291,7 @@ public class PlayerState(byte playerId)
         {
             if (AmongUsClient.Instance.AmHost)
             {
-                RPC.SendDeathReason(PlayerId, deathReason);
+                RPC.SendDeathReason(PlayerId, deathReason, IsDead);
                 if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
                 {
                     MeetingHud.Instance.CheckForEndVoting();
@@ -301,6 +301,17 @@ public class PlayerState(byte playerId)
         catch (Exception e)
         {
             Logger.Error(e.StackTrace, "SetDead()");
+        }
+    }
+
+    public void SetAlive()
+    {
+        IsDead = false;
+        deathReason = DeathReason.etc;
+
+        if (AmongUsClient.Instance.AmHost)
+        {
+            RPC.SendDeathReason(PlayerId, deathReason, IsDead);
         }
     }
     public bool IsSuicide => deathReason == DeathReason.Suicide;

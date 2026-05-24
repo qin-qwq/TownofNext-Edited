@@ -3,7 +3,6 @@ using System;
 using System.Collections.Concurrent;
 using TMPro;
 using TONE.Patches;
-using TONE.Patches.Crowded;
 using TONE.Roles.Core;
 using UnityEngine;
 using UnityEngine.Events;
@@ -88,7 +87,7 @@ public static class GameOptionsMenuPatch
                 {
                     CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(__instance.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, __instance.settingsContainer);
                     categoryHeaderMasked.SetHeader(StringNames.RolesCategory, 20);
-                    categoryHeaderMasked.Title.text = option.GetName(disableColor: true);
+                    categoryHeaderMasked.Title.SetText(option.GetName(disableColor: true));
                     categoryHeaderMasked.Background.color = categoryHeaderMasked.Divider.color = option.NameColor;
                     categoryHeaderMasked.transform.localScale = Vector3.one * 0.68f;
                     categoryHeaderMasked.transform.localPosition = new(-0.913f, num, posZ);
@@ -469,7 +468,7 @@ public static class ToggleOptionPatch
             renderer.sprite = Utils.LoadSprite("TONE.Resources.Images.CheckMarkBox.png", 100f);
             renderer.color = color;
 
-            __instance.TitleText.text = item.GetName();
+            __instance.TitleText.SetText(item.GetName());
             __instance.CheckMark.enabled = item.GetBool();
             return false;
         }
@@ -528,22 +527,13 @@ public static class NumberOptionPatch
                 __instance.Value = (float)Math.Round(__instance.Value, 2);
                 break;
             case StringNames.GamePlayerSpeed:
-                if (IsVanillaServer)
-                    __instance.ValidRange = new(Main.MinSpeed, 3f);
-
-                __instance.Increment = 0.05f;
-                __instance.Value = Mathf.Clamp((float)Math.Round(__instance.Value, 2), __instance.ValidRange.min, __instance.ValidRange.max);
-                break;
             case StringNames.GameCrewLight:
             case StringNames.GameImpostorLight:
                 __instance.Increment = 0.05f;
                 __instance.Value = (float)Math.Round(__instance.Value, 2);
                 break;
             case StringNames.GameNumImpostors:
-                __instance.ValidRange = !IsVanillaServer
-                    ? new(0, Crowded.MaxImpostors) : new(1, 3);
-                __instance.Value = Mathf.Clamp((float)Math.Round(__instance.Value, 2), __instance.ValidRange.min, __instance.ValidRange.max);
-                if (DebugModeManager.AmDebugger) __instance.ValidRange.min = 0;
+                __instance.ValidRange = new(0f, GameOptionsManager.Instance.CurrentGameOptions.MaxPlayers / 2);
                 break;
             case StringNames.CapacityLabel:
                 __instance.ValidRange = IsVanillaServer ? new(4, 15) : new(4, 127);
@@ -554,7 +544,7 @@ public static class NumberOptionPatch
         if (ModGameOptionsMenu.OptionList.TryGetValue(__instance.GetInstanceID(), out var index))
         {
             var item = OptionItem.AllOptions[index];
-            __instance.TitleText.text = item.GetName();
+            __instance.TitleText.SetText(item.GetName());
             return false;
         }
 
@@ -593,7 +583,7 @@ public static class NumberOptionPatch
             if (__instance.oldValue != __instance.Value)
             {
                 __instance.oldValue = __instance.Value;
-                __instance.ValueText.text = GetValueString(__instance, __instance.Value, OptionItem.AllOptions[index]);
+                __instance.ValueText.SetText(GetValueString(__instance, __instance.Value, OptionItem.AllOptions[index]));
             }
             return false;
         }
@@ -658,25 +648,9 @@ public static class NumberOptionPatch
 [HarmonyPatch(typeof(StringOption))]
 public static class StringOptionPatch
 {
-    private static bool IsVanillaServer => GameStates.IsVanillaServer && !GameStates.IsLocalGame;
-
-    private static void ClampOfficialStringOption(StringOption option)
-    {
-        if (!IsVanillaServer) return;
-
-        switch (option.Title)
-        {
-            case StringNames.GameKillDistance:
-                option.Value = Mathf.Clamp(option.Value, 0, Math.Min(2, option.Values.Length - 1));
-                break;
-        }
-    }
-
     [HarmonyPatch(nameof(StringOption.Initialize)), HarmonyPrefix]
     private static bool InitializePrefix(StringOption __instance)
     {
-        ClampOfficialStringOption(__instance);
-
         if (ModGameOptionsMenu.OptionList.TryGetValue(__instance.GetInstanceID(), out var index))
         {
             var item = OptionItem.AllOptions[index];
@@ -700,7 +674,7 @@ public static class StringOptionPatch
 
                 SetupHelpIcon(role, __instance);
             }
-            __instance.TitleText.text = name;
+            __instance.TitleText.SetText(name);
             return false;
         }
         return true;
@@ -714,7 +688,7 @@ public static class StringOptionPatch
         icon.gameObject.SetActive(true);
         icon.name = $"{role}HelpIcon";
         var text = icon.GetComponentInChildren<TextMeshPro>();
-        text.text = "?";
+        text.SetText("?");
         text.color = Color.white;
         _ = ColorUtility.TryParseHtmlString("#000000", out var clr2);
         icon.FindChild("ButtonSprite").GetComponent<SpriteRenderer>().color = Utils.GetRoleColor(role);
@@ -734,7 +708,7 @@ public static class StringOptionPatch
                     var infoLong = str[(str.IndexOf('\n') + 1)..str.Length];
                     var ColorRole = Utils.ColorString(Utils.GetRoleColor(role), GetString(role.ToString()));
                     var info = $"<size={size}%>{ColorRole}: {infoLong}</size>";
-                    GameSettingMenu.Instance.MenuDescriptionText.text = info;
+                    GameSettingMenu.Instance.MenuDescriptionText.SetText(info);
                 }
             }
         }));
@@ -781,8 +755,6 @@ public static class StringOptionPatch
     [HarmonyPatch(nameof(StringOption.FixedUpdate)), HarmonyPrefix]
     private static bool FixedUpdatePrefix(StringOption __instance)
     {
-        ClampOfficialStringOption(__instance);
-
         if (ModGameOptionsMenu.OptionList.TryGetValue(__instance.GetInstanceID(), out var index))
         {
             var item = OptionItem.AllOptions[index];
@@ -794,7 +766,7 @@ public static class StringOptionPatch
                 if (__instance.oldValue != __instance.Value)
                 {
                     __instance.oldValue = __instance.Value;
-                    __instance.ValueText.text = stringOptionItem.GetString();
+                    __instance.ValueText.SetText(stringOptionItem.GetString());
                 }
             }
             else if (item is PresetOptionItem presetOptionItem)
@@ -802,7 +774,7 @@ public static class StringOptionPatch
                 if (__instance.oldValue != __instance.Value)
                 {
                     __instance.oldValue = __instance.Value;
-                    __instance.ValueText.text = presetOptionItem.GetString();
+                    __instance.ValueText.SetText(presetOptionItem.GetString());
                 }
             }
             return false;

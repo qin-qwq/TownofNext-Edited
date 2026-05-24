@@ -101,11 +101,10 @@ internal class PotionMaster : CovenManager
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.PhantomCooldown = 1f;
+        base.ApplyGameOptions(opt, playerId);
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc) => true;
-    //public override bool CanUseSabotage(PlayerControl pc) => true;
-
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
