@@ -460,10 +460,13 @@ internal class EAC
             //Normal clients will never directly send MushroomMixupSabotage
         }
 
-        if ((GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.VoteStates.Animating && !ReportDeadBodyPatch.PreventEAC) || GameStates.IsExilling)
+        if ((GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.VoteStates.Animating) || GameStates.IsExilling)
         {
-            WarnHost();
-            Report(player, "Bad Sabotage D : In Meeting");
+            if (!ReportDeadBodyPatch.PreventEAC)
+            {
+                WarnHost();
+                Report(player, "Bad Sabotage D : In Meeting");
+            }
             Logger.Fatal($"玩家【{player.GetClientId()}:{player.GetRealName()}】Bad Sabotage D，已驳回", "EAC");
             return true;
         }

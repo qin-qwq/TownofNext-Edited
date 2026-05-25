@@ -1560,7 +1560,6 @@
   "Jester_RevealUponEject": "投票出局时显示",
   "CannotVoteWhenDead": "死亡时不能投票",
   "EnableVote": "启用/vote指令",
-  "ShouldVoteSpam": "尝试隐藏/vote指令",
   "VoteDisabled": "房主已禁用/vote指令",
   "CanTargetImpostor": "<color=#ff1919>内鬼阵营</color>可以成为目标",
   "CanTargetNeutralKiller": "<color=#ff1919>带刀</color><color=#7f8c8d>中立</color>可以成为目标",
@@ -4453,5 +4452,6 @@
   "Message.SetRoleTestTip": "房主将你下一局职业分配为<b>{0}</b>",
   "NiceMiniCanWin": "好迷你船员死亡后抢夺胜利",
   "MiniSpeed": "18岁之前的速度",
-  "InvestigativeRoleCantGuess": "<color=#8cffff>调查类</color>身份无法使用猜测"
+  "InvestigativeRoleCantGuess": "<color=#8cffff>调查类</color>身份无法使用猜测",
+  "ExileWithoutAnyoneVoting": "无人投票同时放逐"
 }

@@ -186,6 +186,7 @@ public static class AddonAssign
     {
         if (RoleAssign.RoleResult.ContainsValue(CustomRoles.Cupid)) return;
         if (CustomRoles.Lovers.GetMode() == 0) return;
+        if (Options.NoLimitAddonsNumMax.GetInt() == 0) return;
         var allPlayers = new List<PlayerControl>();
         foreach (var pc in Main.AllPlayerControls)
         {
@@ -250,6 +251,7 @@ public static class AddonAssign
     public static void StartAssigningGuesser()
     {
         if (!Guesser.AdvancedSettings.GetBool() || !CustomRoles.Guesser.IsEnable()) return;
+        if (Options.NoLimitAddonsNumMax.GetInt() == 0) return;
         var random = IRandom.Instance;
         List<PlayerControl> AllPlayers = Main.EnumeratePlayerControls().Shuffle(random).ToList();
         var ImpNum = Guesser.GImpMax.GetInt();

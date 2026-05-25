@@ -378,7 +378,7 @@ class CheckForEndVotingPatch
             List<Collector> CollectorCL = GetRoleBasesByType<Collector>()?.ToList();
             if (Collector.HasEnabled) CollectorCL?.Do(x => { x.CollectAmount(VotingData, __instance); });
 
-            if (Balancer.Choose && tie)
+            if (Balancer.Choose && (tie || (Balancer.ExileWithoutAnyoneVoting.GetBool() && VotingData.All(x => x.Key == 255))))
             {
                 byte targetId = byte.MaxValue;
                 foreach (var data in VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).ToArray())
@@ -403,6 +403,10 @@ class CheckForEndVotingPatch
                 else
                 {
                     var exileIds = VotingData.Where(x => x.Key < allPlayerCount && x.Value == max).Select(kvp => kvp.Key).ToArray();
+                    if (Balancer.ExileWithoutAnyoneVoting.GetBool() && VotingData.All(x => x.Key == 255))
+                    {
+                        exileIds = allPlayers.Where(x => x.PlayerId == Balancer.Target1 || x.PlayerId == Balancer.Target2).Select(kvp => kvp.PlayerId).ToArray();
+                    }
                     foreach (var playerId in exileIds)
                         GetPlayerById(playerId).SetRealKiller(null);
                     TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);

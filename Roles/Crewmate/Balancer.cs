@@ -19,6 +19,7 @@ internal class Balancer : RoleBase
     //==================================================================\\
 
     public static OptionItem MeetingTime;
+    public static OptionItem ExileWithoutAnyoneVoting;
 
     public static byte Target1 = 253;
     public static byte Target2 = 253;
@@ -30,6 +31,7 @@ internal class Balancer : RoleBase
         Options.SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Balancer);
         MeetingTime = IntegerOptionItem.Create(Id + 3, "MeetingTime", new(15, 300, 15), 90, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Balancer])
             .SetValueFormat(OptionFormat.Seconds);
+        ExileWithoutAnyoneVoting = BooleanOptionItem.Create(Id + 4, "ExileWithoutAnyoneVoting", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Balancer]);
     }
     public override void Init()
     {

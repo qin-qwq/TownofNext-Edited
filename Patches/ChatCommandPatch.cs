@@ -57,10 +57,15 @@ internal class ChatCommands
         var text = __instance.freeChatField.textArea.text;
         if (ChatHistory.Count == 0 || ChatHistory[^1] != text) ChatHistory.Add(text);
         ChatControllerUpdatePatch.CurrentHistorySelection = ChatHistory.Count;
+        var canceled = false;
+        if (text.StartsWith("/cmd"))
+        {
+            canceled = true;
+            text = "/" + text[4..].TrimStart();
+        }
         string[] args = text.Trim().Split(' ');
         string subArgs = "";
         string subArgs2 = "";
-        var canceled = false;
         var cancelVal = "";
         Main.isChatCommand = true;
         Logger.Info(text, "SendChat");
@@ -569,10 +574,6 @@ internal class ChatCommands
                     {
                         Utils.SendMessage(GetString("VoteDisabled"), PlayerControl.LocalPlayer.PlayerId);
                         break;
-                    }
-                    if (Options.ShouldVoteCmdsSpamChat.GetBool())
-                    {
-                        canceled = true;
                     }
                     if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
                     {
@@ -3168,11 +3169,6 @@ internal class ChatCommands
                 {
                     Utils.SendMessage(GetString("VoteDisabled"), player.PlayerId);
                     break;
-                }
-                if (Options.ShouldVoteCmdsSpamChat.GetBool())
-                {
-                    canceled = true;
-                    ChatManager.SendPreviousMessagesToAll();
                 }
                 if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
                 {

@@ -260,7 +260,6 @@ public static class Options
     public static OptionItem AutoPlayAgainCountdown;
 
     public static OptionItem EnableVoteCommand;
-    public static OptionItem ShouldVoteCmdsSpamChat;
 
     public static OptionItem LowLoadMode;
     public static OptionItem LowLoadDelayUpdateNames;
@@ -2090,9 +2089,6 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard);
         EnableVoteCommand = BooleanOptionItem.Create(60746, "EnableVote", true, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
-            .SetGameMode(CustomGameMode.Standard);
-        ShouldVoteCmdsSpamChat = BooleanOptionItem.Create(60747, "ShouldVoteSpam", false, TabGroup.ModSettings, false)
-            .SetParent(EnableVoteCommand)
             .SetGameMode(CustomGameMode.Standard);
         ShowMeetingReason = BooleanOptionItem.Create(60748, "ShowMeetingReason", false, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
