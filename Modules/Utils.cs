@@ -1561,6 +1561,8 @@ public static class Utils
                 name = $"<color=#fffb00><size=1.7>{GetString("ModeSpeedRun")}</size></color>\r\n" + name;
             if (Options.CurrentGameMode == CustomGameMode.TagMode)
                 name = $"<color=#2ccc00><size=1.7>{GetString("ModeTagMode")}</size></color>\r\n" + name;
+            if (Options.CurrentGameMode == CustomGameMode.BonfireNight)
+                name = $"<color=#ff8c00><size=1.7>{GetString("ModeBonfireNight")}</size></color>\r\n" + name;
         }
 
 

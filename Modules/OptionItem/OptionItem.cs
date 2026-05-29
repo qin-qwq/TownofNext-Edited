@@ -33,6 +33,7 @@ public abstract class OptionItem
     public CustomGameMode HideOptionInHnS { get; protected set; }
     public CustomGameMode HideOptionInSpeedRun { get; protected set; }
     public CustomGameMode HideOptionInTagMode { get; protected set; }
+    public CustomGameMode HideOptionInBonfireNight { get; protected set; }
     public bool IsHeader { get; protected set; }
     public bool IsHidden { get; protected set; }
     public bool IsText { get; protected set; }
@@ -84,6 +85,7 @@ public abstract class OptionItem
         HideOptionInHnS = CustomGameMode.All;
         HideOptionInSpeedRun = CustomGameMode.All;
         HideOptionInTagMode = CustomGameMode.All;
+        HideOptionInBonfireNight = CustomGameMode.All;
         IsHeader = false;
         IsHidden = false;
         IsText = false;
@@ -140,6 +142,7 @@ public abstract class OptionItem
     public OptionItem HideInHnS(CustomGameMode value = CustomGameMode.HidenSeekTONE) => Do(i => i.HideOptionInHnS = value);
     public OptionItem HideInSpeedRun(CustomGameMode value = CustomGameMode.SpeedRun) => Do(i => i.HideOptionInSpeedRun = value);
     public OptionItem HideInTagMode(CustomGameMode value = CustomGameMode.TagMode) => Do(i => i.HideOptionInTagMode = value);
+    public OptionItem HideInBonfireNight(CustomGameMode value = CustomGameMode.BonfireNight) => Do(i => i.HideOptionInBonfireNight = value);
 
     public OptionItem SetParent(OptionItem parent, bool OverrideRoleName = true) => Do(i =>
     {
@@ -200,6 +203,7 @@ public abstract class OptionItem
             || (HideOptionInHnS != CustomGameMode.All && HideOptionInHnS == mode)
             || (HideOptionInSpeedRun != CustomGameMode.All && HideOptionInSpeedRun == mode)
             || (HideOptionInTagMode != CustomGameMode.All && HideOptionInTagMode == mode)
+            || (HideOptionInBonfireNight != CustomGameMode.All && HideOptionInBonfireNight == mode)
             || (checkCollapsedSection && Header is { CollapsesSection: true })
             || (GameMode != CustomGameMode.All && GameMode != mode);
     }

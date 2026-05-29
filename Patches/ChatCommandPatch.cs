@@ -407,7 +407,7 @@ internal class ChatCommands
                 case "/成为":
                     canceled = true;
                     subArgs = text.Remove(0, 3);
-                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp)
+                    if (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp && !Main.IsBirthday2)
                     {
                         Utils.SendMessage($"{GetString("InvalidPermissionCMD")}", PlayerControl.LocalPlayer.PlayerId);
                         break;
@@ -551,6 +551,10 @@ internal class ChatCommands
 
                         case CustomGameMode.TagMode:
                             TagMode.AppendTagModeKcount(sub);
+                            break;
+
+                        case CustomGameMode.BonfireNight:
+                            BonfireNight.AppendBonfireNightKcount(sub);
                             break;
                     }
 
@@ -2079,6 +2083,11 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("ModeDescribe.TagMode"), playerId);
                     return;
                 }
+            case CustomGameMode.BonfireNight:
+                {
+                    Utils.SendMessage(GetString("ModeDescribe.BonfireNight"), playerId);
+                    return;
+                }
         }
         role = role.Trim().ToLower();
         if (role.StartsWith("/r")) _ = role.Replace("/r", string.Empty);
@@ -2573,6 +2582,10 @@ internal class ChatCommands
 
                     case CustomGameMode.TagMode:
                         TagMode.AppendTagModeKcount(sub);
+                        break;
+
+                    case CustomGameMode.BonfireNight:
+                        BonfireNight.AppendBonfireNightKcount(sub);
                         break;
                 }
 

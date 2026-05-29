@@ -71,4 +71,22 @@ namespace TONE.Modules.Rpc
 
         private readonly MessageWriter writer;
     }
+    class RpcSyncBonfireNightStates : BaseModdedRpc
+    {
+        public override byte RpcType => (byte)CustomRPC.SyncBonfireNightStates;
+
+        public RpcSyncBonfireNightStates(uint rpcObjectNetId, MessageWriter writer) : base(rpcObjectNetId)
+        {
+            this.writer = writer;
+        }
+
+        public override void SerializeRpcValues(MessageWriter msg)
+        {
+            msg.Write(writer, false);
+            writer.Recycle();
+            // There are chances that the writer can't be recycled. May cause memory leak.
+        }
+
+        private readonly MessageWriter writer;
+    }
 }

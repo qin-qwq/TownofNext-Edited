@@ -15,6 +15,7 @@ public enum CustomGameMode
     FFA = 0x02,
     SpeedRun = 0x03,
     TagMode = 0x04,
+    BonfireNight = 0x05,
 
     HidenSeekTONE = 0x08, // HidenSeekTONE must be after other game modes
     All = int.MaxValue
@@ -56,7 +57,8 @@ public static class Options
 
             2 => CustomGameMode.SpeedRun,
             3 => CustomGameMode.TagMode,
-            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
+            4 => CustomGameMode.BonfireNight,
+            5 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
             _ => CustomGameMode.Standard
         };
     public static int prevGameMode = 0;
@@ -67,6 +69,7 @@ public static class Options
 
         "SpeedRun",
         "TagMode",
+        "BonfireNight",
 
         "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
     ];
@@ -1404,6 +1407,9 @@ public static class Options
         //Tag Mode
         TagMode.SetupCustomOption();
 
+        //Bonfire Night
+        BonfireNight.SetupCustomOption();
+
         // Hide & Seek
         TextOptionItem.Create(10000055, "MenuTitle.Hide&Seek", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.HidenSeekTONE)
@@ -2101,13 +2107,15 @@ public static class Options
             .HideInFFA()
             .HideInSpeedRun()
             .HideInTagMode()
+            .HideInBonfireNight()
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
         // 梯子摔死
         LadderDeath = BooleanOptionItem.Create(60760, "LadderDeath", false, TabGroup.ModSettings, false)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue))
             .HideInFFA()
             .HideInSpeedRun()
-            .HideInTagMode();
+            .HideInTagMode()
+            .HideInBonfireNight();
         LadderDeathChance = StringOptionItem.Create(60761, "LadderDeathChance", EnumHelper.GetAllNames<SpawnChance>()[1..], 0, TabGroup.ModSettings, false)
             .SetParent(LadderDeath);
 

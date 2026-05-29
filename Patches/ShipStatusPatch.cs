@@ -170,7 +170,8 @@ class ShipStatusCloseDoorsPatch
         bool allow;
         if (Options.CurrentGameMode == CustomGameMode.FFA || Options.DisableCloseDoor.GetBool()
                     || Options.CurrentGameMode == CustomGameMode.SpeedRun && !SpeedRun.SpeedRun_AllowCloseDoor.GetBool()
-                    || Options.CurrentGameMode == CustomGameMode.TagMode) allow = false;
+                    || Options.CurrentGameMode == CustomGameMode.TagMode
+                    || Options.CurrentGameMode == CustomGameMode.BonfireNight) allow = false;
         else allow = true;
 
         if (allow)

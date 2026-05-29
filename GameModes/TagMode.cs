@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
 using System;
 using System.Text;
@@ -227,7 +228,10 @@ public class TZombie : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        if (AmongUsClient.Instance.AmHost) player.RpcSetColor(2);
+        player.SetColor(2);
+
+        var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 2);
+        RpcUtils.LateBroadcastReliableMessage(message);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -338,9 +342,12 @@ public class TCrewmate : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2 && AmongUsClient.Instance.AmHost)
+        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2)
         {
-            player.RpcSetColor(13);
+            player.SetColor(13);
+
+            var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 13);
+            RpcUtils.LateBroadcastReliableMessage(message);
         }
         playerId.SetAbilityUseLimit(TagMode.CrewmateVentLimit.GetFloat());
         ProtectState = (false, 0f);

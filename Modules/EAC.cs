@@ -136,12 +136,9 @@ internal class EAC
                 // Some mods may add custom colors. Skip check color check
                 case RpcCalls.SetColor:
                     // Only sent by Host
-                    if (Options.CurrentGameMode != CustomGameMode.TagMode)
-                    {
-                        Report(pc, "Directly SetColor");
-                        HandleCheat(pc, "Directly SetColor");
-                        Logger.Fatal($"Directly SetColor【{pc.GetClientId()}:{pc.GetRealName()}】已驳回", "EAC");
-                    }
+                    Report(pc, "Directly SetColor");
+                    HandleCheat(pc, "Directly SetColor");
+                    Logger.Fatal($"Directly SetColor【{pc.GetClientId()}:{pc.GetRealName()}】已驳回", "EAC");
                     return true;
                 case RpcCalls.CheckMurder:
                     if (GameStates.IsLobby)

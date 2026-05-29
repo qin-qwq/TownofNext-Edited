@@ -316,6 +316,14 @@ public class GameStartManagerBeginGamePatch
             return false;
         }
 
+        if (Options.CurrentGameMode == CustomGameMode.BonfireNight && !Main.IsBirthday && !PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev)
+        {
+            Options.GameMode.SetValue(0);
+            Logger.SendInGame(string.Format(GetString("Warning.GameModeNotEnabled"), GetString("BonfireNight")));
+            Utils.SendMessage(GetString("BonfireNightOpeningHours"), PlayerControl.LocalPlayer.PlayerId);
+            return false;
+        }
+
         DoTasksForBeginGame();
 
         __instance.ReallyBegin(false);

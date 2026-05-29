@@ -54,8 +54,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.05.24";
-    public const string PluginDisplayVersion = "2.0.0 Alpha 3";
+    public const string PluginVersion = "26.05.29";
+    public const string PluginDisplayVersion = "2.0.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 3, 31, 0) // 2026.3.31 & 17.3
@@ -66,7 +66,7 @@ public class Main : BasePlugin
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 3
-    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V1.9.0 Beta 1
+    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V2.0.0 Beta 1
     public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.10.0
 #pragma warning restore IDE1006 // Naming Styles
 
@@ -173,6 +173,7 @@ public class Main : BasePlugin
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
+        [CustomGameMode.BonfireNight] = new Color32(255, 140, 0, byte.MaxValue),
     };
 
     public static string Star_Path = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
@@ -252,6 +253,34 @@ public class Main : BasePlugin
             DateTime t = new(utcNow.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
             DateTime t2 = new(utcNow.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
             return utcNow >= t && utcNow <= t2;
+        }
+    }
+    public static bool IsBirthday
+    {
+        get
+        {
+            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
+            {
+                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 6, 17, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 6, 29, 7, 0, 0, 0, DateTimeKind.Utc);
+                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
+            }
+            return false;
+        }
+    }
+    public static bool IsBirthday2
+    {
+        get
+        {
+            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
+            {
+                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 6, 17, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 6, 22, 7, 0, 0, 0, DateTimeKind.Utc);
+                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
+            }
+            return false;
         }
     }
     public static bool ResetOptions = true;
@@ -1061,6 +1090,11 @@ public enum CustomRoles
     TZombie,
     TCrewmate,
 
+    // Bonfire Night
+    RWoodCollector,
+    BWoodCollector,
+    FireThief,
+
     // Sub-role after 500
     NotAssigned = 500,
 
@@ -1226,6 +1260,9 @@ public enum CustomWinner
     Dreamer = CustomRoles.Dreamer,
     TreasureHunter = CustomRoles.TreasureHunter,
     Logos = CustomRoles.Logos,
+    RedTeam = CustomRoles.RWoodCollector,
+    BlueTeam = CustomRoles.BWoodCollector,
+    FireThief = CustomRoles.FireThief,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners

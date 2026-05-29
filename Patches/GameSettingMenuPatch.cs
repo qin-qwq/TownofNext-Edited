@@ -34,6 +34,7 @@ public class GameSettingMenuPatch
             CustomGameMode.FFA => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
             CustomGameMode.SpeedRun => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
             CustomGameMode.TagMode => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
+            CustomGameMode.BonfireNight => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
             _ => []
         };
 

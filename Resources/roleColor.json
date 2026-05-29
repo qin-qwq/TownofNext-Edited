@@ -25,7 +25,6 @@
   "Vigilante": "#9900cc",
   "CopyCat": "#ffb2ab",
   "SuperStar": "#f6f657",
-  "Celebrity": "#ee4a55",
   "SpeedBooster": "#00ffff",
   "Doctor": "#80ffdd",
   "Dictator": "#df9b00",
@@ -261,5 +260,8 @@
   "Drunkard": "#0acd4b",
   "TreasureHunter": "#d0a12d",
   "Logos": "#cdf1ff",
-  "Philosopher": "#cdf1ff"
+  "Philosopher": "#cdf1ff",
+  "RWoodCollector": "#ff0000",
+  "BWoodCollector": "#0000ff",
+  "FireThief": "#a9a9a9"
 }

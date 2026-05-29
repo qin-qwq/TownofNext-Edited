@@ -95,6 +95,7 @@ class HudManagerUpdatePatch
                 switch (Options.CurrentGameMode)
                 {
                     case CustomGameMode.Standard:
+                    case CustomGameMode.BonfireNight:
                         var roleClass = player.GetRoleClass();
                         LowerInfoText.text = roleClass?.GetLowerText(player, player, isForMeeting: Main.MeetingIsStarted, isForHud: true) ?? string.Empty;
 
@@ -361,6 +362,9 @@ class TaskPanelBehaviourPatch
 
                     AllText += $"\r\n\r\n<size=80%>{SpeedRun.GetGameState()}</size>";
 
+                    break;
+                case CustomGameMode.BonfireNight:
+                    AllText += $"\r\n\r\n<size=80%>{BonfireNight.GetGameState()}</size>";
                     break;
             }
 

@@ -125,6 +125,8 @@ public enum CustomRPC : byte // 184/255 USED
     SyncSpeedRunStates,
     //Tag Mode
     SyncTagModeTaskStates,
+    //Bonfire Night
+    SyncBonfireNightStates,
 }
 [Obfuscation(Exclude = true)]
 public enum Sounds
@@ -603,6 +605,9 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.SyncTagModeTaskStates:
                 TagMode.HandleSyncTagModeTaskStates(reader);
+                break;
+            case CustomRPC.SyncBonfireNightStates:
+                BonfireNight.HandleSyncBonfireNightStates(reader);
                 break;
             case CustomRPC.SyncAllPlayerNames:
                 Main.AllPlayerNames.Clear();

@@ -165,6 +165,10 @@ public class RoleAssign
                     RoleResult[pc.PlayerId] = CustomRoles.TCrewmate;
                 }
                 return;
+
+            case CustomGameMode.BonfireNight:
+                BonfireNight.SelectRoles();
+                return;
         }
 
         var rd = IRandom.Instance;

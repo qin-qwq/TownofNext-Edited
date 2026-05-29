@@ -264,6 +264,9 @@ internal class ChangeRoleSettings
             //Tag Mode
             TagMode.Init();
 
+            //Bonfire Night
+            BonfireNight.Init();
+
             try
             {
                 SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
@@ -594,6 +597,9 @@ internal class StartGameHostPatch
                     break;
                 case CustomGameMode.TagMode:
                     GameEndCheckerForNormal.SetPredicateToTagMode();
+                    break;
+                case CustomGameMode.BonfireNight:
+                    GameEndCheckerForNormal.SetPredicateToBonfireNight();
                     break;
             }
 

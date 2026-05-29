@@ -1693,6 +1693,10 @@ static class ExtendedPlayerControl
     public static string GetRoleInfo(this PlayerControl player, bool InfoLong = false)
     {
         var role = player.GetCustomRole();
+        if (role is CustomRoles.RWoodCollector or CustomRoles.BWoodCollector)
+        {
+            role = CustomRoles.FireThief;
+        }
         if (role is CustomRoles.Crewmate or CustomRoles.Impostor)
             InfoLong = false;
 
@@ -1702,7 +1706,7 @@ static class ExtendedPlayerControl
         if (!InfoLong && role == CustomRoles.Nemesis)
             Prefix = Nemesis.CheckCanUseKillButton(player) ? "After" : "Before";
 
-        var Info = (role.IsVanilla() ? "Blurb" : "Info");
+        var Info = role.IsVanilla() ? "Blurb" : "Info";
         return !InfoLong ? GetString($"{Prefix}{text}{Info}") : role.GetInfoLong();
     }
     public static void SetRealKiller(this PlayerControl target, PlayerControl killer, bool NotOverRide = false)

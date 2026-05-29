@@ -122,7 +122,7 @@ public class SetUpRoleTextPatch
             var mapName = Utils.GetActiveMapName();
             Logger.Msg($"{mapName}", "Map");
             if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode &&
-                !Main.LIMap)
+                !Main.LIMap && Options.CurrentGameMode != CustomGameMode.BonfireNight)
             {
                 RandomSpawn.SpawnMap spawnMap = mapName switch
                 {
@@ -715,6 +715,14 @@ class BeginCrewmatePatch
                 __instance.ImpostorText.gameObject.SetActive(true);
                 __instance.ImpostorText.text = GetString("TagModeInfo");
                 break;
+            case CustomGameMode.BonfireNight:
+                __instance.TeamTitle.text = GetString("BonfireNight");
+                __instance.TeamTitle.color = __instance.BackgroundBar.material.color = new Color32(255, 140, 0, byte.MaxValue);
+                SoundManager.Instance.PlaySound(GameManagerCreator.Instance.HideAndSeekManagerPrefab.MusicCollection.ImpostorRanchMusic, true, 25f);
+                PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Impostor);
+                __instance.ImpostorText.gameObject.SetActive(true);
+                __instance.ImpostorText.text = GetString("BonfireNightInfo");
+                break;
         }
 
         // I hope no one notices this in code
@@ -981,7 +989,8 @@ class IntroCutsceneDestroyPatch
                 {
                     pc.RpcResetAbilityCooldown();
 
-                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode != CustomGameMode.FFA && Options.CurrentGameMode != CustomGameMode.TagMode)
+                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode != CustomGameMode.FFA && Options.CurrentGameMode != CustomGameMode.TagMode &&
+                        Options.CurrentGameMode != CustomGameMode.BonfireNight)
                     {
                         _ = new LateTask(() =>
                         {
@@ -1008,6 +1017,11 @@ class IntroCutsceneDestroyPatch
             if (Options.CurrentGameMode is CustomGameMode.TagMode)
             {
                 Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.TZombie)).Do(x => x.RpcTeleportRandomSpawn());
+            }
+
+            if (Options.CurrentGameMode is CustomGameMode.BonfireNight)
+            {
+                BonfireNight.Add();
             }
 
             foreach (var player in Main.EnumeratePlayerControls())

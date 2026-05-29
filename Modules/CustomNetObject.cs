@@ -573,6 +573,44 @@ namespace TONE.Modules
             // this.OwnerId = OwnerId;
         }
     }
+    internal sealed class Bonfire : CustomNetObject
+    {
+        internal Bonfire(Vector2 position, int team)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            switch (team)
+            {
+                case 1:
+                    CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WWWWWW</color><mark=#c0c0c0>W</mark><mark=#ff0000>W</mark>\n<#0000>WWWWWW</color><mark=#c0c0c0>W</mark><mark=#ff0000>W</mark>\n<#0000>WWWWWW</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WW</color><mark=#a0522d>W</mark><mark=#ffa500>W</mark><mark=#a0522d>W</mark><#0000>W</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WWW</color><mark=#a0522d>W</mark><#0000>WW</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WW</color><mark=#a0522d>W</mark><#0000>W</color><mark=#a0522d>W</mark><#0000>W</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>W</color><mark=#000000>WWWWWW</mark><#0000>W</color>\n<#0000>WWWWWWWW</color>", position);
+                    break;
+                case 2:
+                    CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WWWWWW</color><mark=#c0c0c0>W</mark><mark=#0000ff>W</mark>\n<#0000>WWWWWW</color><mark=#c0c0c0>W</mark><mark=#0000ff>W</mark>\n<#0000>WWWWWW</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WW</color><mark=#a0522d>W</mark><mark=#ffa500>W</mark><mark=#a0522d>W</mark><#0000>W</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WWW</color><mark=#a0522d>W</mark><#0000>WW</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WW</color><mark=#a0522d>W</mark><#0000>W</color><mark=#a0522d>W</mark><#0000>W</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>W</color><mark=#000000>WWWWWW</mark><#0000>W</color>\n<#0000>WWWWWWWW</color>", position);
+                    break;
+                case 3:
+                    CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WWWWWW</color><mark=#c0c0c0>W</mark><mark=#a9a9a9>W</mark>\n<#0000>WWWWWW</color><mark=#c0c0c0>W</mark><mark=#a9a9a9>W</mark>\n<#0000>WWWWWW</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WW</color><mark=#a0522d>W</mark><mark=#ffa500>W</mark><mark=#a0522d>W</mark><#0000>W</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WWW</color><mark=#a0522d>W</mark><#0000>WW</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>WW</color><mark=#a0522d>W</mark><#0000>W</color><mark=#a0522d>W</mark><#0000>W</color><mark=#c0c0c0>W</mark><#0000>W</color>\n<#0000>W</color><mark=#000000>WWWWWW</mark><#0000>W</color>\n<#0000>WWWWWWWW</color>", position);
+                    break;
+            }
+            // this.OwnerId = OwnerId;
+        }
+    }
+    internal sealed class Tree : CustomNetObject
+    {
+        internal Tree(Vector2 position)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WWW</color><mark=#228b22>WW</mark><#0000>WWW</color>\n<#0000>WW</color><mark=#228b22>WWWW</mark><#0000>WW</color>\n<#0000>W</color><mark=#228b22>WWWWWW</mark><#0000>W</color>\n<#0000>W</color><mark=#228b22>WWWWWW</mark><#0000>W</color>\n<mark=#228b22>WWWWWWWW</mark>\n<#0000>WWW</color><mark=#a0522d>WW</mark><#0000>WWW</color>\n<#0000>WWW</color><mark=#a0522d>WW</mark><#0000>WWW</color>\n<#0000>WWW</color><mark=#a0522d>WW</mark><#0000>WWW</color>", position);
+            // this.OwnerId = OwnerId;
+        }
+    }
+    internal sealed class SakuraTree : CustomNetObject
+    {
+        internal SakuraTree(Vector2 position)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WWW</color><mark=#db7093>WW</mark><#0000>WWW</color>\n<#0000>WW</color><mark=#db7093>WWWW</mark><#0000>WW</color>\n<#0000>W</color><mark=#db7093>WWWWWW</mark><#0000>W</color>\n<#0000>W</color><mark=#db7093>WWWWWW</mark><#0000>W</color>\n<mark=#db7093>WWWWWWWW</mark>\n<#0000>WWW</color><mark=#a0522d>WW</mark><#0000>WWW</color>\n<#0000>WWW</color><mark=#a0522d>WW</mark><#0000>WWW</color>\n<#0000>WWW</color><mark=#a0522d>WW</mark><#0000>WWW</color>", position);
+            // this.OwnerId = OwnerId;
+        }
+    }
     internal sealed class ShapeshiftMenuElement : CustomNetObject
     {
         public ShapeshiftMenuElement(PlayerControl guesser)

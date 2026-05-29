@@ -226,6 +226,14 @@ class SetEverythingUpPatch
                     WinnerText.color = winnerId.GetPlayerColor();
                     goto EndOfText;
                 }
+            case CustomGameMode.BonfireNight:
+                {
+                    var winnerId = CustomWinnerHolder.WinnerIds.FirstOrDefault();
+                    __instance.BackgroundBar.material.color = Utils.HexToColor(BonfireNight.Draw.Item2);
+                    WinnerText.text = BonfireNight.Draw.Item1;
+                    WinnerText.color = Utils.HexToColor(BonfireNight.Draw.Item2);
+                    goto EndOfText;
+                }
         }
 
         var winnerRole = (CustomRoles)CustomWinnerHolder.WinnerTeam;

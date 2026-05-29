@@ -103,11 +103,11 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTONE
+                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode/BonfireNight in H&S game, set HideNSeekTONE
                     if (Options.CurrentGameMode != CustomGameMode.HidenSeekTONE)
                     {
                         // Select HideNSeekTONE
-                        Options.GameMode.SetValue(4);
+                        Options.GameMode.SetValue(5);
                     }
                     break;
 

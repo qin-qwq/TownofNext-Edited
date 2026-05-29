@@ -19,6 +19,8 @@ public static class CustomRoleManager
     public static readonly Dictionary<CustomRoles, IAddon> AddonClasses = [];
     public static RoleBase GetStaticRoleClass(this CustomRoles role)
     {
+        if (role is CustomRoles.RWoodCollector or CustomRoles.BWoodCollector) return new FireThief();
+
         var roleClass = RoleClass.FirstOrDefault(x => x.Key == role).Value;
 
         if (!role.IsVanilla() && !role.IsAdditionRole()
