@@ -372,7 +372,7 @@ class SpeedRunGameEndPredicate : GameEndPredicate
     {
         reason = GameOverReason.ImpostorsByKill;
 
-        if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Runner)) <= 1)
+        if (!Main.AllAlivePlayerControls.Any(x => x.Is(CustomRoles.Runner)))
         {
             CustomWinnerHolder.WinnerIds.Clear();
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Runner)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));

@@ -469,41 +469,26 @@ class BonfireNightGameEndPredicate : GameEndPredicate
     {
         reason = GameOverReason.ImpostorsByKill;
 
-        if (!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief)))
+        if ((!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief))) ||
+            BonfireNight.BonfireState.Item1 >= BonfireNight.WoodToWin.GetInt())
         {
             reason = GameOverReason.ImpostorDisconnect;
             BonfireNight.SetWinner("r");
             return true;
         }
 
-        if (!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief)))
+        if ((!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief))) ||
+            BonfireNight.BonfireState.Item2 >= BonfireNight.WoodToWin.GetInt())
         {
             reason = GameOverReason.ImpostorDisconnect;
             BonfireNight.SetWinner("b");
             return true;
         }
 
-        if (!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector)))
+        if ((!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector))) ||
+            BonfireNight.BonfireState.Item3 >= BonfireNight.WoodToWin.GetInt())
         {
             reason = GameOverReason.ImpostorDisconnect;
-            BonfireNight.SetWinner("f");
-            return true;
-        }
-
-        if (BonfireNight.BonfireState.Item1 >= BonfireNight.WoodToWin.GetInt())
-        {
-            BonfireNight.SetWinner("r");
-            return true;
-        }
-
-        if (BonfireNight.BonfireState.Item2 >= BonfireNight.WoodToWin.GetInt())
-        {
-            BonfireNight.SetWinner("b");
-            return true;
-        }
-
-        if (BonfireNight.BonfireState.Item3 >= BonfireNight.WoodToWin.GetInt())
-        {
             BonfireNight.SetWinner("f");
             return true;
         }
@@ -759,7 +744,6 @@ public class FireThief : RoleBase
         NotifyRoles();
         return tree;
     }
-
     private BonfireNight.SakuraTreeState TryCollect(BonfireNight.SakuraTreeState tree, Vector2 pos, int max)
     {
         if (WoodNum >= max) return tree;
@@ -782,7 +766,6 @@ public class FireThief : RoleBase
         hud.AbilityButton?.OverrideText(GetString("PickUp"));
         hud.AbilityButton.SetUsesRemaining(MaxNum - WoodNum);
     }
-
     public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => seer.IsAlive();
     public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];
 }

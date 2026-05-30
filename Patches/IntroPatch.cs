@@ -1016,6 +1016,7 @@ class IntroCutsceneDestroyPatch
 
             if (Options.CurrentGameMode is CustomGameMode.TagMode)
             {
+                TagMode.Add();
                 Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.TZombie)).Do(x => x.RpcTeleportRandomSpawn());
             }
 

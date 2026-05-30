@@ -120,21 +120,24 @@ public static class TagMode
         if (Options.CurrentGameMode != CustomGameMode.TagMode) return;
 
         Zap = false;
+    }
 
+    public static void Add()
+    {
         int TaskNum = 0;
         switch (CrewmateTasks.GetInt())
         {
             case 0:
-                TaskNum = Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt();
+                TaskNum = Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt();
                 break;
             case 1:
-                TaskNum = (Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt()) * 2;
+                TaskNum = (Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt()) * 2;
                 break;
             case 2:
-                TaskNum = (Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt()) * 3;
+                TaskNum = (Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt()) * 3;
                 break;
             case 3:
-                TaskNum = (Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt()) * 4;
+                TaskNum = (Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt()) * 4;
                 break;
         }
         TaskCount = (0, TaskNum);
@@ -185,7 +188,7 @@ class TagModeGameEndPredicate : GameEndPredicate
     {
         reason = GameOverReason.ImpostorsByKill;
 
-        if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TZombie)) <= 0)
+        if (!Main.AllAlivePlayerControls.Any(x => x.Is(CustomRoles.TZombie)))
         {
             reason = GameOverReason.ImpostorDisconnect;
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Crewmate);
@@ -195,7 +198,7 @@ class TagModeGameEndPredicate : GameEndPredicate
             return true;
         }
 
-        if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TCrewmate)) < 1)
+        if (!Main.AllAlivePlayerControls.Any(x => x.Is(CustomRoles.TCrewmate)))
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TZombie);
             CustomWinnerHolder.WinnerIds.Clear();
