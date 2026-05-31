@@ -28,6 +28,7 @@ public static class Options
     public static void OptionsLoadStart_Postfix()
     {
         Logger.Msg("Mod option loading start", "Load Options");
+        ChatCommands.LoadCommands();
         try
         {
             Main.Instance.StartCoroutine(CoLoadOptions());

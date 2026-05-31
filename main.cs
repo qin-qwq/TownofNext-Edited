@@ -13,6 +13,7 @@ using System.Text;
 using System.Text.Json;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Patches;
 using TONE.Patches.Crowded;
 using TONE.Roles.AddOns;
 using TONE.Roles.Core;
@@ -126,6 +127,7 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
     public static ConfigEntry<bool> EnableCustomDecorations { get; private set; }
     public static ConfigEntry<bool> EnableMapVentIcon { get; private set; }
+    public static ConfigEntry<bool> EnableCommandHelper { get; private set; }
     public static ConfigEntry<bool> SwitchVanilla { get; private set; }
 
     // Debug
@@ -646,6 +648,7 @@ public class Main : BasePlugin
         EnableCustomSoundEffect = Config.Bind("Client Options", "EnableCustomSoundEffect", true);
         EnableCustomDecorations = Config.Bind("Client Options", "EnableCustomDecorations", true);
         EnableMapVentIcon = Config.Bind("Client Options", "EnableMapVentIcon", true);
+        EnableCommandHelper = Config.Bind("Client Options", "EnableCommandHelper", true);
         SwitchVanilla = Config.Bind("Client Options", "SwitchVanilla", false);
 
         // Debug
@@ -760,7 +763,13 @@ public class Main : BasePlugin
         HideNSeekGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
-        Harmony.PatchAll();
+        Harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+        if (!OperatingSystem.IsAndroid())
+        {
+            // there are some issues with TextBoxPatch on Android
+            Harmony.PatchAll(typeof(TextBoxPatch));
+        }
 
         // ConsoleManager.DetachConsole();
         if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();

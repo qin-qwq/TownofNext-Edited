@@ -1,6 +1,7 @@
 using AmongUs.Data;
 using System;
 using TMPro;
+using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Neutral;
@@ -117,10 +118,14 @@ class ChatControllerUpdatePatch
         {
             var backgroundColor = new Color32(40, 40, 40, byte.MaxValue);
 
+            if (!TextBoxPatch.IsInvalidCommand)
+            {
+                __instance.freeChatField.textArea.compoText.Color(Color.white);
+                __instance.freeChatField.textArea.outputText.color = Color.white;
+            }
+
             // free chat
             __instance.freeChatField.background.color = backgroundColor;
-            __instance.freeChatField.textArea.compoText.Color(Color.white);
-            __instance.freeChatField.textArea.outputText.color = Color.white;
 
             // quick chat
             __instance.quickChatField.background.color = backgroundColor;
@@ -143,7 +148,10 @@ class ChatControllerUpdatePatch
         }
         else
         {
-            __instance.freeChatField.textArea.outputText.color = Color.black;
+            if (!TextBoxPatch.IsInvalidCommand)
+            {
+                __instance.freeChatField.textArea.outputText.color = Color.black;
+            }
         }
 
         if (SendTargetPatch.SendTarget != SendTargetPatch.SendTargets.Default)
@@ -176,6 +184,7 @@ class ChatControllerUpdatePatch
 
         __instance.freeChatField.textArea.characterLimit = AmongUsClient.Instance.AmHost ? 2000 : 1200;
 
+        if (Input.GetKeyDown(KeyCode.Tab)) TextBoxPatch.OnTabPress(__instance);
 
         if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.C))
             ClipboardHelper.PutClipboardString(__instance.freeChatField.textArea.text);

@@ -1371,6 +1371,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Solsticer)
                     || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Cupid)
+                    || pc.Is(CustomRoles.Wraith)
                 )
                     return false;
                 break;
@@ -1454,7 +1455,9 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.ChiefOfPolice)
                     || pc.Is(CustomRoles.Shaman)
                     || pc.Is(CustomRoles.VoodooMaster)
-                    || pc.Is(CustomRoles.Archaeologist))
+                    || pc.Is(CustomRoles.Archaeologist)
+                    || pc.Is(CustomRoles.Lovers)
+                    || pc.Is(CustomRoles.Balancer))
                     return false;
                 break;
         }

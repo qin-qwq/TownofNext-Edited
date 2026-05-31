@@ -283,6 +283,8 @@ public static class Utils
     }
     public static string GetInfoLong(this CustomRoles role)
     {
+        if (role is CustomRoles.RWoodCollector or CustomRoles.BWoodCollector or CustomRoles.FireThief) return GetString("ModeDescribe.BonfireNight");
+
         var InfoLong = GetString($"{role}" + "InfoLong");
         var CustomName = GetString($"{role}");
         var ColorName = ColorString(GetRoleColor(role).ShadeColor(0.25f), CustomName);

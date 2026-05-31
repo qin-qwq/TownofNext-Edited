@@ -1183,6 +1183,7 @@ class FixedUpdateInNormalGamePatch
         if (!lowLoad)
         {
             Zoom.OnFixedUpdate();
+            TextBoxPatch.CheckChatOpen();
 
             //try
             //{

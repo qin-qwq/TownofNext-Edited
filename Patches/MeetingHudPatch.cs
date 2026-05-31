@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using TMPro;
 using TONE.Modules;
+using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
 using TONE.Roles.AddOns.Impostor;
@@ -1474,6 +1475,8 @@ class MeetingHudStartPatch
         }
 
         __instance.SortButtons();
+
+        TextBoxPatch.OnMeetingStart();
     }
 }
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
