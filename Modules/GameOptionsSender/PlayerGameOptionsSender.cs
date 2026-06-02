@@ -49,7 +49,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
         }
     }
 
-    public static void SendAllImmediately()
+    public static DataFlagRateLimiter.QueuedAction SendAllImmediately()
     {
         ForceWaitFrame = true;
 
@@ -82,19 +82,21 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             }
         }
 
+        DataFlagRateLimiter.QueuedAction qa = null;
+
         if (PackedWriter != null)
         {
             if (PackedWriterMessages > 0)
             {
                 PackedWriter.EndMessage();
+                Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendAllImmediately");
                 var capturedWriter = PackedWriter;
-                DataFlagRateLimiter.Enqueue(() =>
+                qa = DataFlagRateLimiter.Enqueue(() =>
                 {
                     AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
                     capturedWriter.Recycle();
                     Logger.Info("PackedWriter flush queue finished and sent", "SendAllImmediately");
                 }, cleanup: capturedWriter.Recycle);
-                Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendAllImmediately");
             }
             else
             {
@@ -104,6 +106,8 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
         PackedWriter = null;
         PackedWriterMessages = 0;
+
+        return qa;
     }
 
     public static void SetDirtyToAll()
@@ -220,6 +224,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
     {
         if (PackedWriter == null) // Single write
         {
+            Logger.Info("Enqueue complete for single write", "SendOptionsArray");
             DataFlagRateLimiter.Enqueue(() =>
             {
                 MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
@@ -247,13 +252,13 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
                 writer.Recycle();
                 Logger.Info("Queue finished and sent for single write", "SendOptionsArray");
             });
-            Logger.Info("Enqueue complete for single write", "SendOptionsArray");
             return;
         }
 
         if (PackedWriter.Length > 1000 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
         {
             PackedWriter.EndMessage();
+            Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArray");
             var capturedWriter = PackedWriter;
             DataFlagRateLimiter.Enqueue(() =>
             {

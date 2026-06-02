@@ -201,7 +201,7 @@ internal class ChangeRoleSettings
                         _ = new LateTask(() =>
                         {
                             if (!GameStates.IsInGame || GameStates.IsEnded) return;
-                            player.RpcSetPet(PetsPatch.GetPetId());
+                            PetsPatch.SetPet(player, PetsPatch.GetPetId());
                         }, 3f);
                     }
                 }

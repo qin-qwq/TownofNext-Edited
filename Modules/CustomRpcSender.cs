@@ -41,7 +41,8 @@ public class CustomRpcSender
     // -2: Not set
     private int currentRpcTarget;
 
-    private bool packed;
+    public bool checkLength;
+    public bool packed;
 
     public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe, bool log)
     {
@@ -53,6 +54,7 @@ public class CustomRpcSender
         this.shouldLog = log;
         this.currentRpcTarget = -2;
         this.packed = false;
+        this.checkLength = true;
         onSendDelegate = () => { };
 
         currentState = State.Ready;
@@ -89,7 +91,7 @@ public class CustomRpcSender
                 throw new InvalidOperationException(errorMsg);
         }
 
-        if (stream.Length > 500)
+        if (checkLength && stream.Length > 500)
         {
             if (currentState == State.InRootPackedMessage)
             {
@@ -138,7 +140,7 @@ public class CustomRpcSender
                 throw new InvalidOperationException(errorMsg);
         }
 
-        if (stream.Length > 500)
+        if (checkLength && stream.Length > 500)
         {
             doneStreams.Add(stream);
             stream = MessageWriter.Get(sendOption);
@@ -346,7 +348,7 @@ public class CustomRpcSender
                     return count;
                 }
 
-                if (1 + GetPackedIntSize(AmongUsClient.Instance.GameId) >= stream.Length)
+                if (3 + GetPackedIntSize(AmongUsClient.Instance.GameId) >= stream.Length)
                     dispose = true;
                 else
                     EndMessage();
@@ -466,7 +468,7 @@ public static class CustomRpcSenderExtensions
             .EndRpc();
     }
 
-    public static void RpcSetName(this CustomRpcSender sender, PlayerControl player, string name, PlayerControl seer = null)
+    public static void RpcSetName(ref CustomRpcSender sender, PlayerControl player, PlayerControl seer, string name)
     {
         bool seerIsNull = !seer;
         int targetClientId = seerIsNull ? -1 : seer.OwnerId;
@@ -486,11 +488,41 @@ public static class CustomRpcSenderExtensions
                 break;
         }
 
-        sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetName, targetClientId)
+        sender.checkLength = false;
+
+        if (sender.stream.Length + GetSetNameRpcSize(player.NetId, name) > 1100)
+        {
+            bool packed = sender.packed;
+            sender.SendMessage();
+            sender = CustomRpcSender.Create(sender.name, sender.sendOption);
+            if (packed) sender.StartPackedMessage();
+        }
+
+        sender.AutoStartRpc(player.NetId, RpcCalls.SetName, targetClientId)
             .Write(player.Data.NetId)
             .Write(name)
             .Write(false)
             .EndRpc();
+
+        return;
+
+        static int GetSetNameRpcSize(uint netId, string playerName)
+        {
+            int byteCount = System.Text.Encoding.UTF8.GetByteCount(playerName);
+            return 3 + PackedUIntSize(netId) + 1 + 4 + PackedUIntSize((uint)byteCount) + byteCount + 1;
+        }
+
+        static int PackedUIntSize(uint value)
+        {
+            return value switch
+            {
+                < 0x80 => 1,
+                < 0x4000 => 2,
+                < 0x20_0000 => 3,
+                < 0x1000_0000 => 4,
+                _ => 5
+            };
+        }
     }
 }
 

@@ -1751,26 +1751,27 @@ public static class Utils
         if (!AmongUsClient.Instance.AmHost || GameStates.IsMeeting) yield break;
 
         const int frameBudget = 3; // milliseconds per frame
-        var stopwatch = new Stopwatch();
+        var stopwatch = Stopwatch.StartNew();
         var aapc = Main.AllAlivePlayerControls;
+        var hasValue = false;
+        var sender = CustomRpcSender.Create("NotifyRoles", sendOption, log: false);
+        sender.StartPackedMessage();
 
         foreach (PlayerControl seer in aapc)
         {
-            foreach (PlayerControl target in aapc)
+            hasValue |= WriteSetNameRpcsToSender(ref sender, false, noCache, false, false, false, false, seer, [seer], aapc, out bool senderWasCleared, sendOption);
+            if (senderWasCleared) hasValue = false;
+            
+            if (stopwatch.ElapsedMilliseconds >= frameBudget)
             {
+                stopwatch.Reset();
+                yield return null;
                 if (GameStates.IsMeeting) yield break;
-                var sender = CustomRpcSender.Create("Utils.NotifyEveryoneAsync", sendOption, log: false);
-                var hasValue = WriteSetNameRpcsToSender(ref sender, false, noCache, false, false, false, false, seer, [seer], [target], out bool senderWasCleared, sendOption) && !senderWasCleared;
-                sender.SendMessage(!hasValue || sender.stream.Length <= 3);
-
-                if (stopwatch.ElapsedMilliseconds >= frameBudget)
-                {
-                    stopwatch.Reset();
-                    yield return null;
-                    stopwatch.Start();
-                }
+                stopwatch.Start();
             }
         }
+
+        sender.SendMessage(!hasValue || sender.stream.Length <= 11);
     }
     // During intro scene to set team name and role info for non-modded clients and skip the rest.
     // Note: When Neutral is based on the Crewmate role then it is impossible to display the info for it
@@ -1860,23 +1861,17 @@ public static class Utils
             var seerList = SpecifySeer ? [SpecifySeer] : apc;
             var targetList = SpecifyTarget ? [SpecifyTarget] : apc;
 
-            var sender = CustomRpcSender.Create("NotifyRoles", SendOption);
             var hasValue = false;
+            var sender = CustomRpcSender.Create("NotifyRoles", SendOption, log: false);
+            if (!isForMeeting) sender.StartPackedMessage();
 
             foreach (PlayerControl seer in seerList)
             {
                 hasValue |= WriteSetNameRpcsToSender(ref sender, isForMeeting, NoCache, ForceLoop, CamouflageIsForMeeting, GuesserIsForMeeting, MushroomMixupIsActive, seer, seerList, targetList, out bool senderWasCleared, SendOption);
                 if (senderWasCleared) hasValue = false;
-
-                if (sender.stream.Length > 500)
-                {
-                    sender.SendMessage();
-                    sender = CustomRpcSender.Create("NotifyRoles", SendOption);
-                    hasValue = false;
-                }
             }
 
-            sender.SendMessage(!hasValue || sender.stream.Length <= 3);
+            sender.SendMessage(!hasValue || sender.stream.Length <= 11);
 
             if (Options.CurrentGameMode != CustomGameMode.Standard) return;
 
@@ -2303,7 +2298,7 @@ public static class Utils
             // Hide player names in during Mushroom Mixup if seer is alive and desync impostor
             if (!CamouflageIsForMeeting && MushroomMixupIsActive && seer.IsAlive() && (!seer.Is(Custom_Team.Impostor) || Main.PlayerStates[seer.PlayerId].IsNecromancer) && seer.HasDesyncRole())
             {
-                sender.RpcSetName(seer, "<size=0%>", seer);
+                CustomRpcSenderExtensions.RpcSetName(ref sender, seer, seer, "<size=0%>");
                 hasValue = true;
             }
             else
@@ -2441,7 +2436,7 @@ public static class Utils
                 if (SelfName.EndsWith("</size>")) SelfName = SelfName[..^7];
                 if (SelfName.EndsWith("</color>")) SelfName = SelfName[..^8];
 
-                sender.RpcSetName(seer, SelfName, seer);
+                CustomRpcSenderExtensions.RpcSetName(ref sender, seer, seer, SelfName);
                 hasValue = true;
             }
 
@@ -2469,7 +2464,7 @@ public static class Utils
                         // Hide player names in during Mushroom Mixup if seer is alive and desync impostor
                         if (!CamouflageIsForMeeting && MushroomMixupIsActive && target.IsAlive() && (!seer.Is(Custom_Team.Impostor) || Main.PlayerStates[seer.PlayerId].IsNecromancer) && seer.HasDesyncRole())
                         {
-                            sender.RpcSetName(realTarget, "<size=0%>", seer);
+                            CustomRpcSenderExtensions.RpcSetName(ref sender, realTarget, seer, "<size=0%>");
                             hasValue = true;
                             senderWasCleared = false;
 
@@ -2621,7 +2616,7 @@ public static class Utils
                             if (TargetName.EndsWith("</size>")) TargetName = TargetName.Remove(TargetName.Length - 7);
                             if (TargetName.EndsWith("</color>")) TargetName = TargetName.Remove(TargetName.Length - 8);
 
-                            sender.RpcSetName(realTarget, TargetName, seer);
+                            CustomRpcSenderExtensions.RpcSetName(ref sender, realTarget, seer, TargetName);
                             hasValue = true;
                             senderWasCleared = false;
 
@@ -3317,6 +3312,7 @@ public static class Utils
 
         DataFlagRateLimiter.Enqueue(() =>
         {
+            if (!deadBodyParent) return;
             CreateDeadBody(position, colorId, deadBodyParent);
             PlayerControl playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab, Vector2.zero, Quaternion.identity);
             playerControl.PlayerId = deadBodyParent.PlayerId;

@@ -50,16 +50,21 @@ internal class Butcher : RoleBase
             return;
         }
 
-        _ = new LateTask(() =>
+        Main.Instance.StartCoroutine(ButcherShowBodiesCoroutine());
+        return;
+
+        System.Collections.IEnumerator ButcherShowBodiesCoroutine()
         {
             for (var i = 0; i < 30; i++)
             {
-                if (!GameStates.IsInTask) return;
-                var ops = target.GetCustomPosition();
+                if (!GameStates.IsInTask) yield break;
 
+                var ops = target.GetCustomPosition();
                 Vector2 location = new(ops.x + ((float)(rd.Next(1, 200) - 100) / 100), ops.y + ((float)(rd.Next(1, 200) - 100) / 100));
                 Utils.RpcCreateDeadBody(location, (byte)target.CurrentOutfit.ColorId, target, SendOption.None);
+
+                yield return new WaitForSeconds(0.2f);
             }
-        }, 0.2f, "Butcher Show Bodies");
+        }
     }
 }

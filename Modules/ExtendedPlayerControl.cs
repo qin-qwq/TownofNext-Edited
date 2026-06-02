@@ -1862,7 +1862,7 @@ static class ExtendedPlayerControl
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.Invisibility, SendOption.Reliable);
             writer.WritePacked(1);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
-            Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false);
+            Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false, SendOption: SendOption.None);
         }
         else
         {
@@ -1915,7 +1915,7 @@ static class ExtendedPlayerControl
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.Invisibility, SendOption.Reliable);
             writer.WritePacked(0);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
-            Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false);
+            Utils.NotifyRoles(SpecifySeer: player, SpecifyTarget: player, ForceLoop: false, SendOption: SendOption.None);
         }
         else
         {

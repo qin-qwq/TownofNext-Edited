@@ -15,20 +15,26 @@ public static class CustomSoundsManager
 {
     public static void RPCPlayCustomSound(this PlayerControl pc, string sound, bool force = false)
     {
-        if (!force) if (!AmongUsClient.Instance.AmHost || !pc.IsModded()) return;
         if (pc == null || PlayerControl.LocalPlayer.PlayerId == pc.PlayerId)
         {
             Play(sound);
             return;
         }
+        if (!force) if (!AmongUsClient.Instance.AmHost || !pc.IsModded()) return;
+        long now = Utils.TimeStamp;
+        if (now == LastSoundRPCTS) return;
+        LastSoundRPCTS = now;
         RpcUtils.LateSpecificSendMessage(new RpcPlayCustomSound(pc.NetId, sound), pc.GetClientId());
     }
 
     public static void RPCPlayCustomSoundAll(string sound)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        RpcUtils.LateBroadcastReliableMessage(new RpcPlayCustomSound(PlayerControl.LocalPlayer.NetId, sound));
         Play(sound);
+        long now = Utils.TimeStamp;
+        if (now == LastSoundRPCTS) return;
+        LastSoundRPCTS = now;
+        RpcUtils.LateBroadcastReliableMessage(new RpcPlayCustomSound(PlayerControl.LocalPlayer.NetId, sound));
     }
 
     public static void ReceiveRPC(MessageReader reader) => Play(reader.ReadString());
@@ -38,6 +44,8 @@ public static class CustomSoundsManager
 #else
     private static readonly string SOUNDS_PATH = Path.Combine(Environment.CurrentDirectory, "BepInEx", "resources");
 #endif
+
+    public static long LastSoundRPCTS;
 
     public static void Play(string sound)
     {

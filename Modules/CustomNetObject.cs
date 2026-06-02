@@ -202,7 +202,8 @@ namespace TONE.Modules
             {
                 if (!AmongUsClient.Instance.AmHost) return;
 
-                if (SnapToSendFrameCount++ < 5) return;
+                // max 30 calls per second in total
+                if (++SnapToSendFrameCount < Math.Max(10, AllObjects.Count)) return;
                 SnapToSendFrameCount = 0;
 
                 if (AmongUsClient.Instance.AmClient)

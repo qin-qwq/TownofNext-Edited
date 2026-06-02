@@ -109,6 +109,8 @@ internal class TimeMaster : RoleBase
                 player.MarkDirtySettings();
             }
 
+            yield return PlayerGameOptionsSender.SendAllImmediately().Wait();
+
             yield return new WaitForSecondsRealtime(0.55f);
 
             for (long i = now - 1; i >= now - length; i--)
@@ -227,5 +229,22 @@ internal class TimeMaster : RoleBase
     {
         if (UsePets.GetBool()) return CustomButton.Get("Time Master");
         return null;
+    }
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        AfterMeetingTasks();
+    }
+
+    public override void AfterMeetingTasks()
+    {
+        if (Rewinding)
+        {
+            Rewinding = false;
+            foreach (var pc in Main.EnumeratePlayerControls())
+            {
+                Main.AllPlayerSpeed[pc.PlayerId] = Main.AllPlayerSpeed[pc.PlayerId] - Main.MinSpeed + originalSpeed[pc.PlayerId];
+                ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
+            }
+        }
     }
 }

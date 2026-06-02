@@ -879,6 +879,10 @@ internal static class RPC
         if (AmongUsClient.Instance.AmHost)
             PlaySound(PlayerID, sound);
 
+        long now = Utils.TimeStamp;
+        if (now == CustomSoundsManager.LastSoundRPCTS) return;
+        CustomSoundsManager.LastSoundRPCTS = now;
+
         var message = new RpcPlaySound(PlayerControl.LocalPlayer.NetId, PlayerID, sound);
         RpcUtils.LateBroadcastReliableMessage(message);
     }

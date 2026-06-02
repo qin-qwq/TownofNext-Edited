@@ -96,7 +96,8 @@ internal class Executioner : RoleBase
                 else if (!CanTargetNeutralEvil.GetBool() && target.GetCustomRole().IsNE()) continue;
                 else if (!CanTargetNeutralChaos.GetBool() && target.GetCustomRole().IsNC()) continue;
                 else if (!CanTargetCoven.GetBool() && target.Is(Custom_Team.Coven)) continue;
-                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.Mini or CustomRoles.Solsticer or CustomRoles.Workaholic) continue;
+                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.Solsticer or CustomRoles.Workaholic) continue;
+                if (target.Is(CustomRoles.Mini)) continue;
                 if (Lovers.AreLovers(executioner, target)) continue;
 
                 targetList.Add(target);

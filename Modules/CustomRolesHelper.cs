@@ -1457,7 +1457,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.VoodooMaster)
                     || pc.Is(CustomRoles.Archaeologist)
                     || pc.Is(CustomRoles.Lovers)
-                    || pc.Is(CustomRoles.Balancer))
+                    || pc.Is(CustomRoles.Balancer)
+                    || pc.Is(CustomRoles.Admirer))
                     return false;
                 break;
         }

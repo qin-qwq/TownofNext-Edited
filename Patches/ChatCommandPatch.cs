@@ -127,6 +127,7 @@ internal class ChatCommands
     public static List<string> ChatHistory = [];
 
     private static bool WaitingToSend;
+    private static long LastUpload;
 
     public static void LoadCommands()
     {
@@ -151,7 +152,7 @@ internal class ChatCommands
             new("Disconnect", "{team}", Command.UsageLevels.Host, Command.UsageTimes.InGame, DisconnectCommand, true, false, [GetString("CommandArgs.Disconnect.Team")]),
             new("Role", "[role]", Command.UsageLevels.Everyone, Command.UsageTimes.Always, RoleCommand, true, false, [GetString("CommandArgs.Role.Role")]),
             new("Factions", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, FactionsCommand, true, false),
-            new("Up", "{role}", Command.UsageLevels.Up, Command.UsageTimes.InLobby, UpCommand, true, false, [GetString("CommandArgs.Up.Role")]),
+            new("Up", "{role}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, UpCommand, true, false, [GetString("CommandArgs.Up.Role")]), // Birthday
             new("SetPlayers", "{number}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, SetPlayersCommand, true, false, [GetString("CommandArgs.SetPlayers.Number")]),
             new("Help", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, HelpCommand, true, false),
             new("Icons", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, IconsCommand, true, false),
@@ -280,11 +281,11 @@ internal class ChatCommands
                 Main.isChatCommand = true;
 
                 if (!command.CanUseCommand(PlayerControl.LocalPlayer, sendErrorMessage: true))
-                    goto Canceled;
+                    canceled = true;
                 
                 command.Action(PlayerControl.LocalPlayer, text, args);
 
-                if (command.IsCanceled || command.AlwaysHidden) goto Canceled;
+                if (command.IsCanceled || command.AlwaysHidden) canceled = true;
                 break;
             }
         }
@@ -868,6 +869,11 @@ internal class ChatCommands
 
     private static void UpCommand(PlayerControl player, string text, string[] args)
     {
+        if (!player.FriendCode.GetDevUser().IsUp && !Main.IsBirthday2)
+        {
+            Utils.SendMessage($"{GetString("InvalidPermissionCMD")}", player.PlayerId);
+            return;
+        }
         var subArgs = text.Remove(0, 3);
         if (!Options.EnableUpMode.GetBool())
         {
@@ -2483,11 +2489,23 @@ internal class ChatCommands
                     Utils.SendMessage(GetString("UploadSamePreset"), player.PlayerId);
                     break;
                 }
+                if (Utils.GetTimeStamp() <= LastUpload + 5)
+                {
+                    Utils.SendMessage(GetString("WaitUpload"), player.PlayerId);
+                    break;
+                }
+                LastUpload = Utils.GetTimeStamp();
                 Main.Instance.StartCoroutine(UploadCurrentPreset(player));
                 Logger.Info("Upload Preset", "PresetCommand");
                 break;
             case "load":
             case "加载":
+                if (Utils.GetTimeStamp() <= LastUpload + 5)
+                {
+                    Utils.SendMessage(GetString("WaitUpload"), player.PlayerId);
+                    break;
+                }
+                LastUpload = Utils.GetTimeStamp();
                 Main.Instance.StartCoroutine(DownloadPreset(player, args[2]));
                 break;
         }
