@@ -2248,7 +2248,7 @@
   "NemesisKillSucceed": "{0} foi morto pelo Mafioso!",
   "NemesisKillDisable": "Desculpe, conforme as configurações do anfitrião, a Vingança do Mafioso é proibida neste jogo",
   "NemesisKillMax": "Você atingiu o Máximo de Abates, você não pode mais matar!",
-  "SuperStarDead": "震惊！大明星 [{0}]\n在最近一段时间内不幸遇害！",
+  "SuperStarDead": "Chocante! A grande superestrela [{0}] foi infelizmente assassinada recentemente!",
   "CyberDead": "Oh não! Parece que o Cibernético, <b>{0}</b>, morreu recentemente.",
   "DetectiveNoticeVictim": "De acordo com sua investigação...\nA vítima {0} tinha a função de {1}.",
   "DetectiveNoticeKiller": "\nA função do assassino é {0}.",
