@@ -3,12 +3,10 @@ using AmongUs.Data.Player;
 using Assets.InnerNet;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using LibCpp2IL;
 using System;
 using System.Collections;
 using System.IO;
 using System.Text.Json;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace TONE;
@@ -161,24 +159,21 @@ public class ModNews
     }
 
     [HarmonyPatch(typeof(PlayerAnnouncementData), nameof(PlayerAnnouncementData.SetAnnouncements)), HarmonyPrefix]
-    public static bool SetModAnnouncements_Prefix(PlayerAnnouncementData __instance, [HarmonyArgument(0)] ref Il2CppReferenceArray<Announcement> aRange)
+    public static void SetModAnnouncements_Prefix([HarmonyArgument(0)] ref Il2CppReferenceArray<Announcement> aRange)
     {
-        Logger.Info("AllModNews:" + AllModNews.Count, "ModNews");
-        AllModNews.Sort((a1, a2) => { return DateTime.Compare(DateTime.Parse(a2.Date), DateTime.Parse(a1.Date)); });
-
-        List<Announcement> FinalAllNews = [];
-        AllModNews.Do(n => FinalAllNews.Add(n.ToAnnouncement()));
-        foreach (var news in aRange)
+        if (AllModNews.Count == 0)
         {
-            if (!AllModNews.Any(x => x.Number == news.Number))
-                FinalAllNews.Add(news);
+            Logger.Warn("AllModNews: 0", "ModNews");
+            return;
         }
-        FinalAllNews.Sort((a1, a2) => { return DateTime.Compare(DateTime.Parse(a2.Date), DateTime.Parse(a1.Date)); });
 
-        aRange = new(FinalAllNews.Count);
-        for (int i = 0; i < FinalAllNews.Count; i++)
-            aRange[i] = FinalAllNews[i];
+        List<Announcement> finalAllNews = AllModNews.ConvertAll(n => n.ToAnnouncement());
+        finalAllNews.AddRange(aRange.Where(news => AllModNews.All(x => x.Number != news.Number)));
+        finalAllNews.Sort((a1, a2) => DateTime.Compare(DateTime.Parse(a2.Date), DateTime.Parse(a1.Date)));
 
-        return true;
+        aRange = new Il2CppReferenceArray<Announcement>(finalAllNews.Count);
+
+        for (var i = 0; i < finalAllNews.Count; i++)
+            aRange[i] = finalAllNews[i];
     }
 }

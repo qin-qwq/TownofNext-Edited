@@ -58,7 +58,7 @@ public static class BonfireNight
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
             .SetValueFormat(OptionFormat.Seconds)
             .SetHeader(true);
-        WoodToWin = IntegerOptionItem.Create(Id + 2, "BonfireNight_WoodToWin", (10, 300, 10), 100, TabGroup.ModSettings, false)
+        WoodToWin = IntegerOptionItem.Create(Id + 3, "BonfireNight_WoodToWin", (10, 300, 10), 100, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
             .SetValueFormat(OptionFormat.Pieces);

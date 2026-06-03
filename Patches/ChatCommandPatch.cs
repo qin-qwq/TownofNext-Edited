@@ -554,8 +554,7 @@ internal class ChatCommands
         }
 
 
-        var Des = result.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool() ? result.GetInfoLong() + $"<size=70%>{GetString("SupportsPetMessage")}</size>"
-           : result.GetInfoLong();
+        var Des = result.GetInfoLong();
         var title = "▲" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
         string rlHex = Utils.GetRoleColorCode(result);
@@ -1041,7 +1040,7 @@ internal class ChatCommands
     {
         var role = player.GetCustomRole();
         var lp = player;
-        var Des = lp.PetActivatedAbility() ? lp.GetRoleInfo(true) + $"<size=70%>{GetString("SupportsPetMessage")}</size>" : lp.GetRoleInfo(true);
+        var Des = lp.GetRoleInfo(true);
         var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
         var Sub = new StringBuilder();
@@ -2055,7 +2054,7 @@ internal class ChatCommands
 
 
         if (Longtitle) msg += "<voffset=-0.5em>" + tytul + "</voffset>\n\n";
-        for (int i = 0; i < Math.Clamp(Questions.Length, 2, 5); i++)
+        for (int i = 0; i < Math.Clamp(Questions.Length, 2, 20); i++)
         {
             msg += Utils.ColorString(RndCLR(), $"{char.ToUpper((char)(i + 65))}) {Questions[i]}\n");
             Pollvotes[char.ToUpper((char)(i + 65))] = 0;

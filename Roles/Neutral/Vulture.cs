@@ -16,13 +16,14 @@ internal class Vulture : RoleBase
     private const int Id = 15600;
     private static readonly HashSet<byte> playerIdList = [];
     public static bool HasEnabled => playerIdList.Any();
-
+    public override bool IsBalance => true;
     public override CustomRoles ThisRoleBase => CanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
     //==================================================================\\
 
     private static OptionItem ArrowsPointingToDeadBody;
     private static OptionItem NumberOfReportsToWin;
+    private static OptionItem MinimumNumberOfReportsToWin;
     private static OptionItem CanVent;
     private static OptionItem VultureReportCD;
     private static OptionItem MaxEaten;
@@ -30,12 +31,14 @@ internal class Vulture : RoleBase
 
     private static readonly Dictionary<byte, int> AbilityLeftInRound = [];
     private static readonly Dictionary<byte, long> LastReport = [];
+    private static int NumberOfReports;
 
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Vulture);
         ArrowsPointingToDeadBody = BooleanOptionItem.Create(Id + 10, "VultureArrowsPointingToDeadBody", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Vulture]);
-        NumberOfReportsToWin = IntegerOptionItem.Create(Id + 11, "VultureNumberOfReportsToWin", new(1, 14, 1), 5, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Vulture]);
+        NumberOfReportsToWin = IntegerOptionItem.Create(Id + 11, "VultureNumberOfReportsToWin", new(1, 14, 1), 3, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Vulture]);
+        MinimumNumberOfReportsToWin = IntegerOptionItem.Create(Id + 16, "VultureMinimumNumberOfReportsToWin", new(1, 14, 1), 2, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Vulture]);
         CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.NeutralRoles, true).SetParent(CustomRoleSpawnChances[CustomRoles.Vulture]);
         VultureReportCD = FloatOptionItem.Create(Id + 13, "VultureReportCooldown", new(0f, 180f, 2.5f), 10f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Vulture])
                 .SetValueFormat(OptionFormat.Seconds);
@@ -56,6 +59,7 @@ internal class Vulture : RoleBase
         playerId.SetAbilityUseLimit(0);
         AbilityLeftInRound[playerId] = MaxEaten.GetInt();
         LastReport[playerId] = GetTimeStamp();
+        NumberOfReports = base.CalculatePlayers(NumberOfReportsToWin.GetInt(), MinimumNumberOfReportsToWin.GetInt());
 
         CustomRoleManager.CheckDeadBodyOthers.Add(CheckDeadBody);
 
@@ -87,7 +91,7 @@ internal class Vulture : RoleBase
     {
         if (lowLoad || !player.IsAlive()) return;
 
-        if (player.GetAbilityUseLimit() >= NumberOfReportsToWin.GetInt())
+        if (player.GetAbilityUseLimit() >= NumberOfReports)
         {
             if (!CustomWinnerHolder.CheckForConvertedWinner(player.PlayerId))
             {
@@ -210,7 +214,7 @@ internal class Vulture : RoleBase
         var ProgressText = new StringBuilder();
         Color TextColor = GetRoleColor(CustomRoles.Vulture).ShadeColor(0.25f);
 
-        ProgressText.Append(ColorString(TextColor, ColorString(Color.white, " - ") + $"({playerId.GetAbilityUseLimit()}/{NumberOfReportsToWin.GetInt()})"));
+        ProgressText.Append(ColorString(TextColor, ColorString(Color.white, " - ") + $"({playerId.GetAbilityUseLimit()}/{NumberOfReports})"));
         return ProgressText.ToString();
     }
 }

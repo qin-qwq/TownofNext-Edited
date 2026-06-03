@@ -878,6 +878,7 @@ public static class LobbyViewSettingsPanePatch
 
                             if (role.OnlySpawnsWithPetsRole()) titleName += GetString("RequiresPet");
                             if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) titleName += GetString("SupportsPet");
+                            if (role.GetStaticRoleClass().IsBalance) titleName += GetString("SupportsBalance");
 
                             var chanceAddOnPerGame = Options.CustomAdtRoleSpawnRate.TryGetValue(role, out var valueAddOnOpt) ? valueAddOnOpt.GetInt() : 0;
                             int numPerGame = Options.CustomRoleCounts.TryGetValue(role, out var valueInt) ? valueInt.GetInt() : 0;

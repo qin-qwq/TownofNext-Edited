@@ -19,7 +19,7 @@ public abstract class RoleBase
     public bool HasVoted = false;
     public virtual bool IsExperimental => false;
     public virtual bool IsDesyncRole => false;
-    public virtual bool IsSideKick => false;
+    public virtual bool IsBalance => false;
 
     public void OnInit() // CustomRoleManager.RoleClass executes this
     {
@@ -476,6 +476,12 @@ public abstract class RoleBase
     public virtual string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => string.Empty;
     public virtual bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target) => false;
 
+    public virtual int CalculatePlayers(int max, int min)
+    {
+        if (!Options.BalanceRoleSetting.GetBool() || Options.BalanceNeedPlayers.GetInt() < Main.AllAlivePlayerControls.Count) return max;
+
+        return min;
+    }
 
     public virtual void ReceiveRPC(MessageReader reader, PlayerControl pc)
     { }

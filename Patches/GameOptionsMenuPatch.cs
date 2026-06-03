@@ -671,6 +671,7 @@ public static class StringOptionPatch
 
                 if (role.OnlySpawnsWithPetsRole()) name += GetString("RequiresPet");
                 if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) name += GetString("SupportsPet");
+                if (role.GetStaticRoleClass().IsBalance) name += GetString("SupportsBalance");
 
                 SetupHelpIcon(role, __instance);
             }

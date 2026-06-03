@@ -291,6 +291,10 @@ public static class Utils
 
         Translator.GetActualRoleName(role, out var RealRole);
 
+        if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool()) InfoLong += $"<size=70%>{GetString("SupportsPetMessage")}</size>";
+
+        if (role.GetStaticRoleClass().IsBalance && Options.BalanceRoleSetting.GetBool()) InfoLong += $"<size=70%>{GetString("BalanceSettingMessage")}</size>";
+
         return InfoLong.Replace(RealRole, $"{ColorName}");
     }
     public static string GetDisplayRoleAndSubName(byte seerId, byte targetId, bool isMeeting, bool notShowAddOns = false)

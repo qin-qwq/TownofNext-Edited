@@ -590,6 +590,8 @@ public static class Options
     public static OptionItem CantUseAbilityDuringDiscussionTime;
     public static OptionItem EnableImpostorChannel;
     public static OptionItem ShowExileMsgAfterMeeting;
+    public static OptionItem BalanceRoleSetting;
+    public static OptionItem BalanceNeedPlayers;
 
     // ------------ General Role Settings ------------
 
@@ -2243,6 +2245,14 @@ public static class Options
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         ShowExileMsgAfterMeeting = BooleanOptionItem.Create(61105, "ShowExileMsgAfterMeeting", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        BalanceRoleSetting = BooleanOptionItem.Create(61106, "BalanceRoleSetting", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        BalanceNeedPlayers = IntegerOptionItem.Create(61107, "BalanceNeedPlayers", (1, 15, 1), 12, TabGroup.ModSettings, false)
+            .SetParent(BalanceRoleSetting)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetValueFormat(OptionFormat.Players)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 
