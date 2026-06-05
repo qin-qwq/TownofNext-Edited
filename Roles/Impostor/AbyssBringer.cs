@@ -277,5 +277,7 @@ internal class AbyssBringer : RoleBase
             if (!AmongUsClient.Instance.AmHost) return;
             CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WW</color><mark=#000000>WWWW</mark><#0000>WW\nW</color><mark=#000000>WWWWWW</mark><#0000>W</color>\n<mark=#000000>WWWWWWWW\nWWWWWWWW\nWWWWWWWW\nWWWWWWWW</mark>\n<#0000>W</color><mark=#000000>WWWWWW</mark><#0000>W\nWW</color><mark=#000000>WWWW</mark><#0000>WW", position);
         }
+
+        protected override bool ConstantlyChangesPosition => BlackHoleMovesTowardsNearestPlayer.GetBool();
     }
 }

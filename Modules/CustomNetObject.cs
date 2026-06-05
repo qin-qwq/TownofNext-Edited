@@ -23,6 +23,8 @@ namespace TONE.Modules
         public static readonly List<CustomNetObject> AllObjects = [];
         private static int MaxId = -1;
 
+        protected virtual bool ConstantlyChangesPosition => false;
+
         protected int Id;
         public PlayerControl playerControl;
         public Vector2 Position;
@@ -93,7 +95,6 @@ namespace TONE.Modules
         public void TP(Vector2 position)
         {
             Position = position;
-            SnapToSendFrameCount = 30;
         }
 
         public void Despawn()
@@ -202,8 +203,20 @@ namespace TONE.Modules
             {
                 if (!AmongUsClient.Instance.AmHost) return;
 
-                // max 30 calls per second in total
-                if (++SnapToSendFrameCount < Math.Max(10, AllObjects.Count)) return;
+                // max ~60 calls per second in total
+                int updateFrequency;
+
+                if (!ConstantlyChangesPosition)
+                {
+                    updateFrequency = 30;
+                }
+                else
+                {
+                    (int trueCount, int falseCount) = AllObjects.SplitCount(x => x.ConstantlyChangesPosition);
+                    updateFrequency = trueCount / 2 + falseCount;
+                }
+
+                if (++SnapToSendFrameCount < updateFrequency) return;
                 SnapToSendFrameCount = 0;
 
                 if (AmongUsClient.Instance.AmClient)
