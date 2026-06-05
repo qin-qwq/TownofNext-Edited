@@ -207,6 +207,7 @@ public class RoleAssign
         {
             int chance = role.GetMode();
             if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) continue;
+            if (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) continue;
             switch (role)
             {
                 case CustomRoles.Stalker when GameStates.FungleIsActive:

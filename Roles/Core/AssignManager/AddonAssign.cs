@@ -12,6 +12,8 @@ public static class AddonAssign
 
     private static bool NotAssignAddOnInGameStarted(CustomRoles role)
     {
+        if (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) return true;
+
         switch (role)
         {
             case CustomRoles.Lovers:

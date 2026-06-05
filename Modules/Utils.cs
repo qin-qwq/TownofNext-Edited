@@ -2900,10 +2900,29 @@ public static class Utils
 
         void ExileMsgAfterMeeting()
         {
-            var impnum = Main.EnumerateAlivePlayerControls().Count(x => x.GetCustomRole().IsImpostorTeamV3() && !x.Is(CustomRoles.Narc));
+            var sub = new StringBuilder();
+            var allAlivePlayers = Main.EnumerateAlivePlayerControls();
+            int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
+            int neutralnum = allAlivePlayers.Count(pc => pc.GetCustomRole().IsNK());
+            int apocnum = allAlivePlayers.Count(pc => pc.IsNeutralApocalypse() || pc.IsTransformedNeutralApocalypse());
+            int covnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Coven));
+
+            if (Options.ShowImpRemainOnEject.GetBool() && impnum > 0)
+                sub.Append(string.Format(GetString("Remaining.ImpostorCount"), impnum));
+
+            if (Options.ShowNKRemainOnEject.GetBool() && neutralnum > 0)
+                sub.Append(string.Format("，" + GetString("Remaining.NeutralCount"), neutralnum));
+
+            if (Options.ShowNARemainOnEject.GetBool() && apocnum > 0)
+                sub.Append(string.Format("，" + GetString("Remaining.ApocalypseCount"), apocnum));
+
+            if (Options.ShowCovenRemainOnEject.GetBool() && covnum > 0)
+                sub.Append(string.Format("，" + GetString("Remaining.CovenCount"), covnum));
+
             foreach (var player in Main.EnumerateAlivePlayerControls())
             {
-                player.Notify(string.Format(GetString("VanillaImpRemain"), impnum));
+                var name = sub.ToString();
+                if (!string.IsNullOrEmpty(name)) player.Notify(name.TrimStart('，'));
             }
         }
     }

@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.05.29";
+    public const string PluginVersion = "26.06.05";
     public const string PluginDisplayVersion = "2.0.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [

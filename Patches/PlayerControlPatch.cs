@@ -598,6 +598,8 @@ class RpcMurderPlayerPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckShapeshift))]
 public static class CheckShapeshiftPatch
 {
+    public static bool BypassCheck = false;
+    public static bool DisableShapeshift = false;
     private static readonly LogHandler logger = Logger.Handler(nameof(PlayerControl.CheckShapeshift));
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
     {
@@ -614,6 +616,8 @@ public static class CheckShapeshiftPatch
             __instance.RpcRejectShapeshift();
             return false;
         }
+
+        if (BypassCheck) return false;
 
         // No called code if is invalid shapeshifting
         if (!CheckInvalidShapeshifting(__instance, target, shouldAnimate))
@@ -700,6 +704,11 @@ public static class CheckShapeshiftPatch
             logger.Info($"Cancel shapeshifting because {instance.GetRealName()} is eaten by Pelican");
             return false;
         }
+        if (DisableShapeshift)
+        {
+            logger.Info("Shapeshifting canceled because DisableShapeshift");
+            return false;
+        }
 
         if (instance == target && Main.UnShapeShifter.Contains(instance.PlayerId))
         {
@@ -740,7 +749,7 @@ class ShapeshiftPatch
 
         if (!AmongUsClient.Instance.AmHost) return;
         if (GameStates.IsHideNSeek) return;
-        if (!shapeshifting) Camouflage.RpcSetSkin(__instance);
+        // if (!shapeshifting) Camouflage.RpcSetSkin(__instance);
 
         shapeshifter.GetRoleClass()?.OnShapeshift(shapeshifter, target, animate, shapeshifting);
 
@@ -1031,16 +1040,16 @@ class ReportDeadBodyPatch
             {
                 // Update skins again, since players have different skins
                 // And can be easily distinguished from each other
-                if (Camouflage.IsCamouflage && Options.KPDCamouflageMode.GetValue() is 2 or 3)
+                /*if (Camouflage.IsCamouflage && Options.KPDCamouflageMode.GetValue() is 2 or 3)
                 {
                     Camouflage.RpcSetSkin(pc);
-                }
+                }*/
 
                 // Check shapeshift and revert skin to default
                 if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
                 {
                     pc.RpcShapeshift(pc, false);
-                    Camouflage.RpcSetSkin(pc, RevertToDefault: true);
+                    // Camouflage.RpcSetSkin(pc, RevertToDefault: true);
                 }
             }
 

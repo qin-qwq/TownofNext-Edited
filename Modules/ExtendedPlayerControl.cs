@@ -713,18 +713,27 @@ static class ExtendedPlayerControl
         writer.WriteNetObject(target);
         AmongUsClient.Instance.FinishRpcImmediately(writer);
     }
-    public static void RpcSpecificShapeshift(this PlayerControl player, PlayerControl target, bool shouldAnimate)
+    public static void RpcSpecificShapeshift(this PlayerControl player, PlayerControl target, PlayerControl seer, bool shouldAnimate)
     {
         if (!AmongUsClient.Instance.AmHost) return;
+
+        var hasValue = false;
+        CustomRpcSender sender = CustomRpcSender.Create("RpcSpecificShapeshift", SendOption.Reliable);
+        sender.StartPackedMessage();
+
         if (player.IsHost())
         {
             player.Shapeshift(target, shouldAnimate);
             return;
         }
-        MessageWriter messageWriter = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.Shapeshift, SendOption.Reliable, player.GetClientId());
-        messageWriter.WriteNetObject(target);
-        messageWriter.Write(shouldAnimate);
-        AmongUsClient.Instance.FinishRpcImmediately(messageWriter);
+
+        sender.AutoStartRpc(player.NetId, RpcCalls.Shapeshift, seer.GetClientId())
+            .WriteNetObject(target)
+            .Write(shouldAnimate)
+            .EndRpc();
+
+        hasValue = true;
+        sender.SendMessage(dispose: !hasValue);
     }
     public static void RpcSpecificRejectShapeshift(this PlayerControl player, PlayerControl target, bool shouldAnimate)
     {
@@ -738,7 +747,7 @@ static class ExtendedPlayerControl
             }
             else
             {
-                player.RpcSpecificShapeshift(target, shouldAnimate);
+                player.RpcSpecificShapeshift(target, player, shouldAnimate);
             }
         }
     }
@@ -760,7 +769,7 @@ static class ExtendedPlayerControl
         }
 
         var currentOutfit = unshifter.Data.Outfits[PlayerOutfitType.Default];
-        unshifter.RpcSpecificShapeshift(PlayerControl.LocalPlayer, false);
+        unshifter.RpcSpecificShapeshift(PlayerControl.LocalPlayer, unshifter, false);
         unshifter.RawSetOutfit(currentOutfit, PlayerOutfitType.Shapeshifted);
         Main.CheckShapeshift[unshifter.PlayerId] = false;
 

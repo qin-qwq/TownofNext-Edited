@@ -516,7 +516,7 @@ internal class ChatCommands
 
         if (isUp)
         {
-            if (result.IsGhostRole() || !shouldDevAssign || result.IsAddonAssignedMidGame())
+            if (result.IsGhostRole() || !shouldDevAssign || result.IsAddonAssignedMidGame() || (result.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla))
             {
                 Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId);
                 return;
@@ -2532,7 +2532,7 @@ internal class ChatCommands
             shouldDevAssign = false;
         }
 
-        if (roleToSet.IsGhostRole() || !shouldDevAssign || roleToSet.IsAddonAssignedMidGame())
+        if (roleToSet.IsGhostRole() || !shouldDevAssign || roleToSet.IsAddonAssignedMidGame() || (roleToSet.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla))
         {
             Utils.SendMessage(string.Format(GetString("Message.SetRoleSelectFailed"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId);
             return;

@@ -167,7 +167,7 @@ public static class Camouflage
             }
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
             {
-                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
+                _ = new LateTask(() => { Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync()); }, 0.2f, "CheckCamouflage.NotifyEveryoneAsync");
             }
             else
             {
@@ -229,6 +229,27 @@ public static class Camouflage
         if (newOutfit.Compare(target.Data.DefaultOutfit)) return;
 
         Logger.Info($"playerId {target.PlayerId} newOutfit={newOutfit.GetString().RemoveHtmlTags()}", "RpcSetSkin");
-        target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false, setPetAbility: true);
+        if (Main.CurrentServerIsVanilla)
+        {
+            if (target.IsHost()) target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false, setPetAbility: true);
+            else
+            {
+                _ = new LateTask(() =>
+                {
+                    var real = newOutfit == PlayerSkins[targetId];
+
+                    CheckShapeshiftPatch.BypassCheck = true;
+                    target.RpcShapeshift(real ? target : PlayerControl.LocalPlayer, false);
+                    CheckShapeshiftPatch.BypassCheck = false;
+
+                    if (!real) CheckShapeshiftPatch.DisableShapeshift = true;
+                    else CheckShapeshiftPatch.DisableShapeshift = false;
+                }, 0.2f, "RpcSetSkin.Vanilla");
+            }
+        }
+        else
+        {
+            target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false, setPetAbility: true);
+        }
     }
 }

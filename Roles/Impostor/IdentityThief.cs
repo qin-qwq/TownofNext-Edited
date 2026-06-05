@@ -1,4 +1,3 @@
-using TONE.Modules;
 using TONE.Roles.Core;
 using static TONE.Options;
 
@@ -16,7 +15,6 @@ internal class IdentityThief : RoleBase
 
     private static OptionItem KillCooldown;
 
-    private static readonly Dictionary<byte, NetworkedPlayerInfo.PlayerOutfit> OriginalPlayerSkins = [];
     public static readonly Dictionary<byte, string> ChangeName = [];
 
     public override void SetupCustomOption()
@@ -29,18 +27,7 @@ internal class IdentityThief : RoleBase
 
     public override void Init()
     {
-        OriginalPlayerSkins.Clear();
         ChangeName.Clear();
-    }
-
-    public override void Add(byte playerId)
-    {
-        OriginalPlayerSkins.TryAdd(playerId, Camouflage.PlayerSkins[playerId]);
-    }
-
-    public override void Remove(byte playerId)
-    {
-        OriginalPlayerSkins.Remove(playerId);
     }
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
@@ -59,11 +46,9 @@ internal class IdentityThief : RoleBase
         ChangeName.Remove(killer.PlayerId);
         ChangeName.Add(killer.PlayerId, tname);
 
-        var targetSkin = new NetworkedPlayerInfo.PlayerOutfit()
-            .Set(tname, target.CurrentOutfit.ColorId, target.CurrentOutfit.HatId, target.CurrentOutfit.SkinId, target.CurrentOutfit.VisorId, target.CurrentOutfit.PetId, target.CurrentOutfit.NamePlateId);
-
-        killer.SetNewOutfit(targetSkin, false, false);
-        Camouflage.PlayerSkins[killer.PlayerId] = targetSkin;
+        CheckShapeshiftPatch.BypassCheck = true;
+        killer.RpcShapeshift(target, false);
+        CheckShapeshiftPatch.BypassCheck = false;
         Logger.Info("Changed killer skin", "IdentityThief");
 
         RPC.SyncAllPlayerNames();
@@ -74,7 +59,5 @@ internal class IdentityThief : RoleBase
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         ChangeName.Clear();
-        _Player.SetNewOutfit(OriginalPlayerSkins[_Player.PlayerId], false, false);
-        Camouflage.PlayerSkins[_Player.PlayerId] = OriginalPlayerSkins[_Player.PlayerId];
     }
 }

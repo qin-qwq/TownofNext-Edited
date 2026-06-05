@@ -109,6 +109,8 @@ internal class ChangeRoleSettings
             Main.Invisible.Clear();
             CheckForEndVotingPatch.SomeoneExiled = false;
             ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
+            CheckShapeshiftPatch.BypassCheck = false;
+            CheckShapeshiftPatch.DisableShapeshift = false;
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
@@ -197,10 +199,14 @@ internal class ChangeRoleSettings
                     foreach (var player in Main.EnumeratePlayerControls())
                     {
                         if (player.Is(CustomRoles.GM)) continue;
+                        if (Main.CurrentServerIsVanilla)
+                        {
+                            Options.UsePets.SetValue(2);
+                        }
 
                         _ = new LateTask(() =>
                         {
-                            if (!GameStates.IsInGame || GameStates.IsEnded) return;
+                            if (!GameStates.IsInGame || GameStates.IsEnded || Main.CurrentServerIsVanilla) return;
                             PetsPatch.SetPet(player, PetsPatch.GetPetId());
                         }, 3f);
                     }
