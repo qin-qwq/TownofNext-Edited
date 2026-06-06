@@ -59,7 +59,7 @@ public class Main : BasePlugin
     public const string PluginDisplayVersion = "2.0.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2026, 3, 31, 0) // 2026.3.31 & 17.3
+            (2026, 3, 31, 0) // 2026.3.31 & 17.3 & 2026.6.5 & 17.4
         ];
 
     // Change this to change alpha/beta/full release
@@ -758,7 +758,7 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalGameOptionsV10.RecommendedImpostors = NormalGameOptionsV10.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
+        NormalGameOptionsV10.RecommendedImpostors = NormalGameOptionsV10.MaxImpostors = Enumerable.Repeat(1, 128).ToArray();
         NormalGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         HideNSeekGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;

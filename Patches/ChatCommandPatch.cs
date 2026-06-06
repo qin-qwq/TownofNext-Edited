@@ -281,7 +281,10 @@ internal class ChatCommands
                 Main.isChatCommand = true;
 
                 if (!command.CanUseCommand(PlayerControl.LocalPlayer, sendErrorMessage: true))
+                {
                     canceled = true;
+                    break;
+                }
                 
                 command.Action(PlayerControl.LocalPlayer, text, args);
 
@@ -918,7 +921,7 @@ internal class ChatCommands
 
     private static void SettingIconsCommand(PlayerControl player, string text, string[] args)
     {
-        Utils.SendMessage(GetString("Command.sicons"), player.PlayerId, GetString("IconsTitle"));
+        Utils.SendMessage(string.Format(GetString("Command.sicons"), Options.BalanceNeedPlayers.GetInt()), player.PlayerId, GetString("IconsTitle"));
     }
 
     private static void KCountCommand(PlayerControl player, string text, string[] args)

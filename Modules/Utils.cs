@@ -293,7 +293,7 @@ public static class Utils
 
         if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && Options.UsePets.GetBool()) InfoLong += $"<size=70%>{GetString("SupportsPetMessage")}</size>";
 
-        if (role.GetStaticRoleClass().IsBalance && Options.BalanceRoleSetting.GetBool()) InfoLong += $"<size=70%>{GetString("BalanceSettingMessage")}</size>";
+        if (role.GetStaticRoleClass().IsBalance && Options.BalanceRoleSetting.GetBool()) InfoLong += $"<size=70%>{string.Format(GetString("BalanceSettingMessage"), Options.BalanceNeedPlayers.GetInt())}</size>";
 
         return InfoLong.Replace(RealRole, $"{ColorName}");
     }
