@@ -218,8 +218,13 @@ class SetHudActivePatch
 
         IsActive = isActive;
 
-        if (GameStates.IsLobby || !isActive) return;
+        if (GameStates.IsLobby) return;
         if (player == null) return;
+        if (!isActive)
+        {
+            __instance.AbilityButton.ToggleVisible(MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted && Options.UseMeetingShapeshift.GetBool() && player.UsesMeetingShapeshift());
+            return;
+        }
 
         if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || Options.CurrentGameMode != CustomGameMode.Standard)
             __instance.ReportButton.ToggleVisible(false);

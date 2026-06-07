@@ -208,6 +208,7 @@ public static class AddonAssign
                 || pc.Is(CustomRoles.Mini)
                 || pc.Is(CustomRoles.Cupid)
                 || pc.Is(CustomRoles.Wraith)
+                || pc.Is(CustomRoles.CopyCat)
                 || (pc.GetCustomRole().IsCrewmate() && !Lovers.CrewCanBeInLove.GetBool())
                 || (pc.GetCustomRole().IsNeutral() && !Lovers.NeutralCanBeInLove.GetBool())
                 || (pc.GetCustomRole().IsImpostor() && !Lovers.ImpCanBeInLove.GetBool())

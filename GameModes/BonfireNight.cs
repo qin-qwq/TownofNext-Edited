@@ -92,7 +92,7 @@ public static class BonfireNight
         WoodGrowthTime = IntegerOptionItem.Create(Id + 10, "BonfireNight_WoodGrowthTime", (1, 60, 1), 20, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
-            .SetValueFormat(OptionFormat.Pieces);
+            .SetValueFormat(OptionFormat.Seconds);
         MaximumWoodRefreshQuantity = IntegerOptionItem.Create(Id + 11, "BonfireNight_MaximumWoodRefreshQuantity", (1, 60, 1), 10, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
@@ -100,7 +100,7 @@ public static class BonfireNight
         SakuraWoodGrowthTime = IntegerOptionItem.Create(Id + 12, "BonfireNight_SakuraWoodGrowthTime", (1, 60, 1), 15, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
-            .SetValueFormat(OptionFormat.Pieces);
+            .SetValueFormat(OptionFormat.Seconds);
         MaximumSakuraWoodRefreshQuantity = IntegerOptionItem.Create(Id + 13, "BonfireNight_MaximumSakuraWoodRefreshQuantity", (1, 60, 1), 30, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
@@ -351,25 +351,25 @@ public static class BonfireNight
                 Draw.Item1 = GetString("RedTeam") + GetString("Wins");
                 Draw.Item2 = "ff0000";
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.RedTeam);
-                Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.RWoodCollector)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+                Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.RWoodCollector)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
                 break;
             case "b":
                 Draw.Item1 = GetString("BlueTeam") + GetString("Wins");
                 Draw.Item2 = "0000ff";
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.BlueTeam);
-                Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.BWoodCollector)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+                Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.BWoodCollector)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
                 break;
             case "f":
                 Draw.Item1 = GetString("FireThief") + GetString("Wins");
                 Draw.Item2 = "a9a9a9";
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.FireThief);
-                Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.FireThief)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+                Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.FireThief)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
                 break;
             case "d":
                 Draw.Item1 = GetString("Draw");
                 Draw.Item2 = "808080";
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Draw);
-                Main.EnumerateAlivePlayerControls().Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+                Main.EnumeratePlayerControls().Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
                 break;   
         }
 
@@ -469,26 +469,41 @@ class BonfireNightGameEndPredicate : GameEndPredicate
     {
         reason = GameOverReason.ImpostorsByKill;
 
-        if ((!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief))) ||
-            BonfireNight.BonfireState.Item1 >= BonfireNight.WoodToWin.GetInt())
+        if (!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief)))
         {
             reason = GameOverReason.ImpostorDisconnect;
             BonfireNight.SetWinner("r");
             return true;
         }
 
-        if ((!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief))) ||
-            BonfireNight.BonfireState.Item2 >= BonfireNight.WoodToWin.GetInt())
+        if (!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.FireThief)))
         {
             reason = GameOverReason.ImpostorDisconnect;
             BonfireNight.SetWinner("b");
             return true;
         }
 
-        if ((!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector))) ||
-            BonfireNight.BonfireState.Item3 >= BonfireNight.WoodToWin.GetInt())
+        if (!Main.AllPlayerControls.Any(x => x.Is(CustomRoles.BWoodCollector)) && !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.RWoodCollector)))
         {
             reason = GameOverReason.ImpostorDisconnect;
+            BonfireNight.SetWinner("f");
+            return true;
+        }
+
+        if (BonfireNight.BonfireState.Item1 >= BonfireNight.WoodToWin.GetInt())
+        {
+            BonfireNight.SetWinner("r");
+            return true;
+        }
+
+        if (BonfireNight.BonfireState.Item2 >= BonfireNight.WoodToWin.GetInt())
+        {
+            BonfireNight.SetWinner("b");
+            return true;
+        }
+
+        if (BonfireNight.BonfireState.Item3 >= BonfireNight.WoodToWin.GetInt())
+        {
             BonfireNight.SetWinner("f");
             return true;
         }

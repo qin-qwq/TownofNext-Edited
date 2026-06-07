@@ -73,22 +73,19 @@ public class ModUpdater
         }
     }
 
-#if ANDROID
-    static string RegionConfigPath = Path.Combine(UnityEngine.Application.persistentDataPath, "BepInEx", "config", "at.duikbo.regioninstall.cfg");
-    static string MiniRegionInstallPath = Path.Combine(UnityEngine.Application.persistentDataPath, "BepInEx", "plugins", "Mini.RegionInstall.dll");
-#else
     const string RegionConfigPath = "./BepInEx/config/at.duikbo.regioninstall.cfg";
     const string MiniRegionInstallPath = "./BepInEx/plugins/Mini.RegionInstall.dll";
-#endif
 
     const string RegionConfigResource = "TONE.Resources.at.duikbo.regioninstall.cfg";
     const string MiniRegionInstallResource = "TONE.Resources.Mini.RegionInstall.dll";
+
     private static void CheckCustomRegions()
     {
-#if ANDROID
-        Logger.Info($"Skip check on Android platform", "CheckCustomRegions");
-        return;
-#endif
+        if (OperatingSystem.IsAndroid())
+        {
+            Logger.Info($"Skip check on Android platform", "CheckCustomRegions");
+            return;
+        }
         var regions = ServerManager.Instance.AvailableRegions;
         var hasCustomRegions = false;
         var forceUpdate = false;
@@ -282,15 +279,18 @@ public class ModUpdater
     }
     public static void StartUpdate(string url)
     {
-#if ANDROID
-        ShowPopup(GetString("AndroidUpdateNotSupported"), StringNames.Close, true, InfoPopup.Close);
-        Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
-        return;
-#else
-        ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
-        Task.Run(() => DownloadDLLAsync(url));
-        return;
-#endif
+        if (OperatingSystem.IsAndroid())
+        {
+            ShowPopup(GetString("AndroidUpdateNotSupported"), StringNames.Close, true, InfoPopup.Close);
+            Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
+            return;
+        }
+        else
+        {
+            ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
+            Task.Run(() => DownloadDLLAsync(url));
+            return;
+        }
     }
     public static bool NewVersionCheck()
     {

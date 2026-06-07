@@ -2,12 +2,7 @@ using Hazel;
 using System;
 using System.IO;
 using TONE.Modules.Rpc;
-
-#if !ANDROID
 using System.Runtime.InteropServices;
-#else
-using UnityEngine;
-#endif
 
 namespace TONE.Modules;
 
@@ -39,11 +34,7 @@ public static class CustomSoundsManager
 
     public static void ReceiveRPC(MessageReader reader) => Play(reader.ReadString());
 
-#if ANDROID
-    private static readonly string SOUNDS_PATH = Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "resources");
-#else
-    private static readonly string SOUNDS_PATH = Path.Combine(Environment.CurrentDirectory, "BepInEx", "resources");
-#endif
+    private static readonly string SOUNDS_PATH = OperatingSystem.IsAndroid() ? Path.Combine(UnityEngine.Application.persistentDataPath, "TONE-DATA", "resources") : Path.Combine(Environment.CurrentDirectory, "BepInEx", "resources");
 
     public static long LastSoundRPCTS;
 
@@ -77,13 +68,11 @@ public static class CustomSoundsManager
         Logger.Msg($"play sound：{sound}", "CustomSounds");
     }
 
-#if !ANDROID
     [DllImport("winmm.dll", CharSet = CharSet.Unicode)]
     private static extern bool PlaySound(string Filename, int Mod, int Flags);
 
     private static void StartPlay(string path) => PlaySound(path, 0, 1);
-#else
-    private static void StartPlay(string path)
+    /*private static void StartPlay(string path)
     {
         try
         {
@@ -134,6 +123,5 @@ public static class CustomSoundsManager
             Logger.Error($"Exception loading audio clip: {ex.Message}", "CustomSounds.LoadAudioClip");
             return null;
         }
-    }
-#endif
+    }*/
 }

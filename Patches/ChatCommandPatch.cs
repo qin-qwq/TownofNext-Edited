@@ -712,24 +712,24 @@ internal class ChatCommands
 
     private static void LastResultCommand(PlayerControl player, string text, string[] args)
     {
-        Utils.ShowKillLog();
-        Utils.ShowLastRoles();
-        Utils.ShowLastResult();
+        Utils.ShowKillLog(player.PlayerId);
+        Utils.ShowLastRoles(player.PlayerId);
+        Utils.ShowLastResult(player.PlayerId);
     }
 
     private static void GameResultCommand(PlayerControl player, string text, string[] args)
     {
-        Utils.ShowLastResult();
+        Utils.ShowLastResult(player.PlayerId);
     }
 
     private static void KillLogCommand(PlayerControl player, string text, string[] args)
     {
-        Utils.ShowKillLog();
+        Utils.ShowKillLog(player.PlayerId);
     }
 
     private static void RoleSummaryCommand(PlayerControl player, string text, string[] args)
     {
-        Utils.ShowLastRoles();
+        Utils.ShowLastRoles(player.PlayerId);
     }
 
     private static void GhostInfoCommand(PlayerControl player, string text, string[] args)

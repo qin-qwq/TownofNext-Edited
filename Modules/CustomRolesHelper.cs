@@ -1377,6 +1377,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Mini)
                     || pc.Is(CustomRoles.Cupid)
                     || pc.Is(CustomRoles.Wraith)
+                    || pc.Is(CustomRoles.CopyCat)
                 )
                     return false;
                 break;
