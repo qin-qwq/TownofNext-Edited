@@ -15,7 +15,7 @@ internal class PhantomTONE : RoleBase
     private static OptionItem InvisCooldown;
     private static OptionItem InvisDuration;
 
-    private (bool, float) IsInvisible = (false, 0);
+    private (bool, long) IsInvisible = (false, 0);
 
     public override void SetupCustomOption()
     {
@@ -45,19 +45,19 @@ internal class PhantomTONE : RoleBase
     {
         if (Main.Invisible.Contains(phantom.PlayerId)) return false;
         phantom.RpcMakeInvisible(true);
-        IsInvisible = (true, InvisDuration.GetInt());
+        IsInvisible = (true, Utils.GetTimeStamp());
         return false;
     }
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
+        if (lowLoad) return;
+
         if (IsInvisible.Item1)
         {
-            IsInvisible.Item2 -= Time.fixedDeltaTime;
-
-            if (IsInvisible.Item2 <= 0)
+            if (IsInvisible.Item2 + InvisDuration.GetInt() < nowTime)
             {
-                IsInvisible = (false, 0f);
+                IsInvisible = (false, 0);
                 PhantomAppear(player);
             }
         }
@@ -67,7 +67,7 @@ internal class PhantomTONE : RoleBase
     {
         if (IsInvisible.Item1)
         {
-            IsInvisible = (false, 0f);
+            IsInvisible = (false, 0);
             PhantomAppear(_Player);
         }
     }
@@ -76,7 +76,7 @@ internal class PhantomTONE : RoleBase
     {
         if (IsInvisible.Item1)
         {
-            IsInvisible = (false, 0f);
+            IsInvisible = (false, 0);
             PhantomAppear(target);
         }
     }

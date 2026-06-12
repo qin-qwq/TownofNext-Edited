@@ -9,8 +9,6 @@ using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;
 
-// 贴图来源 : https://github.com/Dolly1016/Nebula-Public
-
 internal class Sniper : RoleBase
 {
     //===========================SETUP================================\\

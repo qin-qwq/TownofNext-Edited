@@ -23,7 +23,7 @@ internal class Dreamer : RoleBase
     private static OptionItem CanVent;
     private static OptionItem HasImpostorVision;
 
-    private (bool, float) SkillTime = (false, 0f);
+    private (bool, long) SkillTime = (false, 0);
     private Vector2 RealPosition;
 
     public override void SetupCustomOption()
@@ -32,10 +32,10 @@ internal class Dreamer : RoleBase
         KillCooldown = FloatOptionItem.Create(Id + 11, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 25f, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Dreamer])
             .SetValueFormat(OptionFormat.Seconds);
-        FantasyCooldown = FloatOptionItem.Create(Id + 12, "FantasyCooldown", new(0f, 180f, 2.5f), 25f, TabGroup.NeutralRoles, false)
+        FantasyCooldown = IntegerOptionItem.Create(Id + 12, "FantasyCooldown", new(1, 180, 1), 25, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Dreamer])
             .SetValueFormat(OptionFormat.Seconds);
-        FantasyDuration = FloatOptionItem.Create(Id + 13, "FantasyDuration", new(0f, 180f, 2.5f), 15f, TabGroup.NeutralRoles, false)
+        FantasyDuration = IntegerOptionItem.Create(Id + 13, "FantasyDuration", new(1, 180, 1), 15, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Dreamer])
             .SetValueFormat(OptionFormat.Seconds);
         FantasySpeed = FloatOptionItem.Create(Id + 14, "FantasySpeed", new(0f, 5f, 0.25f), 1.75f, TabGroup.NeutralRoles, false)
@@ -48,7 +48,7 @@ internal class Dreamer : RoleBase
     }
     public override void Init()
     {
-        SkillTime = (false, 0f);
+        SkillTime = (false, 0);
         RealPosition = Vector2.zero;
     }
 
@@ -71,7 +71,7 @@ internal class Dreamer : RoleBase
 
         pc.FreezeForOthers();
         pc.MarkDirtySettings();
-        SkillTime = (true, FantasyDuration.GetFloat());
+        SkillTime = (true, Utils.GetTimeStamp());
         RealPosition = pc.GetCustomPosition();
         pc.RpcAddAbilityCD(includeDuration: true);
         return false;
@@ -95,14 +95,14 @@ internal class Dreamer : RoleBase
 
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
     {
+        if (lowLoad) return;
+
         if (SkillTime.Item1)
         {
-            SkillTime.Item2 -= Time.fixedDeltaTime;
-
-            if (SkillTime.Item2 <= 0)
+            if (SkillTime.Item2 + FantasyDuration.GetInt() < nowTime)
             {
                 pc.RevertFreeze(RealPosition);
-                SkillTime = (false, 0f);
+                SkillTime = (false, 0);
                 pc.MarkDirtySettings();
             }
         }
@@ -113,7 +113,7 @@ internal class Dreamer : RoleBase
         if (SkillTime.Item1)
         {
             _Player.RevertFreeze(RealPosition);
-            SkillTime = (false, 0f);
+            SkillTime = (false, 0);
             _Player.MarkDirtySettings();
         }
     }
@@ -123,7 +123,7 @@ internal class Dreamer : RoleBase
         if (SkillTime.Item1)
         {
             target.RevertFreeze(RealPosition);
-            SkillTime = (false, 0f);
+            SkillTime = (false, 0);
             target.MarkDirtySettings();
         }
     }

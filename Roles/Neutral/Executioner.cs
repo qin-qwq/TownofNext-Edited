@@ -204,7 +204,7 @@ internal class Executioner : RoleBase
         Utils.NotifyRoles(SpecifySeer: executioner);
     }
 
-    public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    /*public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
         if (_Player != null && _Player.PlayerId == target.PlayerId)
         {
@@ -212,7 +212,7 @@ internal class Executioner : RoleBase
             TargetList.Remove(TargetId);
             TargetId = byte.MaxValue;
         }
-    }
+    }*/
     private void OnOthersDead(PlayerControl killer, PlayerControl target, bool inMeeting)
     {
         if (IsTarget(target.PlayerId))

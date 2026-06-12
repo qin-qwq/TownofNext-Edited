@@ -21,7 +21,8 @@ internal class Fury : RoleBase
     private static OptionItem AngryKillCooldown;
     private static OptionItem AngrySpeed;
 
-    private (bool, float) PlayerToAngry = (false, 0f);
+    private (bool, long) PlayerToAngry = (false, 0);
+    private bool Animation = false;
     private static readonly Dictionary<byte, float> tmpSpeed = [];
     private static readonly Dictionary<byte, float> tmpKcd = [];
 
@@ -30,9 +31,9 @@ internal class Fury : RoleBase
         SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Fury);
         KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 120f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Seconds);
-        AngryCooldown = FloatOptionItem.Create(Id + 11, "AngryCooldown", new(2.5f, 120f, 2.5f), 25f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
+        AngryCooldown = IntegerOptionItem.Create(Id + 11, "AngryCooldown", new(1, 120, 1), 25, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Seconds);
-        AngryDuration = FloatOptionItem.Create(Id + 12, "AngryDuration", new(2.5f, 60f, 2.5f), 15f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
+        AngryDuration = IntegerOptionItem.Create(Id + 12, "AngryDuration", new(1, 60, 1), 15, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
                 .SetValueFormat(OptionFormat.Seconds);
         AngryKillCooldown = FloatOptionItem.Create(Id + 13, "AngryKillCooldown", new(0f, 120f, 2.5f), 2.5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Fury])
             .SetValueFormat(OptionFormat.Seconds);
@@ -47,7 +48,8 @@ internal class Fury : RoleBase
     }
     public override void Add(byte playerId)
     {
-        PlayerToAngry = (false, 0f);
+        PlayerToAngry = (false, 0);
+        Animation = false;
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
@@ -60,12 +62,12 @@ internal class Fury : RoleBase
     {
         if (PlayerToAngry.Item1)
         {
-            PlayerToAngry = (false, 0f);
+            PlayerToAngry = (false, 0);
             ToCalm(player, true);
             return false;
         }
         if (player.HasAbilityCD()) return false;
-        PlayerToAngry = (true, AngryDuration.GetFloat());
+        PlayerToAngry = (true, Utils.GetTimeStamp());
         ToAngry(player);
         return false;
     }
@@ -73,20 +75,27 @@ internal class Fury : RoleBase
     public void ToAngry(PlayerControl player)
     {
         player.RpcAddAbilityCD(includeDuration: true);
-        player.SetKillCooldown(AngryKillCooldown.GetFloat());
         foreach (var target in Main.EnumeratePlayerControls())
         {
             if (!target.IsModded()) target.KillFlash();
             RPC.PlaySoundRPC(Sounds.ImpTransform, target.PlayerId);
             target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Fury), GetString("SeerFuryInRage")));
         }
-        player.MarkDirtySettings();
         tmpSpeed.Remove(player.PlayerId);
         tmpSpeed.Add(player.PlayerId, Main.AllPlayerSpeed[player.PlayerId]);
-        Main.AllPlayerSpeed[player.PlayerId] = AngrySpeed.GetFloat();
         tmpKcd.Remove(player.PlayerId);
         tmpKcd.Add(player.PlayerId, Main.AllPlayerKillCooldown[player.PlayerId]);
-        Main.AllPlayerKillCooldown[player.PlayerId] = AngryKillCooldown.GetFloat();
+        Animation = true;
+        Main.AllPlayerSpeed[player.PlayerId] = Main.MinSpeed;
+        player.MarkDirtySettings();
+        _ = new LateTask(() =>
+        {
+            Animation = false;
+            player.SetKillCooldown(AngryKillCooldown.GetFloat());
+            Main.AllPlayerSpeed[player.PlayerId] = AngrySpeed.GetFloat();
+            Main.AllPlayerKillCooldown[player.PlayerId] = AngryKillCooldown.GetFloat();
+            player.MarkDirtySettings();
+        }, 1.5f, "Fury To Angry");
     }
 
     public void ToCalm(PlayerControl player, bool reset = false)
@@ -97,22 +106,31 @@ internal class Fury : RoleBase
             player.RpcRemoveAbilityCD();
             player.RpcAddAbilityCD();
         }
-        Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - AngrySpeed.GetFloat() + tmpSpeed[player.PlayerId];
-        Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKcd[player.PlayerId];
         player.Notify(GetString("FuryInCalm"), 5f);
+        Animation = true;
+        Main.AllPlayerSpeed[player.PlayerId] = Main.MinSpeed;
         player.MarkDirtySettings();
+        _ = new LateTask(() =>
+        {
+            Animation = false;
+            Main.AllPlayerSpeed[player.PlayerId] = Main.AllPlayerSpeed[player.PlayerId] - Main.MinSpeed + tmpSpeed[player.PlayerId];
+            Main.AllPlayerKillCooldown[player.PlayerId] = Main.AllPlayerKillCooldown[player.PlayerId] - AngryKillCooldown.GetFloat() + tmpKcd[player.PlayerId];
+            player.MarkDirtySettings();
+        }, 1.5f, "Fury To Calm");
     }
+
+    public override bool CanUseKillButton(PlayerControl pc) => !Animation;
 
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
     {
+        if (lowLoad) return;
+
         if (PlayerToAngry.Item1)
         {
-            PlayerToAngry.Item2 -= Time.fixedDeltaTime;
-
-            if (PlayerToAngry.Item2 <= 0)
+            if (PlayerToAngry.Item2 + AngryDuration.GetInt() < nowTime)
             {
                 ToCalm(pc);
-                PlayerToAngry = (false, 0f);
+                PlayerToAngry = (false, 0);
             }
         }
     }
@@ -122,7 +140,7 @@ internal class Fury : RoleBase
         if (PlayerToAngry.Item1)
         {
             ToCalm(_Player);
-            PlayerToAngry = (false, 0f);
+            PlayerToAngry = (false, 0);
         }
     }
 
@@ -131,7 +149,7 @@ internal class Fury : RoleBase
         if (PlayerToAngry.Item1)
         {
             ToCalm(target);
-            PlayerToAngry = (false, 0f);
+            PlayerToAngry = (false, 0);
         }
     }
 

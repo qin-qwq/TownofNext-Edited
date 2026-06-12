@@ -20,6 +20,7 @@ public class GameSettingMenuPatch
 
     static Dictionary<TabGroup, PassiveButton> ModSettingsButtons = [];
     static Dictionary<TabGroup, GameOptionsMenu> ModSettingsTabs = [];
+    public static readonly TabGroup[] TabGroupValues = Enum.GetValues<TabGroup>();
     public static GameSettingMenu Instance;
 
     [HarmonyPatch(nameof(GameSettingMenu.Start)), HarmonyPrefix]
@@ -30,11 +31,11 @@ public class GameSettingMenuPatch
 
         TabGroup[] ExludeList = Options.CurrentGameMode switch
         {
-            CustomGameMode.HidenSeekTONE => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
-            CustomGameMode.FFA => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
-            CustomGameMode.SpeedRun => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
-            CustomGameMode.TagMode => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
-            CustomGameMode.BonfireNight => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
+            CustomGameMode.HidenSeekTONE => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.FFA => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.SpeedRun => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.TagMode => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.BonfireNight => TabGroupValues.Skip(2).ToArray(),
             _ => []
         };
 

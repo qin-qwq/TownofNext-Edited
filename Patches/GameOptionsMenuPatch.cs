@@ -95,6 +95,8 @@ public static class GameOptionsMenuPatch
                     chmText.fontStyle = FontStyles.Bold;
                     chmText.outlineWidth = 0.17f;
                     var chmCollider = categoryHeaderMasked.gameObject.AddComponent<BoxCollider2D>();
+                    chmCollider.size = new Vector2(7, 0.7f);
+                    chmCollider.offset = new Vector2(1.5f, -0.3f);
                     var chmButton = categoryHeaderMasked.gameObject.AddComponent<PassiveButton>();
                     chmButton.ClickSound = __instance.BackButton.GetComponent<PassiveButton>().ClickSound;
                     chmButton.OnMouseOver = new();
