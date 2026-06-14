@@ -1643,9 +1643,14 @@ class FixedUpdateInNormalGamePatch
         }
     }
 }
-[HarmonyPatch(typeof(PlayerControl._Start_d__82), "MoveNext")]
+[HarmonyPatch]
 class PlayerStartPatch
 {
+    public static MethodBase TargetMethod()
+    {
+        return Utils.GetStateMachineMoveNext<PlayerControl>(nameof(PlayerControl._Start_d__82));
+    }
+
     public static void Postfix(PlayerControl._Start_d__82 __instance, ref bool __result)
     {
         if (__result) return;
@@ -1670,9 +1675,14 @@ class PlayerStartPatch
     }
 }
 // Player press vent button
-[HarmonyPatch(typeof(PlayerPhysics._CoEnterVent_d__47), "MoveNext")]
+[HarmonyPatch]
 class CoEnterVentPatch
 {
+    public static MethodBase TargetMethod()
+    {
+        return Utils.GetStateMachineMoveNext<PlayerPhysics>(nameof(PlayerPhysics._CoEnterVent_d__47));
+    }
+
     public static bool Prefix(PlayerPhysics._CoEnterVent_d__47 __instance)
     {
         if (__instance.__1__state >= 1) return true; // track the start of function
@@ -1804,9 +1814,14 @@ class RpcEnterVentPatch
     }
 }
 
-[HarmonyPatch(typeof(PlayerPhysics._CoExitVent_d__48), "MoveNext")]
+[HarmonyPatch]
 class CoExitVentPatch
 {
+    public static MethodBase TargetMethod()
+    {
+        return Utils.GetStateMachineMoveNext<PlayerPhysics>(nameof(PlayerPhysics._CoExitVent_d__48));
+    }
+
     public static void Postfix(PlayerPhysics._CoExitVent_d__48 __instance, ref bool __result)
     {
         if (__result) return; // false is end of co

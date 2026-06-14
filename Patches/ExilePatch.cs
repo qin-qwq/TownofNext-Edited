@@ -48,9 +48,14 @@ class ExileControllerWrapUpPatch
         }
     }
 
-    [HarmonyPatch(typeof(AirshipExileController._WrapUpAndSpawn_d__11), "MoveNext")]
+    [HarmonyPatch]
     class AirshipExileControllerPatch
     {
+        public static MethodBase TargetMethod()
+        {
+            return Utils.GetStateMachineMoveNext<AirshipExileController>(nameof(AirshipExileController._WrapUpAndSpawn_d__11));
+        }
+
         public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
         {
             if (Main.NormalOptions.MapId == 7) return;
