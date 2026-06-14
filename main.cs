@@ -55,11 +55,11 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.06.07";
+    public const string PluginVersion = "26.06.13";
     public const string PluginDisplayVersion = "2.0.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2026, 3, 31, 0) // 2026.3.31 & 17.3 & 2026.6.5 & 17.4
+            (2026, 6, 5, 0) // 2026.6.5 & 17.4
         ];
 
     // Change this to change alpha/beta/full release
