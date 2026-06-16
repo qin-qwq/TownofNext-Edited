@@ -328,6 +328,18 @@ public static class CustomRoleManager
             return false;
         }
 
+        if (killer.GetCustomRole().GetRoleTypes() == RoleTypes.Viper)
+        {
+            foreach (var pc in Main.EnumeratePlayerControls())
+            {
+                killer.RpcSetRoleDesyncV2(RoleTypes.Viper, pc.GetClientId());
+
+                if (pc.IsModded() || pc.GetCustomRole().IsImpostor() || pc == killer) continue;
+                var realKiller = killer;
+                _ = new LateTask(() => { realKiller.RpcSetRoleDesyncV2(RoleTypes.Crewmate, pc.GetClientId()); }, 0.01f, "Revert Crewmate");
+            }
+        }
+
         return true;
     }
     /// <summary>

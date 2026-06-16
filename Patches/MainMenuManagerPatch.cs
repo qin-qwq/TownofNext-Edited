@@ -275,3 +275,17 @@ public static class MainMenuManagerPatch
         if (MainMenuManagerStartPatch.ToheLogo != null) MainMenuManagerStartPatch.ToheLogo.gameObject.SetActive(true);
     }
 }
+[HarmonyPatch(typeof(EjectMainMenu), nameof(EjectMainMenu.EjectCrewmate))]
+class EjectMainMenuEjectCrewmatePatch
+{
+    public static void Postfix(EjectMainMenu __instance)
+    {
+        try
+        {
+            __instance.pressState.SetActive(false);
+            __instance.ejectButton.SetActive(true);
+            __instance.onCooldown = false;
+        }
+        catch { }
+    }
+}

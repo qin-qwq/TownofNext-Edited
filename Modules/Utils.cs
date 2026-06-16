@@ -946,7 +946,8 @@ public static class Utils
                 }
                 if (Main.CurrentServerIsVanilla)
                 {
-                    if (mode.Contains("100")) mode = GetString("RoleOn");
+                    if (mode.Contains(GetString("Chance100"))) mode = GetString("RoleOn");
+                    else if (mode.Contains(GetString("Chance0"))) mode = GetString("RoleOff");
                     else mode = GetString("RoleRate");
                 }
                 var roleDisplay = ColorString(GetRoleColor(role), $"{GetRoleName(role)}") + $": {mode} x{role.GetCount()}";
@@ -1858,8 +1859,18 @@ public static class Utils
     {
         try
         {
-            if (!AmongUsClient.Instance.AmHost) return;
-            if (!SetUpRoleTextPatch.IsInIntro && ((SpecifySeer && SpecifySeer.IsModded() && (Options.CurrentGameMode == CustomGameMode.Standard || SpecifySeer.IsHost())) || (GameStates.IsMeeting && !isForMeeting) || GameStates.IsLobby)) return;
+            if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek || Main.EnumeratePlayerControls() == null || SetUpRoleTextPatch.IsInIntro) return;
+
+            if (MeetingHud.Instance)
+            {
+                // When the meeting window is active and game is not ended
+                if (!GameEndCheckerForNormal.GameIsEnded) return;
+            }
+            else
+            {
+                // When some one press report button but NotifyRoles is not for meeting
+                if (Main.MeetingIsStarted && !isForMeeting) return;
+            }
 
             var apc = Main.EnumeratePlayerControls();
             var seerList = SpecifySeer ? [SpecifySeer] : apc;
@@ -1867,7 +1878,7 @@ public static class Utils
 
             var hasValue = false;
             var sender = CustomRpcSender.Create("NotifyRoles", SendOption, log: false);
-            if (!isForMeeting) sender.StartPackedMessage();
+            if (!isForMeeting && !GameStates.IsLocalGame) sender.StartPackedMessage();
 
             foreach (PlayerControl seer in seerList)
             {
@@ -2281,7 +2292,11 @@ public static class Utils
 
         try
         {
-            if (!seer || seer.Data.Disconnected || (seer.IsModded() && (seer.IsHost() || Options.CurrentGameMode == CustomGameMode.Standard)) || (!SetUpRoleTextPatch.IsInIntro && GameStates.IsLobby))
+            // Do nothing when the seer is not present in the game
+            if (!seer || seer.notRealPlayer)
+                return false;
+
+            if (seer.IsModded() || seer.PlayerId == OnPlayerLeftPatch.LeftPlayerId || seer.Data.Disconnected)
                 return false;
 
             sender ??= CustomRpcSender.Create("NotifyRoles", sendOption);
@@ -2688,10 +2703,7 @@ public static class Utils
     {
         if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
         {
-            foreach (var playerinfo in GameData.Instance.AllPlayers)
-            {
-                playerinfo.SendGameData();
-            }
+            Main.Instance.StartCoroutine(SendGameDataToEveryone());
         }
         else
         {
@@ -2702,6 +2714,44 @@ public static class Utils
 
             AmongUsClient.Instance.SendAllStreamedObjects();
         }
+    }
+    public static System.Collections.IEnumerator SendGameDataToEveryone()
+    {
+        int messages = 0;
+
+        MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
+        writer.StartMessage(5);
+        writer.Write(AmongUsClient.Instance.GameId);
+
+        foreach (NetworkedPlayerInfo playerinfo in GameData.Instance.AllPlayers)
+        {
+            if (writer.Length > 500 || messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
+            {
+                messages = 0;
+                writer.EndMessage();
+                var qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(writer));
+                yield return qa.Wait();
+                if (qa.Dropped)
+                {
+                    writer.Recycle();
+                    yield break;
+                }
+                writer.Clear(SendOption.Reliable);
+                writer.StartMessage(5);
+                writer.Write(AmongUsClient.Instance.GameId);
+            }
+
+            writer.StartMessage(1);
+            writer.WritePacked(playerinfo.NetId);
+            playerinfo.Serialize(writer, false);
+            writer.EndMessage();
+            
+            messages++;
+        }
+
+        writer.EndMessage();
+        yield return DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(writer)).Wait();
+        writer.Recycle();
     }
     public static void SetAllVentInteractions()
     {

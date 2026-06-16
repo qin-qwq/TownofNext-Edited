@@ -342,15 +342,15 @@ class SetEverythingUpPatch
 
         LastWinsText = WinnerText.text/*.RemoveHtmlTags()*/;
 
-        GC.Collect();
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //########################################
         //     ==The final result indicates==
         //########################################
 
+        GC.Collect();
         Resources.UnloadUnusedAssets();
+        GC.Collect();
 
         var Pos = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, Camera.main.nearClipPlane));
         var RoleSummaryObject = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);

@@ -235,7 +235,7 @@ internal class Executioner : RoleBase
 
     public override void CheckExileTarget(NetworkedPlayerInfo exiled, ref bool DecidedWinner, bool isMeetingHud, ref string name)
     {
-        if (!_Player.IsAlive() || !IsTarget(exiled.PlayerId)) return;
+        if (!_Player.IsAlive() || !IsTarget(exiled.PlayerId) || !exiled) return;
 
         if (isMeetingHud)
         {

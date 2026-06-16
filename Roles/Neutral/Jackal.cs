@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
 using UnityEngine;
@@ -470,8 +471,8 @@ internal class Jackal : RoleBase
 
     public static bool JackalChannel(PlayerControl pc, string msg, bool check = true)
     {
-        if (!AmongUsClient.Instance.AmHost) return false;
-        if (!GameStates.IsMeeting || pc == null) return false;
+        //if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.Is(CustomRoles.Jackal) && !pc.Is(CustomRoles.Sidekick) && !pc.Is(CustomRoles.Recruit)) return false;
         if (!EnableJackalChannel.GetBool()) return false;
         if (!pc.IsAlive()) return false;
@@ -483,10 +484,23 @@ internal class Jackal : RoleBase
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jackal) || x.Is(CustomRoles.Sidekick) || x.Is(CustomRoles.Recruit))
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), $"{GetString("MessageFromJackal")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+        if (AmongUsClient.Instance.AmHost || !pc.IsModded())
+        {
+            SendJackalChannelMsg(pc, msg);
+        }
+        else
+        {
+            var message = new RpcSendChannelMsg(PlayerControl.LocalPlayer.NetId, msg, (int)SendTargetPatch.SendTargets.Jackal);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
 
         return true;
+    }
+
+    public static void SendJackalChannelMsg(PlayerControl pc, string msg)
+    {
+        Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jackal) || x.Is(CustomRoles.Sidekick) || x.Is(CustomRoles.Recruit))
+            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), $"{GetString("MessageFromJackal")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 }
 

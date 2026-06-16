@@ -24,6 +24,17 @@ internal class ControllerManagerUpdatePatch
         */
         try
         {
+            var clientControlGUI = ClientControlGUI.Instance;
+            var hudManagerExists = HudManager.InstanceExists;
+
+            if (clientControlGUI)
+            {
+                if ((!hudManagerExists || !HudManager.Instance.Chat || !HudManager.Instance.Chat.IsOpenOrOpening) && Input.GetKeyDown(KeyCode.Delete))
+                    clientControlGUI.TogglePanel();
+
+                if (clientControlGUI.IsOpen) return;
+            }
+
             if (!RehostManager.IsAutoRehostDone && GetKeysDown(KeyCode.LeftShift, KeyCode.C))
             {
                 Logger.Info("User canceled Auto Rehost!", "ControllerManager");

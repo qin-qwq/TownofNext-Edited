@@ -115,9 +115,9 @@ static class ExtendedPlayerControl
     {
         player.StartCoroutine(player.CoSetRole(role, canOverride));
     }
-    public static void RpcSetRoleDesync(this PlayerControl player, RoleTypes role,/* bool canOverride,*/ int clientId)
+    public static void RpcSetRoleDesync(this PlayerControl player, RoleTypes role, int clientId)
     {
-        if (player == null) return;
+        if (!player) return;
         if (AmongUsClient.Instance.ClientId == clientId)
         {
             player.SetRole(role, true);
@@ -127,6 +127,21 @@ static class ExtendedPlayerControl
         var message = new RpcSetRoleMessage(player.NetId, role, true);
         RpcUtils.LateSpecificSendMessage(message, clientId, SendOption.Reliable);
     }
+    public static void RpcSetRoleDesyncV2(this PlayerControl player, RoleTypes role, int clientId)
+    {
+        if (!player) return;
+
+        if (AmongUsClient.Instance.ClientId == clientId)
+        {
+            player.SetRole(role, true);
+            return;
+        }
+
+        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)RpcCalls.SetRole, SendOption.Reliable, clientId);
+        writer.Write((ushort)role);
+        writer.Write(true);
+        AmongUsClient.Instance.FinishRpcImmediately(writer);
+    }
 
     public static (RoleTypes RoleType, CustomRoles CustomRole) GetRoleMap(this PlayerControl player, byte targetId = byte.MaxValue) => Utils.GetRoleMap(player.PlayerId, targetId);
 
@@ -135,7 +150,7 @@ static class ExtendedPlayerControl
     /// </summary>
     public static void RpcRevive(this PlayerControl player)
     {
-        if (player == null) return;
+        if (!player) return;
         if (!player.Data.IsDead && player.IsAlive())
         {
             Logger.Warn($"Invalid Revive for {player.GetRealName()} / player have data is dead: {player.Data.IsDead}, in game states is dead: {!player.IsAlive()}", "RpcRevive");
@@ -173,7 +188,7 @@ static class ExtendedPlayerControl
     /// <param name="newCustomRole">The custom role to change and auto set role type for others</param>
     public static void RpcChangeRoleBasis(this PlayerControl player, CustomRoles newCustomRole, bool loggerRoleMap = false)
     {
-        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || player == null) return;
+        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || !player) return;
 
         var playerId = player.PlayerId;
         var playerClientId = player.GetClientId();
@@ -332,7 +347,7 @@ static class ExtendedPlayerControl
     /// </summary>
     public static void RpcSetRoleType(this PlayerControl player, RoleTypes roleType, bool removeFromDesyncList)
     {
-        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || player == null) return;
+        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || !player) return;
 
         var customRole = player.GetCustomRole();
         player.RpcSetRole(roleType, canOverrideRole: true);
@@ -350,7 +365,7 @@ static class ExtendedPlayerControl
     /// </summary>
     public static void RpcResetTasks(this PlayerControl player)
     {
-        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || player == null) return;
+        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || !player) return;
 
         player.Data.RpcSetTasks(new Il2CppStructArray<byte>(0));
         Main.PlayerStates[player.PlayerId].InitTask(player);

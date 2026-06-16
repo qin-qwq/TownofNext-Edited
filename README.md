@@ -94,6 +94,7 @@
 > - Improved Role Spawns
 > - Improve text box (TextBoxPatch.cs)
 > - Some ideas to improve performance
+> - Some ideas to support Android
 >
 ### :star: [TONEX (Formerly TOHEX)](https://github.com/XtremeWave/TownOfNewEpic_Xtreme)
 >

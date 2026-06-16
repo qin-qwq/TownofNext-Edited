@@ -39,6 +39,10 @@ public static class BonfireNight
     public static (int, int, int) BonfireState = (0, 0, 0);
     public static bool FireThief = false;
     public static (string, string) Draw = (string.Empty, string.Empty);
+    public static int CachedWoodGrowthTime;
+    public static int CachedMaxWoodRefresh;
+    public static int CachedSakuraGrowthTime;
+    public static int CachedMaxSakuraRefresh;
 
     public static TreeState Tree1;
     public static TreeState Tree2;
@@ -119,12 +123,16 @@ public static class BonfireNight
         Tree4.Wood = MaximumWoodRefreshQuantity.GetInt();
         SakuraTree1.Wood = MaximumSakuraWoodRefreshQuantity.GetInt();
         SakuraTree2.Wood = MaximumSakuraWoodRefreshQuantity.GetInt();
-        Tree1.Grow = WoodGrowthTime.GetInt();
-        Tree2.Grow = WoodGrowthTime.GetInt();
-        Tree3.Grow = WoodGrowthTime.GetInt();
-        Tree4.Grow = WoodGrowthTime.GetInt();
-        SakuraTree1.Grow = SakuraWoodGrowthTime.GetInt();
-        SakuraTree2.Grow = SakuraWoodGrowthTime.GetInt();
+        Tree1.Grow = 0;
+        Tree2.Grow = 0;
+        Tree3.Grow = 0;
+        Tree4.Grow = 0;
+        SakuraTree1.Grow = 0;
+        SakuraTree2.Grow = 0;
+        CachedWoodGrowthTime = WoodGrowthTime.GetInt();
+        CachedMaxWoodRefresh = MaximumWoodRefreshQuantity.GetInt();
+        CachedSakuraGrowthTime = SakuraWoodGrowthTime.GetInt();
+        CachedMaxSakuraRefresh = MaximumSakuraWoodRefreshQuantity.GetInt();
 
         switch (GetActiveMapName())
         {
@@ -153,7 +161,7 @@ public static class BonfireNight
             case MapNames.Polus:
                 RedTeamState.Position = new Vector2(36.5f, -7.5f);
                 BlueTeamState.Position = new Vector2(2.3f, -24.0f);
-                FireThiefState.Position = new Vector2(24.0f, -22.5f);
+                FireThiefState.Position = new Vector2(21.75f, -25.15f);
                 SakuraTree1.Position = new Vector2(26.0f, -17.0f);
                 SakuraTree2.Position = new Vector2(9.5f, -12.5f);
                 Tree1.Position = new Vector2(36.5f, -22.0f);
@@ -219,7 +227,6 @@ public static class BonfireNight
                 var targetClientId = pc.GetClientId();
                 if (pc.Is(CustomRoles.RWoodCollector))
                 {
-                    pc.RpcSetRoleDesync(RoleTypes.Phantom, targetClientId);
                     pc.SetColor(0);
 
                     var message = new RpcSetColorMessage(pc.NetId, pc.Data.NetId, 0);
@@ -228,7 +235,6 @@ public static class BonfireNight
                 }
                 else if (pc.Is(CustomRoles.BWoodCollector))
                 {
-                    pc.RpcSetRoleDesync(RoleTypes.Phantom, targetClientId);
                     pc.SetColor(1);
 
                     var message = new RpcSetColorMessage(pc.NetId, pc.Data.NetId, 1);
@@ -254,6 +260,7 @@ public static class BonfireNight
         writer.Write(BonfireState.Item1);
         writer.Write(BonfireState.Item2);
         writer.Write(BonfireState.Item3);
+        writer.Write(FireThief);
         var sender = new RpcSyncBonfireNightStates(PlayerControl.LocalPlayer.NetId, writer);
         RpcUtils.LateBroadcastReliableMessage(sender);
     }
@@ -268,6 +275,7 @@ public static class BonfireNight
         BonfireState.Item1 = reader.ReadInt32();
         BonfireState.Item2 = reader.ReadInt32();
         BonfireState.Item3 = reader.ReadInt32();
+        FireThief = reader.ReadBoolean();
     }
 
     public static void SelectRoles()
@@ -387,7 +395,7 @@ public static class BonfireNight
         public int Wood;
         public Vector2 Position;
         internal Tree Tree;
-        public int Grow;
+        public long Grow;
     }
 
     public struct SakuraTreeState
@@ -395,7 +403,7 @@ public static class BonfireNight
         public int Wood;
         public Vector2 Position;
         internal SakuraTree SakuraTree;
-        public int Grow;
+        public long Grow;
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
@@ -418,16 +426,16 @@ public static class BonfireNight
                 NotifyRoles();
             }
 
-            var maxWood = MaximumWoodRefreshQuantity.GetInt();
-            var growTime = WoodGrowthTime.GetInt();
+            var maxWood = CachedMaxWoodRefresh;
+            var growTime = CachedWoodGrowthTime;
 
             Tree1 = UpdateTree(Tree1, maxWood, growTime);
             Tree2 = UpdateTree(Tree2, maxWood, growTime);
             Tree3 = UpdateTree(Tree3, maxWood, growTime);
             Tree4 = UpdateTree(Tree4, maxWood, growTime);
 
-            var maxSakura = MaximumSakuraWoodRefreshQuantity.GetInt();
-            var sakuraGrow = SakuraWoodGrowthTime.GetInt();
+            var maxSakura = CachedMaxSakuraRefresh;
+            var sakuraGrow = CachedSakuraGrowthTime;
 
             SakuraTree1 = UpdateSakuraTree(SakuraTree1, maxSakura, sakuraGrow);
             SakuraTree2 = UpdateSakuraTree(SakuraTree2, maxSakura, sakuraGrow);
@@ -437,11 +445,10 @@ public static class BonfireNight
         {
             if (tree.Wood >= maxWood) return tree;
 
-            tree.Grow--;
-            if (tree.Grow > 0) return tree;
+            if (tree.Grow + growTime > TimeStamp) return tree;
 
             tree.Wood++;
-            tree.Grow = growTime;
+            tree.Grow = GetTimeStamp();
             if (tree.Wood == 1)
                 tree.Tree = new Tree(tree.Position);
             return tree;
@@ -451,11 +458,10 @@ public static class BonfireNight
         {
             if (tree.Wood >= maxWood) return tree;
 
-            tree.Grow--;
-            if (tree.Grow > 0) return tree;
+            if (tree.Grow + growTime > TimeStamp) return tree;
 
             tree.Wood++;
-            tree.Grow = growTime;
+            tree.Grow = GetTimeStamp();
             if (tree.Wood == 1)
                 tree.SakuraTree = new SakuraTree(tree.Position);
             return tree;
@@ -550,9 +556,9 @@ public class FireThief : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.None;
     public override bool IsDesyncRole => true;
 
-    public int WoodNum = 0;
-    public float ReviveTime = 0;
-    public int MaxNum = 0;
+    public static readonly Dictionary<byte, int> WoodNum = [];
+    public static readonly Dictionary<byte, int> MaxNum = [];
+    public long ReviveTime = 0;
 
     public override bool CanUseSabotage(PlayerControl pc)
     {
@@ -564,9 +570,9 @@ public class FireThief : RoleBase
         return false;
     }
 
-    public override bool CanUseKillButton(PlayerControl pc) => WoodNum == 0;
+    public override bool CanUseKillButton(PlayerControl pc) => WoodNum[pc.PlayerId] == 0;
 
-    public override bool CanUseImpostorVentButton(PlayerControl pc) => WoodNum == 0;
+    public override bool CanUseImpostorVentButton(PlayerControl pc) => WoodNum[pc.PlayerId] == 0;
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = BonfireNight.KillCooldown.GetFloat();
 
@@ -575,12 +581,18 @@ public class FireThief : RoleBase
         return false;
     }
 
+    public override void Init()
+    {
+        WoodNum.Clear();
+        MaxNum.Clear();
+    }
+
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        WoodNum = 0;
-        ReviveTime = BonfireNight.ReviveCooldown.GetFloat();
-        MaxNum = player.Is(CustomRoles.FireThief) ? BonfireNight.FireThiefMaximumWoodHoldingQuantity.GetInt() : BonfireNight.MaximumWoodHoldingQuantity.GetInt();
+        WoodNum.TryAdd(playerId, 0);
+        MaxNum.TryAdd(playerId, player.Is(CustomRoles.FireThief) ? BonfireNight.FireThiefMaximumWoodHoldingQuantity.GetInt() : BonfireNight.MaximumWoodHoldingQuantity.GetInt());
+        ReviveTime = 0;
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -590,10 +602,11 @@ public class FireThief : RoleBase
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        if (!player.IsAlive() && ReviveTime > 0)
+        if (lowLoad) return;
+
+        if (!player.IsAlive())
         {
-            ReviveTime -= Time.fixedDeltaTime;
-            if (ReviveTime <= 0)
+            if (ReviveTime + BonfireNight.ReviveCooldown.GetInt() < nowTime)
             {
                 player.RpcRevive();
                 switch (player.GetCustomRole())
@@ -608,103 +621,97 @@ public class FireThief : RoleBase
                         player.RpcTeleport(BonfireNight.FireThiefState.Position);
                         break;
                 }
-                ReviveTime = BonfireNight.ReviveCooldown.GetFloat();
             }
         }
 
         var changed = false;
-        if (player.Is(CustomRoles.RWoodCollector) && GetDistance(player.GetCustomPosition(), BonfireNight.RedTeamState.Position) <= 1f && WoodNum > 0)
+        if (player.Is(CustomRoles.RWoodCollector) && GetDistance(player.GetCustomPosition(), BonfireNight.RedTeamState.Position) <= 1f && WoodNum[player.PlayerId] > 0)
         {
-            BonfireNight.BonfireState.Item1 += WoodNum;
-            WoodNum = 0;
+            BonfireNight.BonfireState.Item1 += WoodNum[player.PlayerId];
+            WoodNum[player.PlayerId] = 0;
             changed = true;
         }
 
-        if (player.Is(CustomRoles.BWoodCollector) && GetDistance(player.GetCustomPosition(), BonfireNight.BlueTeamState.Position) <= 1f && WoodNum > 0)
+        if (player.Is(CustomRoles.BWoodCollector) && GetDistance(player.GetCustomPosition(), BonfireNight.BlueTeamState.Position) <= 1f && WoodNum[player.PlayerId] > 0)
         {
-            BonfireNight.BonfireState.Item2 += WoodNum;
-            WoodNum = 0;
+            BonfireNight.BonfireState.Item2 += WoodNum[player.PlayerId];
+            WoodNum[player.PlayerId] = 0;
             changed = true;
         }
 
-        if (player.Is(CustomRoles.FireThief) && GetDistance(player.GetCustomPosition(), BonfireNight.FireThiefState.Position) <= 1f && WoodNum > 0)
+        if (player.Is(CustomRoles.FireThief) && GetDistance(player.GetCustomPosition(), BonfireNight.FireThiefState.Position) <= 1f && WoodNum[player.PlayerId] > 0)
         {
-            BonfireNight.BonfireState.Item3 += WoodNum;
-            WoodNum = 0;
+            BonfireNight.BonfireState.Item3 += WoodNum[player.PlayerId];
+            WoodNum[player.PlayerId] = 0;
             changed = true;
         }
 
         if (changed)
         {
-            SendRPC();
+            SendRPC(player);
             BonfireNight.RpcSyncBonfireNightStates();
             NotifyRoles();
         }
     }
 
-    public void SendRPC()
+    public void SendRPC(PlayerControl player)
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
-        writer.Write(WoodNum);
+        writer.Write(WoodNum[player.PlayerId]);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
-        WoodNum = reader.ReadInt32();
+        WoodNum[pc.PlayerId] = reader.ReadInt32();
     }
 
-    public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
+    /*public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
         if (seer.PlayerId == seen.PlayerId)
         {
             var color = new Color32(244, 164, 96, byte.MaxValue);
-            return ColorString(color, $"({WoodNum}/{MaxNum})");
+            return ColorString(color, $"({WoodNum[seer.PlayerId]}/{MaxNum[seer.PlayerId]})");
         }
 
         return "";
-    }
+    }*/
 
     public override string GetMarkOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        if (seer.PlayerId == seen.PlayerId) return "";
+        //if (seer.PlayerId == seen.PlayerId) return "";
 
-        if (seen.GetRoleClass() is FireThief ft)
-        {
-            var color = new Color32(244, 164, 96, byte.MaxValue);
-            return ColorString(color, $"({ft.WoodNum}/{MaxNum})");
-        }
-
-        return "";
+        var color = new Color32(244, 164, 96, byte.MaxValue);
+        return ColorString(color, $"({WoodNum[seen.PlayerId]}/{MaxNum[seen.PlayerId]})");
     }
 
     public override bool OnCheckVanish(PlayerControl phantom)
     {
         var position = phantom.GetCustomPosition();
 
-        BonfireNight.Tree1 = TryCollect(BonfireNight.Tree1, position, MaxNum);
-        BonfireNight.Tree2 = TryCollect(BonfireNight.Tree2, position, MaxNum);
-        BonfireNight.Tree3 = TryCollect(BonfireNight.Tree3, position, MaxNum);
-        BonfireNight.Tree4 = TryCollect(BonfireNight.Tree4, position, MaxNum);
-        BonfireNight.SakuraTree1 = TryCollect(BonfireNight.SakuraTree1, position, MaxNum);
-        BonfireNight.SakuraTree2 = TryCollect(BonfireNight.SakuraTree2, position, MaxNum);
+        BonfireNight.Tree1 = TryCollect(phantom, BonfireNight.Tree1, position, MaxNum[phantom.PlayerId]);
+        BonfireNight.Tree2 = TryCollect(phantom, BonfireNight.Tree2, position, MaxNum[phantom.PlayerId]);
+        BonfireNight.Tree3 = TryCollect(phantom, BonfireNight.Tree3, position, MaxNum[phantom.PlayerId]);
+        BonfireNight.Tree4 = TryCollect(phantom, BonfireNight.Tree4, position, MaxNum[phantom.PlayerId]);
+        BonfireNight.SakuraTree1 = TryCollect(phantom, BonfireNight.SakuraTree1, position, MaxNum[phantom.PlayerId]);
+        BonfireNight.SakuraTree2 = TryCollect(phantom, BonfireNight.SakuraTree2, position, MaxNum[phantom.PlayerId]);
 
-        if (phantom.Is(CustomRoles.FireThief) && BonfireNight.FireThiefCanStealWood.GetBool() && WoodNum < MaxNum)
+        if (phantom.Is(CustomRoles.FireThief) && BonfireNight.FireThiefCanStealWood.GetBool() && WoodNum[phantom.PlayerId] < MaxNum[phantom.PlayerId])
         {
             if (GetDistance(BonfireNight.RedTeamState.Position, position) <= 1f && BonfireNight.BonfireState.Item1 > 0)
             {
-                WoodNum++;
+                WoodNum[phantom.PlayerId]++;
                 BonfireNight.BonfireState.Item1--;
-                SendRPC();
+                SendRPC(phantom);
                 BonfireNight.RpcSyncBonfireNightStates();
                 NotifyRoles();
             }
 
             if (GetDistance(BonfireNight.BlueTeamState.Position, position) <= 1f && BonfireNight.BonfireState.Item2 > 0)
             {
-                WoodNum++;
+                WoodNum[phantom.PlayerId]++;
                 BonfireNight.BonfireState.Item2--;
-                SendRPC();
+                SendRPC(phantom);
                 BonfireNight.RpcSyncBonfireNightStates();
                 NotifyRoles();
             }
@@ -722,17 +729,22 @@ public class FireThief : RoleBase
 
     public override void OnMurderPlayerAsKiller(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
-        if (target.GetRoleClass() is FireThief ft && ft.WoodNum > 0)
+        if (WoodNum.TryGetValue(target.PlayerId, out var num) && num > 0)
         {
-            WoodNum += ft.WoodNum;
-            ft.WoodNum = 0;
-            if (WoodNum > MaxNum)
+            WoodNum[killer.PlayerId] += num;
+            WoodNum[target.PlayerId] = 0;
+            if (WoodNum[killer.PlayerId] > MaxNum[killer.PlayerId])
             {
-                WoodNum = MaxNum;
+                WoodNum[killer.PlayerId] = MaxNum[killer.PlayerId];
             }
-            SendRPC();
+            SendRPC(killer);
             NotifyRoles();
         }
+    }
+
+    public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    {
+        ReviveTime = GetTimeStamp();
     }
 
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
@@ -743,35 +755,35 @@ public class FireThief : RoleBase
         return seer.IsModded() ? timeText : $"{BonfireNight.GetGameState()}\n{timeText}";
     }
 
-    private BonfireNight.TreeState TryCollect(BonfireNight.TreeState tree, Vector2 pos, int max)
+    private BonfireNight.TreeState TryCollect(PlayerControl player, BonfireNight.TreeState tree, Vector2 pos, int max)
     {
-        if (WoodNum >= max) return tree;
+        if (WoodNum[player.PlayerId] >= max) return tree;
         if (GetDistance(tree.Position, pos) <= 1f && tree.Wood > 0)
         {
-            WoodNum++;
+            WoodNum[player.PlayerId]++;
             tree.Wood--;
             if (tree.Wood <= 0)
             {
                 tree.Tree.Despawn();
             }
         }
-        SendRPC();
+        SendRPC(player);
         NotifyRoles();
         return tree;
     }
-    private BonfireNight.SakuraTreeState TryCollect(BonfireNight.SakuraTreeState tree, Vector2 pos, int max)
+    private BonfireNight.SakuraTreeState TryCollect(PlayerControl player, BonfireNight.SakuraTreeState tree, Vector2 pos, int max)
     {
-        if (WoodNum >= max) return tree;
+        if (WoodNum[player.PlayerId] >= max) return tree;
         if (GetDistance(tree.Position, pos) <= 1f && tree.Wood > 0)
         {
-            WoodNum++;
+            WoodNum[player.PlayerId]++;
             tree.Wood--;
             if (tree.Wood <= 0)
             {
                 tree.SakuraTree.Despawn();
             }
         }
-        SendRPC();
+        SendRPC(player);
         NotifyRoles();
         return tree;
     }
@@ -779,7 +791,7 @@ public class FireThief : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.AbilityButton?.OverrideText(GetString("PickUp"));
-        hud.AbilityButton.SetUsesRemaining(MaxNum - WoodNum);
+        hud.AbilityButton.SetUsesRemaining(MaxNum[playerId] - WoodNum[playerId]);
     }
     public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => seer.IsAlive();
     public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];

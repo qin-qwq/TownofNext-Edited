@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace TONE;
 
-// Credit: TONX
+// Code based off of https://github.com/TownOfNext/TownOfNext/blob/main/src/Patches/ChatControlPatch.cs
 [HarmonyPatch(typeof(ChatController))]
 public static class SendTargetPatch
 {
@@ -23,6 +23,8 @@ public static class SendTargetPatch
     }
     public static SendTargets SendTarget = SendTargets.Default;
     public static GameObject SendTargetShower;
+    public static float lastSwipeTime = 0f;
+
     [HarmonyPatch(nameof(ChatController.Awake)), HarmonyPostfix]
     public static void Awake_Postfix(ChatController __instance)
     {
@@ -43,10 +45,33 @@ public static class SendTargetPatch
     {
         if (SendTargetShower == null) return;
         string text = Translator.GetString($"SendTargets.{Enum.GetName(SendTarget)}");
-        if (GameStates.IsInGame && __instance.IsOpenOrOpening && AmongUsClient.Instance.AmHost)
+        if (GameStates.IsInGame && __instance.IsOpenOrOpening)
         {
-            text += "<size=75%>" + Translator.GetString("SendTargetSwitchNotice") + "</size>";
-            if (Input.GetKeyDown(KeyCode.Tab))
+            var notice = OperatingSystem.IsAndroid() ? Translator.GetString("SendTargetSwitchNoticeAndroid") : Translator.GetString("SendTargetSwitchNotice");
+            text += "<size=75%>" + notice + "</size>";
+
+            var shouldSwitch = false;
+
+            if (Input.GetKeyDown(KeyCode.LeftControl))
+                shouldSwitch = true;
+
+            if (!shouldSwitch && Input.touchSupported && Input.touchCount > 0)
+            {
+                foreach (var touch in Input.touches)
+                {
+                    if (touch.phase == TouchPhase.Moved && touch.deltaPosition.y > 5f)
+                    {
+                        if (Time.time - lastSwipeTime > 0.2f)
+                        {
+                            shouldSwitch = true;
+                            lastSwipeTime = Time.time;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (shouldSwitch)
             {
                 var enumLength = Enum.GetValues(typeof(SendTargets)).Length;
                 var current = (int)SendTarget;
@@ -94,6 +119,27 @@ public static class SendTargetPatch
 
             default:
                 return false;
+        }
+    }
+    public static void GetChannel(PlayerControl __instance, string msg, SendTargets target)
+    {
+        switch (target)
+        {
+            case SendTargets.Lovers:
+                Lovers.SendLoversChannelMsg(__instance, msg);
+                break;
+            case SendTargets.Imp:
+                ChatCommands.SendImpostorChannelMsg(__instance, msg);
+                break;
+            case SendTargets.Jackal:
+                Jackal.SendJackalChannelMsg(__instance, msg);
+                break;
+            case SendTargets.Jailer:
+                Jailer.SendJailerChannelMsg(__instance, msg);
+                break;
+            default:
+                Logger.Error($"Not exist {(int)target}", "RPC.SendChannelMsg");
+                break;
         }
     }
 }

@@ -1,4 +1,5 @@
 using Hazel;
+using TONE.Modules.Rpc;
 using TONE.Roles.Neutral;
 using static TONE.Options;
 
@@ -210,8 +211,8 @@ public class Lovers : IAddon
 
     public static bool LoversMsg(PlayerControl pc, string msg, bool check = true)
     {
-        if (!AmongUsClient.Instance.AmHost) return false;
-        if (!GameStates.IsMeeting || pc == null) return false;
+        //if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.Is(CustomRoles.Lovers)) return false;
         if (!PrivateChat.GetBool()) return false;
         if (!pc.IsAlive()) return false;
@@ -226,10 +227,24 @@ public class Lovers : IAddon
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId == player || x == pc)
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+        if (AmongUsClient.Instance.AmHost || !pc.IsModded())
+        {
+            SendLoversChannelMsg(pc, msg);
+        }
+        else
+        {
+            var message = new RpcSendChannelMsg(PlayerControl.LocalPlayer.NetId, msg, (int)SendTargetPatch.SendTargets.Lovers);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
 
         return true;
+    }
+
+    public static void SendLoversChannelMsg(PlayerControl pc, string msg)
+    {
+        var player = GetLoverId(pc);
+        Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId == player || x == pc)
+            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 }
 

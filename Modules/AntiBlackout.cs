@@ -124,7 +124,7 @@ public static class AntiBlackout
         {
             // Dead > Modded > not Impostor/Shapeshifter/Phantom/Viper
             dummyImp = Main.EnumeratePlayerControls()
-                .Where(pc => pc.PlayerId != PlayerControl.LocalPlayer.PlayerId)
+                .Where(pc => pc.PlayerId != PlayerControl.LocalPlayer.PlayerId && pc.GetCustomRole().GetRoleTypes() != RoleTypes.Detective)
                 .OrderByDescending(pc => !pc.IsAlive())
                 .ThenByDescending(pc => pc.IsModded())
                 .ThenByDescending(pc => pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
@@ -150,7 +150,7 @@ public static class AntiBlackout
                 sender.Write(true);
                 sender.EndRpc();
             }
-            else
+            else if (player.GetCustomRole().GetRoleTypes() != RoleTypes.Detective)
             {
                 sender.StartRpc(player.NetId, (byte)RpcCalls.SetRole);
                 sender.Write((ushort)RoleTypes.Crewmate);
@@ -316,6 +316,7 @@ public static class AntiBlackout
             var target = targetId.GetPlayer();
 
             if (seer == null || target == null) continue;
+            if (target.GetCustomRole().GetRoleTypes() is RoleTypes.Detective) continue;
 
             var isSelf = seerId == targetId;
             var isDead = target.Data.IsDead;
@@ -371,6 +372,32 @@ public static class AntiBlackout
         }
 
         ResetAllCooldown();
+    }
+    public static void RevertDetective()
+    {
+        foreach (var player in Main.EnumeratePlayerControls())
+        {
+            if (player != PlayerControl.LocalPlayer)
+            {
+                var sender = CustomRpcSender.Create("Set Detective", SendOption.Reliable);
+                sender.StartMessage(player.GetClientId());
+                foreach (var pc in Main.EnumeratePlayerControls())
+                {
+                    if (pc.IsAlive() && pc.GetCustomRole().GetRoleTypes() is RoleTypes.Detective)
+                    {
+                        if (PlayerControl.LocalPlayer.PlayerId == pc.PlayerId)
+                        {
+                            sender.StartRpc(pc.NetId, RpcCalls.SetRole)
+                            .Write((ushort)RoleTypes.Detective)
+                            .Write(true)
+                            .EndRpc();
+                        }
+                    }
+                }
+                sender.EndMessage();
+                sender.SendMessage();
+            }
+        }
     }
     private static void ResetAllCooldown()
     {

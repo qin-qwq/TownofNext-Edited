@@ -178,6 +178,13 @@ class ExileControllerWrapUpPatch
                 }
             }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
 
+            _ = new LateTask(() =>
+            {
+                if (GameStates.IsEnded) return;
+
+                AntiBlackout.RevertDetective();
+            }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.51f : 1.41f, "Revert Detective");
+
             _ = new LateTask(AntiBlackout.ResetAfterMeeting, 0.6f, "ResetAfterMeeting");
 
             _ = new LateTask(() =>

@@ -92,6 +92,7 @@
 > - 改进职业分配
 > - 改进文本框（TextBoxPatch.cs）
 > - 提高性能的一些想法
+> - 适配安卓的一些想法
 >
 ### :star: [TONEX （以前是 TOHEX）](https://github.com/XtremeWave/TownOfNewEpic_Xtreme)
 >

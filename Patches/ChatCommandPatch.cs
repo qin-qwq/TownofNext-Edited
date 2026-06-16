@@ -664,7 +664,7 @@ internal class ChatCommands
     private static void VersionCommand(PlayerControl player, string text, string[] args)
     {
         string version_text = "";
-        var target = PlayerControl.LocalPlayer;
+        var target = player;
         var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
         var name = target?.Data?.PlayerName;
         try
@@ -2662,8 +2662,8 @@ internal class ChatCommands
 
     private static bool ImpostorChannel(PlayerControl pc, string msg, bool check = true)
     {
-        if (!AmongUsClient.Instance.AmHost) return false;
-        if (!GameStates.IsMeeting || pc == null) return false;
+        //if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.IsPlayerImpostorTeam() || !pc.GetCustomRole().IsImpostor()) return false;
         if (!Options.EnableImpostorChannel.GetBool()) return false;
         if (!pc.IsAlive()) return false;
@@ -2675,16 +2675,29 @@ internal class ChatCommands
 
         if (string.IsNullOrEmpty(msg)) return false;
 
+        if (AmongUsClient.Instance.AmHost || !pc.IsModded())
+        {
+            SendImpostorChannelMsg(pc, msg);
+        }
+        else
+        {
+            var message = new RpcSendChannelMsg(PlayerControl.LocalPlayer.NetId, msg, (int)SendTargetPatch.SendTargets.Imp);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
+
+        return true;
+    }
+
+    public static void SendImpostorChannelMsg(PlayerControl pc, string msg)
+    {
         if (CustomRoles.Narc.RoleExist(true))
         {
             Utils.SendMessage(GetString("NarcInterference"), pc.PlayerId, noReplay: true);
-            return true;
+            return;
         }
 
         Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam() && x.GetCustomRole().IsImpostor())
             .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
-
-        return true;
     }
 
     public class PresetRequest

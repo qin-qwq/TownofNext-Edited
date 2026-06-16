@@ -124,7 +124,6 @@ public static class PhantomRolePatch
 
             _ = new LateTask(() =>
             {
-                if (phantom.GetCustomRole() is CustomRoles.Fury) return;
                 phantom.SetKillCooldown(Math.Max(killCooldown, 0.001f));
             }, 0.2f, $"Phantom Check");
 

@@ -304,6 +304,7 @@ internal class ChangeRoleSettings
 
             GC.Collect();
             Resources.UnloadUnusedAssets();
+            GC.Collect();
 
             Logger.Msg("End", "Initialization");
         }
@@ -382,10 +383,12 @@ internal class StartGameHostPatch
             thiz.Spawn(ShipStatus.Instance, -2, SpawnFlags.None);
         }
         float timer = 0f;
+        var start = DateTime.Now;
         while (true)
         {
             bool stopWaiting = true;
             int maxTimer = 10;
+            var totalSeconds = (float)(DateTime.Now - start).TotalSeconds;
             if (GameOptionsManager.Instance.CurrentGameOptions.MapId is 4 or 5)
             {
                 maxTimer = 15;
@@ -411,6 +414,11 @@ internal class StartGameHostPatch
                     }
                 }
             }
+            if (totalSeconds < maxTimer)
+            {
+                LoadingBarManager.Instance.ToggleLoadingBar(true);
+                LoadingBarManager.Instance.SetLoadingPercent((float)(totalSeconds / maxTimer * 100.0), StringNames.LoadingBarGameStartWaitingPlayers);
+            }
             yield return null;
             if (stopWaiting)
             {
@@ -421,6 +429,9 @@ internal class StartGameHostPatch
         thiz.SendClientReady();
         yield return new WaitForSecondsRealtime(2f);
         yield return AssignRoles();
+
+        LoadingBarManager.Instance.ToggleLoadingBar(false);
+
         //ShipStatus.Instance.Begin(); // Tasks sets in IntroPatch
         yield break;
     }

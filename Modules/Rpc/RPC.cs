@@ -19,7 +19,7 @@ namespace TONE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 184/255 USED
+public enum CustomRPC : byte // 187/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -70,6 +70,7 @@ public enum CustomRPC : byte // 184/255 USED
     PlayGuardAndKill,
     SyncAbilityCD,
     BreakEmergencyButton,
+    SendChannelMsg,
 
     //Roles 
     SyncRoleSkill,
@@ -174,7 +175,8 @@ internal class RPCHandlerPatch
         or CustomRPC.SetFriendCode
         or CustomRPC.BetterCheck
         or CustomRPC.DictatorRPC
-        or CustomRPC.Balancer;
+        or CustomRPC.Balancer
+        or CustomRPC.SendChannelMsg;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
         var rpcType = (RpcCalls)callId;
@@ -433,6 +435,23 @@ internal class RPCHandlerPatch
             case CustomRPC.BreakEmergencyButton:
                 ShipStatus.Instance.BreakEmergencyButton();
                 break;
+            case CustomRPC.SendChannelMsg:
+                {
+                    if (!AmongUsClient.Instance.AmHost) break;
+
+                    if (!__instance || !__instance.IsModded())
+                    {
+                        Logger.Error("Player is null or not a modded client", "RPC.SendChannelMsg");
+                        break;
+                    }
+
+                    var msg = reader.ReadString();
+                    var number = reader.ReadInt32();
+                    var channel = (SendTargetPatch.SendTargets)number;
+
+                    SendTargetPatch.GetChannel(__instance, msg, channel);
+                    break;
+                }
             case CustomRPC.SetBountyTarget:
                 BountyHunter.ReceiveRPC(reader);
                 break;

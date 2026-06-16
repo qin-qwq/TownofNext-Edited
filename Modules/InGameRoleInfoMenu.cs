@@ -56,7 +56,7 @@ public static class InGameRoleInfoMenu
 
     public static void SetRoleInfoRef(PlayerControl player)
     {
-        if (player == null) return;
+        if (!player) return;
 
         if (!Fill || !Menu) Init();
 

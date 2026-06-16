@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.06.13";
+    public const string PluginVersion = "26.06.17";
     public const string PluginDisplayVersion = "2.0.0 Beta 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
@@ -63,7 +63,7 @@ public class Main : BasePlugin
         ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.ALPHA;
+    public static readonly Release RELEASE = Release.BETA;
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 3
@@ -125,9 +125,10 @@ public class Main : BasePlugin
     public static ConfigEntry<bool> ForceOwnLanguageRoleName { get; private set; }
     public static ConfigEntry<bool> EnableCustomButton { get; private set; }
     public static ConfigEntry<bool> EnableCustomSoundEffect { get; private set; }
-    public static ConfigEntry<bool> EnableCustomDecorations { get; private set; }
+    //public static ConfigEntry<bool> EnableCustomDecorations { get; private set; }
     public static ConfigEntry<bool> EnableMapVentIcon { get; private set; }
     public static ConfigEntry<bool> EnableCommandHelper { get; private set; }
+    public static ConfigEntry<bool> EnableClientControlGUI { get; private set; }
     public static ConfigEntry<bool> SwitchVanilla { get; private set; }
 
     // Debug
@@ -646,9 +647,10 @@ public class Main : BasePlugin
         ForceOwnLanguageRoleName = Config.Bind("Client Options", "ForceOwnLanguageRoleName", false);
         EnableCustomButton = Config.Bind("Client Options", "EnableCustomButton", true);
         EnableCustomSoundEffect = Config.Bind("Client Options", "EnableCustomSoundEffect", true);
-        EnableCustomDecorations = Config.Bind("Client Options", "EnableCustomDecorations", true);
+        //EnableCustomDecorations = Config.Bind("Client Options", "EnableCustomDecorations", true);
         EnableMapVentIcon = Config.Bind("Client Options", "EnableMapVentIcon", true);
         EnableCommandHelper = Config.Bind("Client Options", "EnableCommandHelper", true);
+        EnableClientControlGUI = Config.Bind("Client Options", "EnableClientControlGUI", false);
         SwitchVanilla = Config.Bind("Client Options", "SwitchVanilla", false);
 
         // Debug
@@ -734,6 +736,8 @@ public class Main : BasePlugin
         TagManager.Init();
         //SpamManager.Init();
         Cloud.Init();
+
+        if (EnableClientControlGUI.Value) AddComponent<ClientControlGUI>();
 
         IRandom.SetInstance(new NetRandomWrapper());
 

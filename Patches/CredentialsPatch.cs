@@ -204,7 +204,7 @@ class VersionShowerStartPatch
 [HarmonyPatch(typeof(AccountTab), nameof(AccountTab.Awake))]
 public static class UpdateFriendCodeUIPatch
 {
-    private static GameObject VersionShower;
+    public static GameObject VersionShower;
 
     public static void Prefix()
     {

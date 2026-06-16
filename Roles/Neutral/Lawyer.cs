@@ -171,6 +171,12 @@ internal class Lawyer : RoleBase
         if (_Player == null || !IsTarget(target.PlayerId)) return;
         ChangeRole(inMeeting);
     }
+    public override void CheckExileTarget(NetworkedPlayerInfo exiled, ref bool DecidedWinner, bool isMeetingHud, ref string name)
+    {
+        if (_Player == null || !IsTarget(exiled.PlayerId) || !exiled) return;
+
+        ChangeRole(true);
+    }
     public static bool TargetKnowLawyer => TargetKnowsLawyer.GetBool();
     public override bool KnowRoleTarget(PlayerControl player, PlayerControl target)
     {

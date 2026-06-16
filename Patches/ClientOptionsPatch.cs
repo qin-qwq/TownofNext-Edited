@@ -21,9 +21,10 @@ public static class OptionsMenuBehaviourStartPatch
     private static ClientOptionItem ForceOwnLanguageRoleName;
     private static ClientOptionItem EnableCustomButton;
     private static ClientOptionItem EnableCustomSoundEffect;
-    private static ClientOptionItem EnableCustomDecorations;
+    //private static ClientOptionItem EnableCustomDecorations;
     private static ClientOptionItem EnableMapVentIcon;
     private static ClientOptionItem EnableCommandHelper;
+    private static ClientOptionItem EnableClientControlGUI;
     private static ClientOptionItem SwitchVanilla;
 
 #if DEBUG
@@ -169,10 +170,10 @@ public static class OptionsMenuBehaviourStartPatch
             EnableCustomSoundEffect = ClientOptionItem.Create("EnableCustomSoundEffect", Main.EnableCustomSoundEffect, __instance);
         }
 
-        if (EnableCustomDecorations == null || EnableCustomDecorations.ToggleButton == null)
+        /*if (EnableCustomDecorations == null || EnableCustomDecorations.ToggleButton == null)
         {
             EnableCustomDecorations = ClientOptionItem.Create("EnableCustomDecorations", Main.EnableCustomDecorations, __instance);
-        }
+        }*/
         if (EnableMapVentIcon == null || EnableMapVentIcon.ToggleButton == null)
         {
             EnableMapVentIcon = ClientOptionItem.Create("EnableMapVentIcon", Main.EnableMapVentIcon, __instance);
@@ -181,12 +182,31 @@ public static class OptionsMenuBehaviourStartPatch
         {
             EnableCommandHelper = ClientOptionItem.Create("EnableCommandHelper", Main.EnableCommandHelper, __instance);
         }
+        if (EnableClientControlGUI == null || EnableClientControlGUI.ToggleButton == null)
+        {
+            EnableClientControlGUI = ClientOptionItem.Create("EnableClientControlGUI", Main.EnableClientControlGUI, __instance, EnableClientControlGUIButtonToggle);
+
+            static void EnableClientControlGUIButtonToggle()
+            {
+                switch (Main.EnableClientControlGUI.Value)
+                {
+                    case true when !ClientControlGUI.Instance:
+                        Main.Instance.AddComponent<ClientControlGUI>();
+                        break;
+                    case false when ClientControlGUI.Instance:
+                        UnityEngine.Object.Destroy(ClientControlGUI.Instance);
+                        break;
+                }
+            }
+        }
 
         if ((SwitchVanilla == null || SwitchVanilla.ToggleButton == null) && !OperatingSystem.IsAndroid())
         {
             SwitchVanilla = ClientOptionItem.Create("SwitchVanilla", Main.SwitchVanilla, __instance, SwitchVanillaButtonToggle);
             static void SwitchVanillaButtonToggle()
             {
+                if (ClientControlGUI.Instance) UnityEngine.Object.Destroy(ClientControlGUI.Instance);
+                if (UpdateFriendCodeUIPatch.VersionShower) UnityEngine.Object.Destroy(UpdateFriendCodeUIPatch.VersionShower);
                 Harmony.UnpatchAll();
                 Main.Instance.Unload();
             }

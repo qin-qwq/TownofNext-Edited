@@ -587,8 +587,12 @@ class RpcMurderPlayerPatch
                 .EndRpc();
         }
 
-        var message = new RpcMurderPlayer(__instance.NetId, target.NetId, murderResultFlags);
-        RpcUtils.LateBroadcastReliableMessage(message);
+        sender.StartRpc(__instance.NetId, RpcCalls.MurderPlayer)
+            .WriteNetObject(target)
+            .Write((int)murderResultFlags)
+            .EndRpc();
+
+        sender.SendMessage();
 
         return false;
         // There is no need to include DecisionByHost in Succeeded kill attempt. DecisionByHost will make client check protection locally and cause confusion.
