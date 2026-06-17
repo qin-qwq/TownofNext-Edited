@@ -172,7 +172,7 @@ public static class BonfireNight
             case MapNames.Airship:
                 RedTeamState.Position = new Vector2(-10.3f, -5.9f);
                 BlueTeamState.Position = new Vector2(33.5f, -1.5f);
-                FireThiefState.Position = new Vector2(15.5f, 0.0f);
+                FireThiefState.Position = new Vector2(6.35f, 2.5f);
                 SakuraTree1.Position = new Vector2(-8.9f, 12.2f);
                 SakuraTree2.Position = new Vector2(16.3f, -8.8f);
                 Tree1.Position = new Vector2(-23.5f, -1.6f);
@@ -231,7 +231,7 @@ public static class BonfireNight
 
                     var message = new RpcSetColorMessage(pc.NetId, pc.Data.NetId, 0);
                     RpcUtils.LateBroadcastReliableMessage(message);
-                    pc.RpcTeleport(RedTeamState.Position);
+                    if (GetActiveMapName() is not MapNames.Airship) pc.RpcTeleport(RedTeamState.Position);
                 }
                 else if (pc.Is(CustomRoles.BWoodCollector))
                 {
@@ -239,7 +239,7 @@ public static class BonfireNight
 
                     var message = new RpcSetColorMessage(pc.NetId, pc.Data.NetId, 1);
                     RpcUtils.LateBroadcastReliableMessage(message);
-                    pc.RpcTeleport(BlueTeamState.Position);
+                    if (GetActiveMapName() is not MapNames.Airship) pc.RpcTeleport(BlueTeamState.Position);
                 }
                 else
                 {
@@ -247,7 +247,7 @@ public static class BonfireNight
 
                     var message = new RpcSetColorMessage(pc.NetId, pc.Data.NetId, 15);
                     RpcUtils.LateBroadcastReliableMessage(message);
-                    pc.RpcTeleport(FireThiefState.Position);
+                    if (GetActiveMapName() is not MapNames.Airship) pc.RpcTeleport(FireThiefState.Position);
                 }
             }
         }, 3f, "BonfireNight Add");

@@ -110,7 +110,7 @@ internal class ChangeRoleSettings
             CheckForEndVotingPatch.SomeoneExiled = false;
             ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
             CheckShapeshiftPatch.BypassCheck = false;
-            CheckShapeshiftPatch.DisableShapeshift = false;
+            CheckShapeshiftPatch.DisableShapeshift.Clear();
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();

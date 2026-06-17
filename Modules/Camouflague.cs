@@ -239,8 +239,8 @@ public static class Camouflage
                 target.RpcShapeshift(real ? target : PlayerControl.LocalPlayer, false);
                 CheckShapeshiftPatch.BypassCheck = false;
 
-                if (!real) CheckShapeshiftPatch.DisableShapeshift = true;
-                else CheckShapeshiftPatch.DisableShapeshift = false;
+                if (!real) CheckShapeshiftPatch.DisableShapeshift.Add(target.PlayerId);
+                else CheckShapeshiftPatch.DisableShapeshift.Remove(target.PlayerId);
             }
         }
         else

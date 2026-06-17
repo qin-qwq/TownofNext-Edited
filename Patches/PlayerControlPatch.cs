@@ -603,7 +603,7 @@ class RpcMurderPlayerPatch
 public static class CheckShapeshiftPatch
 {
     public static bool BypassCheck = false;
-    public static bool DisableShapeshift = false;
+    public static readonly HashSet<byte> DisableShapeshift = [];
     private static readonly LogHandler logger = Logger.Handler(nameof(PlayerControl.CheckShapeshift));
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
     {
@@ -708,7 +708,7 @@ public static class CheckShapeshiftPatch
             logger.Info($"Cancel shapeshifting because {instance.GetRealName()} is eaten by Pelican");
             return false;
         }
-        if (DisableShapeshift)
+        if (DisableShapeshift.Contains(instance.PlayerId))
         {
             logger.Info("Shapeshifting canceled because DisableShapeshift");
             return false;
@@ -996,9 +996,7 @@ class ReportDeadBodyPatch
 
             Rebirth.OnReportDeadBody();
 
-            var allCNO = CustomNetObject.AllObjects.ToArray();
-
-            foreach (var cno in allCNO)
+            foreach (var cno in CustomNetObject.AllObjects)
             {
                 try
                 {
@@ -1012,12 +1010,9 @@ class ReportDeadBodyPatch
 
             _ = new LateTask(() =>
             {
-                foreach (var cno in allCNO)
+                for (var index = CustomNetObject.AllObjects.Count - 1; index >= 0; index--)
                 {
-                    try
-                    {
-                        cno?.OnMeetingTasks();
-                    }
+                    try { CustomNetObject.AllObjects[index]?.OnMeetingTasks(); }
                     catch (Exception e) { Utils.ThrowException(e); }
                 }
             }, 5f, "CNO OnMeeting");
@@ -1052,6 +1047,7 @@ class ReportDeadBodyPatch
                 // Check shapeshift and revert skin to default
                 if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
                 {
+                    CheckShapeshiftPatch.DisableShapeshift.Remove(pc.PlayerId);
                     pc.RpcShapeshift(pc, false);
                     // Camouflage.RpcSetSkin(pc, RevertToDefault: true);
                 }
