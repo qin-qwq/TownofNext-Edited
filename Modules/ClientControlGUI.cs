@@ -44,8 +44,7 @@ public class ClientControlGUI : MonoBehaviour
 
     private GUIStyle _sAction, _sHost, _sDanger, _sSection, _sToggle, _sWindow, _sTitleBar, _sDragHint;
     private Camera _cam;
-
-    private static readonly Color PinkBase = new Color32(255, 192, 203, 255);
+    public bool shouldSkip;
 
     private void Awake()
     {
@@ -460,7 +459,7 @@ public class ClientControlGUI : MonoBehaviour
                         MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
                         MeetingHud.Instance.RpcClose();
                     }, true));
-                    ingameButtons.Add((Label(GetString("EndByVotes"), "F6"), _sHost, () => { CheckForEndVotingPatch.shouldSkip = true; MeetingHud.Instance.CheckForEndVoting(); }, true));
+                    ingameButtons.Add((Label(GetString("EndByVotes"), "F6"), _sHost, () => { shouldSkip = true; MeetingHud.Instance.CheckForEndVoting(); }, true));
                 }
                 ingameButtons.Add((Label(GetString("OpenYourChat"), "SHIFT + ENTER + C"), _sHost, () => HudManager.Instance.Chat.SetVisible(true), true));
                 if (noGameEnd)

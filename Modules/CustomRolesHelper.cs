@@ -23,8 +23,8 @@ public static class CustomRolesHelper
     }
     public static bool NotAssignInVanillaServer(this CustomRoles roles)
     {
-        return roles is CustomRoles.DollMaster or CustomRoles.Devourer or CustomRoles.Doppelganger or CustomRoles.Rebirth or
-                        CustomRoles.Sacrifist;
+        return roles is CustomRoles.DollMaster or CustomRoles.Devourer or CustomRoles.Camouflager or CustomRoles.Doppelganger or
+                        CustomRoles.Rebirth or CustomRoles.Sacrifist;
     }
     public static CustomRoles GetVNRole(this CustomRoles role) // RoleBase: Impostor, Shapeshifter, Crewmate, Engineer, Scientist
     {

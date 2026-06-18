@@ -48,13 +48,16 @@ class CheckForEndVotingPatch
     public static string TempExileMsg;
     public static NetworkedPlayerInfo TempExiledPlayer;
     public static bool SomeoneExiled;
-    public static bool shouldSkip;
     public static bool Prefix(MeetingHud __instance)
     {
         if (!AmongUsClient.Instance.AmHost) return true;
 
         //Meeting Skip with vote counting on keystroke (F6)
-        shouldSkip |= Input.GetKeyDown(KeyCode.F6);
+        var shouldSkip = false;
+        if (Input.GetKeyDown(KeyCode.F6) || ClientControlGUI.Instance && ClientControlGUI.Instance.shouldSkip)
+        {
+            shouldSkip = true;
+        }
 
         //  HasNotVoted = 255;
         //  MissedVote = 254;

@@ -2720,11 +2720,13 @@ public static class Utils
         int messages = 0;
 
         MessageWriter writer = MessageWriter.Get(SendOption.Reliable);
-        writer.StartMessage(5);
+        writer.StartMessage(5); //0x05 GameData
         writer.Write(AmongUsClient.Instance.GameId);
 
-        foreach (NetworkedPlayerInfo playerinfo in GameData.Instance.AllPlayers)
+        for (var index = 0; index < GameData.Instance.AllPlayers.Count; index++)
         {
+            NetworkedPlayerInfo playerinfo = GameData.Instance.AllPlayers[index];
+
             if (writer.Length > 500 || messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
             {
                 messages = 0;
@@ -2737,11 +2739,11 @@ public static class Utils
                     yield break;
                 }
                 writer.Clear(SendOption.Reliable);
-                writer.StartMessage(5);
+                writer.StartMessage(5); //0x05 GameData
                 writer.Write(AmongUsClient.Instance.GameId);
             }
 
-            writer.StartMessage(1);
+            writer.StartMessage(1); //0x01 Data
             writer.WritePacked(playerinfo.NetId);
             playerinfo.Serialize(writer, false);
             writer.EndMessage();
@@ -2875,6 +2877,11 @@ public static class Utils
         {
             AFKDetector.NumAFK = 0;
             AFKDetector.PlayerData.Clear();
+
+            if (ClientControlGUI.Instance)
+            {
+                ClientControlGUI.Instance.shouldSkip = false;
+            }
 
             if (Main.CurrentServerIsVanilla && !PlayerControl.LocalPlayer.IsAlive())
                 PlayerControl.LocalPlayer.RpcMakeInvisible();

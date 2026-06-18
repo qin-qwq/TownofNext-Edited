@@ -603,7 +603,6 @@ class RpcMurderPlayerPatch
 public static class CheckShapeshiftPatch
 {
     public static bool BypassCheck = false;
-    public static readonly HashSet<byte> DisableShapeshift = [];
     private static readonly LogHandler logger = Logger.Handler(nameof(PlayerControl.CheckShapeshift));
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
     {
@@ -621,10 +620,8 @@ public static class CheckShapeshiftPatch
             return false;
         }
 
-        if (BypassCheck) return false;
-
         // No called code if is invalid shapeshifting
-        if (!CheckInvalidShapeshifting(__instance, target, shouldAnimate))
+        if (!CheckInvalidShapeshifting(__instance, target, shouldAnimate) && !BypassCheck)
         {
             __instance.RpcRejectShapeshift();
             return false;
@@ -706,11 +703,6 @@ public static class CheckShapeshiftPatch
         if (Pelican.IsEaten(instance.PlayerId))
         {
             logger.Info($"Cancel shapeshifting because {instance.GetRealName()} is eaten by Pelican");
-            return false;
-        }
-        if (DisableShapeshift.Contains(instance.PlayerId))
-        {
-            logger.Info("Shapeshifting canceled because DisableShapeshift");
             return false;
         }
 
@@ -1047,7 +1039,6 @@ class ReportDeadBodyPatch
                 // Check shapeshift and revert skin to default
                 if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
                 {
-                    CheckShapeshiftPatch.DisableShapeshift.Remove(pc.PlayerId);
                     pc.RpcShapeshift(pc, false);
                     // Camouflage.RpcSetSkin(pc, RevertToDefault: true);
                 }

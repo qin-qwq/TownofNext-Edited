@@ -4469,6 +4469,7 @@
   "BonfireNight_GameTime": "游戏时间",
   "BonfireNight_WoodToWin": "获胜所需木材",
   "BonfireNight_ReviveCooldown": "复活时间",
+  "BonfireNight_InvincibilityCooldownAfterRevive": "复活后无敌时间",
   "BonfireNight_PickUpWoodCooldown": "拾取冷却时间",
   "BonfireNight_MaximumWoodHoldingQuantity": "拾荒者最大拾取木材数量",
   "BonfireNight_FireThiefMaximumWoodHoldingQuantity": "盗火者最大拾取木材数量",

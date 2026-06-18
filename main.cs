@@ -55,8 +55,8 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.06.17";
-    public const string PluginDisplayVersion = "2.0.0 Beta 1";
+    public const string PluginVersion = "26.06.19";
+    public const string PluginDisplayVersion = "2.0.0 Beta 1 Hotfix 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 6, 5, 0) // 2026.6.5 & 17.4
@@ -67,7 +67,7 @@ public class Main : BasePlugin
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 3
-    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V2.0.0 Beta 1
+    public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V2.0.0 Beta 1 Hotfix 1
     public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.10.0
 #pragma warning restore IDE1006 // Naming Styles
 
@@ -771,8 +771,9 @@ public class Main : BasePlugin
 
         if (!OperatingSystem.IsAndroid())
         {
-            // there are some issues with TextBoxPatch on Android
+            // there are some issues with TextBoxPatch and DiscordRPC on Android
             Harmony.PatchAll(typeof(TextBoxPatch));
+            Harmony.PatchAll(typeof(DiscordRPC));
         }
 
         // ConsoleManager.DetachConsole();

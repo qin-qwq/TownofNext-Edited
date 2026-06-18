@@ -178,7 +178,7 @@ public static class Camouflage
     public static void RpcSetSkin(PlayerControl target, bool ForceRevert = false, bool RevertToDefault = false, bool GameEnd = false)
     {
         if (!(AmongUsClient.Instance.AmHost && (Options.CommsCamouflage.GetBool() || Camouflager.HasEnabled))) return;
-        if (target == null) return;
+        if (!target) return;
 
         var targetId = target.PlayerId;
 
@@ -187,6 +187,8 @@ public static class Camouflage
         {
             return;
         }
+
+        if (Main.CurrentServerIsVanilla) return;
 
         // Check which Outfit needs to be set
         var newOutfit = Options.KPDCamouflageMode.GetValue() is 2 or 3
@@ -229,23 +231,6 @@ public static class Camouflage
         if (newOutfit.Compare(target.Data.DefaultOutfit)) return;
 
         Logger.Info($"playerId {target.PlayerId} newOutfit={newOutfit.GetString().RemoveHtmlTags()}", "RpcSetSkin");
-        if (Main.CurrentServerIsVanilla)
-        {
-            if (!target.IsHost())
-            {
-                var real = newOutfit == PlayerSkins[targetId];
-
-                CheckShapeshiftPatch.BypassCheck = true;
-                target.RpcShapeshift(real ? target : PlayerControl.LocalPlayer, false);
-                CheckShapeshiftPatch.BypassCheck = false;
-
-                if (!real) CheckShapeshiftPatch.DisableShapeshift.Add(target.PlayerId);
-                else CheckShapeshiftPatch.DisableShapeshift.Remove(target.PlayerId);
-            }
-        }
-        else
-        {
-            target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false, setPetAbility: true);
-        }
+        target.SetNewOutfit(newOutfit, setName: false, setNamePlate: false, setPetAbility: true);
     }
 }

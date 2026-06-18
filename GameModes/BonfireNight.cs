@@ -22,6 +22,7 @@ public static class BonfireNight
     public static OptionItem WoodToWin;
     public static OptionItem KillCooldown;
     public static OptionItem ReviveCooldown;
+    public static OptionItem InvincibilityCooldownAfterRevive;
     public static OptionItem PickUpWoodCooldown;
     public static OptionItem MaximumWoodHoldingQuantity;
     public static OptionItem FireThiefMaximumWoodHoldingQuantity;
@@ -73,6 +74,10 @@ public static class BonfireNight
             .SetValueFormat(OptionFormat.Seconds)
             .SetHeader(true);
         ReviveCooldown = FloatOptionItem.Create(Id + 5, "BonfireNight_ReviveCooldown", (2.5f, 300f, 2.5f), 10f, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.BonfireNight)
+            .SetColor(new Color32(255, 140, 0, byte.MaxValue))
+            .SetValueFormat(OptionFormat.Seconds);
+        InvincibilityCooldownAfterRevive = IntegerOptionItem.Create(Id + 14, "BonfireNight_InvincibilityCooldownAfterRevive", (0, 300, 1), 5, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
             .SetValueFormat(OptionFormat.Seconds);
@@ -224,7 +229,6 @@ public static class BonfireNight
 
             foreach (var pc in Main.EnumerateAlivePlayerControls())
             {
-                var targetClientId = pc.GetClientId();
                 if (pc.Is(CustomRoles.RWoodCollector))
                 {
                     pc.SetColor(0);
@@ -249,6 +253,7 @@ public static class BonfireNight
                     RpcUtils.LateBroadcastReliableMessage(message);
                     if (GetActiveMapName() is not MapNames.Airship) pc.RpcTeleport(FireThiefState.Position);
                 }
+                pc.SetKillCooldown(KillCooldown.GetFloat());
             }
         }, 3f, "BonfireNight Add");
     }
@@ -421,7 +426,7 @@ public static class BonfireNight
 
             if (!AmongUsClient.Instance.AmHost) return;
 
-            if ((StartedAt + GameTime.GetInt() - GetTimeStamp()) <= 60)
+            if ((StartedAt + GameTime.GetInt() - TimeStamp) <= 60)
             {
                 NotifyRoles();
             }
@@ -687,6 +692,8 @@ public class FireThief : RoleBase
 
     public override bool OnCheckVanish(PlayerControl phantom)
     {
+        if (BonfireNight.StartedAt + 3 > TimeStamp) return false;
+
         var position = phantom.GetCustomPosition();
 
         BonfireNight.Tree1 = TryCollect(phantom, BonfireNight.Tree1, position, MaxNum[phantom.PlayerId]);
@@ -723,6 +730,11 @@ public class FireThief : RoleBase
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (killer.GetCustomRole() == target.GetCustomRole()) return false;
+
+        if (target.GetRoleClass() is FireThief ft)
+        {
+            if (ft.ReviveTime + BonfireNight.ReviveCooldown.GetInt() + BonfireNight.InvincibilityCooldownAfterRevive.GetInt() > TimeStamp) return false;
+        }
 
         return true;
     }
