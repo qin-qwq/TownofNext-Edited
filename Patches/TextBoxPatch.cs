@@ -16,6 +16,12 @@ public static class TextBoxPatch
 
     public static bool IsInvalidCommand;
 
+    public static void AddChars()
+    {
+        TextBoxTMP.EmailChars.Add('<');
+        TextBoxTMP.EmailChars.Add('>');
+    }
+
     [HarmonyPatch(typeof(TextBoxTMP), nameof(TextBoxTMP.Start))]
     [HarmonyPostfix]
     public static void TextBoxPostfix(TextBoxTMP __instance)

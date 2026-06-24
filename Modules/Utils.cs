@@ -1393,7 +1393,7 @@ public static class Utils
                 text.SplitMessage().Do(x => SendMessage(x, sendTo, title, logforChatManager, noReplay, false));
                 return;
             }
-            if (ShouldSplit && title.Length > 750)
+            if (ShouldSplit && title.Length > 720)
             {
                 title.SplitMessage().Do(x => SendMessage(text, sendTo, x, logforChatManager, noReplay, false));
                 return;
@@ -2701,19 +2701,12 @@ public static class Utils
 
     public static void SendGameData()
     {
-        if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
+        foreach (var playerinfo in GameData.Instance.AllPlayers)
         {
-            Main.Instance.StartCoroutine(SendGameDataToEveryone());
+            playerinfo.MarkDirty();
         }
-        else
-        {
-            foreach (var playerinfo in GameData.Instance.AllPlayers)
-            {
-                playerinfo.MarkDirty();
-            }
 
-            AmongUsClient.Instance.SendAllStreamedObjects();
-        }
+        AmongUsClient.Instance.SendAllStreamedObjects();
     }
     public static System.Collections.IEnumerator SendGameDataToEveryone()
     {
@@ -2877,20 +2870,6 @@ public static class Utils
         {
             AFKDetector.NumAFK = 0;
             AFKDetector.PlayerData.Clear();
-
-            if (ClientControlGUI.Instance)
-            {
-                ClientControlGUI.Instance.shouldSkip = false;
-            }
-
-            if (Main.CurrentServerIsVanilla && !PlayerControl.LocalPlayer.IsAlive())
-                PlayerControl.LocalPlayer.RpcMakeInvisible();
-
-            if (ChatManager.NeedHide)
-            {
-                ChatManager.SendPreviousMessagesToAll();
-                ChatManager.NeedHide = false;
-            }
 
             foreach (var playerState in Main.PlayerStates.Values.ToArray())
             {

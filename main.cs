@@ -55,18 +55,19 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.06.19";
-    public const string PluginDisplayVersion = "2.0.0 Beta 1 Hotfix 1";
+    public const string PluginVersion = "26.06.24";
+    public const string PluginDisplayVersion = "2.0.0 Alpha 4";
+    public const int ExtraPluginVersion = 10; // Updating the Alpha version after the Beta version requires an increase of at least 10
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 6, 5, 0) // 2026.6.5 & 17.4
         ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.BETA;
+    public static readonly Release RELEASE = Release.ALPHA;
 
 #pragma warning disable IDE1006 // Naming Styles
-    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 3
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 4
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V2.0.0 Beta 1 Hotfix 1
     public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.10.0
 #pragma warning restore IDE1006 // Naming Styles
@@ -775,6 +776,8 @@ public class Main : BasePlugin
             Harmony.PatchAll(typeof(TextBoxPatch));
             Harmony.PatchAll(typeof(DiscordRPC));
         }
+
+        TextBoxPatch.AddChars();
 
         // ConsoleManager.DetachConsole();
         if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();

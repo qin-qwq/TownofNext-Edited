@@ -110,10 +110,6 @@ internal class ChangeRoleSettings
             CheckForEndVotingPatch.SomeoneExiled = false;
             ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
             CheckShapeshiftPatch.BypassCheck = false;
-            if (ClientControlGUI.Instance)
-            {
-                ClientControlGUI.Instance.shouldSkip = false;
-            }
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
@@ -195,24 +191,6 @@ internal class ChangeRoleSettings
                 {
                     var pair = (target.PlayerId, pc.PlayerId);
                     Main.LastNotifyNames[pair] = currentName;
-                }
-
-                if (Options.UsePets.GetBool() && Options.CurrentGameMode is CustomGameMode.Standard && AmongUsClient.Instance.AmHost)
-                {
-                    foreach (var player in Main.EnumeratePlayerControls())
-                    {
-                        if (player.Is(CustomRoles.GM)) continue;
-                        if (Main.CurrentServerIsVanilla)
-                        {
-                            Options.UsePets.SetValue(2);
-                        }
-
-                        _ = new LateTask(() =>
-                        {
-                            if (!GameStates.IsInGame || GameStates.IsEnded || Main.CurrentServerIsVanilla) return;
-                            PetsPatch.SetPet(player, PetsPatch.GetPetId());
-                        }, 3f);
-                    }
                 }
 
                 Main.PlayerStates[pc.PlayerId] = new(pc.PlayerId)

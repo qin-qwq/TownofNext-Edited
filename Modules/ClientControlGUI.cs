@@ -44,7 +44,7 @@ public class ClientControlGUI : MonoBehaviour
 
     private GUIStyle _sAction, _sHost, _sDanger, _sSection, _sToggle, _sWindow, _sTitleBar, _sDragHint;
     private Camera _cam;
-    public bool shouldSkip;
+    public bool shouldSkip = false;
 
     private void Awake()
     {

@@ -188,8 +188,6 @@ public static class Camouflage
             return;
         }
 
-        if (Main.CurrentServerIsVanilla) return;
-
         // Check which Outfit needs to be set
         var newOutfit = Options.KPDCamouflageMode.GetValue() is 2 or 3
             ? PlayerOutfitExtension.GetRandomOutfit()

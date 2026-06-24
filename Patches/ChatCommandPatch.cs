@@ -223,7 +223,7 @@ internal class ChatCommands
         var canceled = false;
         if (text.StartsWith("/cmd"))
         {
-            canceled = true;
+            if (AmongUsClient.Instance.AmHost) canceled = true;
             text = "/" + text[4..].TrimStart();
         }
         string[] args = text.Trim().Split(' ');
@@ -298,36 +298,39 @@ internal class ChatCommands
         Main.isChatCommand = false;
         canceled = true;
     Skip:
-        if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Lovers)
+        if (!Blackmailer.CheckBlackmaile(PlayerControl.LocalPlayer))
         {
-            if (Lovers.LoversMsg(PlayerControl.LocalPlayer, text, false))
+            if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Lovers)
             {
-                Main.isChatCommand = true;
-                canceled = true;
+                if (Lovers.LoversMsg(PlayerControl.LocalPlayer, text, false))
+                {
+                    Main.isChatCommand = true;
+                    canceled = true;
+                }
             }
-        }
-        else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Imp)
-        {
-            if (ImpostorChannel(PlayerControl.LocalPlayer, text, false))
+            else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Imp)
             {
-                Main.isChatCommand = true;
-                canceled = true;
+                if (ImpostorChannel(PlayerControl.LocalPlayer, text, false))
+                {
+                    Main.isChatCommand = true;
+                    canceled = true;
+                }
             }
-        }
-        else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Jackal)
-        {
-            if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text, false))
+            else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Jackal)
             {
-                Main.isChatCommand = true;
-                canceled = true;
+                if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text, false))
+                {
+                    Main.isChatCommand = true;
+                    canceled = true;
+                }
             }
-        }
-        else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Jailer)
-        {
-            if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text, false))
+            else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Jailer)
             {
-                Main.isChatCommand = true;
-                canceled = true;
+                if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text, false))
+                {
+                    Main.isChatCommand = true;
+                    canceled = true;
+                }
             }
         }
         if (canceled)
@@ -340,21 +343,6 @@ internal class ChatCommands
             __instance.quickChatField.Clear();
         }
 
-        if (!canceled && AmongUsClient.Instance.AmHost && ChatUpdatePatch.TempReviveHostRunning)
-        {
-            if (!WaitingToSend) Main.Instance.StartCoroutine(Wait());
-            return false;
-
-            IEnumerator Wait()
-            {
-                WaitingToSend = true;
-                while (ChatUpdatePatch.TempReviveHostRunning && AmongUsClient.Instance.AmHost) yield return null;
-                yield return new WaitForSecondsRealtime(0.5f);
-                WaitingToSend = false;
-                if (GameStates.IsEnded || GameStates.IsLobby) yield break;
-                if (HudManager.InstanceExists) HudManager.Instance.Chat.SendChat();
-            }
-        }
         return !canceled;
     }
 
@@ -2725,7 +2713,6 @@ class ChatUpdatePatch
 {
     public static bool DoBlockChat = false;
     public static ChatController Instance;
-    public static bool TempReviveHostRunning = false;
     private static string[] CachedLetterOnlyHexColors = [];
     private static readonly Regex ColorTagRegex = new(@"<\s*(?:color\s*=\s*)?#([0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?)\s*>", RegexOptions.Compiled);
     private static readonly Dictionary<(int R, int G, int B), string> CachedColorReplacements = [];
@@ -2758,7 +2745,7 @@ class ChatUpdatePatch
         }
 
         var player = PlayerControl.LocalPlayer;
-        if ((GameStates.IsInGame || player.Data.IsDead) && !Main.CurrentServerIsVanilla)
+        if (GameStates.IsInGame || player.Data.IsDead)
         {
             player = Main.EnumerateAlivePlayerControls().ToArray().OrderBy(x => x.PlayerId).FirstOrDefault()
                      ?? Main.EnumeratePlayerControls().ToArray().OrderBy(x => x.PlayerId).FirstOrDefault()
@@ -2792,23 +2779,6 @@ class ChatUpdatePatch
         var name = player.Data.PlayerName;
 
         //__instance.freeChatField.textArea.characterLimit = 999;
-
-        if (player.AmOwner && !player.IsAlive() && !TempReviveHostRunning)
-        {
-            player.Data.IsDead = false;
-            player.Data.SendGameData();
-            TempReviveHostRunning = true;
-
-            _ = new LateTask(() =>
-            {
-                if (!GameStates.IsEnded && !GameStates.IsLobby)
-                {
-                    player.Data.IsDead = true;
-                    player.Data.SendGameData();
-                }
-                TempReviveHostRunning = false;
-            }, 1f);
-        }
 
         if (clientId == -1)
         {

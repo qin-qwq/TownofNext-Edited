@@ -274,7 +274,7 @@ internal class DoubleAgent : RoleBase
                 if (player.inVent) continue;
                 Main.PlayerStates[target.PlayerId].deathReason = PlayerState.DeathReason.Bombed;
                 target.RpcMurderPlayer(target);
-                target.SetRealKiller(player);
+                target.SetRealKiller(_Player);
             }
         }
 

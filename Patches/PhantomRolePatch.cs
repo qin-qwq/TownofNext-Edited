@@ -101,7 +101,11 @@ public static class PhantomRolePatch
 
             if (phantom.AmOwner)
             {
-                DestroyableSingleton<HudManager>.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
+                try
+                {
+                    HudManager.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
+                }
+                catch { }
                 phantom.Data.Role.SetCooldown();
                 return false;
             }

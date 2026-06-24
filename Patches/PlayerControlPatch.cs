@@ -745,7 +745,7 @@ class ShapeshiftPatch
 
         if (!AmongUsClient.Instance.AmHost) return;
         if (GameStates.IsHideNSeek) return;
-        // if (!shapeshifting) Camouflage.RpcSetSkin(__instance);
+        if (!shapeshifting) Camouflage.RpcSetSkin(__instance);
 
         shapeshifter.GetRoleClass()?.OnShapeshift(shapeshifter, target, animate, shapeshifting);
 
@@ -1031,16 +1031,16 @@ class ReportDeadBodyPatch
             {
                 // Update skins again, since players have different skins
                 // And can be easily distinguished from each other
-                /*if (Camouflage.IsCamouflage && Options.KPDCamouflageMode.GetValue() is 2 or 3)
+                if (Camouflage.IsCamouflage && Options.KPDCamouflageMode.GetValue() is 2 or 3)
                 {
                     Camouflage.RpcSetSkin(pc);
-                }*/
+                }
 
                 // Check shapeshift and revert skin to default
                 if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
                 {
                     pc.RpcShapeshift(pc, false);
-                    // Camouflage.RpcSetSkin(pc, RevertToDefault: true);
+                    Camouflage.RpcSetSkin(pc, RevertToDefault: true);
                 }
             }
 

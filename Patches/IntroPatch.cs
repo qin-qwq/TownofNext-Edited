@@ -1044,6 +1044,16 @@ internal static class IntroCutsceneDestroyPatch
 
             Utils.CheckAndSetVentInteractions();
 
+            if (Options.UsePets.GetBool() && Options.CurrentGameMode is CustomGameMode.Standard)
+            {
+                foreach (var player in Main.EnumerateAlivePlayerControls())
+                {
+                    if (player.Is(CustomRoles.GM)) continue;
+
+                    PetsPatch.SetPet(player, PetsPatch.GetPetId());
+                }
+            }
+
             if (AFKDetector.ActivateOnStart.GetBool()) _ = new LateTask(() => Main.EnumerateAlivePlayerControls().Do(AFKDetector.RecordPosition), 1f);
 
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())

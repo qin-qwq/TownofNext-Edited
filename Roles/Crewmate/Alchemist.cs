@@ -227,7 +227,7 @@ internal class Alchemist : RoleBase
 
                 ventedId.Remove(alchemistId);
 
-                alchemist.Notify(GetString("SwooperInvisStateOut"));
+                alchemist.Notify(GetString("SwooperInvisStateOut"), hasPriority: true, sendInLog: false);
 
                 needSync = true;
                 InvisTime.Remove(alchemistId);
@@ -235,7 +235,7 @@ internal class Alchemist : RoleBase
             else if (remainTime <= 10)
             {
                 if (!alchemist.IsModded())
-                    alchemist.Notify(string.Format(GetString("SwooperInvisStateCountdown"), remainTime), sendInLog: false);
+                    alchemist.Notify(string.Format(GetString("SwooperInvisStateCountdown"), remainTime), hasPriority: true, sendInLog: false);
             }
         }
 
@@ -370,7 +370,7 @@ internal class Alchemist : RoleBase
 
             InvisTime.Add(pc.PlayerId, Utils.GetTimeStamp());
             SendRPC(pc);
-            pc.Notify(GetString("ChameleonInvisState"), InvisDuration.GetFloat());
+            pc.Notify(GetString("ChameleonInvisState"), InvisDuration.GetFloat(), hasPriority: true, sendInLog: false);
 
         }, 0.8f, "Alchemist Invis");
     }

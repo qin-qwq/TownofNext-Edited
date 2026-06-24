@@ -101,7 +101,7 @@ class GameEndCheckerForNormal
             NameNotifyManager.Reset();
 
             // Reset Camouflage
-            // Main.EnumeratePlayerControls().Do(pc => Camouflage.RpcSetSkin(pc, ForceRevert: true, RevertToDefault: true, GameEnd: true));
+            Main.EnumeratePlayerControls().Do(pc => Camouflage.RpcSetSkin(pc, ForceRevert: true, RevertToDefault: true, GameEnd: true));
 
             // Show all roles
             GameIsEnded = true;

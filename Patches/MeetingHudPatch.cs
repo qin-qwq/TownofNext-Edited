@@ -54,8 +54,14 @@ class CheckForEndVotingPatch
 
         //Meeting Skip with vote counting on keystroke (F6)
         var shouldSkip = false;
-        if (Input.GetKeyDown(KeyCode.F6) || ClientControlGUI.Instance && ClientControlGUI.Instance.shouldSkip)
+        if (Input.GetKeyDown(KeyCode.F6))
         {
+            shouldSkip = true;
+        }
+
+        if (ClientControlGUI.Instance && ClientControlGUI.Instance.shouldSkip)
+        {
+            ClientControlGUI.Instance.shouldSkip = false;
             shouldSkip = true;
         }
 

@@ -192,6 +192,7 @@ internal class Logos : RoleBase
     public override void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
         if (!exiled) return;
+        if (exiled.Object != player) return;
 
         foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Philosopher)))
         {

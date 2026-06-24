@@ -167,9 +167,6 @@ static class ExtendedPlayerControl
         if (Camouflage.IsCamouflage)
             Camouflage.RpcSetSkin(player);
 
-        if (player.AmOwner && Main.CurrentServerIsVanilla)
-            player.RpcMakeVisible();
-
         var customRole = player.GetCustomRole();
         Main.PlayerStates[player.PlayerId].SetAlive();
 

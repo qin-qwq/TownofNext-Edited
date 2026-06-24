@@ -16,13 +16,11 @@ namespace TONE.Modules.ChatManager
         private static readonly Dictionary<byte, string> LastSystemChatMsg = [];
         private const int maxHistorySize = 20;
         public static List<string> ChatSentBySystem = [];
-        public static bool NeedHide;
         public static QuickChatSpamMode quickChatSpamMode => (QuickChatSpamMode)UseQuickChatSpamCheat.GetInt();
         public static void ResetHistory()
         {
             chatHistory.Clear();
             LastSystemChatMsg.Clear();
-            NeedHide = false;
         }
         public static void ClearLastSysMsg()
         {
@@ -173,74 +171,6 @@ namespace TONE.Modules.ChatManager
         {
             if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost) return;
             //This should never function for non host
-            if (Main.CurrentServerIsVanilla)
-            {
-                if (GameStates.IsExilling)
-                {
-                    NeedHide = true;
-                    return;
-                }
-                var pc = PlayerControl.LocalPlayer;
-
-                var title = "​";
-                var name = pc?.Data?.PlayerName;
-
-                var alive = pc.IsAlive();
-                if (!alive)
-                {
-                    pc.Data.IsDead = false;
-                    pc.Data.SendGameData();
-                }
-
-                for (int i = 0; i < 30; i++)
-                {
-                    int clientId = -1;
-                    pc.SetName(title);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(pc, String.Empty);
-                    pc.SetName(name);
-                    var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-                    writer.StartMessage(clientId);
-                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SetName)
-                        .Write(pc.Data.NetId)
-                        .Write(title)
-                        .EndRpc();
-                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SendChat)
-                        .Write(String.Empty)
-                        .EndRpc();
-                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SetName)
-                        .Write(pc.Data.NetId)
-                        .Write(name)
-                        .EndRpc();
-                    writer.EndMessage();
-                    writer.SendMessage();
-                }
-                _ = new LateTask(() =>
-                {
-                    foreach (var playerId in LastSystemChatMsg.Keys.ToArray())
-                    {
-                        var pc = playerId.GetPlayer();
-                        if (pc == null && playerId != byte.MaxValue) continue;
-                        var title = "<color=#FF0000>" + GetString("LastMessageReplay") + "</color>";
-                        Utils.SendMessage(LastSystemChatMsg[playerId], playerId, title: title, noReplay: true);
-                    }
-                    StringBuilder sb = new();
-                    chatHistory.ForEach(dict =>
-                    {
-                        foreach (var kvp in dict)
-                        {
-                            byte id = kvp.Key;
-                            string msg = kvp.Value;
-
-                            sb.Append(id.ColoredPlayerName());
-                            sb.Append(':');
-                            sb.Append(' ');
-                            sb.AppendLine(msg);
-                        }
-                    });
-                    Utils.SendMessage("\n", title: sb.ToString().Trim(), noReplay: true);
-                }, 0.5f);
-                return;
-            }
             if (GameStates.IsExilling && chatHistory.Count < 20)
             {
                 if (quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)
