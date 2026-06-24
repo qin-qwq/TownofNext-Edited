@@ -32,7 +32,7 @@ public static class SendTargetPatch
         __instance.freeChatField.textArea.AllowPaste = true;
         __instance.freeChatField.UpdateCharCount();
         if (SendTargetShower != null) return;
-        SendTargetShower = UnityEngine.Object.Instantiate(__instance.freeChatField.charCountText.gameObject, __instance.freeChatField.charCountText.transform.parent);
+        SendTargetShower = Object.Instantiate(__instance.freeChatField.charCountText.gameObject, __instance.freeChatField.charCountText.transform.parent);
         SendTargetShower.name = "TONE Send Target Shower";
         SendTargetShower.transform.localPosition = new Vector3(1.95f, 0.5f, 0f);
         SendTargetShower.GetComponent<RectTransform>().sizeDelta = new Vector2(5f, 0.1f);

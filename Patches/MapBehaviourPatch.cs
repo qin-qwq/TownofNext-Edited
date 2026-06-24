@@ -2,7 +2,6 @@ using System;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace TONE;
 

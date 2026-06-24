@@ -126,7 +126,6 @@ internal class ChatCommands
 
     public static List<string> ChatHistory = [];
 
-    private static bool WaitingToSend;
     private static long LastUpload;
 
     public static void LoadCommands()
@@ -152,7 +151,7 @@ internal class ChatCommands
             new("Disconnect", "{team}", Command.UsageLevels.Host, Command.UsageTimes.InGame, DisconnectCommand, true, false, [GetString("CommandArgs.Disconnect.Team")]),
             new("Role", "[role]", Command.UsageLevels.Everyone, Command.UsageTimes.Always, RoleCommand, true, false, [GetString("CommandArgs.Role.Role")]),
             new("Factions", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, FactionsCommand, true, false),
-            new("Up", "{role}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, UpCommand, true, false, [GetString("CommandArgs.Up.Role")]), // Birthday
+            new("Up", "{role}", Command.UsageLevels.Up, Command.UsageTimes.InLobby, UpCommand, true, false, [GetString("CommandArgs.Up.Role")]),
             new("SetPlayers", "{number}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, SetPlayersCommand, true, false, [GetString("CommandArgs.SetPlayers.Number")]),
             new("Help", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, HelpCommand, true, false),
             new("Icons", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, IconsCommand, true, false),
@@ -859,11 +858,6 @@ internal class ChatCommands
 
     private static void UpCommand(PlayerControl player, string text, string[] args)
     {
-        if (!player.FriendCode.GetDevUser().IsUp && !Main.IsBirthday2)
-        {
-            Utils.SendMessage($"{GetString("InvalidPermissionCMD")}", player.PlayerId);
-            return;
-        }
         var subArgs = text.Remove(0, 3);
         if (!Options.EnableUpMode.GetBool())
         {

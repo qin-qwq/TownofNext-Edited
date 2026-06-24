@@ -84,7 +84,7 @@ class HudManagerUpdatePatch
                 // Set lower info text for modded players
                 if (LowerInfoText == null)
                 {
-                    LowerInfoText = UnityEngine.Object.Instantiate(__instance.KillButton.cooldownTimerText, __instance.transform, true);
+                    LowerInfoText = Object.Instantiate(__instance.KillButton.cooldownTimerText, __instance.transform, true);
                     LowerInfoText.alignment = TextAlignmentOptions.Center;
                     LowerInfoText.transform.localPosition = new(0, -2f, 0);
                     LowerInfoText.overflowMode = TextOverflowModes.Overflow;
@@ -478,7 +478,7 @@ internal static class SabotageMapPatch
 
             if (!TimerTexts.TryGetValue(room, out TextMeshPro timerText))
             {
-                TimerTexts[room] = timerText = UnityEngine.Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, mr.special.transform, true);
+                TimerTexts[room] = timerText = Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, mr.special.transform, true);
                 timerText.alignment = TextAlignmentOptions.Center;
                 timerText.transform.localPosition = mr.special.transform.localPosition;
                 timerText.transform.localPosition = new(0, -0.4f, 0f);
@@ -566,7 +566,7 @@ internal static class MapRoomDoorsUpdatePatch
 
         if (!DoorTimerTexts.TryGetValue(room, out TextMeshPro doorTimerText))
         {
-            DoorTimerTexts[room] = doorTimerText = UnityEngine.Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, __instance.door.transform, true);
+            DoorTimerTexts[room] = doorTimerText = Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, __instance.door.transform, true);
             doorTimerText.alignment = TextAlignmentOptions.Center;
             doorTimerText.transform.localPosition = __instance.door.transform.localPosition;
             doorTimerText.transform.localPosition = new(0, -0.4f, 0f);

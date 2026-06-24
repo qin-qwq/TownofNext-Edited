@@ -3117,7 +3117,7 @@ public static class Utils
         var obj = hud.transform.FindChild("FlashColor_FullScreen")?.gameObject;
         if (obj == null)
         {
-            obj = UnityEngine.Object.Instantiate(hud.FullScreen.gameObject, hud.transform);
+            obj = Object.Instantiate(hud.FullScreen.gameObject, hud.transform);
             obj.name = "FlashColor_FullScreen";
         }
         hud.StartCoroutine(Effects.Lerp(duration, new Action<float>((t) =>
@@ -3231,7 +3231,7 @@ public static class Utils
     {
         if (!GameStates.IsInGame || !AmongUsClient.Instance.AmHost) return;
 
-        MeetingHud.Instance = UnityEngine.Object.Instantiate(HudManager.Instance.MeetingPrefab);
+        MeetingHud.Instance = Object.Instantiate(HudManager.Instance.MeetingPrefab);
         MeetingHud.Instance.ServerStart(PlayerControl.LocalPlayer.PlayerId);
         AmongUsClient.Instance.Spawn(MeetingHud.Instance, -2, SpawnFlags.None);
         MeetingHud.Instance.RpcClose();
@@ -3353,7 +3353,7 @@ public static class Utils
     {
         int baseColorId = deadBodyParent.Data.DefaultOutfit.ColorId;
         deadBodyParent.Data.DefaultOutfit.ColorId = colorId;
-        DeadBody deadBody = UnityEngine.Object.Instantiate(GameManager.Instance.deadBodyPrefab[0]);
+        DeadBody deadBody = Object.Instantiate(GameManager.Instance.deadBodyPrefab[0]);
         deadBody.enabled = false;
         deadBody.ParentId = deadBodyParent.PlayerId;
         foreach (SpriteRenderer b in deadBody.bodyRenderers)
@@ -3373,7 +3373,7 @@ public static class Utils
         {
             if (!deadBodyParent) return;
             CreateDeadBody(position, colorId, deadBodyParent);
-            PlayerControl playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab, Vector2.zero, Quaternion.identity);
+            PlayerControl playerControl = Object.Instantiate(AmongUsClient.Instance.PlayerPrefab, Vector2.zero, Quaternion.identity);
             playerControl.PlayerId = deadBodyParent.PlayerId;
             playerControl.isNew = false;
             playerControl.notRealPlayer = true;
@@ -3427,7 +3427,7 @@ public static class Utils
             writer.WritePacked(playerControl.NetId);
             writer.EndMessage();
             AmongUsClient.Instance.RemoveNetObject(playerControl);
-            UnityEngine.Object.Destroy(playerControl.gameObject);
+            Object.Destroy(playerControl.gameObject);
             sender.EndMessage();
             sender.SendMessage();
         });

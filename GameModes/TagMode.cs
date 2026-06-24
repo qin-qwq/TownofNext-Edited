@@ -162,7 +162,7 @@ public static class TagMode
         {
             var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
 
-            var newPopUp = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
+            var newPopUp = Object.Instantiate(popup, HudManager.Instance.transform.parent);
 
             var target = targetId.GetPlayer();
 
@@ -303,7 +303,7 @@ public class TZombie : RoleBase
 
         var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
 
-        var newPopUp = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
+        var newPopUp = Object.Instantiate(popup, HudManager.Instance.transform.parent);
 
         newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
         newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("TagMode.BecomeZombie");

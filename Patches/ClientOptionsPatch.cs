@@ -194,7 +194,7 @@ public static class OptionsMenuBehaviourStartPatch
                         Main.Instance.AddComponent<ClientControlGUI>();
                         break;
                     case false when ClientControlGUI.Instance:
-                        UnityEngine.Object.Destroy(ClientControlGUI.Instance);
+                        Object.Destroy(ClientControlGUI.Instance);
                         break;
                 }
             }
@@ -205,8 +205,8 @@ public static class OptionsMenuBehaviourStartPatch
             SwitchVanilla = ClientOptionItem.Create("SwitchVanilla", Main.SwitchVanilla, __instance, SwitchVanillaButtonToggle);
             static void SwitchVanillaButtonToggle()
             {
-                if (ClientControlGUI.Instance) UnityEngine.Object.Destroy(ClientControlGUI.Instance);
-                if (UpdateFriendCodeUIPatch.VersionShower) UnityEngine.Object.Destroy(UpdateFriendCodeUIPatch.VersionShower);
+                if (ClientControlGUI.Instance) Object.Destroy(ClientControlGUI.Instance);
+                if (UpdateFriendCodeUIPatch.VersionShower) Object.Destroy(UpdateFriendCodeUIPatch.VersionShower);
                 Harmony.UnpatchAll();
                 Main.Instance.Unload();
             }

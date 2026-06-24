@@ -342,7 +342,7 @@ internal class DoubleAgent : RoleBase
             if (pc == null || !pc.IsAlive()) continue;
             if (pc.GetCustomRole().GetCustomRoleTeam() == Custom_Team.Impostor || PlayerControl.LocalPlayer == pc) continue;
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
+            GameObject targetBox = Object.Instantiate(template, pva.transform);
             targetBox.name = "PlantBombButton";
             targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
             createdButtonsList.Add(targetBox);
@@ -368,7 +368,7 @@ internal class DoubleAgent : RoleBase
     private static void DestroyButtons(GameObject pressedButton)
     {
         foreach (var button in createdButtonsList.Where(button => button != pressedButton))
-            UnityEngine.Object.Destroy(button);
+            Object.Destroy(button);
         createdButtonsList.Clear();
 
         pressedButton.GetComponent<PassiveButton>().enabled = false;

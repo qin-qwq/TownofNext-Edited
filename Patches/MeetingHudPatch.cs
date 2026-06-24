@@ -1192,7 +1192,7 @@ class MeetingHudStartPatch
         SoundManager.Instance.ChangeAmbienceVolume(0f);
         if (!GameStates.IsModHost) return;
 
-        GuessManager.textTemplate = UnityEngine.Object.Instantiate(__instance.playerStates[0].NameText);
+        GuessManager.textTemplate = Object.Instantiate(__instance.playerStates[0].NameText);
         GuessManager.textTemplate.enabled = false;
 
         foreach (var pva in __instance.playerStates)
@@ -1208,9 +1208,9 @@ class MeetingHudStartPatch
 
             // Create role text in meeting
             var RoleTextData = GetRoleAndSubText(playerId, targetId, isMeeting: true);
-            var roleTextMeeting = UnityEngine.Object.Instantiate(textTemplate);
+            var roleTextMeeting = Object.Instantiate(textTemplate);
             if (roleTextMeeting.transform.FindChild("DeathReasonTextMeeting") != null)
-                UnityEngine.Object.Destroy(roleTextMeeting.transform.FindChild("DeathReasonTextMeeting").gameObject);
+                Object.Destroy(roleTextMeeting.transform.FindChild("DeathReasonTextMeeting").gameObject);
             roleTextMeeting.transform.SetParent(textTemplate.transform);
             roleTextMeeting.transform.localPosition = new Vector3(0f, -0.18f, 0f);
             roleTextMeeting.fontSize = 1.6f;
@@ -1222,9 +1222,9 @@ class MeetingHudStartPatch
             roleTextMeeting.enabled = target.AmOwner || ExtendedPlayerControl.KnowRoleTarget(player, target);
 
             // Create death reason text in meeting
-            var deathReasonText = UnityEngine.Object.Instantiate(textTemplate);
+            var deathReasonText = Object.Instantiate(textTemplate);
             if (deathReasonText.transform.FindChild("RoleTextMeeting") != null)
-                UnityEngine.Object.Destroy(deathReasonText.transform.FindChild("RoleTextMeeting").gameObject);
+                Object.Destroy(deathReasonText.transform.FindChild("RoleTextMeeting").gameObject);
             deathReasonText.transform.transform.SetParent(textTemplate.transform);
             deathReasonText.transform.localPosition = new Vector3(0f, +0.18f, 0f);
             deathReasonText.fontSize = 1.4f;
@@ -1236,14 +1236,14 @@ class MeetingHudStartPatch
 
             // Thanks BAU (By D1GQ)
             var PlayerLevel = pva.transform.Find("PlayerLevel");
-            var LevelDisplay = UnityEngine.Object.Instantiate(PlayerLevel, pva.transform);
+            var LevelDisplay = Object.Instantiate(PlayerLevel, pva.transform);
             LevelDisplay.localPosition = new Vector3(-1.21f, -0.15f, PlayerLevel.transform.localPosition.z);
             LevelDisplay.transform.SetSiblingIndex(pva.transform.Find("PlayerLevel").GetSiblingIndex() + 1);
             LevelDisplay.gameObject.name = "PlayerId";
             LevelDisplay.GetComponent<SpriteRenderer>().color = Palette.Purple;
             var IdLabel = LevelDisplay.transform.Find("LevelLabel");
             var IdNumber = LevelDisplay.transform.Find("LevelNumber");
-            UnityEngine.Object.Destroy(IdLabel.GetComponent<TextTranslatorTMP>());
+            Object.Destroy(IdLabel.GetComponent<TextTranslatorTMP>());
             IdLabel.GetComponent<TextMeshPro>().text = "ID";
             IdNumber.GetComponent<TextMeshPro>().text = pva.TargetPlayerId.ToString();
             IdLabel.name = "IdLabel";
@@ -1490,7 +1490,7 @@ class MeetingHudUpdatePatch
 {
     private static int bufferTime = 10;
     private static void ClearShootButton(MeetingHud __instance, bool forceAll = false)
-     => __instance.playerStates.ToList().ForEach(x => { if ((forceAll || (!Main.PlayerStates.TryGetValue(x.TargetPlayerId, out var ps) || ps.IsDead)) && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
+     => __instance.playerStates.ToList().ForEach(x => { if ((forceAll || (!Main.PlayerStates.TryGetValue(x.TargetPlayerId, out var ps) || ps.IsDead)) && x.transform.FindChild("ShootButton") != null) Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
 
     // Force call RpcClose here
     public static bool Prefix(MeetingHud __instance)

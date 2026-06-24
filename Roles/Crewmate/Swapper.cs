@@ -377,14 +377,14 @@ internal class Swapper : RoleBase
     {
         foreach (var pva in __instance.playerStates)
         {
-            if (pva.transform.Find("SwapButton") != null) UnityEngine.Object.Destroy(pva.transform.Find("SwapButton").gameObject);
+            if (pva.transform.Find("SwapButton") != null) Object.Destroy(pva.transform.Find("SwapButton").gameObject);
 
             var pc = pva.TargetPlayerId.GetPlayer();
             var local = PlayerControl.LocalPlayer;
             if (pc == null || !pc.IsAlive()) continue;
 
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
+            GameObject targetBox = Object.Instantiate(template, pva.transform);
             targetBox.name = "SwapButton";
             targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
             SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();

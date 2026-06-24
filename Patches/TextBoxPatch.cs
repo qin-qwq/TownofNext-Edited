@@ -121,7 +121,7 @@ public static class TextBoxPatch
 
             if (!PlaceHolderText)
             {
-                PlaceHolderText = UnityEngine.Object.Instantiate(__instance.outputText, __instance.outputText.transform.parent);
+                PlaceHolderText = Object.Instantiate(__instance.outputText, __instance.outputText.transform.parent);
                 PlaceHolderText.name = "PlaceHolderText";
                 PlaceHolderText.color = new(0.7f, 0.7f, 0.7f, 0.7f);
                 PlaceHolderText.transform.localPosition = __instance.outputText.transform.localPosition;
@@ -129,7 +129,7 @@ public static class TextBoxPatch
 
             if (!CommandInfoText)
             {
-                CommandInfoText = UnityEngine.Object.Instantiate(hud.KillButton.cooldownTimerText, hud.transform.parent, true);
+                CommandInfoText = Object.Instantiate(hud.KillButton.cooldownTimerText, hud.transform.parent, true);
                 CommandInfoText.name = "CommandInfoText";
                 CommandInfoText.alignment = TextAlignmentOptions.Left;
                 CommandInfoText.verticalAlignment = VerticalAlignmentOptions.Top;
@@ -144,7 +144,7 @@ public static class TextBoxPatch
 
             if (!AdditionalInfoText)
             {
-                AdditionalInfoText = UnityEngine.Object.Instantiate(hud.KillButton.cooldownTimerText, hud.transform.parent, true);
+                AdditionalInfoText = Object.Instantiate(hud.KillButton.cooldownTimerText, hud.transform.parent, true);
                 AdditionalInfoText.name = "AdditionalInfoText";
                 AdditionalInfoText.alignment = TextAlignmentOptions.Left;
                 AdditionalInfoText.verticalAlignment = VerticalAlignmentOptions.Top;

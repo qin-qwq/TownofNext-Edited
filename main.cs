@@ -273,20 +273,6 @@ public class Main : BasePlugin
             return false;
         }
     }
-    public static bool IsBirthday2
-    {
-        get
-        {
-            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
-            {
-                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 6, 17, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 6, 22, 7, 0, 0, 0, DateTimeKind.Utc);
-                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
-            }
-            return false;
-        }
-    }
     public static bool ResetOptions = true;
     public static string FirstDied = ""; //Store with hash puid so things can pass through different round
     public static string FirstDiedPrevious = "";

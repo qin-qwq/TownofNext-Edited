@@ -181,7 +181,7 @@ internal class Dictator : RoleBase
             foreach (var pva in __instance.playerStates)
             {
                 if (pva?.transform?.Find("DictatorButton") != null)
-                    UnityEngine.Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
+                    Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
             }
         }
     }
@@ -190,14 +190,14 @@ internal class Dictator : RoleBase
     {
         foreach (var pva in __instance.playerStates)
         {
-            if (pva.transform.Find("DictatorButton") != null) UnityEngine.Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
+            if (pva.transform.Find("DictatorButton") != null) Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
 
             var pc = pva.TargetPlayerId.GetPlayer();
             var local = PlayerControl.LocalPlayer;
             if (pc == null || !pc.IsAlive()) continue;
 
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
+            GameObject targetBox = Object.Instantiate(template, pva.transform);
             targetBox.name = "DictatorButton";
             targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
             SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();

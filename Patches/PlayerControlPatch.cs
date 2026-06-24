@@ -1649,7 +1649,7 @@ class PlayerStartPatch
 
         if (GameStates.IsHideNSeek) return;
 
-        var roleText = UnityEngine.Object.Instantiate(instance.cosmetics.nameText);
+        var roleText = Object.Instantiate(instance.cosmetics.nameText);
         roleText.transform.SetParent(instance.cosmetics.nameText.transform);
         roleText.fontMaterial.SetFloat("_StencilComp", 7f);
         roleText.fontMaterial.SetFloat("_Stencil", 2f);

@@ -208,7 +208,7 @@ internal class Exorcist : RoleBase
 
         GameObject parent = GameObject.Find("Main Camera").transform.Find("Hud").Find("ChatUi").Find("ChatScreenRoot").Find("ChatScreenContainer").gameObject;
         GameObject template = __instance.transform.Find("MeetingContents").Find("ButtonStuff").Find("button_skipVoting").gameObject;
-        GameObject exorcistButton = UnityEngine.Object.Instantiate(template, parent.transform);
+        GameObject exorcistButton = Object.Instantiate(template, parent.transform);
         exorcistButton.name = "ExorcistButton";
         exorcistButton.transform.localPosition = new Vector3(3.46f, 0f, 45f);
         exorcistButton.SetActive(true);

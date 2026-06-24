@@ -253,12 +253,12 @@ class StartPatch
                 var Dropship = GameObject.Find("Dropship/panel_fuel");
                 if (Dropship != null)
                 {
-                    var Decorations = UnityEngine.Object.Instantiate(Dropship, GameObject.Find("Dropship")?.transform);
+                    var Decorations = Object.Instantiate(Dropship, GameObject.Find("Dropship")?.transform);
                     Decorations.name = "Dropship_Decorations";
                     Decorations.transform.DestroyChildren();
-                    UnityEngine.Object.Destroy(Decorations.GetComponent<Console>());
-                    UnityEngine.Object.Destroy(Decorations.GetComponent<BoxCollider2D>());
-                    UnityEngine.Object.Destroy(Decorations.GetComponent<PassiveButton>());
+                    Object.Destroy(Decorations.GetComponent<Console>());
+                    Object.Destroy(Decorations.GetComponent<BoxCollider2D>());
+                    Object.Destroy(Decorations.GetComponent<PassiveButton>());
                     Decorations.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TONE.Resources.Images.Dropship-Decorations.png", 100f);
                     Decorations.transform.SetSiblingIndex(1);
                     Decorations.transform.localPosition = new(0.0709f, 0.73f);
@@ -276,7 +276,7 @@ class StartMeetingPatch
         if (GameStates.IsHideNSeek) return;
 
         MeetingStates.ReportTarget = target;
-        MeetingStates.DeadBodies = UnityEngine.Object.FindObjectsOfType<DeadBody>();
+        MeetingStates.DeadBodies = Object.FindObjectsOfType<DeadBody>();
     }
     public static void Postfix()
     {

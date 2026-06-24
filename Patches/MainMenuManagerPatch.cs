@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static TONE.Translator;
-using Object = UnityEngine.Object;
 
 namespace TONE;
 

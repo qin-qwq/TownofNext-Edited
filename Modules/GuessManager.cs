@@ -661,7 +661,7 @@ public static class GuessManager
             var pc = Utils.GetPlayerById(pva.TargetPlayerId);
             if (pc == null || !pc.IsAlive()) continue;
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
+            GameObject targetBox = Object.Instantiate(template, pva.transform);
             targetBox.name = "ShootButton";
             targetBox.transform.localPosition = new Vector3(-0.95f, 0.03f, -1.31f);
             SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
@@ -716,7 +716,7 @@ public static class GuessManager
             PageButtons = [];
             __instance.playerStates.ToList().ForEach(x => x.gameObject.SetActive(false));
 
-            Transform container = UnityEngine.Object.Instantiate(GameObject.Find("PhoneUI").transform, __instance.transform);
+            Transform container = Object.Instantiate(GameObject.Find("PhoneUI").transform, __instance.transform);
             container.transform.localPosition = new Vector3(0, 0, -200f);
             guesserUI = container.gameObject;
 
@@ -725,14 +725,14 @@ public static class GuessManager
             var maskTemplate = __instance.playerStates[0].transform.FindChild("MaskArea");
             var smallButtonTemplate = __instance.playerStates[0].Buttons.transform.Find("CancelButton");
             textTemplate.enabled = true;
-            if (textTemplate.transform.FindChild("RoleTextMeeting") != null) UnityEngine.Object.Destroy(textTemplate.transform.FindChild("RoleTextMeeting").gameObject);
-            if (textTemplate.transform.FindChild("DeathReasonTextMeeting") != null) UnityEngine.Object.Destroy(textTemplate.transform.FindChild("DeathReasonTextMeeting").gameObject);
+            if (textTemplate.transform.FindChild("RoleTextMeeting") != null) Object.Destroy(textTemplate.transform.FindChild("RoleTextMeeting").gameObject);
+            if (textTemplate.transform.FindChild("DeathReasonTextMeeting") != null) Object.Destroy(textTemplate.transform.FindChild("DeathReasonTextMeeting").gameObject);
 
             Transform exitButtonParent = new GameObject().transform;
             exitButtonParent.SetParent(container);
-            Transform exitButton = UnityEngine.Object.Instantiate(buttonTemplate, exitButtonParent);
+            Transform exitButton = Object.Instantiate(buttonTemplate, exitButtonParent);
             exitButton.FindChild("ControllerHighlight").gameObject.SetActive(false);
-            Transform exitButtonMask = UnityEngine.Object.Instantiate(maskTemplate, exitButtonParent);
+            Transform exitButtonMask = Object.Instantiate(maskTemplate, exitButtonParent);
             exitButtonMask.transform.localScale = new Vector3(2.88f, 0.8f, 1f);
             exitButtonMask.transform.localPosition = new Vector3(0f, 0f, 1f);
             exitButton.gameObject.GetComponent<SpriteRenderer>().sprite = smallButtonTemplate.GetComponent<SpriteRenderer>().sprite;
@@ -748,7 +748,7 @@ public static class GuessManager
                     x.Buttons.transform.gameObject.SetActive(false);
                 });
 
-                UnityEngine.Object.Destroy(container.gameObject);
+                Object.Destroy(container.gameObject);
             }));
             ExitButton = exitButton.GetComponent<PassiveButton>();
 
@@ -799,10 +799,10 @@ public static class GuessManager
 
                 Transform TeambuttonParent = new GameObject().transform;
                 TeambuttonParent.SetParent(container);
-                Transform Teambutton = UnityEngine.Object.Instantiate(buttonTemplate, TeambuttonParent);
+                Transform Teambutton = Object.Instantiate(buttonTemplate, TeambuttonParent);
                 Teambutton.FindChild("ControllerHighlight").gameObject.SetActive(false);
-                Transform TeambuttonMask = UnityEngine.Object.Instantiate(maskTemplate, TeambuttonParent);
-                TextMeshPro Teamlabel = UnityEngine.Object.Instantiate(textTemplate, Teambutton);
+                Transform TeambuttonMask = Object.Instantiate(maskTemplate, TeambuttonParent);
+                TextMeshPro Teamlabel = Object.Instantiate(textTemplate, Teambutton);
                 Teambutton.GetComponent<SpriteRenderer>().sprite = CustomButton.Get("GuessPlateKPD");
                 RoleSelectButtons.Add((Custom_Team)TabId, Teambutton.GetComponent<SpriteRenderer>());
                 TeambuttonParent.localPosition = new(-3.10f + (tabCount++ * 1.47f), 2.225f, -200);
@@ -860,10 +860,10 @@ public static class GuessManager
                 var smallButtonTemplate = __instance.playerStates[0].Buttons.transform.Find("CancelButton");
                 Transform PagebuttonParent = new GameObject().transform;
                 PagebuttonParent.SetParent(container);
-                Transform Pagebutton = UnityEngine.Object.Instantiate(buttonTemplate, PagebuttonParent);
+                Transform Pagebutton = Object.Instantiate(buttonTemplate, PagebuttonParent);
                 Pagebutton.FindChild("ControllerHighlight").gameObject.SetActive(false);
-                Transform PagebuttonMask = UnityEngine.Object.Instantiate(maskTemplate, PagebuttonParent);
-                TextMeshPro Pagelabel = UnityEngine.Object.Instantiate(textTemplate, Pagebutton);
+                Transform PagebuttonMask = Object.Instantiate(maskTemplate, PagebuttonParent);
+                TextMeshPro Pagelabel = Object.Instantiate(textTemplate, Pagebutton);
                 Pagebutton.GetComponent<SpriteRenderer>().sprite = CustomButton.Get("GuessPlateKPD");
                 PagebuttonParent.localPosition = IsNext ? new(3.535f, -2.2f, -200) : new(-3.475f, -2.2f, -200);
                 PagebuttonParent.localScale = new(0.55f, 0.55f, 1f);
@@ -1037,10 +1037,10 @@ public static class GuessManager
                 if (MaxOneScreenRole <= info[(int)role.GetCustomRoleTeam()]) info[(int)role.GetCustomRoleTeam()] = 0;
                 Transform buttonParent = new GameObject().transform;
                 buttonParent.SetParent(container);
-                Transform button = UnityEngine.Object.Instantiate(buttonTemplate, buttonParent);
+                Transform button = Object.Instantiate(buttonTemplate, buttonParent);
                 button.FindChild("ControllerHighlight").gameObject.SetActive(false);
-                Transform buttonMask = UnityEngine.Object.Instantiate(maskTemplate, buttonParent);
-                TextMeshPro label = UnityEngine.Object.Instantiate(textTemplate, button);
+                Transform buttonMask = Object.Instantiate(maskTemplate, buttonParent);
+                TextMeshPro label = Object.Instantiate(textTemplate, button);
                 button.GetComponent<SpriteRenderer>().sprite = CustomButton.Get("GuessPlate");
                 if (!RoleButtons.ContainsKey(role.GetCustomRoleTeam()))
                 {
@@ -1083,7 +1083,7 @@ public static class GuessManager
                             x.gameObject.SetActive(true);
                             x.Buttons.transform.gameObject.SetActive(false);
                         });
-                        UnityEngine.Object.Destroy(container.gameObject);
+                        Object.Destroy(container.gameObject);
                         textTemplate.enabled = false;
 
                     }
@@ -1114,8 +1114,8 @@ public static class GuessManager
             {
                 return;
             }
-            if (textTemplate) UnityEngine.Object.Destroy(textTemplate.gameObject);
-            if (guesserUI) UnityEngine.Object.Destroy(guesserUI.gameObject);
+            if (textTemplate) Object.Destroy(textTemplate.gameObject);
+            if (guesserUI) Object.Destroy(guesserUI.gameObject);
         }
     }
 

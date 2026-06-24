@@ -1170,7 +1170,7 @@ static class ExtendedPlayerControl
 
     public static DeadBody GetDeadBody(this NetworkedPlayerInfo playerData)
     {
-        return UnityEngine.Object.FindObjectsOfType<DeadBody>().FirstOrDefault(bead => bead.ParentId == playerData.PlayerId);
+        return Object.FindObjectsOfType<DeadBody>().FirstOrDefault(bead => bead.ParentId == playerData.PlayerId);
     }
 
     public static float GetKillDistances(bool ovverideValue = false, int newValue = 2)

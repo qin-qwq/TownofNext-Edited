@@ -4,7 +4,6 @@ using InnerNet;
 using System;
 using System.Collections;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 // Credit: https://github.com/Rabek009/MoreGamemodes/blob/e054eb498094dfca0a365fc6b6fea8d17f9974d7/Modules/CustomObjects, https://github.com/Gurge44/EndlessHostRoles/blob/main/Modules/CustomNetObject.cs

@@ -6,7 +6,6 @@ using TMPro;
 using TONE.Patches;
 using UnityEngine;
 using static TONE.Translator;
-using Object = UnityEngine.Object;
 
 namespace TONE;
 

@@ -7,7 +7,6 @@ using TONE.Roles.Core;
 using UnityEngine;
 using UnityEngine.Events;
 using static TONE.Translator;
-using Object = UnityEngine.Object;
 
 namespace TONE;
 

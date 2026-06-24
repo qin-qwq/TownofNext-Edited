@@ -8,7 +8,6 @@ using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
-using Object = UnityEngine.Object;
 
 namespace TONE.Roles.Crewmate;
 

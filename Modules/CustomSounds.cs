@@ -88,7 +88,7 @@ public static class CustomSoundsManager
                 audioSource.Play();
 
                 // 播放完成后销毁对象
-                UnityEngine.Object.Destroy(gameObject, audioClip.length);
+                Object.Destroy(gameObject, audioClip.length);
             }
         }
         catch (Exception ex)

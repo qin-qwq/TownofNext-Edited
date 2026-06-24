@@ -196,7 +196,7 @@ class SetEverythingUpPatch
 
         __instance.WinText.alignment = TextAlignmentOptions.Right;
 
-        var WinnerTextObject = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);
+        var WinnerTextObject = Object.Instantiate(__instance.WinText.gameObject);
         WinnerTextObject.transform.localScale = new(0.6f, 0.6f, 0.6f);
         WinnerTextObject.transform.position = new(__instance.WinText.transform.position.x + 2.4f, __instance.WinText.transform.position.y - 0.5f, __instance.WinText.transform.position.z);
 
@@ -353,7 +353,7 @@ class SetEverythingUpPatch
         GC.Collect();
 
         var Pos = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, Camera.main.nearClipPlane));
-        var RoleSummaryObject = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);
+        var RoleSummaryObject = Object.Instantiate(__instance.WinText.gameObject);
         RoleSummaryObject.transform.position = new Vector3(__instance.Navigation.ExitButton.transform.position.x + 0.1f, Pos.y - 0.1f, -15f);
         RoleSummaryObject.transform.localScale = new Vector3(1f, 1f, 1f);
 

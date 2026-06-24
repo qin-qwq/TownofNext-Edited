@@ -48,7 +48,7 @@ internal static class Crowded
 
                     __instance.UpdateMaxPlayersButtons(__instance.GetTargetOptions());
                 }));
-                UnityEngine.Object.Destroy(firstButtonRenderer);
+                Object.Destroy(firstButtonRenderer);
 
                 var lastButtonRenderer = __instance.MaxPlayerButtons[^1];
                 lastButtonRenderer.GetComponentInChildren<TextMeshPro>().text = "+";
@@ -70,7 +70,7 @@ internal static class Crowded
 
                     __instance.UpdateMaxPlayersButtons(__instance.GetTargetOptions());
                 }));
-                UnityEngine.Object.Destroy(lastButtonRenderer);
+                Object.Destroy(lastButtonRenderer);
 
                 for (var i = 1; i < 11; i++)
                 {
@@ -97,9 +97,9 @@ internal static class Crowded
             {
                 var secondButton = __instance.ImpostorButtons[1];
                 secondButton.SpriteRenderer.enabled = false;
-                UnityEngine.Object.Destroy(secondButton.transform.FindChild("ConsoleHighlight").gameObject);
-                UnityEngine.Object.Destroy(secondButton.PassiveButton);
-                UnityEngine.Object.Destroy(secondButton.BoxCollider);
+                Object.Destroy(secondButton.transform.FindChild("ConsoleHighlight").gameObject);
+                Object.Destroy(secondButton.PassiveButton);
+                Object.Destroy(secondButton.BoxCollider);
 
                 var secondButtonText = secondButton.TextMesh;
                 secondButtonText.text = __instance.GetTargetOptions().NumImpostors.ToString();

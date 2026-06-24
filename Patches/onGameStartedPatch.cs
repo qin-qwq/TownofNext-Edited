@@ -256,8 +256,8 @@ internal class ChangeRoleSettings
 
             try
             {
-                SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
-                MapRoomDoorsUpdatePatch.DoorTimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
+                SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => Object.Destroy(x.gameObject));
+                MapRoomDoorsUpdatePatch.DoorTimerTexts.Values.DoIf(x => x != null, x => Object.Destroy(x.gameObject));
             }
             catch (Exception e) { Utils.ThrowException(e); }
 

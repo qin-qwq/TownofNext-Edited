@@ -54,11 +54,11 @@ public class ModUpdater
         CheckCustomRegions();
         NewVersionCheck();
         DeleteOldFiles();
-        InfoPopup = UnityEngine.Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
+        InfoPopup = Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
         InfoPopup.name = "InfoPopup";
         InfoPopup.TextAreaTMP.GetComponent<RectTransform>().sizeDelta = new(2.5f, 2f);
 
-        InfoPopupV2 = UnityEngine.Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
+        InfoPopupV2 = Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
         InfoPopupV2.name = "InfoPopupV2";
 
         if (!isChecked)
@@ -472,8 +472,8 @@ public class ModUpdater
 
             InfoPopupV2.Show(message);
             templateExitGame.gameObject.SetActive(false);
-            var firstButton = UnityEngine.Object.Instantiate(templateExitGame, InfoPopupV2.transform);
-            var secondButton = UnityEngine.Object.Instantiate(templateExitGame, InfoPopupV2.transform);
+            var firstButton = Object.Instantiate(templateExitGame, InfoPopupV2.transform);
+            var secondButton = Object.Instantiate(templateExitGame, InfoPopupV2.transform);
             if (firstButton != null)
             {
                 firstButton.gameObject.SetActive(true);
