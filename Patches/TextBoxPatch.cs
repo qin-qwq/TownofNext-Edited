@@ -20,6 +20,23 @@ public static class TextBoxPatch
     {
         TextBoxTMP.EmailChars.Add('<');
         TextBoxTMP.EmailChars.Add('>');
+        TextBoxTMP.EmailChars.Add('"');
+        TextBoxTMP.EmailChars.Add('’');
+        TextBoxTMP.EmailChars.Add('`');
+        TextBoxTMP.EmailChars.Add('–');
+        TextBoxTMP.EmailChars.Add('—');
+        TextBoxTMP.EmailChars.Add('‐');
+        TextBoxTMP.EmailChars.Add('[');
+        TextBoxTMP.EmailChars.Add(']');
+        TextBoxTMP.EmailChars.Add('{');
+        TextBoxTMP.EmailChars.Add('}');
+        TextBoxTMP.EmailChars.Add('*');
+        TextBoxTMP.EmailChars.Add('|');
+        TextBoxTMP.EmailChars.Add('$');
+        TextBoxTMP.EmailChars.Add('€');
+        TextBoxTMP.EmailChars.Add('£');
+        TextBoxTMP.EmailChars.Add('¥');
+        TextBoxTMP.EmailChars.Add('₽');
     }
 
     [HarmonyPatch(typeof(TextBoxTMP), nameof(TextBoxTMP.Start))]

@@ -51,7 +51,7 @@ class HudManagerUpdatePatch
 
         if (SetHudActivePatch.IsActive)
         {
-            if (Options.CurrentGameMode == CustomGameMode.FFA)
+            if (GameModeBase.GetGameMode() == CustomGameMode.FFA)
             {
                 if (LowerInfoText == null)
                 {
@@ -92,7 +92,7 @@ class HudManagerUpdatePatch
                     LowerInfoText.color = Color.white;
                     LowerInfoText.fontSize = LowerInfoText.fontSizeMax = LowerInfoText.fontSizeMin = 2.8f;
                 }
-                switch (Options.CurrentGameMode)
+                switch (GameModeBase.GetGameMode())
                 {
                     case CustomGameMode.Standard:
                     case CustomGameMode.BonfireNight:
@@ -226,7 +226,7 @@ class SetHudActivePatch
             return;
         }
 
-        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || Options.CurrentGameMode != CustomGameMode.Standard)
+        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || GameModeBase.GetGameMode() != CustomGameMode.Standard)
             __instance.ReportButton.ToggleVisible(false);
 
         if (player.Is(CustomRoles.Mare) && !Utils.IsActive(SystemTypes.Electrical))
@@ -291,7 +291,7 @@ class TaskPanelBehaviourPatch
         var taskText = __instance.taskText.text;
         if (taskText == "None") return;
 
-        if (player == null) return;
+        if (!player) return;
 
         // Display Description
         if (!player.GetCustomRole().IsVanilla())
@@ -301,77 +301,35 @@ class TaskPanelBehaviourPatch
 
             var AllText = Utils.ColorString(player.GetRoleColor(), RoleWithInfo);
 
-            switch (Options.CurrentGameMode)
+            if (GameModeBase.GetGameMode().GetGameModeClass().NormalTaskText)
             {
-                case CustomGameMode.Standard:
-                case CustomGameMode.TagMode:
+                var lines = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
+                StringBuilder sb = new();
+                foreach (var eachLine in lines)
+                {
+                    var line = eachLine.Trim();
+                    if ((line.StartsWith("<color=#FF1919FF>") || line.StartsWith("<color=#FF0000FF>")) && sb.Length < 1 && !line.Contains('(')) continue;
+                    sb.Append(line + "\r\n");
+                }
 
-                    var lines = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
-                    StringBuilder sb = new();
-                    foreach (var eachLine in lines)
-                    {
-                        var line = eachLine.Trim();
-                        if ((line.StartsWith("<color=#FF1919FF>") || line.StartsWith("<color=#FF0000FF>")) && sb.Length < 1 && !line.Contains('(')) continue;
-                        sb.Append(line + "\r\n");
-                    }
+                if (sb.Length > 1)
+                {
+                    var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
+                    if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
+                        text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
+                    AllText += $"\r\n\r\n<size=85%>{text}</size>";
+                }
 
-                    if (sb.Length > 1)
-                    {
-                        var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
-                            text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
-                        AllText += $"\r\n\r\n<size=85%>{text}</size>";
-                    }
-
-                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode is CustomGameMode.Standard && !OperatingSystem.IsAndroid())
-                    {
-                        AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
-                        AllText += "</size>";
-                    }
-                    break;
-                case CustomGameMode.FFA:
-                    Dictionary<byte, string> SummaryText2 = [];
-                    foreach (var id in Main.PlayerStates.Keys)
-                    {
-                        string name = Main.AllPlayerNames[id].RemoveHtmlTags().Replace("\r\n", string.Empty);
-                        string summary = $"{Utils.GetProgressText(id)}  {Utils.ColorString(id.GetPlayerColor(), name)}";
-                        if (Utils.GetProgressText(id).Trim() == string.Empty) continue;
-                        SummaryText2[id] = summary;
-                    }
-
-                    List<(int, byte)> list2 = [];
-                    foreach (var id in Main.PlayerStates.Keys) list2.Add((FFAManager.GetRankOfScore(id), id));
-                    list2.Sort();
-                    foreach (var id in list2.Where(x => SummaryText2.ContainsKey(x.Item2))) AllText += "\r\n" + SummaryText2[id.Item2];
-
-                    AllText = $"<size=70%>{AllText}</size>";
-
-                    break;
-                case CustomGameMode.SpeedRun:
-                    var lines2 = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
-                    StringBuilder sb2 = new();
-                    foreach (var eachLine in lines2)
-                    {
-                        var line = eachLine.Trim();
-                        if ((line.StartsWith("<color=#FF1919FF>") || line.StartsWith("<color=#FF0000FF>")) && sb2.Length < 1 && !line.Contains('(')) continue;
-                        sb2.Append(line + "\r\n");
-                    }
-
-                    if (sb2.Length > 1)
-                    {
-                        var text = sb2.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb2.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
-                            text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
-                        AllText += $"\r\n\r\n<size=85%>{text}</size>";
-                    }
-
-                    AllText += $"\r\n\r\n<size=80%>{SpeedRun.GetGameState()}</size>";
-
-                    break;
-                case CustomGameMode.BonfireNight:
-                    AllText += $"\r\n\r\n<size=80%>{BonfireNight.GetGameState()}</size>";
-                    break;
+                if (MeetingStates.FirstMeeting && GameModeBase.GetGameMode() is CustomGameMode.Standard && !OperatingSystem.IsAndroid())
+                {
+                    AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
+                    AllText += "</size>";
+                }
             }
+
+            AllText += GameModeBase.GetGameMode().GetGameModeClass().GetGameState(taskText);
+
+            if (GameModeBase.GetGameMode() is CustomGameMode.FFA) AllText = $"<size=70%>{AllText}</size>";
 
             __instance.taskText.text = AllText;
         }

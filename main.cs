@@ -55,9 +55,9 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.06.24";
-    public const string PluginDisplayVersion = "2.0.0 Alpha 4";
-    public const int ExtraPluginVersion = 10; // Updating the Alpha version after the Beta version requires an increase of at least 10
+    public const string PluginVersion = "26.06.26";
+    public const string PluginDisplayVersion = "2.0.0 Alpha 5";
+    public const int ExtraPluginVersion = 10; // Add Beta version number × 10
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
             (2026, 6, 5, 0) // 2026.6.5 & 17.4
@@ -67,7 +67,7 @@ public class Main : BasePlugin
     public static readonly Release RELEASE = Release.ALPHA;
 
 #pragma warning disable IDE1006 // Naming Styles
-    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 4
+    public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 5
     public static bool canaryRelease => RELEASE == Release.BETA; // Latest: V2.0.0 Beta 1 Hotfix 1
     public static bool fullRelease => RELEASE == Release.RELEASE; // Latest: V1.10.0
 #pragma warning restore IDE1006 // Naming Styles
@@ -545,6 +545,45 @@ public class Main : BasePlugin
             Utils.ThrowException(err);
         }
     }
+    public static void LoadGameModeClasses()
+    {
+        TONE.Logger.Info("Loading All GameModeClasses...", "LoadGameModeClasses");
+        try
+        {
+            var GameModeTypes = Assembly.GetAssembly(typeof(GameModeBase))!
+            .GetTypes()
+            .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(GameModeBase)));
+
+            var roleInstances = new List<GameModeBase>();
+            foreach (var type in GameModeTypes)
+            {
+                try
+                {
+                    if (Activator.CreateInstance(type) is GameModeBase instance)
+                        roleInstances.Add(instance);
+                    else
+                        TONE.Logger.Warn($"Failed to create instance of {type.Name}: Activator returned null", "LoadGameModeClasses");
+                }
+                catch (Exception ex)
+                {
+                    TONE.Logger.Error($"Failed to create instance of {type.Name}: {ex.Message}", "LoadGameModeClasses");
+                }
+            }
+
+            foreach (var gamemode in CustomGameModeManager.AllGameModes.Where(x => x != CustomGameMode.All && x != CustomGameMode.HidenSeekTONE))
+            {
+                var gamemodeType = roleInstances.FirstOrDefault(x => x.GameMode == gamemode)?.GetType() ?? typeof(Standard);
+
+                CustomGameModeManager.GameModeClass.Add(gamemode, (GameModeBase)Activator.CreateInstance(gamemodeType));
+            }
+
+            TONE.Logger.Info("RoleClasses Loaded Successfully", "LoadGameModeClasses");
+        }
+        catch (Exception err)
+        {
+            Utils.ThrowException(err);
+        }
+    }
     static void UpdateCustomTranslation()
     {
         string path = @$"{Path}/{LANGUAGE_FOLDER_NAME}/RoleColor.dat";
@@ -715,6 +754,7 @@ public class Main : BasePlugin
         LoadRoleClasses();
         LoadAddonClasses();
         LoadRoleColors(); //loads all the role colors from default and then tries to load custom colors if any.
+        LoadGameModeClasses();
 
         CustomWinnerHolder.Reset();
         Translator.Init();

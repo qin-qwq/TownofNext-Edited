@@ -134,8 +134,8 @@ public class SetUpRoleTextPatch
 
         var mapName = Utils.GetActiveMapName();
         Logger.Msg($"{mapName}", "Map");
-        if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && Options.CurrentGameMode != CustomGameMode.TagMode &&
-            !Main.LIMap && Options.CurrentGameMode != CustomGameMode.BonfireNight)
+        if (AmongUsClient.Instance.AmHost && RandomSpawn.IsRandomSpawn() && RandomSpawn.CanSpawnInFirstRound() && GameModeBase.GetGameMode() != CustomGameMode.TagMode &&
+            !Main.LIMap && GameModeBase.GetGameMode() != CustomGameMode.BonfireNight)
         {
             RandomSpawn.SpawnMap spawnMap = mapName switch
             {
@@ -154,7 +154,7 @@ public class SetUpRoleTextPatch
             PlayerControl localPlayer = PlayerControl.LocalPlayer;
             CustomRoles role = localPlayer.GetCustomRole();
             Color color;
-            switch (Options.CurrentGameMode)
+            switch (GameModeBase.GetGameMode())
             {
                 case CustomGameMode.FFA:
                     color = ColorUtility.TryParseHtmlString("#00ffff", out var newColorFFA) ? newColorFFA : new(255, 255, 255, 255);
@@ -329,7 +329,7 @@ public class SetUpRoleTextPatch
         sb.Append("------------Modded Settings------------\n");
         foreach (OptionItem o in OptionItem.AllOptions)
         {
-            if (!o.IsHiddenOn(Options.CurrentGameMode) && (o.Parent?.GetBool() ?? !o.GetString().Equals("0%")))
+            if (!o.IsHiddenOn(GameModeBase.GetGameMode()) && (o.Parent?.GetBool() ?? !o.GetString().Equals("0%")))
                 sb.Append($"{(o.Parent == null ? o.GetName(true, true).RemoveHtmlTags().PadRightV2(40) : $"┗ {o.GetName(true, true).RemoveHtmlTags()}".PadRightV2(41))}:{o.GetString().RemoveHtmlTags()}\n");
         }
 
@@ -696,7 +696,7 @@ class BeginCrewmatePatch
             __instance.ImpostorText.text = GetString("SubText.Madmate");
         }
 
-        switch (Options.CurrentGameMode)
+        switch (GameModeBase.GetGameMode())
         {
             case CustomGameMode.FFA:
                 __instance.TeamTitle.text = "FREE FOR ALL";
@@ -961,8 +961,8 @@ internal static class IntroCutsceneDestroyPatch
                 {
                     pc.RpcResetAbilityCooldown();
 
-                    if (Options.FixFirstKillCooldown.GetBool() && Options.CurrentGameMode != CustomGameMode.FFA && Options.CurrentGameMode != CustomGameMode.TagMode &&
-                        Options.CurrentGameMode != CustomGameMode.BonfireNight)
+                    if (Options.FixFirstKillCooldown.GetBool() && GameModeBase.GetGameMode() != CustomGameMode.FFA && GameModeBase.GetGameMode() != CustomGameMode.TagMode &&
+                        GameModeBase.GetGameMode() != CustomGameMode.BonfireNight)
                     {
                         _ = new LateTask(() =>
                         {
@@ -980,22 +980,7 @@ internal static class IntroCutsceneDestroyPatch
                 }
             }
 
-            if (Options.CurrentGameMode is CustomGameMode.SpeedRun)
-            {
-                SpeedRun.StartedAt = Utils.GetTimeStamp();
-                SpeedRun.RpcSyncSpeedRunStates();
-            }
-
-            if (Options.CurrentGameMode is CustomGameMode.TagMode)
-            {
-                TagMode.Add();
-                Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.TZombie)).Do(x => x.RpcTeleportRandomSpawn());
-            }
-
-            if (Options.CurrentGameMode is CustomGameMode.BonfireNight)
-            {
-                BonfireNight.Add();
-            }
+            GameModeBase.GetGameMode().GetGameModeClass().Add();
 
             foreach (var player in Main.EnumeratePlayerControls())
             {
@@ -1022,7 +1007,7 @@ internal static class IntroCutsceneDestroyPatch
                 }, 3f, "Set Dev Ghost-Roles");
             }
 
-            bool chatVisible = Options.CurrentGameMode switch
+            bool chatVisible = GameModeBase.GetGameMode() switch
             {
 
                 CustomGameMode.FFA => FFAManager.FFA_ShowChatInGame.GetBool(),
@@ -1044,7 +1029,7 @@ internal static class IntroCutsceneDestroyPatch
 
             Utils.CheckAndSetVentInteractions();
 
-            if (Options.UsePets.GetBool() && Options.CurrentGameMode is CustomGameMode.Standard)
+            if (Options.UsePets.GetBool() && GameModeBase.GetGameMode() is CustomGameMode.Standard)
             {
                 foreach (var player in Main.EnumerateAlivePlayerControls())
                 {

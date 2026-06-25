@@ -82,93 +82,10 @@ public class RoleAssign
     }
     public static void StartSelect()
     {
-        switch (Options.CurrentGameMode)
+        if (!GameModeBase.GetGameMode().GetGameModeClass().NormalSelectRoles)
         {
-            case CustomGameMode.FFA:
-                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
-                {
-                    if (Main.EnableGM.Value && pc.IsHost())
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        continue;
-                    }
-                    else if (TagManager.AssignGameMaster(pc.FriendCode))
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
-                        continue;
-                    }
-                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;
-                    }
-                    RoleResult[pc.PlayerId] = CustomRoles.Killer;
-                }
-                return;
-
-            case CustomGameMode.SpeedRun:
-                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
-                {
-                    if (Main.EnableGM.Value && pc.IsHost())
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        continue;
-                    }
-                    else if (TagManager.AssignGameMaster(pc.FriendCode))
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
-                        continue;
-                    }
-                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;
-                    }
-                    RoleResult[pc.PlayerId] = CustomRoles.Runner;
-                }
-                return;
-
-            case CustomGameMode.TagMode:
-                var random = IRandom.Instance;
-                List<PlayerControl> AllPlayers2 = Main.EnumeratePlayerControls().Shuffle(random).ToList();
-                var ZombieNum = TagMode.ZombieMaximun.GetInt();
-                foreach (PlayerControl pc in AllPlayers2)
-                {
-                    if (Main.EnableGM.Value && pc.IsHost())
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        continue;
-                    }
-                    else if (TagManager.AssignGameMaster(pc.FriendCode))
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
-                        continue;
-                    }
-                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;
-                    }
-                    else if (ZombieNum > 0)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.TZombie;
-                        ZombieNum--;
-                        Logger.Info($"将感染者分配给 [{pc.PlayerId}]{pc.GetRealName()}", "TagModeAssign");
-                        continue;
-                    }
-                    RoleResult[pc.PlayerId] = CustomRoles.TCrewmate;
-                }
-                return;
-
-            case CustomGameMode.BonfireNight:
-                BonfireNight.SelectRoles();
-                return;
+            GameModeBase.GetGameMode().GetGameModeClass().SelectRoles();
+            return;
         }
 
         var rd = IRandom.Instance;

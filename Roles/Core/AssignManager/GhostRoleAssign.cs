@@ -25,7 +25,7 @@ public static class GhostRoleAssign
     public static void GhostAssignPatch(PlayerControl player)
     {
         if (GameStates.IsHideNSeek
-            || Options.CurrentGameMode != CustomGameMode.Standard
+            || GameModeBase.GetGameMode() != CustomGameMode.Standard
             || player == null
             || player.Data == null
             || player.Data.Disconnected

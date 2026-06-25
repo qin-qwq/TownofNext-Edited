@@ -321,7 +321,7 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             CustomRoles role = player.GetCustomRole();
             RoleTypes roleTypes = player.GetCustomRole().GetRoleTypes();
 
-            if (Options.CurrentGameMode == CustomGameMode.FFA)
+            if (GameModeBase.GetGameMode() == CustomGameMode.FFA)
             {
                 if (FFAManager.FFALowerVisionList.ContainsKey(player.PlayerId))
                 {

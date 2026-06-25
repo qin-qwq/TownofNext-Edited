@@ -355,11 +355,6 @@ public class SabotageSystemPatch
                     return false;
             }
 
-            if (Options.CurrentGameMode is CustomGameMode.SpeedRun or CustomGameMode.TagMode or CustomGameMode.BonfireNight)
-            {
-                return false;
-            }
-
             if (TimeMaster.Rewinding)
             {
                 return false;

@@ -14,9 +14,11 @@ using Tree = TONE.Modules.Tree;
 
 namespace TONE;
 
-public static class BonfireNight
+internal class BonfireNight : GameModeBase
 {
+    public override CustomGameMode GameMode => CustomGameMode.BonfireNight;
     private const int Id = 67_228_001;
+    public override bool OpeningHours => Main.IsBirthday;
 
     public static OptionItem GameTime;
     public static OptionItem WoodToWin;
@@ -52,7 +54,7 @@ public static class BonfireNight
     public static SakuraTreeState SakuraTree1;
     public static SakuraTreeState SakuraTree2;
 
-    public static void SetupCustomOption()
+    public override void SetupCustomOption()
     {
         TextOptionItem.Create(10000038, "MenuTitle.BonfireNight", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.BonfireNight)
@@ -116,8 +118,10 @@ public static class BonfireNight
             .SetValueFormat(OptionFormat.Pieces);
     }
 
-    public static void Init()
+    public override void Init()
     {
+        if (GetGameMode() != CustomGameMode.BonfireNight) return;
+
         StartedAt = GetTimeStamp();
         BonfireState = (0, 0, 0);
         FireThief = false;
@@ -210,7 +214,7 @@ public static class BonfireNight
         }
     }
 
-    public static void Add()
+    public override void Add()
     {
         StartedAt = GetTimeStamp();
         RpcSyncBonfireNightStates();
@@ -266,11 +270,11 @@ public static class BonfireNight
         writer.Write(BonfireState.Item2);
         writer.Write(BonfireState.Item3);
         writer.Write(FireThief);
-        var sender = new RpcSyncBonfireNightStates(PlayerControl.LocalPlayer.NetId, writer);
+        var sender = new RpcSyncGameModeStates(PlayerControl.LocalPlayer.NetId, writer);
         RpcUtils.LateBroadcastReliableMessage(sender);
     }
 
-    public static void HandleSyncBonfireNightStates(MessageReader reader)
+    public override void ReceiveRPC(MessageReader reader)
     {
         var start = reader.ReadString();
         if (!long.TryParse(start, out StartedAt))
@@ -283,7 +287,7 @@ public static class BonfireNight
         FireThief = reader.ReadBoolean();
     }
 
-    public static void SelectRoles()
+    public override void SelectRoles()
     {
         var random = IRandom.Instance;
         var AllPlayers = Main.EnumeratePlayerControls().Shuffle(random).ToList();
@@ -331,7 +335,9 @@ public static class BonfireNight
         }
     }
 
-    public static string GetGameState()
+    public override void SetPredicate() => GameEndCheckerForNormal.predicate = new BonfireNightGameEndPredicate();
+
+    public override string GetGameState(string taskText = null, bool forGameEnd = false)
     {
         StringBuilder builder = new();
         builder.Append(ColorString(Color.red, GetString("RedTeamWoodNum")) + $": {BonfireState.Item1}");
@@ -342,10 +348,10 @@ public static class BonfireNight
             builder.AppendLine();
             builder.Append(ColorString(Color.gray, GetString("FireThiefWoodNum")) + $": {BonfireState.Item3}");
         }
-        return builder.ToString();
+        return $"\r\n\r\n<size=80%>{builder}</size>";
     }
 
-    public static void AppendBonfireNightKcount(StringBuilder builder)
+    public override void AppendKcount(StringBuilder builder)
     {
         int RedCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.RWoodCollector));
         int BlueCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.BWoodCollector));
@@ -417,7 +423,7 @@ public static class BonfireNight
         private static long LastFixedUpdate;
         public static void Postfix()
         {
-            if (!GameStates.IsInTask || Options.CurrentGameMode != CustomGameMode.BonfireNight) return;
+            if (!GameStates.IsInTask || GetGameMode() != CustomGameMode.BonfireNight) return;
 
             var now = GetTimeStamp();
 
@@ -763,8 +769,9 @@ public class FireThief : RoleBase
     {
         var time = BonfireNight.StartedAt + BonfireNight.GameTime.GetInt() - GetTimeStamp();
         var timeText = $"{GetString("BonfireNight_GameTime")}: {time}s";
+        var gameState = new BonfireNight().GetGameState();
     
-        return seer.IsModded() ? timeText : $"{BonfireNight.GetGameState()}\n{timeText}";
+        return seer.IsModded() ? timeText : $"{gameState}\n{timeText}";
     }
 
     private BonfireNight.TreeState TryCollect(PlayerControl player, BonfireNight.TreeState tree, Vector2 pos, int max)

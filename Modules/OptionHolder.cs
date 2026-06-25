@@ -7,20 +7,6 @@ using UnityEngine;
 
 namespace TONE;
 
-[Obfuscation(Exclude = true)]
-[Flags]
-public enum CustomGameMode
-{
-    Standard = 0x01,
-    FFA = 0x02,
-    SpeedRun = 0x03,
-    TagMode = 0x04,
-    BonfireNight = 0x05,
-
-    HidenSeekTONE = 0x08, // HidenSeekTONE must be after other game modes
-    All = int.MaxValue
-}
-
 [HarmonyPatch]
 public static class Options
 {
@@ -51,29 +37,7 @@ public static class Options
 
     // Custom Game Mode
     public static OptionItem GameMode;
-    public static CustomGameMode CurrentGameMode
-        => GameMode.GetInt() switch
-        {
-            1 => CustomGameMode.FFA,
-
-            2 => CustomGameMode.SpeedRun,
-            3 => CustomGameMode.TagMode,
-            4 => CustomGameMode.BonfireNight,
-            5 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
-            _ => CustomGameMode.Standard
-        };
     public static int prevGameMode = 0;
-    public static readonly string[] gameModes =
-    [
-        "Standard",
-        "FFA",
-
-        "SpeedRun",
-        "TagMode",
-        "BonfireNight",
-
-        "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
-    ];
 
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
@@ -760,7 +724,7 @@ public static class Options
                 .SetHidden(true);
 
         // Game Mode
-        GameMode = StringOptionItem.Create(60000, "GameMode", gameModes, 0, TabGroup.ModSettings, false)
+        GameMode = StringOptionItem.Create(60000, "GameMode", CustomGameModeManager.gameModes, 0, TabGroup.ModSettings, false)
             .SetHeader(true);
 
 
@@ -1401,17 +1365,8 @@ public static class Options
         yield return null;
 
         #region Game Settings
-        //FFA
-        FFAManager.SetupCustomOption();
 
-        //Speed Run
-        SpeedRun.SetupCustomOption();
-
-        //Tag Mode
-        TagMode.SetupCustomOption();
-
-        //Bonfire Night
-        BonfireNight.SetupCustomOption();
+        CustomGameModeManager.GameModeClass.Values.Do(x => x.SetupCustomOption());
 
         // Hide & Seek
         TextOptionItem.Create(10000055, "MenuTitle.Hide&Seek", TabGroup.ModSettings)

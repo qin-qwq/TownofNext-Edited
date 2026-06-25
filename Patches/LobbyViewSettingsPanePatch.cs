@@ -251,9 +251,9 @@ public static class LobbyViewSettingsPanePatch
 
             // Change game mode text & position
             __instance.gameModeText.DestroyTranslator();
-            __instance.gameModeText.text = GetString(Options.CurrentGameMode.ToString());
-            __instance.gameModeText.color = Main.GameModeColors[Options.CurrentGameMode];
-            LastGameModeSelected = Options.CurrentGameMode;
+            __instance.gameModeText.text = GetString(GameModeBase.GetGameMode().ToString());
+            __instance.gameModeText.color = Main.GameModeColors[GameModeBase.GetGameMode()];
+            LastGameModeSelected = GameModeBase.GetGameMode();
             yield return null;
 
             // Create button "Show Only Enabled Roles"
@@ -457,7 +457,7 @@ public static class LobbyViewSettingsPanePatch
             __instance.taskTabButton.activeSprites.GetComponent<SpriteRenderer>().color = new(0.2f, 0.2f, 0.2f);
             __instance.taskTabButton.selectedSprites.GetComponent<SpriteRenderer>().color = new(0.1f, 0.1f, 0.1f);
 
-            LastGameModeSelected = Options.CurrentGameMode;
+            LastGameModeSelected = GameModeBase.GetGameMode();
 
             __instance.ChangeTab(LastTabPressed);
         }, 0.3f, "ChangeTab", shoudLog: false);
@@ -620,7 +620,7 @@ public static class LobbyViewSettingsPanePatch
                 if (option.Tab != tabName) continue;
                 BaseGameSetting data = GameOptionsMenuPatch.GetSetting(option);
 
-                bool enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode, true) && option.Parent?.GetBool() is null or true;
+                bool enabledOrNotCollapsed = !option.IsHiddenOn(GameModeBase.GetGameMode(), true) && option.Parent?.GetBool() is null or true;
                 // Title
                 if (data == null && option is TextOptionItem toi)
                 {
@@ -789,8 +789,8 @@ public static class LobbyViewSettingsPanePatch
                         continue;
                 }
 
-                var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode, true) && option.Parent?.GetBool() is null or true;
-                var enabled = !option.IsHiddenOn(Options.CurrentGameMode, true, false) && option.Parent?.GetBool() is null or true;
+                var enabledOrNotCollapsed = !option.IsHiddenOn(GameModeBase.GetGameMode(), true) && option.Parent?.GetBool() is null or true;
+                var enabled = !option.IsHiddenOn(GameModeBase.GetGameMode(), true, false) && option.Parent?.GetBool() is null or true;
                 BaseGameSetting data = GameOptionsMenuPatch.GetSetting(option);
                 string titleName = option.GetName(disableColor: true).Trim('★', ' ').RemoveHtmlTags();
                 string realName = option.Name;
@@ -1144,7 +1144,7 @@ public static class LobbyViewSettingsPanePatch
         while (true)
         {
             if (o == null) return true;
-            if (o.IsHiddenOn(Options.CurrentGameMode, true, checkCollapsedSection) || !o.GetBool()) return false;
+            if (o.IsHiddenOn(GameModeBase.GetGameMode(), true, checkCollapsedSection) || !o.GetBool()) return false;
             o = o.Parent;
         }
     }

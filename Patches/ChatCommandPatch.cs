@@ -449,28 +449,10 @@ internal class ChatCommands
 
     public static void SendRolesInfo(string role, byte playerId, bool isDev = false, bool isUp = false)
     {
-        switch (Options.CurrentGameMode)
+        if (GameModeBase.GetGameMode() is not CustomGameMode.Standard and not CustomGameMode.HidenSeekTONE)
         {
-            case CustomGameMode.FFA:
-                {
-                    Utils.SendMessage(GetString("ModeDescribe.FFA"), playerId);
-                    return;
-                }
-            case CustomGameMode.SpeedRun:
-                {
-                    Utils.SendMessage(GetString("ModeDescribe.SpeedRun"), playerId);
-                    return;
-                }
-            case CustomGameMode.TagMode:
-                {
-                    Utils.SendMessage(GetString("ModeDescribe.TagMode"), playerId);
-                    return;
-                }
-            case CustomGameMode.BonfireNight:
-                {
-                    Utils.SendMessage(GetString("ModeDescribe.BonfireNight"), playerId);
-                    return;
-                }
+            Utils.SendMessage(GetString($"ModeDescribe.{GameModeBase.GetGameMode()}"), playerId);
+            return;
         }
         role = role.Trim().ToLower();
         if (role.StartsWith("/r")) _ = role.Replace("/r", string.Empty);
@@ -916,42 +898,7 @@ internal class ChatCommands
 
         var sub = new StringBuilder();
 
-        switch (Options.CurrentGameMode)
-        {
-            case CustomGameMode.Standard:
-                var allAlivePlayers = Main.EnumerateAlivePlayerControls();
-                int impnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Impostor) && !pc.Is(CustomRoles.Narc));
-                int madnum = allAlivePlayers.Count(pc => (pc.GetCustomRole().IsMadmate() && !pc.Is(CustomRoles.Narc)) || pc.Is(CustomRoles.Madmate));
-                int neutralnum = allAlivePlayers.Count(pc => pc.GetCustomRole().IsNK());
-                int apocnum = allAlivePlayers.Count(pc => pc.IsNeutralApocalypse() || pc.IsTransformedNeutralApocalypse());
-                int covnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Coven));
-
-                sub.Append(string.Format(GetString("Remaining.ImpostorCount"), impnum));
-
-                if (Options.ShowMadmatesInLeftCommand.GetBool())
-                    sub.Append(string.Format("\n\r" + GetString("Remaining.MadmateCount"), madnum));
-
-                if (Options.ShowApocalypseInLeftCommand.GetBool())
-                    sub.Append(string.Format("\n\r" + GetString("Remaining.ApocalypseCount"), apocnum));
-
-                if (Options.ShowCovenInLeftCommand.GetBool())
-                    sub.Append(string.Format("\n\r" + GetString("Remaining.CovenCount"), covnum));
-
-                sub.Append(string.Format("\n\r" + GetString("Remaining.NeutralCount"), neutralnum));
-                break;
-
-            case CustomGameMode.FFA:
-                FFAManager.AppendFFAKcount(sub);
-                break;
-
-            case CustomGameMode.SpeedRun:
-                SpeedRun.AppendSpeedRunKcount(sub);
-                break;
-
-            case CustomGameMode.TagMode:
-                TagMode.AppendTagModeKcount(sub);
-                break;
-        }
+        GameModeBase.GetGameMode().GetGameModeClass().AppendKcount(sub);
 
         Utils.SendMessage(sub.ToString(), player.PlayerId);
     }
@@ -2372,7 +2319,7 @@ internal class ChatCommands
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
             return;
         }
-        if (Options.CurrentGameMode != CustomGameMode.Standard)
+        if (GameModeBase.GetGameMode() != CustomGameMode.Standard)
         {
             Utils.SendMessage(GetString("StartDraftWrongGameMode"), player.PlayerId);
             return;

@@ -40,7 +40,7 @@ public static class AFKDetector
 
     public static void RecordPosition(PlayerControl pc)
     {
-        if (!EnableDetector.GetBool() || !GameStates.IsInTask || pc == null || ExemptedPlayers.Contains(pc.PlayerId) || Options.CurrentGameMode is CustomGameMode.FFA) return;
+        if (!EnableDetector.GetBool() || !GameStates.IsInTask || pc == null || ExemptedPlayers.Contains(pc.PlayerId) || GameModeBase.GetGameMode() is CustomGameMode.FFA) return;
 
         var waitingTime = 10f;
         if (!pc.IsAlive()) waitingTime += 5f;

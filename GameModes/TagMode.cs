@@ -7,15 +7,18 @@ using TMPro;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
 using UnityEngine;
 using static TONE.Translator;
 using static TONE.Utils;
 
 namespace TONE;
 
-public static class TagMode
+internal class TagMode : GameModeBase
 {
+    public override CustomGameMode GameMode => CustomGameMode.TagMode;
     private const int Id = 67_226_001;
+    public override bool NormalTaskText => true;
 
     public static OptionItem ZombieMaximun;
     public static OptionItem ZombieVision;
@@ -46,7 +49,7 @@ public static class TagMode
     public static bool Zap;
     public static (int, int) TaskCount = (0, 0);
 
-    public static void SetupCustomOption()
+    public override void SetupCustomOption()
     {
         TextOptionItem.Create(10000037, "MenuTitle.TagMode", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.TagMode)
@@ -115,14 +118,12 @@ public static class TagMode
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
     }
 
-    public static void Init()
+    public override void Init()
     {
-        if (Options.CurrentGameMode != CustomGameMode.TagMode) return;
-
         Zap = false;
     }
 
-    public static void Add()
+    public override void Add()
     {
         int TaskNum = 0;
         switch (CrewmateTasks.GetInt())
@@ -141,7 +142,45 @@ public static class TagMode
                 break;
         }
         TaskCount = (0, TaskNum);
+        Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.TZombie)).Do(x => x.RpcTeleportRandomSpawn());
     }
+
+    public override void SelectRoles()
+    {
+        var random = IRandom.Instance;
+        List<PlayerControl> AllPlayers2 = Main.EnumeratePlayerControls().Shuffle(random).ToList();
+        var ZombieNum = ZombieMaximun.GetInt();
+        foreach (PlayerControl pc in AllPlayers2)
+        {
+            if (Main.EnableGM.Value && pc.IsHost())
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                continue;
+            }
+            else if (TagManager.AssignGameMaster(pc.FriendCode))
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
+                continue;
+            }
+            else if (RoleAssign.SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                continue;
+            }
+            else if (ZombieNum > 0)
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.TZombie;
+                ZombieNum--;
+                Logger.Info($"将感染者分配给 [{pc.PlayerId}]{pc.GetRealName()}", "TagModeAssign");
+                continue;
+            }
+            RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.TCrewmate;
+        }
+    }
+
+    public override void SetPredicate() => GameEndCheckerForNormal.predicate = new TagModeGameEndPredicate();
 
     public static void SendTaskRPC(byte targetId = 255)
     {
@@ -149,11 +188,11 @@ public static class TagMode
         writer.Write(targetId);
         writer.Write(TaskCount.Item1);
         writer.Write(TaskCount.Item2);
-        var sender = new RpcSyncTagModeTaskStates(PlayerControl.LocalPlayer.NetId, writer);
+        var sender = new RpcSyncGameModeStates(PlayerControl.LocalPlayer.NetId, writer);
         RpcUtils.LateBroadcastReliableMessage(sender);
     }
 
-    public static void HandleSyncTagModeTaskStates(MessageReader reader)
+    public override void ReceiveRPC(MessageReader reader)
     {
         byte targetId = reader.ReadByte();
         TaskCount = (reader.ReadInt32(), reader.ReadInt32());
@@ -172,7 +211,7 @@ public static class TagMode
         }
     }
 
-    public static void AppendTagModeKcount(StringBuilder builder)
+    public override void AppendKcount(StringBuilder builder)
     {
         int ZombieCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TZombie));
         int CrewmateCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TCrewmate));

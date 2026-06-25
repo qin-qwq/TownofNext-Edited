@@ -92,7 +92,7 @@ class OnGameJoinedPatch
                         AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
 
                     // If custom Gamemode is HideNSeekTONE in normal game, set Standard
-                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTONE)
+                    if (GameModeBase.GetGameMode() == CustomGameMode.HidenSeekTONE)
                     {
                         // Select Standard
                         Options.GameMode.SetValue(0);
@@ -104,7 +104,7 @@ class OnGameJoinedPatch
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
                     // If custom Gamemode is Standard/FFA/Speedrun/TagMode/BonfireNight in H&S game, set HideNSeekTONE
-                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekTONE)
+                    if (GameModeBase.GetGameMode() != CustomGameMode.HidenSeekTONE)
                     {
                         // Select HideNSeekTONE
                         Options.GameMode.SetValue(5);

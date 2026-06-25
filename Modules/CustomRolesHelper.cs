@@ -65,7 +65,7 @@ public static class CustomRolesHelper
     {
         if (player == null) return false;
 
-        if (Options.CurrentGameMode is CustomGameMode.SpeedRun) return true;
+        if (GameModeBase.GetGameMode() is CustomGameMode.SpeedRun) return true;
 
         return player.GetCustomRole().HasImpBasis();
     }

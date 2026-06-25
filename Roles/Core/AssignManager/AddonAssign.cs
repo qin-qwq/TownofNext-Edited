@@ -33,7 +33,7 @@ public static class AddonAssign
 
     public static void StartSelect()
     {
-        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (!GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons) return;
 
         AddonRolesList.Clear();
         foreach (var cr in CustomRolesHelper.AllRoles)
@@ -48,7 +48,7 @@ public static class AddonAssign
     }
     public static void StartSortAndAssign()
     {
-        if (Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (!GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons) return;
 
         var rd = IRandom.Instance;
         List<CustomRoles> addonsList = [];

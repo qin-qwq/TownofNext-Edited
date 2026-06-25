@@ -1238,7 +1238,7 @@ static class ExtendedPlayerControl
         {
             return GetRealName(player);
         }
-        return $"{player?.Data?.PlayerName}" + (GameStates.IsInGame && Options.CurrentGameMode != CustomGameMode.FFA ? $"({player?.GetAllRoleName(forUser)})" : string.Empty);
+        return $"{player?.Data?.PlayerName}" + (GameStates.IsInGame && GameModeBase.GetGameMode() != CustomGameMode.FFA ? $"({player?.GetAllRoleName(forUser)})" : string.Empty);
     }
     public static string GetRoleColorCode(this PlayerControl player)
     {
@@ -1547,7 +1547,7 @@ static class ExtendedPlayerControl
     private readonly static LogHandler logger = Logger.Handler("KnowRoleTarget");
     public static bool KnowRoleTarget(PlayerControl seer, PlayerControl target)
     {
-        if (Options.CurrentGameMode == CustomGameMode.FFA || GameEndCheckerForNormal.GameIsEnded) return true;
+        if (GameModeBase.GetGameMode() == CustomGameMode.FFA || GameEndCheckerForNormal.GameIsEnded) return true;
         else if (seer.Is(CustomRoles.GM) || target.Is(CustomRoles.GM) || (seer.AmOwner && Main.GodMode.Value)) return true;
         else if (Options.SeeEjectedRolesInMeeting.GetBool() && Main.PlayerStates[target.PlayerId].deathReason == PlayerState.DeathReason.Vote) return true;
         else if (Altruist.HasEnabled && seer.IsMurderedThisRound()) return false;
@@ -1867,7 +1867,7 @@ static class ExtendedPlayerControl
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (!Main.Invisible.Add(player.PlayerId)) return;
-        if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (phantom && GameModeBase.GetGameMode() != CustomGameMode.Standard) return;
         var petId = player.Data.DefaultOutfit.PetId;
         if (petId != "")
         {
@@ -1922,7 +1922,7 @@ static class ExtendedPlayerControl
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (!Main.Invisible.Remove(player.PlayerId)) return;
-        if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (phantom && GameModeBase.GetGameMode() != CustomGameMode.Standard) return;
         if (PhantomRolePatch.PetsList.TryGetValue(player.PlayerId, out var petId))
         {
             player.RpcSetPet(petId);
@@ -1979,7 +1979,7 @@ static class ExtendedPlayerControl
     {
         if (!AmongUsClient.Instance.AmHost) return;
         if (!Main.Invisible.Contains(player.PlayerId)) return;
-        if (phantom && Options.CurrentGameMode != CustomGameMode.Standard) return;
+        if (phantom && GameModeBase.GetGameMode() != CustomGameMode.Standard) return;
 
         bool hasValue = false;
         var sender = CustomRpcSender.Create("RpcResetInvisibility", SendOption.Reliable);

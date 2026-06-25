@@ -89,7 +89,7 @@ internal class ChangeRoleSettings
 
             Main.LastNotifyNames.Clear();
 
-            Main.FirstDiedPrevious = Options.CurrentGameMode is CustomGameMode.Standard && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
+            Main.FirstDiedPrevious = GameModeBase.GetGameMode() is CustomGameMode.Standard && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
 
             LobbyViewSettingsPanePatch.ClearReferences();
 
@@ -238,21 +238,15 @@ internal class ChangeRoleSettings
                 addOn?.Init();
             }
 
+            // Initialize all GameModes
+            foreach (var gm in CustomGameModeManager.GameModeClass.Values)
+            {
+                gm?.Init();
+            }
+
             TargetArrow.Init();
             LocateArrow.Init();
             DoubleTrigger.Init();
-
-            //FFA
-            FFAManager.Init();
-
-            //Speed Run
-            SpeedRun.Init();
-
-            //Tag Mode
-            TagMode.Init();
-
-            //Bonfire Night
-            BonfireNight.Init();
 
             try
             {
@@ -506,7 +500,7 @@ internal class StartGameHostPatch
                 Main.PlayerStates[pc.PlayerId].SetMainRole(role, false);
             }
 
-            if (Options.CurrentGameMode is CustomGameMode.FFA)
+            if (GameModeBase.GetGameMode() is CustomGameMode.FFA)
             {
                 foreach (var pair in RoleAssign.RoleResult)
                 {
@@ -524,7 +518,7 @@ internal class StartGameHostPatch
 
             try
             {
-                if (Options.CurrentGameMode is CustomGameMode.Standard)
+                if (GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons)
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
@@ -582,24 +576,7 @@ internal class StartGameHostPatch
                 RoleOpt.SetRoleRate(roleType.Key, roleNum, RoleOpt.GetChancePerGame(roleType.Key));
             }
 
-            switch (Options.CurrentGameMode)
-            {
-                case CustomGameMode.Standard:
-                    GameEndCheckerForNormal.SetPredicateToNormal();
-                    break;
-                case CustomGameMode.FFA:
-                    GameEndCheckerForNormal.SetPredicateToFFA();
-                    break;
-                case CustomGameMode.SpeedRun:
-                    GameEndCheckerForNormal.SetPredicateToSpeedRun();
-                    break;
-                case CustomGameMode.TagMode:
-                    GameEndCheckerForNormal.SetPredicateToTagMode();
-                    break;
-                case CustomGameMode.BonfireNight:
-                    GameEndCheckerForNormal.SetPredicateToBonfireNight();
-                    break;
-            }
+            GameModeBase.GetGameMode().GetGameModeClass().SetPredicate();
 
             EAC.LogAllRoles();
             //Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);

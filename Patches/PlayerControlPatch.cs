@@ -204,7 +204,7 @@ class CheckMurderPatch
         }
 
         //FFA
-        if (Options.CurrentGameMode == CustomGameMode.FFA)
+        if (GameModeBase.GetGameMode() == CustomGameMode.FFA)
         {
             FFAManager.OnPlayerAttack(killer, target);
             return false;
@@ -439,7 +439,7 @@ class MurderPlayerPatch
             }
 
             if (!target.IsProtected() && !Main.OvverideOutfit.ContainsKey(target.PlayerId) && !Camouflage.ResetSkinAfterDeathPlayers.Contains(target.PlayerId) &&
-                Options.CurrentGameMode != CustomGameMode.BonfireNight)
+                GameModeBase.GetGameMode() != CustomGameMode.BonfireNight)
             {
                 Camouflage.ResetSkinAfterDeathPlayers.Add(target.PlayerId);
                 Camouflage.RpcSetSkin(target, ForceRevert: true, RevertToDefault: true);
@@ -785,7 +785,7 @@ class ReportDeadBodyPatch
             return false;
         }
         if (Options.DisableMeeting.GetBool()) return false;
-        if (Options.CurrentGameMode != CustomGameMode.Standard) return false;
+        if (!GameModeBase.GetGameMode().GetGameModeClass().CanReport) return false;
 
         if (!CanReport[__instance.PlayerId])
         {
@@ -1426,10 +1426,10 @@ class FixedUpdateInNormalGamePatch
 
             var (text, color) = Utils.GetRoleAndSubText(localPlayerId, playerId, isMeeting: false);
 
-            roleText.text = Options.CurrentGameMode is CustomGameMode.FFA ? string.Empty : text;
+            roleText.text = GameModeBase.GetGameMode() is CustomGameMode.FFA ? string.Empty : text;
             roleText.color = color;
 
-            if (playerAmOwner || Options.CurrentGameMode is CustomGameMode.FFA) roleText.enabled = true;
+            if (playerAmOwner || GameModeBase.GetGameMode() is CustomGameMode.FFA) roleText.enabled = true;
             else if (ExtendedPlayerControl.KnowRoleTarget(localPlayer, player)) roleText.enabled = true;
             else roleText.enabled = false;
 
@@ -1482,7 +1482,7 @@ class FixedUpdateInNormalGamePatch
 
             if (playerAmOwner && isInTask)
             {
-                if (Options.CurrentGameMode is CustomGameMode.FFA)
+                if (GameModeBase.GetGameMode() is CustomGameMode.FFA)
                 {
                     string FFAName = string.Empty;
                     FFAManager.GetNameNotify(player, ref FFAName);
@@ -1518,7 +1518,7 @@ class FixedUpdateInNormalGamePatch
                 }
             }
 
-            switch (Options.CurrentGameMode)
+            switch (GameModeBase.GetGameMode())
             {
                 case CustomGameMode.FFA:
                     Suffix.Append(FFAManager.GetPlayerArrow(localPlayer, player));
@@ -1687,7 +1687,7 @@ class CoEnterVentPatch
         Logger.Info($" {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()}, Vent ID: {id}", "CoEnterVent");
 
         //FFA
-        if (Options.CurrentGameMode == CustomGameMode.FFA && FFAManager.CheckCoEnterVent(instance, id))
+        if (GameModeBase.GetGameMode() == CustomGameMode.FFA && FFAManager.CheckCoEnterVent(instance, id))
         {
             return true;
         }
@@ -1823,7 +1823,7 @@ class CoExitVentPatch
         Logger.Info($" {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()}, Vent ID: {id}", "CoExitVent");
 
         var player = instance.myPlayer;
-        if (Options.CurrentGameMode == CustomGameMode.FFA && FFAManager.FFA_DisableVentingWhenKCDIsUp.GetBool())
+        if (GameModeBase.GetGameMode() == CustomGameMode.FFA && FFAManager.FFA_DisableVentingWhenKCDIsUp.GetBool())
         {
             FFAManager.CoExitVent(player);
         }

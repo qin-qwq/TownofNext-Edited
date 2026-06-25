@@ -645,7 +645,7 @@ public static class Utils
         //if (playerData.Role.IsImpostor)
         //    hasTasks = false; //Tasks are determined based on CustomRole
 
-        if (Options.CurrentGameMode == CustomGameMode.FFA) return false;
+        if (GameModeBase.GetGameMode() == CustomGameMode.FFA) return false;
         if (playerData.IsDead && Options.GhostIgnoreTasks.GetBool()) hasTasks = false;
 
         if (GameStates.IsHideNSeek) return hasTasks;
@@ -723,7 +723,7 @@ public static class Utils
             var ProgressText = new StringBuilder();
             var role = Main.PlayerStates[playerId].MainRole;
 
-            if (Options.CurrentGameMode == CustomGameMode.FFA && role == CustomRoles.Killer)
+            if (GameModeBase.GetGameMode() == CustomGameMode.FFA && role == CustomRoles.Killer)
             {
                 ProgressText.Append(FFAManager.GetDisplayScore(playerId));
             }
@@ -836,7 +836,7 @@ public static class Utils
 
         var sb = new StringBuilder();
         sb.Append(" ★ " + GetString("TabGroup.SystemSettings"));
-        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Tab is TabGroup.SystemSettings && !x.IsHiddenOn(Options.CurrentGameMode)).ToArray())
+        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Tab is TabGroup.SystemSettings && !x.IsHiddenOn(GameModeBase.GetGameMode())).ToArray())
         {
             sb.Append($"\n{opt.GetName(true)}: {opt.GetString()}");
             //ShowChildrenSettings(opt, ref sb);
@@ -844,7 +844,7 @@ public static class Utils
             sb.Clear().Append(text.RemoveHtmlTags());
         }
         sb.Append("\n\n ★ " + GetString("TabGroup.ModSettings"));
-        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Tab is TabGroup.ModSettings && !x.IsHiddenOn(Options.CurrentGameMode)).ToArray())
+        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Tab is TabGroup.ModSettings && !x.IsHiddenOn(GameModeBase.GetGameMode())).ToArray())
         {
             sb.Append($"\n{opt.GetName(true)}: {opt.GetString()}");
             //ShowChildrenSettings(opt, ref sb);
@@ -874,7 +874,7 @@ public static class Utils
             var text = sb.ToString();
             sb.Clear().Append(text.RemoveHtmlTags());
         }
-        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Id > 59999 && !x.IsHiddenOn(Options.CurrentGameMode)).ToArray())
+        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Id > 59999 && !x.IsHiddenOn(GameModeBase.GetGameMode())).ToArray())
         {
             if (opt.Name is "KillFlashDuration" or "RoleAssigningAlgorithm")
                 sb.Append($"\n【{opt.GetName(true)}: {opt.GetString()}】\n");
@@ -906,7 +906,7 @@ public static class Utils
             sb.Clear().Append(text.RemoveHtmlTags());
         }
         sb.Append($"━━━━━━━━━━━━【{GetString("Settings")}】━━━━━━━━━━━━");
-        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Id > 59999 && !x.IsHiddenOn(Options.CurrentGameMode)).ToArray())
+        foreach (var opt in OptionItem.AllOptions.Where(x => x.GetBool() && x.Parent == null && x.Id > 59999 && !x.IsHiddenOn(GameModeBase.GetGameMode())).ToArray())
         {
             if (opt.Name == "KillFlashDuration")
                 sb.Append($"\n【{opt.GetName(true)}: {opt.GetString()}】\n");
@@ -1019,35 +1019,7 @@ public static class Utils
             sb.Append($"\n<#c4aa02>★</color> ").Append(winner/*.RemoveHtmlTags()*/);
             cloneRoles.Remove(id);
         }
-        switch (Options.CurrentGameMode)
-        {
-            case CustomGameMode.FFA:
-                List<(int, byte)> listFFA = [];
-                foreach (byte id in cloneRoles.ToArray())
-                {
-                    listFFA.Add((FFAManager.GetRankOfScore(id), id));
-                }
-                listFFA.Sort();
-                foreach ((int, byte) id in listFFA.ToArray())
-                {
-                    if (EndGamePatch.SummaryText.TryGetValue(id.Item2, out string winner))
-                        sb.Append($"\n　 ").Append(winner);
-                }
-                break;
-            case CustomGameMode.SpeedRun:
-                sb.Clear();
-                sb.Append(SpeedRun.GetGameState(forGameEnd: true));
-                break;
-            default: // Normal game
-                foreach (byte id in cloneRoles.ToArray())
-                {
-                    if (!EndGamePatch.SummaryText.TryGetValue(id, out string loser)) continue;
-                    if (loser.Contains("<INVALID:NotAssigned>")) continue;
-                    sb.Append($"\n　 ").Append(loser);
-
-                }
-                break;
-        }
+        GameModeBase.GetGameMode().GetGameModeClass().SummaryText(sb, cloneRoles, true);
         if (sendMessage)
         {
             try
@@ -1091,7 +1063,7 @@ public static class Utils
         var sb = new StringBuilder();
         if (SetEverythingUpPatch.LastWinsText != "") sb.Append($"{GetString("LastResult")}: {SetEverythingUpPatch.LastWinsText}");
         if (SetEverythingUpPatch.LastWinsReason != "") sb.Append($"\n{GetString("LastEndReason")}: {SetEverythingUpPatch.LastWinsReason}");
-        if (sb.Length > 0 && Options.CurrentGameMode != CustomGameMode.FFA) SendMessage(sb.ToString(), PlayerId);
+        if (sb.Length > 0 && GameModeBase.GetGameMode() != CustomGameMode.FFA) SendMessage(sb.ToString(), PlayerId);
     }
     public static string GetSubRolesText(byte id, bool disableColor = false, bool intro = false, bool summary = false)
     {
@@ -1562,14 +1534,8 @@ public static class Utils
 
 
             }
-            if (Options.CurrentGameMode == CustomGameMode.FFA)
-                name = $"<color=#00ffff><size=1.7>{GetString("ModeFFA")}</size></color>\r\n" + name;
-            if (Options.CurrentGameMode == CustomGameMode.SpeedRun)
-                name = $"<color=#fffb00><size=1.7>{GetString("ModeSpeedRun")}</size></color>\r\n" + name;
-            if (Options.CurrentGameMode == CustomGameMode.TagMode)
-                name = $"<color=#2ccc00><size=1.7>{GetString("ModeTagMode")}</size></color>\r\n" + name;
-            if (Options.CurrentGameMode == CustomGameMode.BonfireNight)
-                name = $"<color=#ff8c00><size=1.7>{GetString("ModeBonfireNight")}</size></color>\r\n" + name;
+            if (GameModeBase.GetGameMode() is not CustomGameMode.Standard and not CustomGameMode.HidenSeekTONE)
+                name = $"<color=#{ColorToHex(Main.GameModeColors[GameModeBase.GetGameMode()])}><size=1.7>{GetString($"Mode{GameModeBase.GetGameMode()}")}</size></color>\r\n" + name;
         }
 
 
@@ -1888,7 +1854,7 @@ public static class Utils
 
             sender.SendMessage(!hasValue || sender.stream.Length <= 11);
 
-            if (Options.CurrentGameMode != CustomGameMode.Standard) return;
+            if (GameModeBase.GetGameMode() != CustomGameMode.Standard) return;
 
             string seers = seerList.Count() == apc.Count() ? "Everyone" : string.Join(", ", seerList.Select(x => x.GetRealName()));
             string targets = targetList.Count() == apc.Count() ? "Everyone" : string.Join(", ", targetList.Select(x => x.GetRealName()));
@@ -2010,7 +1976,7 @@ public static class Utils
                 SelfSuffix.Append(Radar.GetPlayerArrow(seer, seer, isForMeeting: isForMeeting));
                 SelfSuffix.Append(Spurt.GetSuffix(seer, isformeeting: isForMeeting));
 
-                switch (Options.CurrentGameMode)
+                switch (GameModeBase.GetGameMode())
                 {
                     case CustomGameMode.FFA:
                         SelfSuffix.Append(FFAManager.GetPlayerArrow(seer));
@@ -2036,7 +2002,7 @@ public static class Utils
                 }
 
                 bool IsDisplayInfo = false;
-                if (MeetingStates.FirstMeeting && Options.ChangeNameToRoleInfo.GetBool() && !isForMeeting && Options.CurrentGameMode != CustomGameMode.FFA)
+                if (MeetingStates.FirstMeeting && Options.ChangeNameToRoleInfo.GetBool() && !isForMeeting && GameModeBase.GetGameMode() != CustomGameMode.FFA)
                 {
                     IsDisplayInfo = true;
                     var SeerRoleInfo = seer.GetRoleInfo();
@@ -2092,7 +2058,7 @@ public static class Utils
                 if (!Regex.IsMatch(SelfName, seer.GetRealName()))
                     IsDisplayInfo = false;
 
-                switch (Options.CurrentGameMode)
+                switch (GameModeBase.GetGameMode())
                 {
                     case CustomGameMode.FFA:
                         FFAManager.GetNameNotify(seer, ref SelfName);
@@ -2352,7 +2318,7 @@ public static class Utils
                 SelfSuffix.Append(Spurt.GetSuffix(seer, isformeeting: isForMeeting));
 
 
-                switch (Options.CurrentGameMode)
+                switch (GameModeBase.GetGameMode())
                 {
                     case CustomGameMode.FFA:
                         SelfSuffix.Append(FFAManager.GetPlayerArrow(seer));
@@ -2378,7 +2344,7 @@ public static class Utils
                 }
 
                 bool IsDisplayInfo = false;
-                if (MeetingStates.FirstMeeting && Options.ChangeNameToRoleInfo.GetBool() && !isForMeeting && Options.CurrentGameMode != CustomGameMode.FFA)
+                if (MeetingStates.FirstMeeting && Options.ChangeNameToRoleInfo.GetBool() && !isForMeeting && GameModeBase.GetGameMode() != CustomGameMode.FFA)
                 {
                     IsDisplayInfo = true;
                     var SeerRoleInfo = seer.GetRoleInfo();
@@ -2434,7 +2400,7 @@ public static class Utils
                 if (!Regex.IsMatch(SelfName, seer.GetRealName()))
                     IsDisplayInfo = false;
 
-                switch (Options.CurrentGameMode)
+                switch (GameModeBase.GetGameMode())
                 {
                     case CustomGameMode.FFA:
                         FFAManager.GetNameNotify(seer, ref SelfName);
@@ -2983,7 +2949,7 @@ public static class Utils
         if (sendLog)
         {
             var sb = new StringBuilder(100);
-            if (Options.CurrentGameMode != CustomGameMode.FFA)
+            if (GameModeBase.GetGameMode() != CustomGameMode.FFA)
             {
                 foreach (var countTypes in EnumHelper.GetAllValues<CountTypes>())
                 {
@@ -3096,7 +3062,7 @@ public static class Utils
 
         var disconnectedText = playerState.deathReason != PlayerState.DeathReason.etc && playerState.Disconnected ? $"({GetString("Disconnected")})" : string.Empty;
         string summary = $"{ColorString(id.GetPlayerColor(), name)} - {GetDisplayRoleAndSubName(id, id, false, true)}{GetSubRolesText(id, summary: true)}{TaskCount} {GetKillCountText(id)} 『{GetVitalText(id, true)}』{disconnectedText}";
-        switch (Options.CurrentGameMode)
+        switch (GameModeBase.GetGameMode())
         {
             case CustomGameMode.FFA:
                 summary = $"{ColorString(id.GetPlayerColor(), name)} {GetKillCountText(id, ffa: true)}";

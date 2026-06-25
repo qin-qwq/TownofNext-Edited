@@ -160,14 +160,14 @@ class RpcSetTasksPatch
             NumShortTasks = Madmate.MadSnitchTasks.GetInt();
         }
 
-        if (Options.CurrentGameMode is CustomGameMode.SpeedRun)
+        if (GameModeBase.GetGameMode() is CustomGameMode.SpeedRun)
         {
             hasCommonTasks = SpeedRun.SpeedRun_NumCommonTasks.GetBool();
             NumLongTasks = SpeedRun.SpeedRun_NumLongTasks.GetInt();
             NumShortTasks = SpeedRun.SpeedRun_NumShortTasks.GetInt();
         }
 
-        if (Options.CurrentGameMode is CustomGameMode.TagMode)
+        if (GameModeBase.GetGameMode() is CustomGameMode.TagMode)
         {
             hasCommonTasks = true;
             NumLongTasks = 1;
@@ -175,7 +175,7 @@ class RpcSetTasksPatch
         }
 
         // GM - no have tasks, Lazy Gay and Lazy have 1 task, FFA all are killers so need to assign any tasks
-        if (pc.Is(CustomRoles.GM) || pc.Is(CustomRoles.LazyGuy) || pc.Is(CustomRoles.Lazy) || Options.CurrentGameMode == CustomGameMode.FFA)
+        if (pc.Is(CustomRoles.GM) || pc.Is(CustomRoles.LazyGuy) || pc.Is(CustomRoles.Lazy) || GameModeBase.GetGameMode() == CustomGameMode.FFA)
         {
             hasCommonTasks = false;
             NumShortTasks = 0;
@@ -235,12 +235,12 @@ class RpcSetTasksPatch
 
         int defaultcommoncount = Main.RealOptionsData.GetInt(Int32OptionNames.NumCommonTasks);
 
-        if (Options.CurrentGameMode is CustomGameMode.SpeedRun)
+        if (GameModeBase.GetGameMode() is CustomGameMode.SpeedRun)
         {
             defaultcommoncount = SpeedRun.SpeedRun_NumCommonTasks.GetInt();
         }
 
-        if (Options.CurrentGameMode is CustomGameMode.TagMode)
+        if (GameModeBase.GetGameMode() is CustomGameMode.TagMode)
         {
             defaultcommoncount = 1;
         }

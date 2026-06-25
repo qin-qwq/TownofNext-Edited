@@ -93,7 +93,7 @@ class UpdateSystemPatch
         if (!AmongUsClient.Instance.AmHost) return true;
 
         // ###### Can Be Sabotage Started? ######
-        if ((Options.CurrentGameMode == CustomGameMode.FFA) && systemType == SystemTypes.Sabotage) return false;
+        if ((GameModeBase.GetGameMode() == CustomGameMode.FFA) && systemType == SystemTypes.Sabotage) return false;
 
         if (Options.DisableSabotage.GetBool() && systemType == SystemTypes.Sabotage) return false;
 
@@ -168,10 +168,7 @@ class ShipStatusCloseDoorsPatch
         Logger.Info($"Trying to close the door in the room: {room}", "CloseDoorsOfType");
 
         bool allow;
-        if (Options.CurrentGameMode == CustomGameMode.FFA || Options.DisableCloseDoor.GetBool()
-                    || Options.CurrentGameMode == CustomGameMode.SpeedRun && !SpeedRun.SpeedRun_AllowCloseDoor.GetBool()
-                    || Options.CurrentGameMode == CustomGameMode.TagMode
-                    || Options.CurrentGameMode == CustomGameMode.BonfireNight) allow = false;
+        if (Options.DisableCloseDoor.GetBool() || !GameModeBase.GetGameMode().GetGameModeClass().CanCloseDoors) allow = false;
         else allow = true;
 
         if (allow)
@@ -192,7 +189,7 @@ class StartPatch
 
         Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
 
-        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || Options.CurrentGameMode != CustomGameMode.Standard)
+        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || !GameModeBase.GetGameMode().GetGameModeClass().CanReport)
         {
             __instance.BreakEmergencyButton();
         }

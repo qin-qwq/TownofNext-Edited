@@ -385,7 +385,7 @@ public class ClientControlGUI : MonoBehaviour
                     InGameRoleInfoMenu.Show();
                 }
                 else if (InGameRoleInfoMenu.Showing) InGameRoleInfoMenu.Hide();
-            }, inGame && (canMove || inMeeting) && Options.CurrentGameMode is CustomGameMode.Standard)
+            }, inGame && (canMove || inMeeting) && GameModeBase.GetGameMode() is CustomGameMode.Standard)
         };
         sections.Add((GetString("General"), generalButtons));
 

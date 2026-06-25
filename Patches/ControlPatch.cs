@@ -54,7 +54,7 @@ internal class ControllerManagerUpdatePatch
             //}
 
             // Show Role info
-            if (GameStates.IsInGame && (GameStates.IsCanMove || GameStates.IsMeeting) && Options.CurrentGameMode is CustomGameMode.Standard)
+            if (GameStates.IsInGame && (GameStates.IsCanMove || GameStates.IsMeeting) && GameModeBase.GetGameMode() is CustomGameMode.Standard)
             {
                 if (Input.GetKey(KeyCode.F1))
                 {

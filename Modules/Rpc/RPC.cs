@@ -19,7 +19,7 @@ namespace TONE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 187/255 USED
+public enum CustomRPC : byte // 184/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -122,12 +122,8 @@ public enum CustomRPC : byte // 187/255 USED
     //FFA
     SyncFFAPlayer,
     SyncFFANameNotify,
-    //Speed run
-    SyncSpeedRunStates,
-    //Tag Mode
-    SyncTagModeTaskStates,
-    //Bonfire Night
-    SyncBonfireNightStates,
+    //Other
+    SyncGameModeStates
 }
 [Obfuscation(Exclude = true)]
 public enum Sounds
@@ -619,14 +615,8 @@ internal class RPCHandlerPatch
             case CustomRPC.SyncFFAPlayer:
                 FFAManager.ReceiveRPCSyncFFAPlayer(reader);
                 break;
-            case CustomRPC.SyncSpeedRunStates:
-                SpeedRun.HandleSyncSpeedRunStates(reader);
-                break;
-            case CustomRPC.SyncTagModeTaskStates:
-                TagMode.HandleSyncTagModeTaskStates(reader);
-                break;
-            case CustomRPC.SyncBonfireNightStates:
-                BonfireNight.HandleSyncBonfireNightStates(reader);
+            case CustomRPC.SyncGameModeStates:
+                GameModeBase.GetGameMode().GetGameModeClass().ReceiveRPC(reader);
                 break;
             case CustomRPC.SyncAllPlayerNames:
                 Main.AllPlayerNames.Clear();

@@ -79,8 +79,8 @@ public static class GameOptionsMenuPatch
                 var option = OptionItem.AllOptions[index];
                 if (option.Tab != modTab) continue;
 
-                var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
-                var enabled = !option.IsHiddenOn(Options.CurrentGameMode, checkCollapsedSection: false) && option.Parent?.GetBool() is null or true;
+                var enabledOrNotCollapsed = !option.IsHiddenOn(GameModeBase.GetGameMode()) && option.Parent?.GetBool() is null or true;
+                var enabled = !option.IsHiddenOn(GameModeBase.GetGameMode(), checkCollapsedSection: false) && option.Parent?.GetBool() is null or true;
 
                 if (option is TextOptionItem toi)
                 {
@@ -201,7 +201,7 @@ public static class GameOptionsMenuPatch
             {
                 if (option.Tab != (TabGroup)(ModGameOptionsMenu.TabIndex - 3)) continue;
 
-                var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
+                var enabledOrNotCollapsed = !option.IsHiddenOn(GameModeBase.GetGameMode()) && option.Parent?.GetBool() is null or true;
 
                 if (option is TextOptionItem) num -= 0.63f;
                 else if (enabledOrNotCollapsed)
@@ -344,8 +344,8 @@ public static class GameOptionsMenuPatch
             var option = OptionItem.AllOptions[index];
             if (option.Tab != modTab) continue;
 
-            var enabledOrNotCollapsed = !option.IsHiddenOn(Options.CurrentGameMode) && option.Parent?.GetBool() is null or true;
-            var enabled = !option.IsHiddenOn(Options.CurrentGameMode, checkCollapsedSection: false) && option.Parent?.GetBool() is null or true;
+            var enabledOrNotCollapsed = !option.IsHiddenOn(GameModeBase.GetGameMode()) && option.Parent?.GetBool() is null or true;
+            var enabled = !option.IsHiddenOn(GameModeBase.GetGameMode(), checkCollapsedSection: false) && option.Parent?.GetBool() is null or true;
 
             if (ModGameOptionsMenu.CategoryHeaderList.TryGetValue(index, out var categoryHeaderMasked))
             {
@@ -454,7 +454,7 @@ public static class ToggleOptionPatch
             var item = OptionItem.AllOptions[index];
 
             // Thanks: https://github.com/Gurge44/EndlessHostRoles
-            CustomGameMode gm = Options.CurrentGameMode;
+            CustomGameMode gm = GameModeBase.GetGameMode();
             Color32 color = gm == CustomGameMode.Standard ? (TabGroup)(ModGameOptionsMenu.TabIndex - 3) switch
             {
                 TabGroup.ImpostorRoles => new Color32(255, 25, 25, 255),

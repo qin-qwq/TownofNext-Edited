@@ -88,9 +88,9 @@ class EndGamePatch
                 if (date == DateTime.MinValue) continue;
                 var killerId = kvp.Value.GetRealKiller();
                 var targetId = kvp.Key;
-                sb.Append($"\n{date:T} {Main.AllPlayerNames[targetId]}({(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(targetId, targetId, false, true))}{(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(targetId, summary: true))}) [{Utils.GetVitalText(kvp.Key)}]");
+                sb.Append($"\n{date:T} {Main.AllPlayerNames[targetId]}({(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(targetId, targetId, false, true))}{(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(targetId, summary: true))}) [{Utils.GetVitalText(kvp.Key)}]");
                 if (killerId != byte.MaxValue && killerId != targetId)
-                    sb.Append($"\n\t⇐ {Main.AllPlayerNames[killerId]}({(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(killerId, killerId, false, true))}{(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(killerId, summary: true))})");
+                    sb.Append($"\n\t⇐ {Main.AllPlayerNames[killerId]}({(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(killerId, killerId, false, true))}{(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(killerId, summary: true))})");
             }
         else
         {
@@ -102,9 +102,9 @@ class EndGamePatch
                 var killerId = kvp.Value.GetRealKiller();
                 var targetId = kvp.Key;
 
-                sb.Append($"\n<line-height=85%><size=85%><voffset=-1em><color=#9c9c9c>{date:T}</color> {Main.AllPlayerNames[targetId]}({(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(targetId, targetId, false, true))}{(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(targetId, summary: true))}) 『{Utils.GetVitalText(kvp.Key, true)}』</voffset></size></line-height>");
+                sb.Append($"\n<line-height=85%><size=85%><voffset=-1em><color=#9c9c9c>{date:T}</color> {Main.AllPlayerNames[targetId]}({(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(targetId, targetId, false, true))}{(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(targetId, summary: true))}) 『{Utils.GetVitalText(kvp.Key, true)}』</voffset></size></line-height>");
                 if (killerId != byte.MaxValue && killerId != targetId)
-                    sb.Append($"<br>\t⇐ {Main.AllPlayerNames[killerId]}({(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(killerId, killerId, false, true))}{(Options.CurrentGameMode == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(killerId, summary: true))})");
+                    sb.Append($"<br>\t⇐ {Main.AllPlayerNames[killerId]}({(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetDisplayRoleAndSubName(killerId, killerId, false, true))}{(GameModeBase.GetGameMode() == CustomGameMode.FFA ? string.Empty : Utils.GetSubRolesText(killerId, summary: true))})");
             }
 
         }
@@ -114,7 +114,7 @@ class EndGamePatch
         var sb2 = new StringBuilder(GetString("MainRoleLog") + ":");
         foreach (var kvp in Main.PlayerStates.OrderBy(x => x.Key))
         {
-            if (Options.CurrentGameMode != CustomGameMode.Standard) break;
+            if (GameModeBase.GetGameMode() != CustomGameMode.Standard) break;
             if (kvp.Value.MainRoleLogs.Where(x => !x.Item2.IsVanilla()).ToList().Count <= 1) continue;
             sb2.Append($"\n[{kvp.Key}] {Main.AllPlayerNames[kvp.Key]} {Utils.GetDisplayRoleAndSubName(kvp.Key, kvp.Key, false, false)}");
             foreach (var item in kvp.Value.MainRoleLogs.OrderBy(x => x.Item1.Ticks))
@@ -208,7 +208,7 @@ class SetEverythingUpPatch
         string AdditionalWinnerText = "";
         string CustomWinnerColor = Utils.GetRoleColorCode(CustomRoles.Crewmate);
 
-        switch (Options.CurrentGameMode)
+        switch (GameModeBase.GetGameMode())
         {
             case CustomGameMode.FFA:
                 {
@@ -365,39 +365,7 @@ class SetEverythingUpPatch
             sb.Append('\n').Append(EndGamePatch.SummaryText[id]);
             cloneRoles.Remove(id);
         }
-        switch (Options.CurrentGameMode)
-        {
-            case CustomGameMode.FFA:
-                {
-                    List<(int, byte)> listFFA = [];
-                    foreach (byte id in cloneRoles.ToArray())
-                    {
-                        listFFA.Add((FFAManager.GetRankOfScore(id), id));
-                    }
-
-                    listFFA.Sort();
-                    foreach (var id in listFFA.Where(x => EndGamePatch.SummaryText.ContainsKey(x.Item2)))
-                        sb.Append($"\n  ").Append(EndGamePatch.SummaryText[id.Item2]);
-                    break;
-                }
-            case CustomGameMode.SpeedRun:
-                {
-                    sb.Clear();
-                    sb.Append(SpeedRun.GetGameState(forGameEnd: true));
-                    break;
-                }
-            default: // Normal game
-                {
-                    sb.Append($"</b>\n");
-                    foreach (byte id in cloneRoles.ToArray())
-                    {
-                        if (EndGamePatch.SummaryText[id].Contains("<INVALID:NotAssigned>")) continue;
-                        sb.Append('\n').Append(EndGamePatch.SummaryText[id]);
-                    }
-
-                    break;
-                }
-        }
+        GameModeBase.GetGameMode().GetGameModeClass().SummaryText(sb, cloneRoles, false);
         var RoleSummary = RoleSummaryObject.GetComponent<TextMeshPro>();
         RoleSummary.alignment = TextAlignmentOptions.TopLeft;
         RoleSummary.color = Color.white;

@@ -15,7 +15,7 @@ class ExileControllerWrapUpPatch
         // This patch is to show exile string for modded players
         public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
         {
-            if (Options.CurrentGameMode is CustomGameMode.Standard && init != null && init.outfit != null)
+            if (GameModeBase.GetGameMode() is CustomGameMode.Standard && init != null && init.outfit != null)
                 __instance.completeString = CheckForEndVotingPatch.TempExileMsg;
             // TempExileMsg for client is sent in RpcClose
         }
@@ -82,7 +82,7 @@ class ExileControllerWrapUpPatch
     private static void CheckAndDoRandomSpawn()
     {
         if (!AmongUsClient.Instance.AmHost || Main.LIMap) return;
-        if (RandomSpawn.IsRandomSpawn() || Options.CurrentGameMode == CustomGameMode.FFA)
+        if (RandomSpawn.IsRandomSpawn() || GameModeBase.GetGameMode() == CustomGameMode.FFA)
         {
             RandomSpawn.SpawnMap spawnMap = Utils.GetActiveMapName() switch
             {
@@ -154,7 +154,7 @@ class ExileControllerWrapUpPatch
         Main.MeetingIsStarted = false;
         Main.MeetingsPassed++;
 
-        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: Options.CurrentGameMode is CustomGameMode.Standard);
+        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: GameModeBase.GetGameMode() is CustomGameMode.Standard);
     }
 
     public static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
@@ -176,14 +176,14 @@ class ExileControllerWrapUpPatch
                 {
                     exiled.Object.RpcExileV2();
                 }
-            }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
+            }, GameModeBase.GetGameMode() is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
 
             _ = new LateTask(() =>
             {
                 if (GameStates.IsEnded) return;
 
                 AntiBlackout.RevertDetective();
-            }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.51f : 1.41f, "Revert Detective");
+            }, GameModeBase.GetGameMode() is CustomGameMode.Standard ? 0.51f : 1.41f, "Revert Detective");
 
             _ = new LateTask(AntiBlackout.ResetAfterMeeting, 0.6f, "ResetAfterMeeting");
 

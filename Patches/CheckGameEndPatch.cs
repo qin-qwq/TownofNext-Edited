@@ -29,7 +29,7 @@ class CheckTaskCompletionPatch
 {
     public static bool Prefix(ref bool __result)
     {
-        if (Options.DisableTaskWin.GetBool() || Options.NoGameEnd.GetBool() || TaskState.InitialTotalTasks == 0 || Options.CurrentGameMode == CustomGameMode.FFA)
+        if (Options.DisableTaskWin.GetBool() || Options.NoGameEnd.GetBool() || TaskState.InitialTotalTasks == 0 || GameModeBase.GetGameMode() == CustomGameMode.FFA)
         {
             __result = false;
             return false;
@@ -56,42 +56,16 @@ class GameEndCheckerForNormal
         var reason = GameOverReason.ImpostorsByKill;
         predicate.CheckForEndGame(out reason);
 
-        // FFA
-        switch (Options.CurrentGameMode)
+        if (GameModeBase.GetGameMode() != CustomGameMode.Standard)
         {
-            case CustomGameMode.FFA:
-                if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
-                {
-                    ShipStatus.Instance.enabled = false;
-                    StartEndGame(reason);
-                    predicate = null;
-                }
-                return false;
-            case CustomGameMode.SpeedRun:
-                if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
-                {
-                    SpeedRun.RpcSyncSpeedRunStates();
-                    ShipStatus.Instance.enabled = false;
-                    StartEndGame(reason);
-                    predicate = null;
-                }
-                return false;
-            case CustomGameMode.TagMode:
-                if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
-                {
-                    ShipStatus.Instance.enabled = false;
-                    StartEndGame(reason);
-                    predicate = null;
-                }
-                return false;
-            case CustomGameMode.BonfireNight:
-                if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
-                {
-                    ShipStatus.Instance.enabled = false;
-                    StartEndGame(reason);
-                    predicate = null;
-                }
-                return false;
+            if (WinnerIds.Count > 0 || WinnerTeam != CustomWinner.Default)
+            {
+                if (GameModeBase.GetGameMode() == CustomGameMode.SpeedRun) SpeedRun.RpcSyncSpeedRunStates();
+                ShipStatus.Instance.enabled = false;
+                StartEndGame(reason);
+                predicate = null;
+            }
+            return false;
         }
 
         // Start end game
@@ -673,16 +647,9 @@ class GameEndCheckerForNormal
         GameManager.Instance.RpcEndGame(reason, false);
     }
 
-    public static void SetPredicateToNormal() => predicate = new NormalGameEndPredicate();
-    public static void SetPredicateToFFA() => predicate = new FFAGameEndPredicate();
-    public static void SetPredicateToSpeedRun() => predicate = new SpeedRunGameEndPredicate();
-    public static void SetPredicateToTagMode() => predicate = new TagModeGameEndPredicate();
-    public static void SetPredicateToBonfireNight() => predicate = new BonfireNightGameEndPredicate();
-
-
     // ===== Check Game End =====
     // For Normal Games
-    class NormalGameEndPredicate : GameEndPredicate
+    public class NormalGameEndPredicate : GameEndPredicate
     {
         public override bool CheckForEndGame(out GameOverReason reason)
         {

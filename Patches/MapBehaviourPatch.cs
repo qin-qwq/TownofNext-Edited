@@ -15,7 +15,7 @@ public class MapBehaviourPatch
     public static readonly Dictionary<int, GameObject> VentIcons = [];
     private static Dictionary<PlayerControl, Vector3> preMeetingPostions = new Dictionary<PlayerControl, Vector3>();
     private static bool ShouldShowRealTime => !PlayerControl.LocalPlayer.IsAlive() || Main.GodMode.Value ||
-    Options.CurrentGameMode == CustomGameMode.TagMode && PlayerControl.LocalPlayer.GetRoleClass() is TCrewmate tc && tc.DetectState.Item1;
+    GameModeBase.GetGameMode() == CustomGameMode.TagMode && PlayerControl.LocalPlayer.GetRoleClass() is TCrewmate tc && tc.DetectState.Item1;
 
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowNormalMap))]
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap))]
@@ -29,7 +29,7 @@ public class MapBehaviourPatch
         }
         InitializeMapVentIcon(__instance);
         InitializeCustomHerePoints(__instance);
-        if (Options.CurrentGameMode is CustomGameMode.Standard)
+        if (GameModeBase.GetGameMode() is CustomGameMode.Standard)
         {
             var player = PlayerControl.LocalPlayer;
             var role = player.GetCustomRole();
@@ -135,7 +135,7 @@ public class MapBehaviourPatch
         herePoints.Clear();
 
         // 创建新图标
-        if (Options.CurrentGameMode == CustomGameMode.TagMode)
+        if (GameModeBase.GetGameMode() == CustomGameMode.TagMode)
         {
             foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
             {

@@ -1641,7 +1641,7 @@ class MeetingHudOnDestroyPatch
             yield return new WaitForSeconds(1f);
             if (!ExileController.Instance || GameStates.IsEnded) yield break;
 
-            if (CheckForEndVotingPatch.TempExileMsg.EndsWith("<size=0>") && Options.CurrentGameMode is CustomGameMode.Standard && CheckForEndVotingPatch.TempExiledPlayer != null)
+            if (CheckForEndVotingPatch.TempExileMsg.EndsWith("<size=0>") && GameModeBase.GetGameMode() is CustomGameMode.Standard && CheckForEndVotingPatch.TempExiledPlayer != null)
                 ExileController.Instance.completeString = CheckForEndVotingPatch.TempExileMsg[..^8];
 
             while (ExileController.Instance) yield return null;
@@ -1659,7 +1659,7 @@ class MeetingHudRpcClosePatch
     {
         Logger.Info("MeetingHud.RpcClose is being called", "MeetingHudRpcClosePatch");
         // Send SetName rpc together with Close rpc
-        if (Options.CurrentGameMode is CustomGameMode.Standard)
+        if (GameModeBase.GetGameMode() is CustomGameMode.Standard)
         {
             if (AmongUsClient.Instance.AmClient)
             {

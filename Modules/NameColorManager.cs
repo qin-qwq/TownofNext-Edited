@@ -108,7 +108,7 @@ public static class NameColorManager
 
         else return seer == target
             || (Main.GodMode.Value && seer.IsHost())
-            || (Options.CurrentGameMode == CustomGameMode.FFA)
+            || (GameModeBase.GetGameMode() == CustomGameMode.FFA)
             || seer.Is(CustomRoles.GM) || target.Is(CustomRoles.GM)
             || target.GetRoleClass().OthersKnowTargetRoleColor(seer, target)
             || PotionMaster.CovenKnowRoleTarget(seer, target)

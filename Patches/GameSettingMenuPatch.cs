@@ -28,7 +28,7 @@ public class GameSettingMenuPatch
     {
         Instance = __instance;
 
-        TabGroup[] ExludeList = Options.CurrentGameMode switch
+        TabGroup[] ExludeList = GameModeBase.GetGameMode() switch
         {
             CustomGameMode.HidenSeekTONE => TabGroupValues.Skip(2).ToArray(),
             CustomGameMode.FFA => TabGroupValues.Skip(2).ToArray(),
@@ -247,7 +247,7 @@ public class GameSettingMenuPatch
 
         var GameSettingsLabel = __instance.GameSettingsButton.transform.parent.parent.FindChild("GameSettingsLabel").GetComponent<TextMeshPro>();
         GameSettingsLabel.DestroyTranslator();
-        GameSettingsLabel.SetText(GetString($"{Options.CurrentGameMode}"));
+        GameSettingsLabel.SetText(GetString($"{GameModeBase.GetGameMode()}"));
 
         var FreeChatField = DestroyableSingleton<ChatController>.Instance.freeChatField;
         var TextField = Object.Instantiate(FreeChatField, ParentLeftPanel.parent);
@@ -302,10 +302,10 @@ public class GameSettingMenuPatch
 
             HiddenBySearch.Do(x => x.SetHidden(false));
             string text = textField.textArea.text.Trim().ToLower();
-            var Result = OptionItem.AllOptions.Where(x => x.Parent == null && !x.IsHiddenOn(Options.CurrentGameMode)
+            var Result = OptionItem.AllOptions.Where(x => x.Parent == null && !x.IsHiddenOn(GameModeBase.GetGameMode())
             && !GetString($"{x.Name}").ToLower().Contains(text) && x.Tab == (TabGroup)(ModGameOptionsMenu.TabIndex - 3)).ToList();
             HiddenBySearch = Result;
-            var SearchWinners = OptionItem.AllOptions.Where(x => x.Parent == null && !x.IsHiddenOn(Options.CurrentGameMode) && x.Tab == (TabGroup)(ModGameOptionsMenu.TabIndex - 3) && !Result.Contains(x)).ToList();
+            var SearchWinners = OptionItem.AllOptions.Where(x => x.Parent == null && !x.IsHiddenOn(GameModeBase.GetGameMode()) && x.Tab == (TabGroup)(ModGameOptionsMenu.TabIndex - 3) && !Result.Contains(x)).ToList();
             if (!SearchWinners.Any() || !ModSettingsTabs.TryGetValue((TabGroup)(ModGameOptionsMenu.TabIndex - 3), out var settingsTab) || settingsTab == null)
             {
                 HiddenBySearch.Clear();
