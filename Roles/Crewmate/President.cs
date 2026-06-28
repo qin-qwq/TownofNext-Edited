@@ -147,11 +147,11 @@ internal class President : RoleBase
         }
         return false;
     }
-    public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
+    public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
+        if (inMeeting || isSuicide || !killer || !target) return;
         if (CheckPresidentReveal[target.PlayerId])
             killer.SetKillCooldown(0.9f);
-        return true;
     }
 
     private static void SendRPC(byte playerId, bool isEnd = true)

@@ -51,7 +51,7 @@ internal class Command(string key, string arguments, Command.UsageLevels usageLe
 
     public static List<Command> AllCommands = [];
 
-    public string[] CommandForms = GetString($"CommandForms.{key}").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    public string[] CommandForms = GetString($"CommandForms.{key}", SupportedLangs.SChinese).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
     public string Key => key;
     public string Arguments => arguments;
     public string Description => GetString($"CommandDescription.{key}");

@@ -172,6 +172,8 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
     protected override IEnumerator SendOptionsArrayAsync(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
     {
+        if (PackedWriter == null) yield break;
+
         if (PackedWriter.Length > 1000 || PackedWriterMessages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
         {
             PackedWriter.EndMessage();

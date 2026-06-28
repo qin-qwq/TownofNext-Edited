@@ -4666,6 +4666,11 @@
   "CommandArgs.Warn.Id": "被警告玩家的编号",
   "CommandArgs.Warn.Reason": "警告理由",
 
+  "CommandForms.Kick": "kick,expulsar,кик,кикнуть,выгнать,踢出,踢",
+  "CommandDescription.Kick": "踢出指定玩家",
+  "CommandArgs.Kick.Id": "被踢出玩家的编号",
+  "CommandArgs.Kick.Reason": "踢出理由",
+
   "CommandForms.TagColor": "tagcolor,tagcolour,标签颜色,附加名称颜色",
   "CommandDescription.TagColor": "修改头衔颜色",
   "CommandArgs.TagColor.Color": "头衔Hex颜色代码",

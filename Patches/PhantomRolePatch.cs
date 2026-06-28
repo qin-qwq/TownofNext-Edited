@@ -129,6 +129,8 @@ public static class PhantomRolePatch
             _ = new LateTask(() =>
             {
                 phantom.SetKillCooldown(Math.Max(killCooldown, 0.001f));
+                phantom.ResetKillCooldown();
+                phantom.SyncSettings();
             }, 0.2f, $"Phantom Check");
 
             return false;

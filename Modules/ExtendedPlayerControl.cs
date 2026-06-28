@@ -795,7 +795,7 @@ static class ExtendedPlayerControl
 
             if (updateName)
             {
-                Utils.NotifyRoles(SpecifySeer: unshifter, NoCache: true, ForceLoop: false);
+                //Utils.NotifyRoles(SpecifySeer: unshifter, NoCache: true, ForceLoop: false);
             }
         }, 0.2f, "Wait and change outfit", shoudLog: false);
     }

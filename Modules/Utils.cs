@@ -1844,7 +1844,7 @@ public static class Utils
 
             var hasValue = false;
             var sender = CustomRpcSender.Create("NotifyRoles", SendOption, log: false);
-            if (!isForMeeting && !GameStates.IsLocalGame) sender.StartPackedMessage();
+            if (!isForMeeting) sender.StartPackedMessage();
 
             foreach (PlayerControl seer in seerList)
             {

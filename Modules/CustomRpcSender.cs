@@ -131,6 +131,8 @@ public class CustomRpcSender
 
     public CustomRpcSender StartPackedMessage()
     {
+        if (GameStates.IsLocalGame) return this;
+
         if (currentState != State.Ready)
         {
             var errorMsg = $"Tried to start Message but State is not Ready (in: \"{name}\")";

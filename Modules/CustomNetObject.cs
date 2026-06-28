@@ -202,21 +202,24 @@ namespace TONE.Modules
             {
                 if (!AmongUsClient.Instance.AmHost) return;
 
-                // max ~60 calls per second in total
-                int updateFrequency;
-
-                if (!ConstantlyChangesPosition)
+                if (Main.CurrentServerIsVanilla)
                 {
-                    updateFrequency = 30;
-                }
-                else
-                {
-                    (int trueCount, int falseCount) = AllObjects.SplitCount(x => x.ConstantlyChangesPosition);
-                    updateFrequency = trueCount / 2 + falseCount;
-                }
+                    // max ~60 calls per second in total
+                    int updateFrequency;
+                
+                    if (!ConstantlyChangesPosition)
+                    {
+                        updateFrequency = 30;
+                    }
+                    else
+                    {
+                        (int trueCount, int falseCount) = AllObjects.SplitCount(x => x.ConstantlyChangesPosition);
+                        updateFrequency = trueCount / 2 + falseCount;
+                    }
 
-                if (++SnapToSendFrameCount < updateFrequency) return;
-                SnapToSendFrameCount = 0;
+                    if (++SnapToSendFrameCount < updateFrequency) return;
+                    SnapToSendFrameCount = 0;
+                }
 
                 if (AmongUsClient.Instance.AmClient)
                 {

@@ -117,7 +117,7 @@ public class SetUpRoleTextPatch
         {
             // After showing team for non-modded clients update player names.
             IsInIntro = false;
-            Utils.NotifyRoles(ForceLoop: false, NoCache: true);
+            //Utils.NotifyRoles(ForceLoop: false, NoCache: true);
         }
 
         if (GameStates.IsNormalGame)
@@ -961,12 +961,11 @@ internal static class IntroCutsceneDestroyPatch
                 {
                     pc.RpcResetAbilityCooldown();
 
-                    if (Options.FixFirstKillCooldown.GetBool() && GameModeBase.GetGameMode() != CustomGameMode.FFA && GameModeBase.GetGameMode() != CustomGameMode.TagMode &&
-                        GameModeBase.GetGameMode() != CustomGameMode.BonfireNight)
+                    if (Options.FixFirstKillCooldown.GetBool() && GameModeBase.GetGameMode() == CustomGameMode.Standard)
                     {
                         _ = new LateTask(() =>
                         {
-                            if (pc != null)
+                            if (pc)
                             {
                                 pc.ResetKillCooldown();
 
@@ -976,6 +975,10 @@ internal static class IntroCutsceneDestroyPatch
                                 }
                             }
                         }, 2f, $"Fix Kill Cooldown Task for playerId {pc.PlayerId}");
+                    }
+                    else
+                    {
+                        pc.SetKillTimer(10f);
                     }
                 }
             }

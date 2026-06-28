@@ -30,8 +30,8 @@ public static class CustomGameModeManager
 
             2 => CustomGameMode.SpeedRun,
             3 => CustomGameMode.TagMode,
-            4 => CustomGameMode.BonfireNight,
-            5 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
+            //4 => CustomGameMode.BonfireNight,
+            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
             _ => CustomGameMode.Standard
         };
 
@@ -42,7 +42,6 @@ public static class CustomGameModeManager
 
         "SpeedRun",
         "TagMode",
-        "BonfireNight",
 
         "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
     ];
