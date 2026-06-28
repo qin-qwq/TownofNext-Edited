@@ -10,7 +10,7 @@ internal class Miner : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Miner;
     private const int Id = 4200;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -35,13 +35,13 @@ internal class Miner : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = MinerSSCD.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = MinerSSCD.GetFloat();
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.AbilityButton.OverrideText(GetString("MinerTeleButtonText"));
     }
-    public override bool OnCheckVanish(PlayerControl player)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
         if (MinerMode.GetInt() == 0)
         {
@@ -53,6 +53,5 @@ internal class Miner : RoleBase
             Vector2 farthestVentPosition = player.GetFarthestVent().transform.position;
             player.RpcTeleport(farthestVentPosition);
         }
-        return false;
     }
 }

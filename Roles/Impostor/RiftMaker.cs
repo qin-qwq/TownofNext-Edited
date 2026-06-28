@@ -14,7 +14,7 @@ internal class RiftMaker : RoleBase
     public override CustomRoles Role => CustomRoles.RiftMaker;
     private const int Id = 27200;
 
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -119,11 +119,11 @@ internal class RiftMaker : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = SSCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = SSCooldown.GetFloat();
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         var shapeshifterId = shapeshifter.PlayerId;
 
@@ -132,12 +132,12 @@ internal class RiftMaker : RoleBase
         if (totalMarked == 1 && Utils.GetDistance(currentPos, MarkedLocation.ElementAt(0).Key) <= 5f)
         {
             shapeshifter.Notify(GetString("RiftsTooClose"));
-            return false;
+            return;
         }
         else if (totalMarked == 2 && Utils.GetDistance(currentPos, MarkedLocation.ElementAt(1).Key) <= 5f)
         {
             shapeshifter.Notify(GetString("RiftsTooClose"));
-            return false;
+            return;
         }
 
         if (totalMarked >= 2)
@@ -153,7 +153,6 @@ internal class RiftMaker : RoleBase
 
         SendRPC(shapeshifterId, 0);
         //sendrpc for marked location and lasttp
-        return false;
     }
 
     public override void OnCoEnterVent(PlayerPhysics physics, int ventId)

@@ -14,7 +14,7 @@ internal class Disturber : RoleBase
     public override CustomRoles Role => CustomRoles.Disturber;
     private const int Id = 34400;
     public override bool IsExperimental => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
 
@@ -60,18 +60,18 @@ internal class Disturber : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = AbilityCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = AbilityCooldown.GetFloat();
     }
 
-    public override bool OnCheckVanish(PlayerControl phantom)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
-        if (phantom.GetAbilityUseLimit() < 1) return false;
+        if (player.GetAbilityUseLimit() < 1) return;
 
-        var location = phantom.GetCustomPosition();
+        var location = player.GetCustomPosition();
 
-        phantom.RpcRemoveAbilityUse();
+        player.RpcRemoveAbilityUse();
         FogLocation.Add(location, new(location));
-        phantom.Notify(Translator.GetString("FogCreated"));
+        player.Notify(Translator.GetString("FogCreated"));
 
         _ = new LateTask(() =>
         {
@@ -79,8 +79,6 @@ internal class Disturber : RoleBase
             FogLocation[location].Despawn();
             FogLocation.Remove(location);
         }, AbilityDuration.GetFloat(), "Fog Disperse");
-
-        return false;
     }
 
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)

@@ -13,7 +13,7 @@ internal class Wraith : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Wraith;
     private const int Id = 18500;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -39,13 +39,12 @@ internal class Wraith : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = SuicideCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = SuicideCooldown.GetFloat();
     }
 
-    public override bool OnCheckVanish(PlayerControl phantom)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
-        phantom.RpcMurderPlayer(phantom);
-        return false;
+        player.RpcMurderPlayer(player);
     }
 
     public override void OnMeetingHudStart(PlayerControl pc)

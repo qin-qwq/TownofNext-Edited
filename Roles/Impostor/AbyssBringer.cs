@@ -14,7 +14,7 @@ internal class AbyssBringer : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Abyssbringer;
     const int Id = 31300;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -60,7 +60,7 @@ internal class AbyssBringer : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = BlackHolePlaceCooldown.GetInt();
+        AURoleOptions.ShapeshifterCooldown = BlackHolePlaceCooldown.GetInt();
     }
 
     public override void Init()
@@ -76,21 +76,20 @@ internal class AbyssBringer : RoleBase
         }
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         if (!Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != shapeshifter.PlayerId).Any())
         {
-            return false;
+            return;
         }
         // When no player exists, Instantly spawm and despawn networked object will cause error spam
 
         if (BlackHoles.Count >= BlackHoleCountLimit.GetInt())
         {
-            return false;
+            return;
         }
 
         CreateBlackHole(shapeshifter);
-        return false;
     }
     private void CreateBlackHole(PlayerControl shapeshifter)
     {

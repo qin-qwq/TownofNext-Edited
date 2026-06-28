@@ -11,7 +11,7 @@ internal class Fury : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Fury;
     private const int Id = 32000;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -53,23 +53,22 @@ internal class Fury : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = 1f;
+        AURoleOptions.ShapeshifterCooldown = 1f;
     }
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
-    public override bool OnCheckVanish(PlayerControl player)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
         if (PlayerToAngry.Item1)
         {
             PlayerToAngry = (false, 0);
             ToCalm(player, true);
-            return false;
+            return;
         }
-        if (player.HasAbilityCD()) return false;
+        if (player.HasAbilityCD()) return;
         PlayerToAngry = (true, Utils.GetTimeStamp());
         ToAngry(player);
-        return false;
     }
 
     public void ToAngry(PlayerControl player)

@@ -15,7 +15,7 @@ internal class Sacrifist : CovenManager
     public override CustomRoles Role => CustomRoles.Sacrifist;
     private const int Id = 30600;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
     //==================================================================\\
 
@@ -86,7 +86,7 @@ internal class Sacrifist : CovenManager
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = 1f;
+        AURoleOptions.ShapeshifterCooldown = 1f;
         base.ApplyGameOptions(opt, playerId);
     }
     // Sacrifist shouldn't be able to kill at all but if there's solo Sacrifist the game is unwinnable so they can kill when solo
@@ -101,7 +101,7 @@ internal class Sacrifist : CovenManager
         killer.Notify(GetString("CovenDontKillOtherCoven"));
         return false;
     }
-    public override bool OnCheckVanish(PlayerControl pc)
+    public override void UnShapeShiftButton(PlayerControl pc)
     {
         var rand = IRandom.Instance;
         DebuffID = (byte)rand.Next(0, 9);
@@ -125,7 +125,7 @@ internal class Sacrifist : CovenManager
                 {
                     Main.AllPlayerKillCooldown[cov.PlayerId] -= Main.AllPlayerKillCooldown[cov.PlayerId] * (NecroReducedCooldown.GetFloat() / 100);
                 }
-                return false;
+                return;
             }
             switch (DebuffID)
             {
@@ -254,7 +254,6 @@ internal class Sacrifist : CovenManager
             SendRPC(pc);
             debuffTimer = 0;
         }
-        return false;
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {

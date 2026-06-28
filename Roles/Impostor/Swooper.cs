@@ -15,7 +15,7 @@ internal class Swooper : RoleBase
     public override CustomRoles Role => CustomRoles.Swooper;
     private const int Id = 4700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swooper);
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -62,7 +62,7 @@ internal class Swooper : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = SwooperCooldown.GetFloat() + 1;
+        AURoleOptions.ShapeshifterCooldown = SwooperCooldown.GetFloat() + 1;
     }
 
     private static bool CanGoInvis(byte id)
@@ -71,9 +71,9 @@ internal class Swooper : RoleBase
     private static bool IsInvis(byte id)
         => InvisDuration.ContainsKey(id);
 
-    public override bool OnCheckVanish(PlayerControl player)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
-        if (IsInvis(player.PlayerId)) return false;
+        if (IsInvis(player.PlayerId)) return;
 
         if (CanGoInvis(player.PlayerId))
         {
@@ -85,8 +85,6 @@ internal class Swooper : RoleBase
             SendRPC(player);
             player.Notify(GetString("SwooperInvisState"), SwooperDuration.GetFloat(), hasPriority: true, sendInLog: false);
         }
-
-        return false;
     }
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)

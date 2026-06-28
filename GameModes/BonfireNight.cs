@@ -563,7 +563,7 @@ class BonfireNightGameEndPredicate : GameEndPredicate
 public class FireThief : RoleBase
 {
     public override CustomRoles Role => CustomRoles.FireThief;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.None;
     public override bool IsDesyncRole => true;
 
@@ -608,7 +608,7 @@ public class FireThief : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = BonfireNight.PickUpWoodCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = BonfireNight.PickUpWoodCooldown.GetFloat();
     }
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
@@ -696,41 +696,39 @@ public class FireThief : RoleBase
         return ColorString(color, $"({WoodNum[seen.PlayerId]}/{MaxNum[seen.PlayerId]})");
     }
 
-    public override bool OnCheckVanish(PlayerControl phantom)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
-        if (BonfireNight.StartedAt + 3 > TimeStamp) return false;
+        if (BonfireNight.StartedAt + 3 > TimeStamp) return;
 
-        var position = phantom.GetCustomPosition();
+        var position = player.GetCustomPosition();
 
-        BonfireNight.Tree1 = TryCollect(phantom, BonfireNight.Tree1, position, MaxNum[phantom.PlayerId]);
-        BonfireNight.Tree2 = TryCollect(phantom, BonfireNight.Tree2, position, MaxNum[phantom.PlayerId]);
-        BonfireNight.Tree3 = TryCollect(phantom, BonfireNight.Tree3, position, MaxNum[phantom.PlayerId]);
-        BonfireNight.Tree4 = TryCollect(phantom, BonfireNight.Tree4, position, MaxNum[phantom.PlayerId]);
-        BonfireNight.SakuraTree1 = TryCollect(phantom, BonfireNight.SakuraTree1, position, MaxNum[phantom.PlayerId]);
-        BonfireNight.SakuraTree2 = TryCollect(phantom, BonfireNight.SakuraTree2, position, MaxNum[phantom.PlayerId]);
+        BonfireNight.Tree1 = TryCollect(player, BonfireNight.Tree1, position, MaxNum[player.PlayerId]);
+        BonfireNight.Tree2 = TryCollect(player, BonfireNight.Tree2, position, MaxNum[player.PlayerId]);
+        BonfireNight.Tree3 = TryCollect(player, BonfireNight.Tree3, position, MaxNum[player.PlayerId]);
+        BonfireNight.Tree4 = TryCollect(player, BonfireNight.Tree4, position, MaxNum[player.PlayerId]);
+        BonfireNight.SakuraTree1 = TryCollect(player, BonfireNight.SakuraTree1, position, MaxNum[player.PlayerId]);
+        BonfireNight.SakuraTree2 = TryCollect(player, BonfireNight.SakuraTree2, position, MaxNum[player.PlayerId]);
 
-        if (phantom.Is(CustomRoles.FireThief) && BonfireNight.FireThiefCanStealWood.GetBool() && WoodNum[phantom.PlayerId] < MaxNum[phantom.PlayerId])
+        if (player.Is(CustomRoles.FireThief) && BonfireNight.FireThiefCanStealWood.GetBool() && WoodNum[player.PlayerId] < MaxNum[player.PlayerId])
         {
             if (GetDistance(BonfireNight.RedTeamState.Position, position) <= 1f && BonfireNight.BonfireState.Item1 > 0)
             {
-                WoodNum[phantom.PlayerId]++;
+                WoodNum[player.PlayerId]++;
                 BonfireNight.BonfireState.Item1--;
-                SendRPC(phantom);
+                SendRPC(player);
                 BonfireNight.RpcSyncBonfireNightStates();
                 NotifyRoles();
             }
 
             if (GetDistance(BonfireNight.BlueTeamState.Position, position) <= 1f && BonfireNight.BonfireState.Item2 > 0)
             {
-                WoodNum[phantom.PlayerId]++;
+                WoodNum[player.PlayerId]++;
                 BonfireNight.BonfireState.Item2--;
-                SendRPC(phantom);
+                SendRPC(player);
                 BonfireNight.RpcSyncBonfireNightStates();
                 NotifyRoles();
             }
         }
-
-        return false;
     }
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)

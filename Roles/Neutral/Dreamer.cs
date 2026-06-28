@@ -12,7 +12,7 @@ internal class Dreamer : RoleBase
     private const int Id = 33600;
     public override bool IsExperimental => true;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
     //==================================================================\\
 
@@ -58,23 +58,22 @@ internal class Dreamer : RoleBase
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         opt.SetVision(HasImpostorVision.GetBool());
-        AURoleOptions.PhantomCooldown = 1f;
+        AURoleOptions.ShapeshifterCooldown = 1f;
 
         var speed = Main.RealOptionsData.GetFloat(FloatOptionNames.PlayerSpeedMod);
         Main.AllPlayerSpeed[playerId] = SkillTime.Item1 ? FantasySpeed.GetFloat() : speed;
         AURoleOptions.PlayerSpeedMod = SkillTime.Item1 ? FantasySpeed.GetFloat() : speed;
     }
 
-    public override bool OnCheckVanish(PlayerControl pc)
+    public override void UnShapeShiftButton(PlayerControl pc)
     {
-        if (pc.HasAbilityCD()) return false;
+        if (pc.HasAbilityCD()) return;
 
         pc.FreezeForOthers();
         pc.MarkDirtySettings();
         SkillTime = (true, Utils.GetTimeStamp());
         RealPosition = pc.GetCustomPosition();
         pc.RpcAddAbilityCD(includeDuration: true);
-        return false;
     }
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
