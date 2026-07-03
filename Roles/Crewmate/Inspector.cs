@@ -145,7 +145,7 @@ internal class Inspector : RoleBase
                 SendMessage(error, pc.PlayerId);
                 return true;
             }
-            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            if (GuessManager.CantUseAbilityDuringDiscussionTime())
             {
                 pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                 return true;

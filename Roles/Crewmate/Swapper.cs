@@ -104,7 +104,7 @@ internal class Swapper : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("SwapperTrialMax"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     return true;
                 }
-                if (Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                if (GuessManager.CantUseAbilityDuringDiscussionTime())
                 {
                     pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                     return true;

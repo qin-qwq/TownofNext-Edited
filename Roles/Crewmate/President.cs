@@ -82,7 +82,7 @@ internal class President : RoleBase
                 Utils.SendMessage(GetString("PresidentEndMax"), pc.PlayerId);
                 return true;
             }
-            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            if (GuessManager.CantUseAbilityDuringDiscussionTime())
             {
                 Utils.SendMessage(GetString("UseAbilityDuringDiscussion"), pc.PlayerId);
                 return true;

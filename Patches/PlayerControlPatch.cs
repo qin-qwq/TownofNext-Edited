@@ -561,12 +561,12 @@ class RpcMurderPlayerPatch
         MurderResultFlags murderResultFlags = didSucceed ? MurderResultFlags.Succeeded : MurderResultFlags.FailedError | MurderResultFlags.DecisionByHost;
         if (AmongUsClient.Instance.AmClient)
         {
-            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded)
+            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded && __instance.IsAlive())
             {
                 __instance.SetRole(RoleTypes.Viper, true);
             }
             __instance.MurderPlayer(target, murderResultFlags);
-            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded)
+            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded && __instance != target)
             {
                 __instance.SetRole(RoleTypes.Crewmate, true);
             }
@@ -595,7 +595,7 @@ class RpcMurderPlayerPatch
                 .EndRpc();
         }
 
-        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper)
+        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && __instance.IsAlive())
         {
             sender.RpcSetRole(__instance, RoleTypes.Viper);
         }
@@ -605,7 +605,7 @@ class RpcMurderPlayerPatch
             .Write((int)murderResultFlags)
             .EndRpc();
 
-        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper)
+        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && __instance != target)
         {
             foreach (var pc in Main.EnumeratePlayerControls())
             {
@@ -840,7 +840,7 @@ class ReportDeadBodyPatch
 
             ReportTarget = target;
 
-            if (target == null) //Meeting
+            if (!target) //Meeting
             {
                 var playerRoleClass = __instance.GetRoleClass();
 
@@ -857,7 +857,7 @@ class ReportDeadBodyPatch
                     return false;
                 }
             }
-            if (target != null) // Report dead body
+            if (target) // Report dead body
             {
                 // Guessed player cannot report
                 if (Main.PlayerStates[target.PlayerId].deathReason == PlayerState.DeathReason.Gambled) return false;
@@ -912,7 +912,7 @@ class ReportDeadBodyPatch
                 }
             }
 
-            if (Options.SyncButtonMode.GetBool() && target == null)
+            if (Options.SyncButtonMode.GetBool() && !target)
             {
                 Logger.Info($"Option: {Options.SyncedButtonCount.GetInt()}, has button count: {Options.UsedButtonCount}", "ReportDeadBody");
                 if (Options.SyncedButtonCount.GetFloat() <= Options.UsedButtonCount)
@@ -934,6 +934,17 @@ class ReportDeadBodyPatch
                 {
                     Logger.Info("The maximum number of meeting buttons has been reached", "ReportDeadBody");
                 }
+            }
+            else if (!target)
+            {
+                Logger.Info($"player called meeting with {__instance.RemainingEmergencies} buttons left", "ReportDeadBody");
+                if (__instance.RemainingEmergencies <= 0)
+                {
+                    __instance.Notify(GetString("NoRemainingEmergencies"), sendInLog: false);
+                    Logger.Info("The button has been canceled because the maximum number of available buttons has been exceeded", "ReportDeadBody");
+                    return false;
+                }
+                else __instance.RemainingEmergencies--;
             }
         }
         catch (Exception e)

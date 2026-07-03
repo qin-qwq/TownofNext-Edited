@@ -117,6 +117,7 @@ internal class ChangeRoleSettings
 
             ChatManager.ResetHistory();
             ReportDeadBodyPatch.CanReport.Clear();
+            ReportDeadBodyPatch.PreventEAC = false;
             Options.UsedButtonCount = 0;
 
             Main.RealOptionsData = new OptionBackupData(GameOptionsManager.Instance.CurrentGameOptions);

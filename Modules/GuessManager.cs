@@ -56,6 +56,11 @@ public static class GuessManager
         return false;
     }
 
+    public static bool CantUseAbilityDuringDiscussionTime()
+    {
+        return Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating or MeetingHud.VoteStates.Results;
+    }
+
     public static byte GetColorFromMsg(string msg)
     {
         if (ComfirmIncludeMsg(msg, "红|紅|red")) return 0;
@@ -148,7 +153,7 @@ public static class GuessManager
                 pc.ShowInfoMessage(isUI, GetString("GuessDead"));
                 return true;
             }
-            if (Options.CantGuessDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            if (CantUseAbilityDuringDiscussionTime())
             {
                 pc.ShowInfoMessage(isUI, GetString("GuessDuringDiscussion"));
                 return true;

@@ -4014,7 +4014,6 @@
   "PlayerDeleteFromModList": "玩家成功移除协管名单",
   "DeputyKnowSheriff": "捕快和警长互相通晓",
   "DeputyCanBecomeSheriff": "捕快可以在警长死后成为警长",
-  "CantGuessDuringDiscussionTime": "不能在讨论时间猜测",
   "GuessDuringDiscussion": "很抱歉，你不能在讨论时间猜测",
   "Balancer": "大神官",
   "BalancerInfo": "实行正义审判",
@@ -4400,7 +4399,7 @@
   "YouJoinSpectateList": "你加入了观战名单",
   "YouDeleteFromSpectateList": "你离开了观战名单",
   "NarcInterference": "警局特工干扰了内鬼阵营频道！",
-  "CantUseAbilityDuringDiscussionTime": "不能在讨论时间使用技能（不包括猜测）",
+  "CantUseAbilityDuringDiscussionTime": "不能在讨论时间使用技能",
   "UseAbilityDuringDiscussion": "很抱歉，你不能在讨论时间使用技能",
   "LobbyViewSettings_ShowOnlyEnabledRolesButtonText": "显示启用职业",
   "LobbyViewSettings_ShowAlldRolesButtonText": "显示所有职业",
@@ -4824,5 +4823,6 @@
 
   "WitchDoctor": "巫医",
   "WitchDoctorInfo": "用巫术招募船员",
-  "WitchDoctorInfoLong": "(巫师阵营):\n巫医可以使用变形使选中的玩家加入巫师阵营\n<b>当巫医获得死灵之书后，巫医可以使用击杀按钮来进行击杀。巫医可以使选中的加入巫师阵营的玩家获得巫师阵营职业</b>"
+  "WitchDoctorInfoLong": "(巫师阵营):\n巫医可以使用变形使选中的玩家加入巫师阵营\n<b>当巫医获得死灵之书后，巫医可以使用击杀按钮来进行击杀。巫医可以使选中的加入巫师阵营的玩家获得巫师阵营职业</b>",
+  "NoRemainingEmergencies": "没有剩余紧急会议次数！"
 }

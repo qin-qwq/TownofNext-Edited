@@ -77,14 +77,8 @@ internal class WitchDoctor : CovenManager
                 Ritualist.ConvertRole(pc, player);
                 pc.RpcRemoveAbilityUse();
                 tempPlayerList.Add(player);
-                if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
-                {
-                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
-                }
-                else
-                {
-                    Utils.NotifyRoles();
-                }
+                Utils.NotifyRoles(SpecifySeer: player);
+                Utils.NotifyRoles(SpecifyTarget: player);
                 return;
             }
 
@@ -107,14 +101,8 @@ internal class WitchDoctor : CovenManager
                 player.RpcChangeRoleBasis(role);
                 player.GetRoleClass().OnAdd(player.PlayerId);
 
-                if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
-                {
-                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
-                }
-                else
-                {
-                    Utils.NotifyRoles();
-                }
+                Utils.NotifyRoles(SpecifySeer: player);
+                Utils.NotifyRoles(SpecifyTarget: player);
 
                 player.ResetKillCooldown();
                 player.SetKillCooldown(forceAnime: true);
