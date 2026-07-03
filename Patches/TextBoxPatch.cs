@@ -16,36 +16,41 @@ public static class TextBoxPatch
 
     public static bool IsInvalidCommand;
 
-    public static void AddChars()
-    {
-        TextBoxTMP.EmailChars.Add('<');
-        TextBoxTMP.EmailChars.Add('>');
-        TextBoxTMP.EmailChars.Add('"');
-        TextBoxTMP.EmailChars.Add('’');
-        TextBoxTMP.EmailChars.Add('`');
-        TextBoxTMP.EmailChars.Add('–');
-        TextBoxTMP.EmailChars.Add('—');
-        TextBoxTMP.EmailChars.Add('‐');
-        TextBoxTMP.EmailChars.Add('[');
-        TextBoxTMP.EmailChars.Add(']');
-        TextBoxTMP.EmailChars.Add('{');
-        TextBoxTMP.EmailChars.Add('}');
-        TextBoxTMP.EmailChars.Add('*');
-        TextBoxTMP.EmailChars.Add('|');
-        TextBoxTMP.EmailChars.Add('$');
-        TextBoxTMP.EmailChars.Add('€');
-        TextBoxTMP.EmailChars.Add('£');
-        TextBoxTMP.EmailChars.Add('¥');
-        TextBoxTMP.EmailChars.Add('₽');
-    }
+    private static int CurrentCharPos;
+    public static bool Pasting;
 
-    [HarmonyPatch(typeof(TextBoxTMP), nameof(TextBoxTMP.Start))]
-    [HarmonyPostfix]
-    public static void TextBoxPostfix(TextBoxTMP __instance)
+    // Thanks to https://github.com/scp222thj/MalumMenu/blob/main/src/Patches/TextBoxTMPPatches.cs
+    [HarmonyPatch(typeof(TextBoxTMP), nameof(TextBoxTMP.IsCharAllowed))]
+    [HarmonyPrefix]
+    public static bool AllowAllCharacters(TextBoxTMP __instance, ref bool __result)
     {
-        __instance.allowAllCharacters = true;
-        __instance.AllowEmail = true;
-        __instance.AllowSymbols = true;
+        string compositionString = Input.compositionString;
+        if (compositionString.Length > 0)
+        {
+            __result = true;
+            return false;
+        }
+
+        var input = Pasting ? GUIUtility.systemCopyBuffer.Trim() : Input.inputString;
+        Pasting = false;
+
+        if (input.Length == 0)
+        {
+            __result = true;
+            return false;
+        }
+
+        string currentText = __instance.text ?? string.Empty;
+        int caretPos = Mathf.Clamp(__instance.caretPos, 0, currentText.Length);
+        string text = currentText.Insert(caretPos, input);
+        CurrentCharPos = Mathf.Clamp(CurrentCharPos, 0, text.Length - 1);
+        char currentChar = text[CurrentCharPos];
+
+        if (CurrentCharPos >= text.Length - 1) CurrentCharPos = 0;
+        else CurrentCharPos++;
+
+        __result = currentChar is not ('\b' or '\r' or '[');
+        return false;
     }
 
     [HarmonyPatch(typeof(TextBoxTMP), nameof(TextBoxTMP.SetText))]

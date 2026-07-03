@@ -1962,6 +1962,8 @@ public static class Utils
                 if (seer.Is(CustomRoles.Mini))
                     SelfMark.Append(Mini.GetMarkOthers(seer, seer, isForMeeting: isForMeeting));
 
+                if (seer.IsPlayerCovenTeam() && CovenManager.HasNecronomicon(seer))
+                    SelfMark.Append(ColorString(GetRoleColor(CustomRoles.Coven), "♣"));
 
                 // ====== Add SelfSuffix for seer ======
 
@@ -2303,6 +2305,9 @@ public static class Utils
 
                 if (seer.Is(CustomRoles.Mini))
                     SelfMark.Append(Mini.GetMarkOthers(seer, seer, isForMeeting: isForMeeting));
+
+                if (seer.IsPlayerCovenTeam() && CovenManager.HasNecronomicon(seer))
+                    SelfMark.Append(ColorString(GetRoleColor(CustomRoles.Coven), "♣"));
 
                 // ====== Add SelfSuffix for seer ======
 

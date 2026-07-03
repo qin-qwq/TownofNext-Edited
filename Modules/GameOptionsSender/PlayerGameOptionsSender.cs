@@ -6,6 +6,7 @@ using InnerNet;
 using System;
 using System.Collections;
 using TONE.Roles.Core;
+using TONE.Roles.Vanilla;
 using Mathf = UnityEngine.Mathf;
 
 namespace TONE.Modules;
@@ -51,6 +52,8 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
     public static DataFlagRateLimiter.QueuedAction SendAllImmediately()
     {
+        if (AntiBlackout.SkipTasks) return null;
+
         ForceWaitFrame = true;
 
         if (PackedWriterMessages > 0 && PackedWriter != null)
@@ -224,6 +227,8 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
     protected override void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
     {
+        if (AntiBlackout.SkipTasks) return;
+
         if (PackedWriter == null) // Single write
         {
             Logger.Info("Enqueue complete for single write", "SendOptionsArray");
@@ -347,6 +352,8 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
             if (role.IsGhostRole())
                 AURoleOptions.GuardianAngelCooldown = Options.DefaultAngelCooldown.GetFloat();
+
+            AURoleOptions.ViperDissolveTime = ViperTONE.ViperDissolveTime.GetInt(); // can't be desynced
 
             /*
             * Builds Modified GameOptions

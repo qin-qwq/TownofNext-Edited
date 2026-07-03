@@ -17,11 +17,11 @@
 		<CodePage>65001</CodePage>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Platform)' == 'Android' ">
-		<DefineConstants>TRACE;ANDROID</DefineConstants>
-	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Platform)' == 'Windows' ">
 		<DefineConstants>TRACE;PC</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Platform)' == 'Android' ">
+		<DefineConstants>TRACE;ANDROID</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

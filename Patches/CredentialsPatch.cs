@@ -149,8 +149,8 @@ class VersionShowerStartPatch
 #endif
         Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TONE version");
 
-        if (Main.IsAprilFools2)
-            Main.credentialsText = $"<color=#00bfff>Town Of Host</color> - 11.45.14";
+        if (Main.IsAprilFools)
+            Main.credentialsText = $"<color=#a54aff>Town Of Next Roles</color> - 0.0.1";
 
         ErrorText.Create(__instance.text);
         if (Main.hasArgumentException && ErrorText.Instance != null)

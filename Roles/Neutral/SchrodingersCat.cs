@@ -35,7 +35,14 @@ internal class SchrodingersCat : RoleBase
         if (killer.GetBetrayalAddon() != CustomRoles.NotAssigned)
             target.RpcSetCustomRole(addon);
 
-        Utils.NotifyRoles(SpecifyTarget: target, ForceLoop: true);
+        if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
+        {
+            Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
+        }
+        else
+        {
+            Utils.NotifyRoles();
+        }
 
         target.ResetKillCooldown();
         target.SetKillCooldown(forceAnime: true);

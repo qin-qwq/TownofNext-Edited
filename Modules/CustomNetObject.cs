@@ -41,6 +41,8 @@ namespace TONE.Modules
 
             DataFlagRateLimiter.Enqueue(() =>
             {
+                if (!playerControl) return;
+
                 Sprite = sprite;
 
                 string name = PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].PlayerName;
@@ -385,6 +387,8 @@ namespace TONE.Modules
                 {
                     yield return DataFlagRateLimiter.Enqueue(() =>
                     {
+                        if (!playerControl) return;
+
                         string name = PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].PlayerName;
                         int colorId = PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].ColorId;
                         string hatId = PlayerControl.LocalPlayer.Data.Outfits[PlayerOutfitType.Default].HatId;

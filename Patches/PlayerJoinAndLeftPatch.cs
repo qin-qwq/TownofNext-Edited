@@ -121,6 +121,8 @@ class OnGameJoinedPatch
                     break;
             }
 
+            Options.prevGameMode = Options.GameMode.GetInt();
+
             _ = new LateTask(() =>
             {
                 JoiningGame = false;

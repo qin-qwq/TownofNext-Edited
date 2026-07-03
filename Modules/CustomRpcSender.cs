@@ -359,6 +359,12 @@ public class CustomRpcSender
 
             if (currentState != State.Ready)
             {
+                if (currentState == State.Finished)
+                {
+                    Logger.Warn($"Tried to send RPC but \"{name}\" is already Finished", "CustomRpcSender.Warn");
+                    return;
+                }
+
                 var errorMsg = $"Tried to send RPC but State is not Ready (in: \"{name}\", state: {currentState})";
 
                 if (isUnsafe)

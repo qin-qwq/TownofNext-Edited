@@ -156,7 +156,7 @@ internal class Ritualist : CovenManager
             EnchantedPlayers[rit].Clear();
         }
     }
-    public void ConvertRole(PlayerControl killer, PlayerControl target)
+    public static void ConvertRole(PlayerControl killer, PlayerControl target)
     {
         var addon = killer.GetBetrayalAddon(true);
         if (target.CanBeRecruitedBy(killer))

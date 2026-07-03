@@ -4820,5 +4820,9 @@
   "CommandForms.SetRole": "sr,setrole,setroles,指定职业",
   "CommandDescription.SetRole": "指定玩家下一局的职业",
   "CommandArgs.SetRole.Id": "被指定玩家的编号",
-  "CommandArgs.SetRole.Role": "被指定的职业"
+  "CommandArgs.SetRole.Role": "被指定的职业",
+
+  "WitchDoctor": "巫医",
+  "WitchDoctorInfo": "用巫术招募船员",
+  "WitchDoctorInfoLong": "(巫师阵营):\n巫医可以使用变形使选中的玩家加入巫师阵营\n<b>当巫医获得死灵之书后，巫医可以使用击杀按钮来进行击杀。巫医可以使选中的加入巫师阵营的玩家获得巫师阵营职业</b>"
 }

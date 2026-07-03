@@ -276,7 +276,7 @@ public static class CustomRolesHelper
             //FFA
             CustomRoles.Killer) return true;
 
-        return role.IsNK() || role.IsNonNK() || role.IsNA() || role.IsMadmate();
+        return role.IsNK() || role.IsNonNK() || role.IsNA();
     }
     public static bool IsNK(this CustomRoles role)
     {
@@ -511,7 +511,7 @@ public static class CustomRolesHelper
                     CustomRoles.Infectious => CustomRoles.Infected,
                     CustomRoles.Jackal => CustomRoles.Recruit,
                     CustomRoles.Virus => CustomRoles.Contagious,
-                    CustomRoles.Ritualist => CustomRoles.Enchanted,
+                    CustomRoles.Ritualist or CustomRoles.WitchDoctor => CustomRoles.Enchanted,
                     _ => addon
                 };
         }

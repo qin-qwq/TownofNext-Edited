@@ -239,20 +239,6 @@ public class Main : BasePlugin
     {
         get
         {
-            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
-            {
-                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
-                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
-            }
-            return false;
-        }
-    }
-    public static bool IsAprilFools2
-    {
-        get
-        {
             DateTime utcNow = DateTime.UtcNow;
             DateTime t = new(utcNow.Year, 4, 1, 7, 0, 0, 0, DateTimeKind.Utc);
             DateTime t2 = new(utcNow.Year, 4, 8, 7, 0, 0, 0, DateTimeKind.Utc);
@@ -803,8 +789,6 @@ public class Main : BasePlugin
             Harmony.PatchAll(typeof(DiscordRPC));
         }
 
-        TextBoxPatch.AddChars();
-
         // ConsoleManager.DetachConsole();
         if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();
 
@@ -1119,6 +1103,7 @@ public enum CustomRoles
     Summoner,
     Summoned,
     VoodooMaster,
+    WitchDoctor,
 
     //FFA
     Killer,

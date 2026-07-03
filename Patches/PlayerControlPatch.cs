@@ -275,7 +275,7 @@ class CheckMurderPatch
         }
 
         // Madmate Spawn Mode Is First Kill
-        if (Madmate.MadmateSpawnMode.GetInt() == 1 && Main.MadmateNum < CustomRoles.Madmate.GetCount() && target.CanBeMadmate())
+        if (Madmate.MadmateSpawnMode.GetInt() == 1 && Main.MadmateNum < CustomRoles.Madmate.GetCount() && target.CanBeMadmate() && GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons)
         {
             Main.MadmateNum++;
             target.RpcSetCustomRole(CustomRoles.Madmate);
@@ -561,7 +561,15 @@ class RpcMurderPlayerPatch
         MurderResultFlags murderResultFlags = didSucceed ? MurderResultFlags.Succeeded : MurderResultFlags.FailedError | MurderResultFlags.DecisionByHost;
         if (AmongUsClient.Instance.AmClient)
         {
+            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded)
+            {
+                __instance.SetRole(RoleTypes.Viper, true);
+            }
             __instance.MurderPlayer(target, murderResultFlags);
+            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded)
+            {
+                __instance.SetRole(RoleTypes.Crewmate, true);
+            }
         }
 
         var sender = CustomRpcSender.Create("RpcMurderPlayer", SendOption.Reliable);
@@ -587,10 +595,25 @@ class RpcMurderPlayerPatch
                 .EndRpc();
         }
 
+        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper)
+        {
+            sender.RpcSetRole(__instance, RoleTypes.Viper);
+        }
+
         sender.StartRpc(__instance.NetId, RpcCalls.MurderPlayer)
             .WriteNetObject(target)
             .Write((int)murderResultFlags)
             .EndRpc();
+
+        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper)
+        {
+            foreach (var pc in Main.EnumeratePlayerControls())
+            {
+                if (pc.IsModded() || pc.GetCustomRole().IsImpostor() || pc == __instance) continue;
+
+                sender.RpcSetRole(__instance, RoleTypes.Crewmate, pc.GetClientId());
+            }
+        }
 
         sender.SendMessage();
 
@@ -602,7 +625,6 @@ class RpcMurderPlayerPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckShapeshift))]
 public static class CheckShapeshiftPatch
 {
-    public static bool BypassCheck = false;
     private static readonly LogHandler logger = Logger.Handler(nameof(PlayerControl.CheckShapeshift));
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
     {
@@ -621,7 +643,7 @@ public static class CheckShapeshiftPatch
         }
 
         // No called code if is invalid shapeshifting
-        if (!CheckInvalidShapeshifting(__instance, target, shouldAnimate) && !BypassCheck)
+        if (!CheckInvalidShapeshifting(__instance, target, shouldAnimate))
         {
             __instance.RpcRejectShapeshift();
             return false;

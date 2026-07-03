@@ -12,7 +12,7 @@ internal class ViperTONE : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
     //==================================================================\\
 
-    private static OptionItem ViperDissolveTime;
+    public static OptionItem ViperDissolveTime;
 
     public override void SetupCustomOption()
     {
@@ -20,17 +20,6 @@ internal class ViperTONE : RoleBase
         ViperDissolveTime = IntegerOptionItem.Create(Id + 2, GeneralOption.ViperBase_ViperDissolveTime, new(1, 180, 1), 15, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.ViperTONE])
             .SetValueFormat(OptionFormat.Seconds);
-    }
-
-    public override void Add(byte playerId)
-    {
-        var player = Utils.GetPlayerById(playerId);
-        player.RpcChangeRoleBasis(CustomRoles.ViperTONE);
-    }
-
-    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
-    {
-        AURoleOptions.ViperDissolveTime = ViperDissolveTime.GetInt();
     }
 
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting)

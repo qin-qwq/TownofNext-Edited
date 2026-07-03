@@ -886,13 +886,38 @@ class BeginImpostorPatch
     }
 }
 
-[HarmonyPatch(typeof(HudManager), nameof(HudManager.OnGameStart))]
+[HarmonyPatch]
 internal static class IntroCutsceneDestroyPatch
 {
     public static long IntroDestroyTS;
+    private static bool _usedFallback;
 
-    public static void Prefix()
+    public static MethodBase TargetMethod()
     {
+        var onDestroy = AccessTools.Method(typeof(IntroCutscene), "OnDestroy");
+        if (onDestroy != null)
+        {
+            _usedFallback = false;
+            Logger.Info("Using OnDestroy for IntroCutsceneDestroyPatch", "IntroCutscene");
+            return onDestroy;
+        }
+
+        _usedFallback = true;
+        return Utils.GetStateMachineMoveNext<IntroCutscene>(nameof(IntroCutscene.CoBegin))!;
+    }
+
+    public static void Prefix(Il2CppObjectBase __instance)
+    {
+        if (_usedFallback)
+        {
+            var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);
+            // run after the final yield
+            if (wrapper.State >= 0)
+            {
+                return;
+            }
+        }
+
         if (AmongUsClient.Instance.AmHost && !AmongUsClient.Instance.IsGameOver)
         {
             if (OperatingSystem.IsAndroid()) Logger.Info("IntroCutscene destroyed for Starlight", "IntroCutscene");
@@ -929,8 +954,18 @@ internal static class IntroCutsceneDestroyPatch
         }
     }
 
-    public static void Postfix()
+    public static void Postfix(Il2CppObjectBase __instance)
     {
+        if (_usedFallback)
+        {
+            var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);
+            // run after the final yield
+            if (wrapper.State >= 0)
+            {
+                return;
+            }
+        }
+
         if (!GameStates.IsInGame) return;
 
         Main.IntroDestroyed = true;

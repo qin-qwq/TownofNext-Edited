@@ -46,11 +46,13 @@ internal class Miner : RoleBase
         if (MinerMode.GetInt() == 0)
         {
             Vector2 closestVentPosition = player.GetClosestVent().transform.position;
+            closestVentPosition.y += 0.3636f;
             player.RpcTeleport(closestVentPosition);
         }
         else
         {
             Vector2 farthestVentPosition = player.GetFarthestVent().transform.position;
+            farthestVentPosition.y += 0.3636f;
             player.RpcTeleport(farthestVentPosition);
         }
     }

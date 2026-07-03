@@ -108,7 +108,7 @@ internal class TimeMaster : RoleBase
                 player.MarkDirtySettings();
             }
 
-            yield return PlayerGameOptionsSender.SendAllImmediately().Wait();
+            yield return PlayerGameOptionsSender.SendAllImmediately()?.Wait();
 
             yield return new WaitForSecondsRealtime(0.55f);
 

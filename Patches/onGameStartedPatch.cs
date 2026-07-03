@@ -109,7 +109,6 @@ internal class ChangeRoleSettings
             Main.Invisible.Clear();
             CheckForEndVotingPatch.SomeoneExiled = false;
             ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
-            CheckShapeshiftPatch.BypassCheck = false;
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
@@ -402,7 +401,7 @@ internal class StartGameHostPatch
             timer += Time.deltaTime;
         }
         thiz.SendClientReady();
-        yield return new WaitForSecondsRealtime(2f);
+        //yield return new WaitForSecondsRealtime(2f);
         yield return AssignRoles();
 
         LoadingBarManager.Instance.ToggleLoadingBar(false);
@@ -466,15 +465,15 @@ internal class StartGameHostPatch
             yield break;
         }
 
-        if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
+        /*if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
         {
             yield return RpcSetRoleReplacer.ReleaseVanilla();
         }
         else
-        {
+        {*/
             // Send all RPC for modded region
             RpcSetRoleReplacer.Release();
-        }
+        //}
 
         try
         {
