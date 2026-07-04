@@ -46,7 +46,6 @@ internal class Inhibitor : RoleBase
             {
                 return killer.CheckDoubleTrigger(target, () =>
                 {
-                    killer.SetKillCooldown(5f);
                     killer.RpcRemoveAbilityUse();
 
                     if (!killer.Is(CustomRoles.Admired))

@@ -713,7 +713,7 @@ internal class ChatCommands
 
     private static void CovenInfoCommand(PlayerControl player, string text, string[] args)
     {
-        Utils.SendMessage(GetString("Message.CovenInfo"), PlayerControl.LocalPlayer.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), GetString("CovenInfoTitle")));
+        Utils.SendMessage(GetString("Message.CovenInfo"), player.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Coven), GetString("CovenInfoTitle")));
     }
 
     private static void ReNameCommand(PlayerControl player, string text, string[] args)

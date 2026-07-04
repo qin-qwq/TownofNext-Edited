@@ -52,8 +52,6 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
     public static DataFlagRateLimiter.QueuedAction SendAllImmediately()
     {
-        if (AntiBlackout.SkipTasks) return null;
-
         ForceWaitFrame = true;
 
         if (PackedWriterMessages > 0 && PackedWriter != null)
@@ -227,8 +225,6 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
 
     protected override void SendOptionsArray(Il2CppStructArray<byte> optionArray, byte logicOptionsIndex)
     {
-        if (AntiBlackout.SkipTasks) return;
-
         if (PackedWriter == null) // Single write
         {
             Logger.Info("Enqueue complete for single write", "SendOptionsArray");

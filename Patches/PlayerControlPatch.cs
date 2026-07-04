@@ -1874,14 +1874,16 @@ class CoExitVentPatch
         _ = new LateTask(() => { player?.RpcSetVentInteraction(); }, 0.8f, $"Set vent interaction after exit vent {player?.PlayerId}", shoudLog: false);
     }
 }
-[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CompleteTask))]
+[HarmonyPatch(typeof(GameData), nameof(GameData.CompleteTask))]
 class PlayerControlCompleteTaskPatch
 {
-    public static bool Prefix(PlayerControl __instance, uint idx)
+    public static bool Prefix(PlayerControl pc, uint taskId)
     {
         if (GameStates.IsHideNSeek) return true;
 
-        var player = __instance;
+        var player = pc;
+        var __instance = pc;
+        var idx = taskId;
         var playerTask = player.myTasks?.ToArray().FirstOrDefault(task => task.Id == idx);
         var taskType = playerTask != null ? playerTask.TaskType : TaskTypes.None;
 

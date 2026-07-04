@@ -1,7 +1,6 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
-using static TONE.CheckForEndVotingPatch;
 using static TONE.Options;
 using static TONE.Utils;
 
@@ -20,7 +19,7 @@ internal class Speaker : RoleBase
     private static OptionItem KillCooldown;
     private static OptionItem SkillLimit;
 
-    private static readonly Dictionary<byte, (byte, byte)> Target = [];
+    private static readonly HashSet<byte> PlayerList = [];
 
     public override void SetupCustomOption()
     {
@@ -35,12 +34,11 @@ internal class Speaker : RoleBase
 
     public override void Init()
     {
-        Target.Clear();
+        PlayerList.Clear();
     }
 
     public override void Add(byte playerId)
     {
-        Target[playerId] = (byte.MaxValue, byte.MaxValue);
         playerId.SetAbilityUseLimit(SkillLimit.GetInt());
 
         var pc = GetPlayerById(playerId);
@@ -51,103 +49,60 @@ internal class Speaker : RoleBase
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (killer.GetAbilityUseLimit() > 0 && target.PlayerId != Target[killer.PlayerId].Item1)
+        if (killer.GetAbilityUseLimit() > 0 && !PlayerList.Contains(target.PlayerId))
         {
             return killer.CheckDoubleTrigger(target, () =>
             {
-                killer.SetKillCooldown(5f);
                 killer.RpcRemoveAbilityUse();
-                var currentTuple = Target[killer.PlayerId];
-                Target[killer.PlayerId] = (target.PlayerId, currentTuple.Item2);
+                PlayerList.Add(target.PlayerId);
                 NotifyRoles(SpecifyTarget: target);
-                SendRPC(0, killer, target);
+                SendRPC(target.PlayerId);
             });
         }
         else return true;
     }
 
-    private void SendRPC(byte typeId, PlayerControl player, PlayerControl target)
+    private void SendRPC(byte targetId = 255)
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
-        writer.Write(typeId);
-        writer.Write(player.PlayerId);
-        writer.Write(target.PlayerId);
+        writer.Write(targetId);
         RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
-        byte typeId = reader.ReadByte();
-        byte playerId = reader.ReadByte();
         byte targetId = reader.ReadByte();
-        var b = Target[playerId];
 
-        if (!Target.ContainsKey(playerId))
+        if (targetId != 255)
         {
-            Target[playerId] = (byte.MaxValue, byte.MaxValue);
+            PlayerList.Add(targetId);
         }
-
-        var currentTuple = Target[playerId];
-
-        switch (typeId)
+        else
         {
-            case 0:
-                Target[playerId] = (targetId, currentTuple.Item2);
-                break;
-            case 1:
-                Target[playerId] = (byte.MaxValue, byte.MaxValue);
-                break;
+            PlayerList.Clear();
         }
     }
 
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        if (!Target.ContainsKey(seer.PlayerId))
+        if (PlayerList.Contains(seen.PlayerId))
         {
-            Target[seer.PlayerId] = (byte.MaxValue, byte.MaxValue);
+            return ColorString(GetRoleColor(CustomRoles.Speaker), " ❖");
         }
 
-        if (Target[seer.PlayerId].Item1 != byte.MaxValue && Target[seer.PlayerId].Item1 == seen.PlayerId)
-            return ColorString(GetRoleColor(CustomRoles.Speaker), " ❖");
         return string.Empty;
     }
 
     public override void AfterMeetingTasks()
     {
-        Target[_Player.PlayerId] = (byte.MaxValue, byte.MaxValue);
-        SendRPC(1, _Player, _Player);
+        PlayerList.Clear();
+        SendRPC();
     }
 
-    public void SwapVotes(MeetingHud __instance)
+    public static bool IsSpoken(byte target)
     {
-        if (!Target.ContainsKey(_Player.PlayerId))
-        {
-            Target[_Player.PlayerId] = (byte.MaxValue, byte.MaxValue);
-            return;
-        }
-
-        var currentTuple = Target[_Player.PlayerId];
-
-        foreach (var pva in __instance.playerStates.ToArray())
-        {
-            if (pva.TargetPlayerId == _Player.PlayerId && !pva.AmDead)
-            {
-                currentTuple.Item2 = pva.VotedFor;
-                Target[_Player.PlayerId] = currentTuple;
-                break;
-            }
-        }
-
-        if (currentTuple.Item1 == byte.MaxValue || currentTuple.Item2 >= 252 || currentTuple.Item1 == currentTuple.Item2)
-            return;
-
-        foreach (var pva in __instance.playerStates.ToArray())
-        {
-            if (pva.TargetPlayerId == currentTuple.Item1 && !pva.AmDead)
-            {
-                pva.VotedFor = currentTuple.Item2;
-                ReturnChangedPva(pva);
-            }
-        }
+        if (PlayerList.Count < 1) return false;
+        if (PlayerList.Contains(target)) return true;
+        return false;
     }
 }

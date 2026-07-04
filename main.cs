@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.06.26";
+    public const string PluginVersion = "26.07.05";
     public const string PluginDisplayVersion = "2.0.0 Alpha 5";
     public const int ExtraPluginVersion = 10; // Add Beta version number × 10
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -303,7 +303,7 @@ public class Main : BasePlugin
     public static List<string> TName_Snacks_EN = ["Ice cream", "Milk tea", "Chocolate", "Cake", "Donut", "Coke", "Lemonade", "Candied haws", "Jelly", "Candy", "Milk", "Matcha", "Burning Grass Jelly", "Pineapple Bun", "Pudding", "Coconut Jelly", "Cookies", "Red Bean Toast", "Three Color Dumplings", "Wormwood Dumplings", "Puffs", "Can be Crepe", "Peach Crisp", "Mochi", "Egg Waffle", "Macaron", "Snow Plum Niang", "Fried Yogurt", "Egg Tart", "Muffin", "Sago Dew", "panna cotta", "soufflé", "croissant", "toffee"];
 
     public static bool LIMap => NormalOptions is { MapId: 7 };
-    public static bool HasReactorPlugin;
+    public static bool HasReactorPlugin => IL2CPPChainloader.Instance.Plugins.ContainsKey("gg.reactor.api");
 
     public static StringNames[] how2playN = [StringNames.HowToPlayText1, StringNames.HowToPlayText2, StringNames.HowToPlayText41, StringNames.HowToPlayText42, StringNames.HowToPlayText43, StringNames.HowToPlayText44, StringNames.HowToPlayText5, StringNames.HowToPlayText6, StringNames.HowToPlayText7, StringNames.HowToPlayText81, StringNames.HowToPlayText82];
     public static StringNames[] how2playHnS = [StringNames.HideSeekHowToPlayCaptionOne, StringNames.HideSeekHowToPlayCaptionTwo, StringNames.HideSeekHowToPlayCaptionThree, StringNames.HideSeekHowToPlayPageOne, StringNames.HideSeekHowToPlaySubtextOne, StringNames.HideSeekHowToPlayCrewmateInfoOne, StringNames.HideSeekHowToPlayCrewmateInfoTwo, StringNames.HideSeekHowToPlayFlashlightConsoles, StringNames.HideSeekHowToPlayImpostorInfoOne, StringNames.HideSeekHowToPlayFinalHide, StringNames.HideSeekHowToPlayFlashlightDefault];
@@ -669,8 +669,6 @@ public class Main : BasePlugin
         VersionCheat = Config.Bind("Client Options", "VersionCheat", false);
         GodMode = Config.Bind("Client Options", "GodMode", false);
         AutoRehost = Config.Bind("Client Options", "AutoRehost", false);
-
-        HasReactorPlugin = IL2CPPChainloader.Instance.Plugins.ContainsKey("gg.reactor.api");
 
         if (!DebugModeManager.AmDebugger)
         {

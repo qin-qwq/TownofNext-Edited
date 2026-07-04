@@ -273,9 +273,6 @@ class CheckForEndVotingPatch
                 // Swapper swap votes
                 if (voter.GetRoleClass() is Swapper sw) sw.SwapVotes(__instance);
 
-                // Speaker swap votes
-                if (voter.GetRoleClass() is Speaker sp) sp.SwapVotes(__instance);
-
                 playerRoleClass?.AddVisualVotes(ps, ref statesList);
 
                 if (CheckRole(ps.TargetPlayerId, CustomRoles.Stealer))
@@ -318,7 +315,7 @@ class CheckForEndVotingPatch
                 {
                     voterstate.VotedForId = voterpva.VotedFor;
                 }
-                if (voterpc.Is(CustomRoles.Silent))
+                if (voterpc.Is(CustomRoles.Silent) || Speaker.IsSpoken(voterpc.PlayerId))
                 {
                     voterstate.VotedForId = 254; //Change to non should work
                 }
@@ -984,6 +981,7 @@ static class ExtendedMeetingHud
 
                 if (CheckForEndVotingPatch.CheckRole(ps.TargetPlayerId, CustomRoles.VoidBallot)) VoteNum = 0;
                 if (Dreamweaver.IsInsomnia(ps.TargetPlayerId)) VoteNum = 0;
+                if (Speaker.IsSpoken(ps.TargetPlayerId)) VoteNum = 0;
 
                 if (Jailer.IsTarget(ps.VotedFor) || Jailer.IsTarget(ps.TargetPlayerId)) VoteNum = 0; //jailed can't vote and can't get voted
 

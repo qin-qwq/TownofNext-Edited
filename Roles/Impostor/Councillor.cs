@@ -41,7 +41,7 @@ internal class Councillor : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         MurderLimitPerMeeting = IntegerOptionItem.Create(Id + 11, "CouncillorMurderLimitPerMeeting", new(1, 15, 1), 1, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
             .SetValueFormat(OptionFormat.Times);
-        MurderLimitPerGame = IntegerOptionItem.Create(Id + 12, "CouncillorMurderLimitPerGame", new(1, 15, 1), 4, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
+        MurderLimitPerGame = IntegerOptionItem.Create(Id + 12, GeneralOption.SkillLimitTimes, new(1, 15, 1), 4, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
             .SetValueFormat(OptionFormat.Times);
         MakeEvilJudgeClear = BooleanOptionItem.Create(Id + 18, "CouncillorMakeEvilJudgeClear", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
         CanMurderMadmate = BooleanOptionItem.Create(Id + 13, "CouncillorCanMurderMadmate", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);

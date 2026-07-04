@@ -97,12 +97,6 @@ public abstract class GameOptionsSender
         {
             while (GameStates.InGame || GameStates.IsLobby)
             {
-                if (AntiBlackout.SkipTasks)
-                {
-                    yield return new WaitForSecondsRealtime(1f);
-                    continue;
-                }
-
                 if (GameStates.InGame)
                 {
                     PackedWriterMessages = 0;

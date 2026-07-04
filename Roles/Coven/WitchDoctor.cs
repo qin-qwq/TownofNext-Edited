@@ -72,7 +72,7 @@ internal class WitchDoctor : CovenManager
 
         if (player)
         {
-            if (pc.GetAbilityUseLimit() >= 1 && !player.IsPlayerCovenTeam() && !tempPlayerList.Contains(player))
+            if (pc.GetAbilityUseLimit() >= 1 && !player.IsPlayerCovenTeam() && !tempPlayerList.Contains(player) && pc.RpcCheckAndMurder(player, true))
             {
                 Ritualist.ConvertRole(pc, player);
                 pc.RpcRemoveAbilityUse();

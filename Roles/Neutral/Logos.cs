@@ -151,7 +151,7 @@ internal class Logos : RoleBase
             Utils.NotifyRoles(target, killer, true);
 
             killer.ResetKillCooldown();
-            killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
+            killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
 
             return false;
         }

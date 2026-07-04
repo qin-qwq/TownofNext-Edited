@@ -222,11 +222,15 @@ class SetHudActivePatch
         if (player == null) return;
         if (!isActive)
         {
-            __instance.AbilityButton.ToggleVisible(MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted && Options.UseMeetingShapeshift.GetBool() && player.UsesMeetingShapeshift());
+            if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted &&
+                Options.UseMeetingShapeshift.GetBool() && player.UsesMeetingShapeshift())
+            {
+                __instance.AbilityButton.ToggleVisible(true);
+            }
             return;
         }
 
-        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || GameModeBase.GetGameMode() != CustomGameMode.Standard)
+        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || !GameModeBase.GetGameMode().GetGameModeClass().CanReport)
             __instance.ReportButton.ToggleVisible(false);
 
         if (player.Is(CustomRoles.Mare) && !Utils.IsActive(SystemTypes.Electrical))
