@@ -55,7 +55,7 @@ public class CompilerGeneratedObjectWrapper
             PropertyCache[fieldName] = propertyInfo;
         }
 
-        return (TField) propertyInfo.GetValue(GeneratedObject)!;
+        return (TField)propertyInfo.GetValue(GeneratedObject)!;
     }
 
     /// <summary>

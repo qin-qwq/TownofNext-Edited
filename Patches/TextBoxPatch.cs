@@ -1,6 +1,6 @@
-using System;
 using AmongUs.Data;
 using InnerNet;
+using System;
 using TMPro;
 using UnityEngine;
 

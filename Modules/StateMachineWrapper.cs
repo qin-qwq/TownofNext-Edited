@@ -19,7 +19,7 @@ public class StateMachineWrapper<T> : CompilerGeneratedObjectWrapper
     /// <summary>
     /// Gets the instance of the parent class that owns the state machine.
     /// </summary>
-    public T Instance => _parentInstance ??= (T) _thisProperty.GetValue(GeneratedObject)!;
+    public T Instance => _parentInstance ??= (T)_thisProperty.GetValue(GeneratedObject)!;
 
     /// <summary>
     /// Gets or sets the current state of the state machine.
@@ -27,7 +27,7 @@ public class StateMachineWrapper<T> : CompilerGeneratedObjectWrapper
     /// <returns>The current state as an integer.</returns>
     public int State
     {
-        get => (int) _stateProperty.GetValue(GeneratedObject)!;
+        get => (int)_stateProperty.GetValue(GeneratedObject)!;
         set => _stateProperty.SetValue(GeneratedObject, value);
     }
 

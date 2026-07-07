@@ -472,8 +472,8 @@ internal class StartGameHostPatch
         }
         else
         {*/
-            // Send all RPC for modded region
-            RpcSetRoleReplacer.Release();
+        // Send all RPC for modded region
+        RpcSetRoleReplacer.Release();
         //}
 
         try

@@ -1732,7 +1732,7 @@ public static class Utils
         {
             hasValue |= WriteSetNameRpcsToSender(ref sender, false, noCache, false, false, false, false, seer, [seer], aapc, out bool senderWasCleared, sendOption);
             if (senderWasCleared) hasValue = false;
-            
+
             if (stopwatch.ElapsedMilliseconds >= frameBudget)
             {
                 stopwatch.Reset();
@@ -2683,7 +2683,7 @@ public static class Utils
             writer.WritePacked(playerinfo.NetId);
             playerinfo.Serialize(writer, false);
             writer.EndMessage();
-            
+
             messages++;
         }
 

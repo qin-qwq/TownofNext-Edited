@@ -1,8 +1,8 @@
 using Hazel;
 using System;
 using System.IO;
-using TONE.Modules.Rpc;
 using System.Runtime.InteropServices;
+using TONE.Modules.Rpc;
 
 namespace TONE.Modules;
 

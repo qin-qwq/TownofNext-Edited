@@ -208,7 +208,7 @@ namespace TONE.Modules
                 {
                     // max ~60 calls per second in total
                     int updateFrequency;
-                
+
                     if (!ConstantlyChangesPosition)
                     {
                         updateFrequency = 30;

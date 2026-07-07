@@ -419,7 +419,7 @@ public class ClientControlGUI : MonoBehaviour
             if (amHost)
             {
                 lobbyButtons.Add((Label(GetString("ShowActiveSettings"), "CTRL + N"), _sHost, () => { Main.isChatCommand = true; Utils.ShowActiveSettings(); }, true));
-                lobbyButtons.Add((Label(GetString("ResetAllOptions"), "CTRL + SHIFT + ENTER + DEL"), _sDanger, () => { OptionItem.AllOptions.ToArray().Where(x => x.Id > 0).Do(x => x.SetValueNoRpc(x.DefaultValue)); Logger.SendInGame(GetString("RestTONESetting"));}, true));
+                lobbyButtons.Add((Label(GetString("ResetAllOptions"), "CTRL + SHIFT + ENTER + DEL"), _sDanger, () => { OptionItem.AllOptions.ToArray().Where(x => x.Id > 0).Do(x => x.SetValueNoRpc(x.DefaultValue)); Logger.SendInGame(GetString("RestTONESetting")); }, true));
             }
             if (lobbyButtons.Count > 0)
                 sections.Add((GetString("Lobby"), lobbyButtons));
@@ -464,7 +464,7 @@ public class ClientControlGUI : MonoBehaviour
                 ingameButtons.Add((Label(GetString("OpenYourChat"), "SHIFT + ENTER + C"), _sHost, () => HudManager.Instance.Chat.SetVisible(true), true));
                 if (noGameEnd)
                     ingameButtons.Add((Label(GetString("ForceGameEnd"), "SHIFT + ENTER + L"), _sDanger, () =>
-                    {    
+                    {
                         NameNotifyManager.Notice.Clear();
                         CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Draw);
                         GameManager.Instance.LogicFlow.CheckEndCriteria();

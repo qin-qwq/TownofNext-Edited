@@ -1,7 +1,7 @@
-using System.Text;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
+using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
@@ -389,7 +389,7 @@ internal class BonfireNight : GameModeBase
                 Draw.Item2 = "808080";
                 CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Draw);
                 Main.EnumeratePlayerControls().Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
-                break;   
+                break;
         }
 
         Main.DoBlockNameChange = true;
@@ -768,7 +768,7 @@ public class FireThief : RoleBase
         var time = BonfireNight.StartedAt + BonfireNight.GameTime.GetInt() - GetTimeStamp();
         var timeText = $"{GetString("BonfireNight_GameTime")}: {time}s";
         var gameState = new BonfireNight().GetGameState();
-    
+
         return seer.IsModded() ? timeText : $"{gameState}\n{timeText}";
     }
 

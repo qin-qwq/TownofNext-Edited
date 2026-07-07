@@ -284,7 +284,7 @@ internal class ChatCommands
                     canceled = true;
                     break;
                 }
-                
+
                 command.Action(PlayerControl.LocalPlayer, text, args);
 
                 if (command.IsCanceled || command.AlwaysHidden) canceled = true;

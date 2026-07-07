@@ -26,7 +26,7 @@ static class ShowRoleMoveNextPatch
     {
         return Utils.GetStateMachineMoveNext<IntroCutscene>(nameof(IntroCutscene.ShowRole));
     }
-    
+
     public static void Postfix(Il2CppObjectBase __instance, ref bool __result)
     {
         var wrapper = new StateMachineWrapper<IntroCutscene>(__instance);

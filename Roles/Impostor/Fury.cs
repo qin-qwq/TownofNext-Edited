@@ -1,6 +1,5 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
-using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 
