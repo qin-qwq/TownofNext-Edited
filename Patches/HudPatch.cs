@@ -124,8 +124,8 @@ class HudManagerUpdatePatch
                 __instance.ImpostorVentButton.ToggleVisible(player.CanUseImpostorVentButton());
                 player.Data.Role.CanVent = player.CanUseVents();
 
-                // Sometimes sabotage button was visible for non-host modded clients
-                if (!AmongUsClient.Instance.AmHost && !player.CanUseSabotage())
+                // Sometimes sabotage button was visible for modded clients
+                if (!player.CanUseSabotage())
                     __instance.SabotageButton.Hide();
             }
             else

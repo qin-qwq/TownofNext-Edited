@@ -2039,13 +2039,6 @@ public static class Utils
                         SelfName = GetString("DevouredName");
                 }
 
-                // IdentityThief
-                if (CustomRoles.IdentityThief.HasEnabled())
-                {
-                    if (IdentityThief.ChangeName.TryGetValue(seer.PlayerId, out var tname) && !CamouflageIsForMeeting)
-                        SelfName = tname;
-                }
-
                 // Dollmaster, Prevent seeing self in mushroom cloud
                 if (CustomRoles.DollMaster.HasEnabled() && seerRole != CustomRoles.DollMaster)
                 {
@@ -2218,13 +2211,6 @@ public static class Utils
                                 TargetPlayerName = GetString("DevouredName");
                         }
 
-                        // IdentityThief
-                        if (CustomRoles.IdentityThief.HasEnabled())
-                        {
-                            if (IdentityThief.ChangeName.TryGetValue(target.PlayerId, out var tname) && !CamouflageIsForMeeting)
-                                TargetPlayerName = tname;
-                        }
-
                         // Camouflage
                         if (!CamouflageIsForMeeting && Camouflage.IsCamouflage)
                             TargetPlayerName = $"<size=0%>{TargetPlayerName}</size>";
@@ -2382,13 +2368,6 @@ public static class Utils
                     bool playerDevoured = Devourer.HideNameOfTheDevoured(seer.PlayerId);
                     if (playerDevoured && !CamouflageIsForMeeting)
                         SelfName = GetString("DevouredName");
-                }
-
-                // IdentityThief
-                if (CustomRoles.IdentityThief.HasEnabled())
-                {
-                    if (IdentityThief.ChangeName.TryGetValue(seer.PlayerId, out var tname) && !CamouflageIsForMeeting)
-                        SelfName = tname;
                 }
 
                 // Dollmaster, Prevent seeing self in mushroom cloud
@@ -2580,13 +2559,6 @@ public static class Utils
                                 bool targetDevoured = Devourer.HideNameOfTheDevoured(target.PlayerId);
                                 if (targetDevoured && !CamouflageIsForMeeting)
                                     TargetPlayerName = GetString("DevouredName");
-                            }
-
-                            // IdentityThief
-                            if (CustomRoles.IdentityThief.HasEnabled())
-                            {
-                                if (IdentityThief.ChangeName.TryGetValue(target.PlayerId, out var tname) && !CamouflageIsForMeeting)
-                                    TargetPlayerName = tname;
                             }
 
                             // Camouflage

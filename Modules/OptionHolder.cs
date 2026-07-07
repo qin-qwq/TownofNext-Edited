@@ -1068,7 +1068,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(127, 140, 141, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralGhost).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralGhosts).ForEach(r => r.SetupCustomOption());
         #endregion
         Logger.Info("Neutral settings setup", "Load Options");
         yield return null;
@@ -1113,7 +1113,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenGhost).ForEach(r => r.SetupCustomOption());
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenGhosts).ForEach(r => r.SetupCustomOption());
         #endregion
         Logger.Info("Coven settings setup", "Load Options");
         yield return null;

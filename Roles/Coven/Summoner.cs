@@ -264,7 +264,7 @@ internal class Summoner : CovenManager
         // Send global message
         string summonMessage = RevealSummonedPlayer.GetBool()
             ? string.Format(GetString("Summoner.SummonAnnouncement"), targetPlayer.GetRealName())
-            : GetString("Summoner.SummonAnnoucementNameless");
+            : GetString("Summoner.SummonAnnouncementNameless");
         SendMessage(summonMessage, byte.MaxValue, CustomRoles.Summoner.ToColoredString().ToUpper());
 
         // Send private message to the summoned player if hidden

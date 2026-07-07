@@ -143,6 +143,11 @@ public static class AntiBlackout
 
         foreach (var player in Main.EnumeratePlayerControls())
         {
+            if (player.GetCustomRole().GetRoleTypes() is RoleTypes.Shapeshifter && !Main.UnShapeShifter.Contains(player.PlayerId))
+            {
+                player.RpcShapeshift(player, false);
+            }
+
             if (player.PlayerId == dummyImp.PlayerId)
             {
                 sender.StartRpc(player.NetId, (byte)RpcCalls.SetRole);

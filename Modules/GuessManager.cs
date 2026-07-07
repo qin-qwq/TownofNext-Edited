@@ -1033,7 +1033,10 @@ public static class GuessManager
                     or CustomRoles.Sloth
                     or CustomRoles.Apocalypse
                     or CustomRoles.Coven
+                    or CustomRoles.Summoned
                     || (role.IsTNA() && !Options.TransformedNeutralApocalypseCanBeGuessed.GetBool())) continue;
+
+                if (role.GetStaticRoleClass().ThisRoleType is Custom_RoleType.None) continue;
 
                 CreateRole(role);
             }

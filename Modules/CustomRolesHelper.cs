@@ -75,8 +75,8 @@ public static class CustomRolesHelper
         if (role.GetStaticRoleClass().ThisRoleType is
             Custom_RoleType.CrewmateGhosts or
             Custom_RoleType.ImpostorGhosts or
-            Custom_RoleType.NeutralGhost or
-            Custom_RoleType.CovenGhost)
+            Custom_RoleType.NeutralGhosts or
+            Custom_RoleType.CovenGhosts)
             return true;
 
         return role is
@@ -284,7 +284,7 @@ public static class CustomRolesHelper
     }
     public static bool IsNonNK(this CustomRoles role) // ROLE ASSIGNING, NOT NEUTRAL TYPE
     {
-        return role.IsNB() || role.IsNE() || role.IsNC();
+        return role.IsNB() || role.IsNE() || role.IsNC() || role.IsNG() || role.IsMadmate();
     }
     public static bool IsNA(this CustomRoles role)
     {
@@ -313,6 +313,11 @@ public static class CustomRolesHelper
         return role.GetStaticRoleClass().ThisRoleType
             is Custom_RoleType.NeutralChaos;
     }
+    public static bool IsNG(this CustomRoles role)
+    {
+        return role.GetStaticRoleClass().ThisRoleType
+            is Custom_RoleType.NeutralGhosts;
+    }
     public static bool IsImpostor(this CustomRoles role) // IsImp
     {
         if (role.GetStaticRoleClass().ThisRoleType is
@@ -335,7 +340,8 @@ public static class CustomRolesHelper
             Custom_RoleType.CovenKilling or
             Custom_RoleType.CovenPower or
             Custom_RoleType.CovenTrickery or
-            Custom_RoleType.CovenUtility;
+            Custom_RoleType.CovenUtility or
+            Custom_RoleType.CovenGhosts;
     }
     public static bool IsAbleToBeSidekicked(this CustomRoles role)
         => role.GetDYRole() == RoleTypes.Impostor && !role.IsImpostor() && !role.IsRecruitingRole();
@@ -1799,14 +1805,14 @@ public enum Custom_RoleType
     NeutralChaos,
     NeutralKilling,
     NeutralApocalypse,
-    NeutralGhost,
+    NeutralGhosts,
 
     // Coven
     CovenPower,
     CovenKilling,
     CovenTrickery,
     CovenUtility,
-    CovenGhost,
+    CovenGhosts,
 
     None
 }

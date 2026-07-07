@@ -374,7 +374,7 @@ public class GameStartManagerBeginGamePatch
         {
             Options.DefaultKillCooldown = Main.NormalOptions.KillCooldown;
             Main.LastKillCooldown.Value = Main.NormalOptions.KillCooldown;
-            //Main.NormalOptions.KillCooldown = 0f;
+            Main.NormalOptions.KillCooldown = 0f;
 
             AURoleOptions.SetOpt(opt);
             Main.LastShapeshifterCooldown.Value = AURoleOptions.ShapeshifterCooldown;

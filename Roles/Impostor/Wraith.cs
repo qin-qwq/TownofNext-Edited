@@ -99,7 +99,7 @@ internal class Wraith : RoleBase
 
     public override bool CanUseKillButton(PlayerControl pc) => false;
 
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Suidce");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("UnleashWraith");
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
@@ -147,4 +147,6 @@ internal class Wraithh : RoleBase
     }
     // EAC bans players when GA uses sabotage
     public override bool CanUseSabotage(PlayerControl pc) => false;
+
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Wraith");
 }

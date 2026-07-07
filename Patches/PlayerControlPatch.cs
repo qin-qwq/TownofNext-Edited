@@ -727,6 +727,11 @@ public static class CheckShapeshiftPatch
             logger.Info($"Cancel shapeshifting because {instance.GetRealName()} is eaten by Pelican");
             return false;
         }
+        if (!Main.IntroDestroyed)
+        {
+            logger.Info($"Cancel shapeshifting because Intro doesn't have Destroyed");
+            return false;
+        }
 
         if (instance == target && Main.UnShapeShifter.Contains(instance.PlayerId))
         {
@@ -935,7 +940,7 @@ class ReportDeadBodyPatch
                     Logger.Info("The maximum number of meeting buttons has been reached", "ReportDeadBody");
                 }
             }
-            else if (!target)
+            else if (!__instance.IsHost() && !target)
             {
                 Logger.Info($"player called meeting with {__instance.RemainingEmergencies} buttons left", "ReportDeadBody");
                 if (__instance.RemainingEmergencies <= 0)
@@ -1070,11 +1075,11 @@ class ReportDeadBodyPatch
                 }
 
                 // Check shapeshift and revert skin to default
-                if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
+                /*if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
                 {
                     pc.RpcShapeshift(pc, false);
                     Camouflage.RpcSetSkin(pc, RevertToDefault: true);
-                }
+                }*/
             }
 
             if (GameStates.FungleIsActive && (pc.IsMushroomMixupActive() || Utils.IsActive(SystemTypes.MushroomMixupSabotage)))
@@ -1598,15 +1603,6 @@ class FixedUpdateInNormalGamePatch
                 if (targetDevoured)
                 {
                     RealName.Clear().Append(GetString("DevouredName"));
-                }
-            }
-
-            // IdentityThief
-            if (IdentityThief.HasEnabled)
-            {
-                if (IdentityThief.ChangeName.TryGetValue(playerId, out var tname))
-                {
-                    RealName.Clear().Append(tname);
                 }
             }
 

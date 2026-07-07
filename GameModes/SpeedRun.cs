@@ -454,7 +454,7 @@ public class Runner : RoleBase
 
     public override bool CanUseSabotage(PlayerControl pc)
     {
-        return pc.IsAlive() && BasisChanged;
+        return false;
     }
 
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute)

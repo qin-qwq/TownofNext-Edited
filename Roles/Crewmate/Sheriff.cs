@@ -197,6 +197,7 @@ internal class Sheriff : RoleBase
             target.GetRoleClass()?.OnAdd(target.PlayerId);
             target.ResetKillCooldown();
             target.SetKillCooldown(forceAnime: true);
+            Logger.Info($"Assigned new Sheriff {target.GetNameWithRole()}", "Sheriff");
         }
     }
 }

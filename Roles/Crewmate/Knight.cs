@@ -64,6 +64,12 @@ internal class Knight : RoleBase
         return true;
     }
 
+    public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target)
+    {
+        if (seer == _Player && CanKnowTargetRole.GetBool() && Main.PlayerStates[target.PlayerId].RealKiller.Item2 == _Player.PlayerId) return true;
+        return false;
+    }
+
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");
 }
 

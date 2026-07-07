@@ -787,6 +787,8 @@ public class Main : BasePlugin
             Harmony.PatchAll(typeof(DiscordRPC));
         }
 
+        TextBoxPatch.AddChars();
+
         // ConsoleManager.DetachConsole();
         if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();
 
