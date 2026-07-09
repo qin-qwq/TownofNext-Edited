@@ -50,7 +50,7 @@ internal class NiceGuesser : RoleBase
     public static bool HideTabInGuesserUI(int TabId)
     {
         if (!GGCanGuessCrew.GetBool() && TabId == 0) return true;
-        if (!GGCanGuessAdt.GetBool() && TabId == 3) return true;
+        if (!GGCanGuessAdt.GetBool() && TabId == 4) return true;
 
         return false;
     }

@@ -380,27 +380,15 @@ public static class AntiBlackout
     }
     public static void RevertDetective()
     {
-        foreach (var player in Main.EnumeratePlayerControls())
+        if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetCustomRole().GetRoleTypes() is RoleTypes.Detective)
         {
-            if (player != PlayerControl.LocalPlayer)
+            foreach (var player in Main.EnumeratePlayerControls())
             {
-                var sender = CustomRpcSender.Create("Set Detective", SendOption.Reliable);
-                sender.StartMessage(player.GetClientId());
-                foreach (var pc in Main.EnumeratePlayerControls())
+                if (player != PlayerControl.LocalPlayer)
                 {
-                    if (pc.IsAlive() && pc.GetCustomRole().GetRoleTypes() is RoleTypes.Detective)
-                    {
-                        if (PlayerControl.LocalPlayer.PlayerId == pc.PlayerId)
-                        {
-                            sender.StartRpc(pc.NetId, RpcCalls.SetRole)
-                            .Write((ushort)RoleTypes.Detective)
-                            .Write(true)
-                            .EndRpc();
-                        }
-                    }
+                    var message = new RpcSetRoleMessage(PlayerControl.LocalPlayer.NetId, RoleTypes.Detective, true);
+                    RpcUtils.LateSpecificSendMessage(message, player.GetClientId());
                 }
-                sender.EndMessage();
-                sender.SendMessage();
             }
         }
     }

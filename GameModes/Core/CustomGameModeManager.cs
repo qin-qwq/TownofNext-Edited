@@ -23,18 +23,6 @@ public static class CustomGameModeManager
 
     public static GameModeBase GetGameModeClass(this CustomGameMode gm) => GameModeClass[gm];
 
-    public static CustomGameMode CurrentGameMode
-        => Options.GameMode.GetInt() switch
-        {
-            1 => CustomGameMode.FFA,
-
-            2 => CustomGameMode.SpeedRun,
-            3 => CustomGameMode.TagMode,
-            //4 => CustomGameMode.BonfireNight,
-            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
-            _ => CustomGameMode.Standard
-        };
-
     public static readonly string[] gameModes =
     [
         "Standard",

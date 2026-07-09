@@ -67,8 +67,7 @@ internal class WitchDoctor : CovenManager
     {
         if (pc.GetAbilityUseLimit() < 1 && !HasNecronomicon(pc)) return;
 
-        var abilityRangeSorted = pc.Data.Role.GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList());
-        var player = abilityRangeSorted.Count <= 0 ? null : abilityRangeSorted[0];
+        var player = pc.FindClosestTarget();
 
         if (player)
         {

@@ -16,7 +16,7 @@ internal class Baker : RoleBase
     private const int Id = 28600;
 
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => BTOS2Baker.GetBool() ? CustomRoles.Phantom : CustomRoles.Impostor;
+    public override CustomRoles ThisRoleBase => BTOS2Baker.GetBool() ? CustomRoles.Shapeshifter : CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;
     //==================================================================\\
 
@@ -77,7 +77,7 @@ internal class Baker : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = 1f;
+        AURoleOptions.ShapeshifterCooldown = 1f;
     }
     private static (int, int) BreadedPlayerCount(byte playerId)
     {
@@ -209,7 +209,7 @@ internal class Baker : RoleBase
             }
         }
     }
-    public override bool OnCheckVanish(PlayerControl pc)
+    public override void UnShapeShiftButton(PlayerControl pc)
     {
         if (BTOS2Baker.GetBool())
         {
@@ -231,7 +231,6 @@ internal class Baker : RoleBase
             }
             pc.Notify(sb.ToString());
         }
-        return false;
     }
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)
     {

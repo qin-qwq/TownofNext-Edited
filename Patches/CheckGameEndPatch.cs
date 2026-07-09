@@ -85,6 +85,13 @@ class GameEndCheckerForNormal
             Logger.Info($"WinnerTeam on enter: {WinnerTeam}", "CheckEndCriteriaForNormal.Prefix");
             Logger.Info($"WinnerIds: {string.Join(", ", WinnerIds)}", "CheckEndCriteriaForNormal.Prefix");
 
+            if (reason == GameOverReason.ImpostorsBySabotage && Options.WinBySabotageTeam.GetValue() != 0)
+            {
+                reason = GameOverReason.ImpostorsByKill;
+                WinnerIds.Clear();
+                ResetAndSetWinner(CustomWinner.Coven);
+            }
+
             if (reason == GameOverReason.ImpostorsBySabotage && (CustomRoles.Jackal.RoleExist() || CustomRoles.Sidekick.RoleExist()) && Jackal.CanWinBySabotageWhenNoImpAlive.GetBool() && !Main.EnumerateAlivePlayerControls().Any(x => x.GetCustomRole().IsImpostorTeamV3() || (x.Is(CustomRoles.Madmate) && Madmate.MadmateCountMode.GetInt() == 1)))
             {
                 reason = GameOverReason.ImpostorsByKill;

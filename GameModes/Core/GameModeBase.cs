@@ -15,7 +15,7 @@ public abstract class GameModeBase
 
     public static CustomGameMode GetGameMode()
     {
-        return CustomGameModeManager.CurrentGameMode;
+        return Options.CurrentGameMode;
     }
 
     /// <summary>

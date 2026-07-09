@@ -52,7 +52,7 @@ internal class EvilGuesser : RoleBase
     public static bool HideTabInGuesserUI(int TabId)
     {
         if (!EGCanGuessImp.GetBool() && TabId == 1) return true;
-        if (!EGCanGuessAdt.GetBool() && TabId == 3) return true;
+        if (!EGCanGuessAdt.GetBool() && TabId == 4) return true;
 
         return false;
     }

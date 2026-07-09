@@ -4818,8 +4818,67 @@
   "CommandArgs.SetRole.Id": "被指定玩家的编号",
   "CommandArgs.SetRole.Role": "被指定的职业",
 
+  "CommandForms.Guess": "bt,shoot,guess,bet,st,gs,猜,赌,賭",
+  "CommandDescription.Guess": "猜测指定玩家的职业",
+  "CommandArgs.Guess.Id": "被猜测玩家的编号",
+  "CommandArgs.Guess.Role": "被猜测的职业",
+
+  "CommandForms.Trial": "tl,trial,sp,jj,审判,判,审,審判,審",
+  "CommandDescription.Trial": "审判指定玩家",
+  "CommandArgs.Trial.Id": "被审判玩家的编号",
+
+  "CommandForms.Finish": "finish,结束,结束会议,結束,結束會議",
+  "CommandDescription.Finish": "结束当前会议",
+
+  "CommandForms.Reveal": "reveal,展示",
+  "CommandDescription.Reveal": "展示总统身份",
+
+  "CommandForms.Compare": "cmp,compare,比较,比較",
+  "CommandDescription.Compare": "比较两名玩家的阵营",
+  "CommandArgs.Compare.Id1": "第一位被比较玩家的编号",
+  "CommandArgs.Compare.Id2": "第二位被比较玩家的编号",
+
+  "CommandForms.Duel": "duel",
+  "CommandDescription.Duel": "与目标或者决斗者决斗",
+  "CommandArgs.Duel.Number": "决斗的数字",
+
+  "CommandForms.Revenge": "rv",
+  "CommandDescription.Revenge": "复仇指定玩家",
+  "CommandArgs.Revenge.Id": "被复仇玩家的编号",
+
+  "CommandForms.Retributionist": "ret",
+  "CommandDescription.Retributionist": "惩罚指定玩家",
+  "CommandArgs.Retributionist.Id": "被惩罚玩家的编号",
+
+  "CommandForms.Exorcise": "ex,exorcise,exorcism",
+  "CommandDescription.Exorcise": "开始驱魔",
+
+  "CommandForms.BloodRitual": "rt,rit,ritual,bloodritual,鲜血仪式,仪式,献祭,举行,附魔",
+  "CommandDescription.BloodRitual": "附魔指定玩家",
+  "CommandArgs.BloodRitual.Id": "被附魔玩家的编号",
+  "CommandArgs.BloodRitual.Role": "被附魔的职业",
+
+  "CommandForms.Medium": "ms,mediumship,medium,通灵",
+  "CommandDescription.Medium": "回答通灵师的问题",
+  "CommandArgs.Medium.Answer": "回答的答案（对/错）",
+
+  "CommandForms.Summon": "sm,summon",
+  "CommandDescription.Summon": "召唤指定玩家",
+  "CommandArgs.Summon.Id": "被召唤玩家的编号",
+
+  "CommandForms.Swap": "sw,换票,换,換票,換,swap,st",
+  "CommandDescription.Swap": "交换指定玩家票数",
+  "CommandArgs.Swap.Id": "被换票玩家的编号",
+
+  "CommandForms.Expel": "exp,expel,独裁,獨裁",
+  "CommandDescription.Expel": "放逐指定玩家",
+  "CommandArgs.Expel.Id": "被放逐玩家的编号",
+
   "WitchDoctor": "巫医",
   "WitchDoctorInfo": "用巫术招募船员",
   "WitchDoctorInfoLong": "(巫师阵营):\n巫医可以使用变形使选中的玩家加入巫师阵营\n<b>当巫医获得死灵之书后，巫医可以使用击杀按钮来进行击杀。巫医可以使选中的加入巫师阵营的玩家获得巫师阵营职业</b>",
-  "NoRemainingEmergencies": "没有剩余紧急会议次数！"
+  "NoRemainingEmergencies": "没有剩余紧急会议次数！",
+  "WinBySabotageTeam": "通过破坏获胜的阵营",
+  "WinBySabotageMode.Impostor": "<color=#ff1919>内鬼</color>",
+  "WinBySabotageMode.Coven": "<color=#ac42f2>巫师</color>"
 }

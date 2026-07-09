@@ -37,6 +37,17 @@ public static class Options
 
     // Custom Game Mode
     public static OptionItem GameMode;
+    public static CustomGameMode CurrentGameMode
+        => GameMode.GetInt() switch
+        {
+            1 => CustomGameMode.FFA,
+
+            2 => CustomGameMode.SpeedRun,
+            3 => CustomGameMode.TagMode,
+            //4 => CustomGameMode.BonfireNight,
+            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
+            _ => CustomGameMode.Standard
+        };
     public static int prevGameMode = 0;
 
     public static OptionItem DraftHeader;
@@ -118,6 +129,11 @@ public static class Options
         "pet_Pusheen",
         "pet_stardew_junimo",
         "pet_RANDOM_FOR_EVERYONE"
+    ];
+    public static readonly string[] WinBySabotageMode =
+    [
+        "WinBySabotageMode.Impostor",
+        "WinBySabotageMode.Coven"
     ];
     [Obfuscation(Exclude = true)]
     public enum QuickChatSpamMode
@@ -346,6 +362,8 @@ public static class Options
     public static OptionItem DisableAirshipViewingDeckLightsPanel;
     public static OptionItem DisableAirshipGapRoomLightsPanel;
     public static OptionItem DisableAirshipCargoLightsPanel;
+
+    public static OptionItem WinBySabotageTeam;
 
     // Disable
     public static OptionItem DisableShieldAnimations;
@@ -1701,6 +1719,9 @@ public static class Options
         DisableAirshipCargoLightsPanel = BooleanOptionItem.Create(60554, "DisableAirshipCargoLightsPanel", false, TabGroup.ModSettings, false)
             .SetParent(LightsOutSpecialSettings)
             .SetGameMode(CustomGameMode.Standard);
+        WinBySabotageTeam = StringOptionItem.Create(60555, "WinBySabotageTeam", WinBySabotageMode, 0, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(243, 96, 96, byte.MaxValue));
 
 
         // Disable

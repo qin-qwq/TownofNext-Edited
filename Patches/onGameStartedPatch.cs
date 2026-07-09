@@ -161,6 +161,7 @@ internal class ChangeRoleSettings
                     CriticalErrorManager.SetCriticalError("Player Have Invalid Color", true);
                     Logger.Error(msg, "CoStartGame");
                 }
+                LateTask.RemoveByName("Re Send Draft Pool Msg");
             }
 
             foreach (var pc in Main.EnumeratePlayerControls())

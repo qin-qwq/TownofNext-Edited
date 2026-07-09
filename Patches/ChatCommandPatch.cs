@@ -208,6 +208,21 @@ internal class ChatCommands
             new("EnableAllRoles", "", Command.UsageLevels.Host, Command.UsageTimes.InLobby, EnableAllRolesCommand, true, false),
             new("Preset", "{mode} {preset_id}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, PresetCommand, true, false, [GetString("CommandArgs.Preset.Mode"), GetString("CommandArgs.Preset.PresetId")]),
             new("SetRole", "{id} [role]", Command.UsageLevels.Up, Command.UsageTimes.InLobby, SetRoleCommand, true, false, [GetString("CommandArgs.SetRole.Id"), GetString("CommandArgs.SetRole.Role")]),
+
+            new("Guess", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]),
+            new("Trial", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Trial.Id")]),
+            new("Finish", "", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false),
+            new("Reveal", "", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false),
+            new("Compare", "{id1} {id2}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Compare.Id1"), GetString("CommandArgs.Compare.Id2")]),
+            new("Duel", "{number}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Duel.Number")]),
+            new("Revenge", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, (_, _, _) => { }, true, false, [GetString("CommandArgs.Revenge.Id")]),
+            new("Retributionist", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, (_, _, _) => { }, true, false, [GetString("CommandArgs.Retributionist.Id")]),
+            new("Exorcise", "", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false),
+            new("BloodRitual", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, (_, _, _) => { }, true, false, [GetString("CommandArgs.BloodRitual.Id"), GetString("CommandArgs.BloodRitual.Role")]),
+            new("Medium", "{answer}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Medium.Answer")]),
+            new("Summon", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Summon.Id")]),
+            new("Swap", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Swap.Id")]),
+            new("Expel", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Expel.Id")]),
         ];
     }
 
@@ -2314,6 +2329,7 @@ internal class ChatCommands
 
     private static void DraftStartCommand(PlayerControl player, string text, string[] args)
     {
+        LateTask.RemoveByName("Re Send Draft Pool Msg");
         if (!player.IsHost() && !player.FriendCode.GetDevUser().IsDev && !Utils.IsPlayerModerator(player.FriendCode))
         {
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
@@ -2330,6 +2346,13 @@ internal class ChatCommands
             return;
         }
         DraftAssign.StartSelect();
+        _ = new LateTask(() =>
+        {
+            foreach (var player in Main.EnumeratePlayerControls())
+            {
+                DraftAssign.SendDraftPoolMsg(player);
+            }
+        }, 25f, "Re Send Draft Pool Msg");
     }
 
     private static void DraftCommand(PlayerControl player, string text, string[] args)
