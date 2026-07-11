@@ -65,8 +65,7 @@ internal class Eraser : RoleBase
         foreach (var pc in PlayerToErase.ToArray())
         {
             var player = Utils.GetPlayerById(pc);
-            if (player == null) continue;
-            if (!player.IsAlive()) continue;
+            if (!player) continue;
 
             player.RPCPlayCustomSound("Oiiai");
             player.Notify(GetString("LostRoleByEraser"));
@@ -77,8 +76,7 @@ internal class Eraser : RoleBase
         foreach (var pc in PlayerToErase.ToArray())
         {
             var player = Utils.GetPlayerById(pc);
-            if (player == null) continue;
-            if (!player.IsAlive()) continue;
+            if (!player) continue;
 
             if (!ErasedRoleStorage.ContainsKey(player.PlayerId))
             {
@@ -99,7 +97,7 @@ internal class Eraser : RoleBase
             CustomRoles EraserRole = player.GetCustomRole().IsImpostor() ? CustomRoles.ImpostorTONE : CustomRoles.CrewmateTONE;
 
             player.GetRoleClass()?.OnRemove(player.PlayerId);
-            player.RpcChangeRoleBasis(EraserRole);
+            if (player.IsAlive()) player.RpcChangeRoleBasis(EraserRole);
             player.RpcSetCustomRole(EraserRole);
             Main.DesyncPlayerList.Remove(player.PlayerId);
             player.GetRoleClass()?.OnAdd(player.PlayerId);

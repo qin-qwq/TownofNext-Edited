@@ -83,6 +83,9 @@ class OnGameJoinedPatch
                     if (Main.NormalOptions.KillCooldown == 0f)
                         Main.NormalOptions.KillCooldown = Main.LastKillCooldown.Value;
 
+                    if (Main.NormalOptions.KillCooldown == 300f)
+                        Main.NormalOptions.KillCooldown = 25f;
+
                     AURoleOptions.SetOpt(Main.NormalOptions.CastFast<IGameOptions>());
 
                     if (AURoleOptions.ShapeshifterCooldown == 0f)

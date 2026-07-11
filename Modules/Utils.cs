@@ -680,6 +680,7 @@ public static class Utils
                 case CustomRoles.Soulless:
                 case CustomRoles.Enchanted:
                 case CustomRoles.Rascal:
+                case CustomRoles.Lovers when !Lovers.LoversPlayers.All(x => x?.IsPlayerCrewmateTeam() == true):
                     hasTasks &= !ForRecompute;
                     break;
                 case CustomRoles.Mundane:
@@ -1534,7 +1535,7 @@ public static class Utils
 
 
             }
-            if (GameModeBase.GetGameMode() is not CustomGameMode.Standard and not CustomGameMode.HidenSeekTONE)
+            if (Options.CurrentGameMode is not CustomGameMode.Standard and not CustomGameMode.HidenSeekTONE)
                 name = $"<color=#{ColorToHex(Main.GameModeColors[GameModeBase.GetGameMode()])}><size=1.7>{GetString($"Mode{GameModeBase.GetGameMode()}")}</size></color>\r\n" + name;
         }
 

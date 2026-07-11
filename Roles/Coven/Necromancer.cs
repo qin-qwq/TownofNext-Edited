@@ -219,6 +219,7 @@ internal class Necromancer : CovenManager
             CustomRoles.God or
             CustomRoles.Innocent or
             CustomRoles.Jackal or
+            CustomRoles.Logos or
             CustomRoles.Workaholic or
             CustomRoles.Specter or
             CustomRoles.Marshall or

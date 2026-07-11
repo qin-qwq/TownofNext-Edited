@@ -7,7 +7,7 @@ public class Drunkard : IAddon
 {
     public CustomRoles Role => CustomRoles.Drunkard;
     private const int Id = 33800;
-    public AddonTypes Type => AddonTypes.Experimental;
+    public AddonTypes Type => AddonTypes.Harmful;
 
     public void SetupCustomOption()
     {
@@ -21,6 +21,7 @@ public class Drunkard : IAddon
     }
     public void Remove(byte playerId)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         Main.AllPlayerSpeed[playerId] = Main.RealOptionsData.GetFloat(FloatOptionNames.PlayerSpeedMod);
         playerId.GetPlayer()?.MarkDirtySettings();
     }

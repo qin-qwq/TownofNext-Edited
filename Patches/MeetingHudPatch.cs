@@ -1353,9 +1353,18 @@ class MeetingHudStartPatch
             {
                 foreach (var pc in Main.EnumerateAlivePlayerControls())
                 {
-                    if (pc.IsHost()) continue;
+                    if (pc.IsModded()) continue;
                     if (!pc.IsPlayerImpostorTeam() || !pc.GetCustomRole().IsImpostor()) continue;
                     SendMessage(GetString("CanUseImpostorChannel"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")}"), noReplay: true);
+                }
+            }
+            if (Options.EnableCovenChannel.GetBool())
+            {
+                foreach (var pc in Main.EnumerateAlivePlayerControls())
+                {
+                    if (pc.IsModded()) continue;
+                    if (!pc.IsPlayerCovenTeam() || !pc.GetCustomRole().IsCoven()) continue;
+                    SendMessage(GetString("CanUseCovenChannel"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.WitchDoctor), $"{GetString("MessageFromCoven")}"), noReplay: true);
                 }
             }
         }
@@ -1744,7 +1753,7 @@ class MeetingHudHandleRpcPatch
     }
 }
 
-[HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.Serialize))]
+/*[HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.Serialize))]
 class NetworkedPlayerInfoSerializePatch
 {
     private static string LastName = string.Empty;
@@ -1769,4 +1778,4 @@ class NetworkedPlayerInfoSerializePatch
             __instance.PlayerName = LastName;
         }
     }
-}
+}*/

@@ -18,6 +18,7 @@ public static class SendTargetPatch
         Default,
         Lovers,
         Imp,
+        Coven,
         Jackal,
         Jailer
     }
@@ -111,6 +112,9 @@ public static class SendTargetPatch
             case SendTargets.Imp:
                 return localPlayer.IsPlayerImpostorTeam() && localPlayer.GetCustomRole().IsImpostor() && Options.EnableImpostorChannel.GetBool();
 
+            case SendTargets.Coven:
+               return localPlayer.IsPlayerCovenTeam() && localPlayer.GetCustomRole().IsCoven() && Options.EnableCovenChannel.GetBool(); 
+
             case SendTargets.Jackal:
                 return (localPlayer.Is(CustomRoles.Jackal) || localPlayer.Is(CustomRoles.Sidekick) || localPlayer.Is(CustomRoles.Recruit)) && Jackal.EnableJackalChannel.GetBool();
 
@@ -130,6 +134,9 @@ public static class SendTargetPatch
                 break;
             case SendTargets.Imp:
                 ChatCommands.SendImpostorChannelMsg(__instance, msg);
+                break;
+            case SendTargets.Coven:
+                ChatCommands.SendCovenChannelMsg(__instance, msg);
                 break;
             case SendTargets.Jackal:
                 Jackal.SendJackalChannelMsg(__instance, msg);
@@ -211,6 +218,10 @@ class ChatControllerUpdatePatch
             else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Imp)
             {
                 backgroundColor = Utils.GetRoleColor(CustomRoles.ImpostorTONE);
+            }
+            else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Coven)
+            {
+                backgroundColor = Utils.GetRoleColor(CustomRoles.WitchDoctor);
             }
             else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Jackal)
             {

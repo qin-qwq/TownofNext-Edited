@@ -570,6 +570,7 @@ public static class Options
     public static OptionItem CancelPetAnimation;
     public static OptionItem CantUseAbilityDuringDiscussionTime;
     public static OptionItem EnableImpostorChannel;
+    public static OptionItem EnableCovenChannel;
     public static OptionItem ShowExileMsgAfterMeeting;
     public static OptionItem BalanceRoleSetting;
     public static OptionItem BalanceNeedPlayers;
@@ -2214,13 +2215,16 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        ShowExileMsgAfterMeeting = BooleanOptionItem.Create(61105, "ShowExileMsgAfterMeeting", true, TabGroup.ModSettings, false)
+        EnableCovenChannel = BooleanOptionItem.Create(61105, "EnableCovenChannel", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        BalanceRoleSetting = BooleanOptionItem.Create(61106, "BalanceRoleSetting", true, TabGroup.ModSettings, false)
+        ShowExileMsgAfterMeeting = BooleanOptionItem.Create(61106, "ShowExileMsgAfterMeeting", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        BalanceNeedPlayers = IntegerOptionItem.Create(61107, "BalanceNeedPlayers", (1, 15, 1), 12, TabGroup.ModSettings, false)
+        BalanceRoleSetting = BooleanOptionItem.Create(61107, "BalanceRoleSetting", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        BalanceNeedPlayers = IntegerOptionItem.Create(61108, "BalanceNeedPlayers", (1, 15, 1), 12, TabGroup.ModSettings, false)
             .SetParent(BalanceRoleSetting)
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Players)

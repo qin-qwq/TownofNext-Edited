@@ -355,10 +355,11 @@ public class SabotageSystemPatch
                     return false;
             }
 
-            if (TimeMaster.Rewinding)
+            if (TimeAssassin.TimeStop || TimeMaster.Rewinding)
             {
                 return false;
             }
+
             return player.CanUseSabotage();
         }
 

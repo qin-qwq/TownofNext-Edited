@@ -727,6 +727,16 @@ public static class CheckShapeshiftPatch
             logger.Info($"Cancel shapeshifting because {instance.GetRealName()} is eaten by Pelican");
             return false;
         }
+        if (TimeAssassin.TimeStop)
+        {
+            logger.Info($"Cancel shapeshifting because TimeAssassin TimeStop");
+            return false;
+        }
+        if (TimeMaster.Rewinding)
+        {
+            logger.Info($"Cancel shapeshifting because TimeMaster Rewinding");
+            return false;
+        }
         if (!Main.IntroDestroyed)
         {
             logger.Info($"Cancel shapeshifting because Intro doesn't have Destroyed");
@@ -1663,23 +1673,15 @@ class FixedUpdateInNormalGamePatch
         }
     }
 }
-[HarmonyPatch]
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Start))]
 class PlayerStartPatch
 {
-    public static MethodBase TargetMethod()
+    public static void Postfix(PlayerControl __instance)
     {
-        return Utils.GetStateMachineMoveNext<PlayerControl>(nameof(PlayerControl._Start_d__82));
-    }
-
-    public static void Postfix(PlayerControl._Start_d__82 __instance, ref bool __result)
-    {
-        if (__result) return;
-        var instance = __instance.__4__this;
-
         if (GameStates.IsHideNSeek) return;
 
-        var roleText = Object.Instantiate(instance.cosmetics.nameText);
-        roleText.transform.SetParent(instance.cosmetics.nameText.transform);
+        var roleText = Object.Instantiate(__instance.cosmetics.nameText);
+        roleText.transform.SetParent(__instance.cosmetics.nameText.transform);
         roleText.fontMaterial.SetFloat("_StencilComp", 7f);
         roleText.fontMaterial.SetFloat("_Stencil", 2f);
         roleText.transform.localPosition = new Vector3(0f, 0.2f, 0f);

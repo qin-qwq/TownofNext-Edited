@@ -142,7 +142,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Swooper => CustomRoles.Chameleon, // 隐匿者 => 变色龙
                 CustomRoles.Vindicator or CustomRoles.Pickpocket => CustomRoles.Mayor, // 卫道士，小偷 => 市长
                 CustomRoles.Opportunist or CustomRoles.BloodKnight or CustomRoles.Wildling => CustomRoles.Guardian, // 投机者，嗜血骑士，野人 => 守护者
-                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist => CustomRoles.Admirer, // 魅魔，病毒，歹徒，大祭司 => 仰慕者
+                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist or CustomRoles.WitchDoctor => CustomRoles.Admirer, // 魅魔，病毒，歹徒，大祭司，巫医 => 仰慕者
                 CustomRoles.Arrogance or CustomRoles.Juggernaut or CustomRoles.Berserker => CustomRoles.Reverie, // 狂妄杀手，天启，狂战士 => 遐想者
                 CustomRoles.Baker when Baker.CurrentBread() is 0 => CustomRoles.Overseer, // 面包师 0 => 预言家
                 CustomRoles.Baker when Baker.CurrentBread() is 1 => CustomRoles.Deputy, // 面包师 1 => 捕快

@@ -14,7 +14,7 @@ public class Mini : IAddon
     //===========================SETUP================================\\
     public CustomRoles Role => CustomRoles.Mini;
     private const int Id = 7000;
-    public AddonTypes Type => AddonTypes.Experimental;
+    public AddonTypes Type => AddonTypes.Helpful;
     //==================================================================\\
 
     private static OptionItem GrowUpDuration;

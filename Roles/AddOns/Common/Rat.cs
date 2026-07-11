@@ -43,7 +43,7 @@ public class Rat : IAddon
     }
     public static void GetMessage()
     {
-        if (!MeetingStates.FirstMeeting) return;
+        if (!MeetingStates.FirstMeeting && !playerList.Any()) return;
 
         int n = ratRoleCount.GetInt();
         int i = 0;
@@ -66,5 +66,7 @@ public class Rat : IAddon
             i += n;
             if (i + n > listOfRoles.Count) i = 0;
         }
+
+        playerList.Clear();
     }
 }

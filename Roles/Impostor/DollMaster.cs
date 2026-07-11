@@ -24,6 +24,8 @@ internal class DollMaster : RoleBase
     private static bool WaitToUnPossess = false;
     public static PlayerControl controllingTarget = null; // Personal possessed player identifier for reference.
     public static PlayerControl DollMasterTarget = null; // Personal possessed player identifier for reference.
+    public static NetworkedPlayerInfo.PlayerOutfit controllingOutfit = null;
+    public static NetworkedPlayerInfo.PlayerOutfit DollMasterOutfit = null;
     private static float originalSpeed = float.MinValue;
     private static Vector2 controllingTargetPos = new(0, 0);
     private static Vector2 DollMasterPos = new(0, 0);
@@ -52,6 +54,8 @@ internal class DollMaster : RoleBase
         ReducedVisionPlayers.Clear();
         DollMasterTarget = null;
         controllingTarget = null;
+        controllingOutfit = null;
+        DollMasterOutfit = null;
     }
 
     public override void Add(byte playerId)
@@ -292,6 +296,7 @@ internal class DollMaster : RoleBase
     }
 
     public override bool CanUseKillButton(PlayerControl pc) => CanKillAsMainBody.GetBool() || IsControllingPlayer;
+    public override bool CanUseImpostorVentButton(PlayerControl pc) => !IsControllingPlayer;
 
     public override bool OnCheckShapeshift(PlayerControl pc, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate) // Possession stuff.
     {
@@ -374,11 +379,16 @@ internal class DollMaster : RoleBase
     // Possess Player
     private static void Possess(PlayerControl pc, PlayerControl target)
     {
+        DollMasterOutfit = new NetworkedPlayerInfo.PlayerOutfit()
+            .Set(pc.GetRealName(), pc.CurrentOutfit.ColorId, pc.CurrentOutfit.HatId, pc.CurrentOutfit.SkinId, pc.CurrentOutfit.VisorId, pc.CurrentOutfit.PetId, pc.CurrentOutfit.NamePlateId);
+        controllingOutfit = new NetworkedPlayerInfo.PlayerOutfit()
+            .Set(target.GetRealName(), target.CurrentOutfit.ColorId, target.CurrentOutfit.HatId, target.CurrentOutfit.SkinId, target.CurrentOutfit.VisorId, target.CurrentOutfit.PetId, target.CurrentOutfit.NamePlateId);
+
         (target.MyPhysics.FlipX, pc.MyPhysics.FlipX) = (pc.MyPhysics.FlipX, target.MyPhysics.FlipX); // Copy the players directions that they are facing, Note this only works for modded clients!
         pc?.RpcShapeshift(target, false);
 
-        pc?.ResetPlayerOutfit(Main.PlayerStates[target.PlayerId].NormalOutfit);
-        target?.ResetPlayerOutfit(Main.PlayerStates[pc.PlayerId].NormalOutfit);
+        pc?.SetNewOutfit(controllingOutfit);
+        target?.SetNewOutfit(DollMasterOutfit);
 
         pc?.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.DollMaster), GetString("DollMaster_PossessedTarget")));
     }
@@ -388,10 +398,9 @@ internal class DollMaster : RoleBase
     {
         (target.MyPhysics.FlipX, pc.MyPhysics.FlipX) = (pc.MyPhysics.FlipX, target.MyPhysics.FlipX); // Copy the players directions that they are facing, Note this only works for modded clients!
 
-        pc?.ResetPlayerOutfit(force: true);
-        target?.ResetPlayerOutfit(force: true);
-
         pc?.RpcShapeshift(pc, false);
+        pc?.SetNewOutfit(DollMasterOutfit);
+        target?.SetNewOutfit(controllingOutfit);
 
         IsControllingPlayer = false;
         ResetPlayerSpeed = true;

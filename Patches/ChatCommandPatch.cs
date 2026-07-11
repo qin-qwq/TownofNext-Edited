@@ -267,6 +267,7 @@ internal class ChatCommands
         if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dt && dt.ExilePlayer(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Lovers.LoversMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (ImpostorChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (CovenChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         Directory.CreateDirectory(modTagsFiles);
@@ -325,6 +326,14 @@ internal class ChatCommands
             else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Imp)
             {
                 if (ImpostorChannel(PlayerControl.LocalPlayer, text, false))
+                {
+                    Main.isChatCommand = true;
+                    canceled = true;
+                }
+            }
+            else if (SendTargetPatch.SendTarget == SendTargetPatch.SendTargets.Coven)
+            {
+                if (CovenChannel(PlayerControl.LocalPlayer, text, false))
                 {
                     Main.isChatCommand = true;
                     canceled = true;
@@ -594,6 +603,7 @@ internal class ChatCommands
         if (Summoner.SummonerCheckMsg(player, text)) { canceled = true; Logger.Info($"Is Summoner command", "OnReceiveChat"); return; }
         if (Lovers.LoversMsg(player, text)) { canceled = true; Logger.Info($"Is Lovers Private Chat", "OnReceiveChat"); return; }
         if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
+        if (CovenChannel(player, text)) { canceled = true; Logger.Info($"Is Coven Channel", "OnReceiveChat"); return; }
         if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
         if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
 
@@ -2650,6 +2660,40 @@ internal class ChatCommands
 
         Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam() && x.GetCustomRole().IsImpostor())
             .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+    }
+
+    private static bool CovenChannel(PlayerControl pc, string msg, bool check = true)
+    {
+        //if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || !pc) return false;
+        if (!pc.IsPlayerCovenTeam() || !pc.GetCustomRole().IsCoven()) return false;
+        if (!Options.EnableCovenChannel.GetBool()) return false;
+        if (!pc.IsAlive()) return false;
+        msg = msg.ToLower().Trim();
+        if (check)
+        {
+            if (!GuessManager.CheckCommond(ref msg, "co|巫师", false)) return false;
+        }
+
+        if (string.IsNullOrEmpty(msg)) return false;
+
+        if (AmongUsClient.Instance.AmHost || !pc.IsModded())
+        {
+            SendCovenChannelMsg(pc, msg);
+        }
+        else
+        {
+            var message = new RpcSendChannelMsg(PlayerControl.LocalPlayer.NetId, msg, (int)SendTargetPatch.SendTargets.Coven);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
+
+        return true;
+    }
+
+    public static void SendCovenChannelMsg(PlayerControl pc, string msg)
+    {
+        Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerCovenTeam() && x.GetCustomRole().IsCoven())
+            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.WitchDoctor), $"{GetString("MessageFromCoven")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 
     public class PresetRequest

@@ -308,7 +308,7 @@ public class TZombie : RoleBase
     {
         var targetRoleClass = target.GetRoleClass();
 
-        if (targetRoleClass.Role != CustomRoles.TCrewmate)
+        if (targetRoleClass.Role != CustomRoles.TCrewmate || target.inVent || target.walkingToVent || target.MyPhysics.Animations.IsPlayingEnterVentAnimation())
         {
             return false;
         }
@@ -351,6 +351,11 @@ public class TZombie : RoleBase
         TagMode.SendTaskRPC(target.PlayerId);
 
         return false;
+    }
+
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (player.inVent) player?.MyPhysics?.RpcBootFromVent(player.GetPlayerVentId());
     }
 
     public override string GetProgressText(byte playerId, bool comms) => string.Empty;
