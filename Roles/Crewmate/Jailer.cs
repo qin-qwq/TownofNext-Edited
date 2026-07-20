@@ -239,12 +239,12 @@ internal class Jailer : RoleBase
         if (pc.Is(CustomRoles.Jailer))
         {
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
-                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")}"), sendTo: x.PlayerId, noReplay: true));
+                .Do(x => SendMessage(ColorString(GetRoleColor(CustomRoles.Jailer), msg), title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")}"), sendTo: x.PlayerId, noReplay: true));
         }
         else
         {
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
-                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+                .Do(x => SendMessage(ColorString(GetRoleColor(CustomRoles.Jailer), msg), title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
         }
     }
 }

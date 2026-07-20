@@ -1018,7 +1018,7 @@ internal static class IntroCutsceneDestroyPatch
                 }
             }
 
-            GameModeBase.GetGameMode().GetGameModeClass().Add();
+            Options.CurrentGameMode.GetGameModeClass().Add();
 
             foreach (var player in Main.EnumeratePlayerControls())
             {

@@ -1536,7 +1536,7 @@ public static class Utils
 
             }
             if (Options.CurrentGameMode is not CustomGameMode.Standard and not CustomGameMode.HidenSeekTONE)
-                name = $"<color=#{ColorToHex(Main.GameModeColors[GameModeBase.GetGameMode()])}><size=1.7>{GetString($"Mode{GameModeBase.GetGameMode()}")}</size></color>\r\n" + name;
+                name = $"<color=#{ColorToHex(Main.GameModeColors[Options.CurrentGameMode])}><size=1.7>{GetString($"Mode{Options.CurrentGameMode}")}</size></color>\r\n" + name;
         }
 
 

@@ -198,7 +198,7 @@ public abstract class OptionItem
     public virtual bool IsHiddenOn(CustomGameMode mode, bool forLobbyView = false, bool checkCollapsedSection = true)
     {
         if (forLobbyView) mode = LobbyViewSettingsPanePatch.LastGameModeSelected;
-        return IsHidden || this.Parent?.IsHiddenOn(GameModeBase.GetGameMode()) == true
+        return IsHidden || this.Parent?.IsHiddenOn(Options.CurrentGameMode) == true
             || (HideOptionInFFA != CustomGameMode.All && HideOptionInFFA == mode)
             || (HideOptionInHnS != CustomGameMode.All && HideOptionInHnS == mode)
             || (HideOptionInSpeedRun != CustomGameMode.All && HideOptionInSpeedRun == mode)

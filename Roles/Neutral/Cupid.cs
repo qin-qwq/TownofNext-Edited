@@ -84,7 +84,7 @@ internal class Cupid : RoleBase
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
         cupidArrows.Clear();
-        var count = reader.ReadInt16();
+        var count = reader.ReadInt32();
 
         for (int i = 0; i < count; i++)
         {

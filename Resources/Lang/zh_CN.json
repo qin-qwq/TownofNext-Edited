@@ -2437,7 +2437,7 @@
   "Message.SetLevel": "你的等级设置为：<b>{0}</b>",
   "Message.SetColor": "你的颜色设置为：<b>{0}</b>",
   "Message.SetName": "你的名字被设置为：<b>{0}</b>",
-  "Message.AllowLevelRange": "等级可设置范围：0-100",
+  "Message.AllowLevelRange": "等级可设置范围：1-999",
   "Message.AllowNameLength": "昵称可设置长度：1-10",
   "Message.OnlyCanUseInLobby": "<color=#ff1919><size=150%><b>错误</b></size></color>\n<color=#ff1919>很抱歉，只有在大厅才能使用该指令</color>",
   "Message.CanNotUseInLobby": "<color=#ff1919><size=150%><b>错误</b></size></color>\n<color=#ff1919>很抱歉，在大厅不能使用该指令</color>",
@@ -4079,9 +4079,6 @@
   "Summoner.NoMeetingWhileSummoned": "你以为你可以召开会议杀死被召唤者吗？\n被召唤者死亡后才能召开会议！",
   "Summoned.Notification": "死灵法师召唤了你！加入巫师阵营，杀死反对巫师阵营的人！",
   "DeathReason.Expired": "过时",
-  "ShowMeetingReason": "显示会议开始原因",
-  "Message.isButton": "会议以使用紧急按钮开始",
-  "Message.isReport": "会议以发现一具尸体开始\n报告的尸体：{0}",
   "GodfatherCloseMeeting": "教父叫停了会议",
   "PresidentCloseMeeting": "总统强制结束了会议",
   "Tunny": "金枪鱼",
@@ -4884,5 +4881,6 @@
   "NoRemainingEmergencies": "没有剩余紧急会议次数！",
   "WinBySabotageTeam": "通过破坏获胜的阵营",
   "WinBySabotageMode.Impostor": "<color=#ff1919>内鬼</color>",
-  "WinBySabotageMode.Coven": "<color=#ac42f2>巫师</color>"
+  "WinBySabotageMode.Coven": "<color=#ac42f2>巫师</color>",
+  "ChangeFactionSettings": "平衡阵营设置"
 }

@@ -52,6 +52,7 @@ internal class Speaker : RoleBase
         {
             return killer.CheckDoubleTrigger(target, () =>
             {
+                killer.SetKillCooldown();
                 killer.RpcRemoveAbilityUse();
                 PlayerList.Add(target.PlayerId);
                 NotifyRoles(SpecifyTarget: target);

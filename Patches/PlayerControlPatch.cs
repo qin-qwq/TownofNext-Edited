@@ -559,14 +559,29 @@ class RpcMurderPlayerPatch
         }
 
         MurderResultFlags murderResultFlags = didSucceed ? MurderResultFlags.Succeeded : MurderResultFlags.FailedError | MurderResultFlags.DecisionByHost;
+        var invisible = Main.Invisible.Contains(__instance.PlayerId) && didSucceed && __instance != target;
+        var viperA = __instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && didSucceed && __instance.IsAlive();
+        var viperB = __instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && didSucceed && __instance != target;
+        var killer = __instance;
         if (AmongUsClient.Instance.AmClient)
         {
-            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded && __instance.IsAlive())
+            if (invisible)
             {
-                __instance.SetRole(RoleTypes.Viper, true);
+                killer.RpcTeleport(target.GetCustomPosition());
+                killer.SetKillCooldown();
+                killer = target;
             }
-            __instance.MurderPlayer(target, murderResultFlags);
-            if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && murderResultFlags == MurderResultFlags.Succeeded && __instance != target)
+            if (viperA)
+            {
+                if (invisible) target.SetRole(RoleTypes.Viper, true);
+                else __instance.SetRole(RoleTypes.Viper, true);
+            }
+            killer.MurderPlayer(target, murderResultFlags);
+            if (invisible)
+            {
+                target.SetRealKiller(__instance);
+            }
+            if (viperB)
             {
                 __instance.SetRole(RoleTypes.Crewmate, true);
             }
@@ -595,21 +610,34 @@ class RpcMurderPlayerPatch
                 .EndRpc();
         }
 
-        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && __instance.IsAlive())
+        if (invisible)
         {
-            sender.RpcSetRole(__instance, RoleTypes.Viper);
+            killer.RpcTeleport(target.GetCustomPosition());
+            killer.SetKillCooldown();
+            killer = target;
         }
 
-        sender.StartRpc(__instance.NetId, RpcCalls.MurderPlayer)
+        if (viperA)
+        {
+            if (invisible) sender.RpcSetRole(target, RoleTypes.Viper);
+            else sender.RpcSetRole(__instance, RoleTypes.Viper);
+        }
+
+        sender.StartRpc(killer.NetId, RpcCalls.MurderPlayer)
             .WriteNetObject(target)
             .Write((int)murderResultFlags)
             .EndRpc();
 
-        if (__instance.GetCustomRole().GetRoleTypes() == RoleTypes.Viper && __instance != target)
+        if (invisible)
+        {
+            target.SetRealKiller(__instance);
+        }
+
+        if (viperB)
         {
             foreach (var pc in Main.EnumeratePlayerControls())
             {
-                if (pc.IsModded() || pc.GetCustomRole().IsImpostor() || pc == __instance) continue;
+                if (pc.GetCustomRole().IsImpostor() || pc == __instance) continue;
 
                 sender.RpcSetRole(__instance, RoleTypes.Crewmate, pc.GetClientId());
             }
@@ -808,7 +836,6 @@ class ShapeshiftPatch
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ReportDeadBody))]
 class ReportDeadBodyPatch
 {
-    public static NetworkedPlayerInfo ReportTarget;
     public static Dictionary<byte, bool> CanReport = [];
     public static Dictionary<byte, List<NetworkedPlayerInfo>> WaitReport = [];
     public static bool PreventEAC = false;
@@ -852,8 +879,6 @@ class ReportDeadBodyPatch
 
             var killer = target?.Object?.GetRealKiller();
             var killerRole = killer?.GetCustomRole();
-
-            ReportTarget = target;
 
             if (!target) //Meeting
             {
@@ -1872,16 +1897,14 @@ class CoExitVentPatch
         _ = new LateTask(() => { player?.RpcSetVentInteraction(); }, 0.8f, $"Set vent interaction after exit vent {player?.PlayerId}", shoudLog: false);
     }
 }
-[HarmonyPatch(typeof(GameData), nameof(GameData.CompleteTask))]
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CompleteTask))]
 class PlayerControlCompleteTaskPatch
 {
-    public static bool Prefix(PlayerControl pc, uint taskId)
+    public static bool Prefix(PlayerControl __instance, uint idx)
     {
         if (GameStates.IsHideNSeek) return true;
 
-        var player = pc;
-        var __instance = pc;
-        var idx = taskId;
+        var player = __instance;
         var playerTask = player.myTasks?.ToArray().FirstOrDefault(task => task.Id == idx);
         var taskType = playerTask != null ? playerTask.TaskType : TaskTypes.None;
 

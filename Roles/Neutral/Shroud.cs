@@ -124,7 +124,10 @@ internal class Shroud : RoleBase
                 var min = targetDistance.OrderBy(c => c.Value).FirstOrDefault();
                 var target = min.Key.GetPlayer();
                 var KillRange = ExtendedPlayerControl.GetKillDistances();
-                if (min.Value <= KillRange && !shroud.inVent && !shroud.inMovingPlat && !target.inVent && !target.inMovingPlat)
+                var playerPos = shroud.GetCustomPosition();
+                var vector = target.GetCustomPosition() - playerPos;
+                var magnitude = vector.magnitude;
+                if (min.Value <= KillRange && !shroud.inVent && !shroud.inMovingPlat && !target.inVent && !target.inMovingPlat && !PhysicsHelpers.AnyNonTriggersBetween(playerPos, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
                 {
                     if (shroud.RpcCheckAndMurder(target, true))
                     {

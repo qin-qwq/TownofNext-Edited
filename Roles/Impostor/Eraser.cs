@@ -45,8 +45,10 @@ internal class Eraser : RoleBase
         {
             return killer.CheckDoubleTrigger(target, () =>
             {
+                killer.SetKillCooldown();
                 killer.RpcRemoveAbilityUse();
                 PlayerToErase.Add(target.PlayerId);
+                Logger.Info($"{killer.GetCustomRole()} votes for {target.GetCustomRole()}", "Vote Eraser");
             });
         }
         else return true;

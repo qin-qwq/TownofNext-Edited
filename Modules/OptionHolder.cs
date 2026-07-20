@@ -15,6 +15,7 @@ public static class Options
     {
         Logger.Msg("Mod option loading start", "Load Options");
         ChatCommands.LoadCommands();
+        FactionOption.Load();
         try
         {
             Main.Instance.StartCoroutine(CoLoadOptions());
@@ -422,7 +423,6 @@ public static class Options
     public static OptionItem WhenSkipVoteIgnoreEmergency;
     public static OptionItem WhenNonVote;
     public static OptionItem WhenTie;
-    public static OptionItem ShowMeetingReason;
     public static OptionItem UseMeetingShapeshift;
 
     // Other
@@ -574,6 +574,7 @@ public static class Options
     public static OptionItem ShowExileMsgAfterMeeting;
     public static OptionItem BalanceRoleSetting;
     public static OptionItem BalanceNeedPlayers;
+    public static OptionItem ChangeFactionSettings;
 
     // ------------ General Role Settings ------------
 
@@ -2071,9 +2072,6 @@ public static class Options
         EnableVoteCommand = BooleanOptionItem.Create(60746, "EnableVote", true, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
-        ShowMeetingReason = BooleanOptionItem.Create(60748, "ShowMeetingReason", false, TabGroup.ModSettings, false)
-            .SetColor(new Color32(147, 241, 240, byte.MaxValue))
-            .SetGameMode(CustomGameMode.Standard);
         UseMeetingShapeshift = BooleanOptionItem.Create(60749, "UseMeetingShapeshift", true, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
@@ -2228,6 +2226,9 @@ public static class Options
             .SetParent(BalanceRoleSetting)
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Players)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        ChangeFactionSettings = BooleanOptionItem.Create(61109, "ChangeFactionSettings", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion
 

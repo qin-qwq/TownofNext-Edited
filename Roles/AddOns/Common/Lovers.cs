@@ -244,7 +244,7 @@ public class Lovers : IAddon
     {
         var player = GetLoverId(pc);
         Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId == player || x == pc)
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+            .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 }
 

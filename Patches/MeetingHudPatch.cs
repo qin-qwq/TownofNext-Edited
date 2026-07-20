@@ -1305,13 +1305,6 @@ class MeetingHudStartPatch
             SendMessage(string.Format(GetString("Message.SyncButtonLeft"), Options.SyncedButtonCount.GetFloat() - Options.UsedButtonCount));
             Logger.Info("Number of remaining buttons: " + (Options.SyncedButtonCount.GetFloat() - Options.UsedButtonCount), "SyncButtonMode");
         }
-        if (Options.ShowMeetingReason.GetBool())
-        {
-            if (ReportDeadBodyPatch.ReportTarget == null && !Balancer.Choose)
-                SendMessage(GetString("Message.isButton"));
-            else if (ReportDeadBodyPatch.ReportTarget != null && !Balancer.Choose)
-                SendMessage(string.Format(GetString("Message.isReport"), ColorString(ReportDeadBodyPatch.ReportTarget.PlayerId.GetPlayerColor(), ReportDeadBodyPatch.ReportTarget.PlayerName)));
-        }
 
         // AntiBlackout Message
         if (AntiBlackout.BlackOutIsActive)

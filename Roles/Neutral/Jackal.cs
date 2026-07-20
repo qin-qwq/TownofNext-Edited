@@ -500,7 +500,7 @@ internal class Jackal : RoleBase
     public static void SendJackalChannelMsg(PlayerControl pc, string msg)
     {
         Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jackal) || x.Is(CustomRoles.Sidekick) || x.Is(CustomRoles.Recruit))
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), $"{GetString("MessageFromJackal")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+            .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), $"{GetString("MessageFromJackal")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 }
 

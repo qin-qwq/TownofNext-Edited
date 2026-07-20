@@ -355,6 +355,11 @@ public class SabotageSystemPatch
                     return false;
             }
 
+            if (player.Is(CustomRoles.Runner))
+            {
+                return false;
+            }
+
             if (TimeAssassin.TimeStop || TimeMaster.Rewinding)
             {
                 return false;

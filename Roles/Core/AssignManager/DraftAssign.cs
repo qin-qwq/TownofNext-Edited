@@ -1,4 +1,5 @@
 using System.Text;
+using TONE.Modules;
 using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
@@ -80,6 +81,7 @@ public static class DraftAssign
             DraftPools[pc.PlayerId] = [];
             DraftRoles[pc.PlayerId] = CustomRoles.NotAssigned;
         }
+        FactionOption.ChangeSettings();
     }
 
     public static void StartSelect()
@@ -318,6 +320,11 @@ public static class DraftAssign
     public static void SendDraftPoolMsg(PlayerControl player)
     {
         Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), player.GetFormattedDraftPool()), player.PlayerId, noReplay: true);
+    }
+
+    public static void RemoveReSendDraftPoolMsg()
+    {
+        LateTask.RemoveByName("Re Send Draft Pool Msg");
     }
 
     public static bool IsSameTeamRoles(CustomRoles role, CustomRoles role2)

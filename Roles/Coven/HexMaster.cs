@@ -308,7 +308,9 @@ internal class HexMaster : CovenManager
                 var min = targetDistance.OrderBy(c => c.Value).FirstOrDefault();
                 var target = min.Key.GetPlayer();
                 var KillRange = ExtendedPlayerControl.GetKillDistances();
-                if (min.Value <= KillRange && !player.inVent && !player.inMovingPlat && !target.inVent && !target.inMovingPlat && player.RpcCheckAndMurder(target, true))
+                var vector = target.GetCustomPosition() - playerPos;
+                var magnitude = vector.magnitude;
+                if (min.Value <= KillRange && !player.inVent && !player.inMovingPlat && !target.inVent && !target.inMovingPlat && player.RpcCheckAndMurder(target, true) && !PhysicsHelpers.AnyNonTriggersBetween(playerPos, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
                 {
                     PassHex(player, target);
                 }

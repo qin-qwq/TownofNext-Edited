@@ -254,7 +254,7 @@ class GameEndCheckerForNormal
                                 WinnerIds.Add(pc.PlayerId);
                             }
                             break;
-                        case CustomRoles.CursedSoul when pc.IsAlive() && WinnerTeam == CustomWinner.Default:
+                        case CustomRoles.CursedSoul when pc.IsAlive():
                             reason = GameOverReason.ImpostorsByKill;
                             if (!CheckForConvertedWinner(pc.PlayerId))
                             {

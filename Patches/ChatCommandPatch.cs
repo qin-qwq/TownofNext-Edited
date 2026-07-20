@@ -2339,7 +2339,7 @@ internal class ChatCommands
 
     private static void DraftStartCommand(PlayerControl player, string text, string[] args)
     {
-        LateTask.RemoveByName("Re Send Draft Pool Msg");
+        DraftAssign.RemoveReSendDraftPoolMsg();
         if (!player.IsHost() && !player.FriendCode.GetDevUser().IsDev && !Utils.IsPlayerModerator(player.FriendCode))
         {
             Utils.SendMessage(GetString("StartDraftNoAccess"), player.PlayerId);
@@ -2659,7 +2659,7 @@ internal class ChatCommands
         }
 
         Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam() && x.GetCustomRole().IsImpostor())
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+            .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 
     private static bool CovenChannel(PlayerControl pc, string msg, bool check = true)
@@ -2693,7 +2693,7 @@ internal class ChatCommands
     public static void SendCovenChannelMsg(PlayerControl pc, string msg)
     {
         Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerCovenTeam() && x.GetCustomRole().IsCoven())
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.WitchDoctor), $"{GetString("MessageFromCoven")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+            .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.WitchDoctor), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.WitchDoctor), $"{GetString("MessageFromCoven")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 
     public class PresetRequest
