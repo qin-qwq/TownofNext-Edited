@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.07.20";
+    public const string PluginVersion = "26.07.22";
     public const string PluginDisplayVersion = "2.0.0 Alpha 6";
     public const int ExtraPluginVersion = 10; // Add Beta version number × 10
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -177,6 +177,7 @@ public class Main : BasePlugin
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
+        [CustomGameMode.RoundUp] = new Color32(248, 216, 110, byte.MaxValue),
         [CustomGameMode.BonfireNight] = new Color32(255, 140, 0, byte.MaxValue),
     };
 
@@ -254,6 +255,20 @@ public class Main : BasePlugin
                 DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
                 DateTime dateTime1 = new DateTime(approximateServerTime.Year, 6, 17, 7, 0, 0, 0, DateTimeKind.Utc);
                 DateTime dateTime2 = new DateTime(approximateServerTime.Year, 6, 29, 7, 0, 0, 0, DateTimeKind.Utc);
+                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
+            }
+            return false;
+        }
+    }
+    public static bool IsSummer
+    {
+        get
+        {
+            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
+            {
+                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 7, 24, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 7, 31, 7, 0, 0, 0, DateTimeKind.Utc);
                 return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
             }
             return false;
@@ -1117,6 +1132,9 @@ public enum CustomRoles
     // Tag Mode
     TZombie,
     TCrewmate,
+
+    // Round Up
+    RDeputy,
 
     // Bonfire Night
     RWoodCollector,

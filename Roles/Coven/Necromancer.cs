@@ -238,6 +238,7 @@ internal class Necromancer : CovenManager
             CustomRoles.Killer or
             CustomRoles.Coven or
             CustomRoles.Apocalypse or
+            CustomRoles.RDeputy or
             CustomRoles.Solsticer or
             CustomRoles.Sunnyboy ||
             (role == CustomRoles.Workaholic && Workaholic.WorkaholicVisibleToEveryone.GetBool()) ||

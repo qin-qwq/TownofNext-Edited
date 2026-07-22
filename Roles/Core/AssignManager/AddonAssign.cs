@@ -13,6 +13,7 @@ public static class AddonAssign
     private static bool NotAssignAddOnInGameStarted(CustomRoles role)
     {
         if (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) return true;
+        if (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp) return true;
 
         switch (role)
         {

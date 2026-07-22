@@ -45,8 +45,9 @@ public static class Options
 
             2 => CustomGameMode.SpeedRun,
             3 => CustomGameMode.TagMode,
+            4 => CustomGameMode.RoundUp,
             //4 => CustomGameMode.BonfireNight,
-            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
+            5 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
             _ => CustomGameMode.Standard
         };
     public static int prevGameMode = 0;
@@ -2227,7 +2228,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetValueFormat(OptionFormat.Players)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        ChangeFactionSettings = BooleanOptionItem.Create(61109, "ChangeFactionSettings", true, TabGroup.ModSettings, false)
+        ChangeFactionSettings = BooleanOptionItem.Create(61109, "ChangeFactionSettings", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion

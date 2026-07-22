@@ -70,7 +70,6 @@ internal class Dreamer : RoleBase
         if (pc.HasAbilityCD()) return;
 
         pc.FreezeForOthers();
-        pc.MarkDirtySettings();
         SkillTime = (true, Utils.GetTimeStamp());
         RealPosition = pc.GetCustomPosition();
         pc.RpcAddAbilityCD(includeDuration: true);
@@ -102,7 +101,6 @@ internal class Dreamer : RoleBase
             {
                 pc.RevertFreeze(RealPosition);
                 SkillTime = (false, 0);
-                pc.MarkDirtySettings();
             }
         }
     }
@@ -113,7 +111,6 @@ internal class Dreamer : RoleBase
         {
             _Player.RevertFreeze(RealPosition);
             SkillTime = (false, 0);
-            _Player.MarkDirtySettings();
         }
     }
 
@@ -123,7 +120,6 @@ internal class Dreamer : RoleBase
         {
             target.RevertFreeze(RealPosition);
             SkillTime = (false, 0);
-            target.MarkDirtySettings();
         }
     }
 

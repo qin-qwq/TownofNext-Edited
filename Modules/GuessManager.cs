@@ -233,6 +233,19 @@ public static class GuessManager
                     pc.ShowInfoMessage(isUI, GetString("GuessDisabled"));
                     return true;
                 }
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue)
+                {
+                    if (target.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
+                        return true;
+                    }
+                    if (pc.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
+                        return true;
+                    }
+                }
                 if (Balancer.Choose && !(target.PlayerId == Balancer.Target1 || target.PlayerId == Balancer.Target2))
                 {
                     pc.ShowInfoMessage(isUI, GetString("SpecialMeeting2"));
@@ -1034,6 +1047,7 @@ public static class GuessManager
                     or CustomRoles.Apocalypse
                     or CustomRoles.Coven
                     or CustomRoles.Summoned
+                    or CustomRoles.RDeputy
                     || (role.IsTNA() && !Options.TransformedNeutralApocalypseCanBeGuessed.GetBool())) continue;
 
                 if (role.GetStaticRoleClass().ThisRoleType is Custom_RoleType.None) continue;

@@ -15,6 +15,7 @@ public abstract class GameModeBase
 
     public static CustomGameMode GetGameMode()
     {
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp) return CustomGameMode.Standard;
         return Options.CurrentGameMode;
     }
 

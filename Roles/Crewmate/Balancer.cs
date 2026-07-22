@@ -228,23 +228,4 @@ internal class Balancer : RoleBase
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => BalancerOnClick(pva.TargetPlayerId/*, __instance*/)));
         }
     }
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
-    class UpdateMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0 && !Choose)
-                UpdateBalancerButton(__instance);
-        }
-    }
-    public static void UpdateBalancerButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            var button = pva?.transform?.FindChild("BalancerButton")?.gameObject;
-            if (!button) continue;
-            if (Target1 == pva.TargetPlayerId || Target2 == pva.TargetPlayerId) button.GetComponent<SpriteRenderer>().color = Color.green;
-            else button.GetComponent<SpriteRenderer>().color = Color.white;
-        }
-    }
 }

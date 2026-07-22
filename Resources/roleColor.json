@@ -263,5 +263,6 @@
   "Philosopher": "#cdf1ff",
   "RWoodCollector": "#ff0000",
   "BWoodCollector": "#0000ff",
-  "FireThief": "#a9a9a9"
+  "FireThief": "#a9a9a9",
+  "RDeputy": "#f8d86e"
 }

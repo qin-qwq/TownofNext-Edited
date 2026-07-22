@@ -315,9 +315,9 @@ public class GameStartManagerBeginGamePatch
             return false;
         }
 
-        if (GameStates.IsNormalGame && !GameModeBase.GetGameMode().GetGameModeClass().OpeningHours && (!PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsDev || Main.BetaBuildURL.Value == ""))
+        if (GameStates.IsNormalGame && !Options.CurrentGameMode.GetGameModeClass().OpeningHours && (!PlayerControl.LocalPlayer.FriendCode.CanUseDev() || Main.BetaBuildURL.Value == ""))
         {
-            Logger.SendInGame(string.Format(GetString("Warning.GameModeNotEnabled"), GetString($"{GameModeBase.GetGameMode()}")));
+            Logger.SendInGame(string.Format(GetString("Warning.GameModeNotEnabled"), GetString($"{Options.CurrentGameMode}")));
             Options.GameMode.SetValue(0);
             Options.prevGameMode = Options.GameMode.GetInt();
             return false;

@@ -147,6 +147,13 @@ class CheckForEndVotingPatch
                     return true;
                 }
 
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && pc.PlayerId == RoundUp.Deputy && pva.VotedFor < 254)
+                {
+                    __instance.UpdateButtons();
+                    __instance.RpcClearVoteDelay(pc.GetClientId());
+                    continue;
+                }
+
                 if (Balancer.Choose && !(pva.VotedFor == Balancer.Target1 || pva.VotedFor == Balancer.Target2) && pva.VotedFor < 254)
                 {
                     __instance.UpdateButtons();
@@ -439,6 +446,20 @@ class CheckForEndVotingPatch
             }
             else if (!braked)
                 exiledPlayer = allPlayers.FirstOrDefault(info => !tie && info.PlayerId == exileId);
+
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp)
+            {
+                if (RoundUp.Deputy != byte.MaxValue)
+                {
+                    exileId = RoundUp.Deputy;
+                    exiledPlayer = GetPlayerInfoById(exileId);
+                }
+                else
+                {
+                    exileId = 0xff;
+                    exiledPlayer = GetPlayerInfoById(exileId);
+                }
+            }
 
             if (Keeper.IsTargetExiled(exileId))
             {
@@ -795,6 +816,11 @@ class CastVotePatch
                 __instance.RpcClearVoteDelay(voter.GetClientId());
                 return false;
             }
+        }
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && voter.PlayerId == RoundUp.Deputy && suspectPlayerId < 254)
+        {
+            __instance.RpcClearVoteDelay(voter.GetClientId());
+            return false;
         }
         if (Balancer.Choose && !(suspectPlayerId == Balancer.Target1 || suspectPlayerId == Balancer.Target2) && suspectPlayerId < 254)
         {
@@ -1153,6 +1179,8 @@ class MeetingHudStartPatch
                 AddMsg(MimicMsg, imp.PlayerId, ColorString(GetRoleColor(CustomRoles.Mimic), GetString("Mimic").ToUpper()));
             }
         }
+
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMeetingHudStart();
 
         msgToSend.Do(x => Logger.Info($"To:{x.Item2} {x.Item3} => {x.Item1}", "Skill Notice OnMeeting Start"));
 

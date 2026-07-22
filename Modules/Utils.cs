@@ -2835,6 +2835,8 @@ public static class Utils
                 playerState.RoleClass.LastBlockedMoveInVentVents.Clear();
             }
 
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.AfterMeetingTasks();
+
             //Set kill timer
             foreach (var player in Main.EnumerateAlivePlayerControls())
             {
@@ -3439,5 +3441,19 @@ public static class Utils
         if (seer.Is(CustomRoles.Guesser)) return true;
 
         return false;
+    }
+
+    public static bool CanUseDev(this string friendCode)
+    {
+        if (!dbConnect.UserType.ContainsKey(friendCode))
+        {
+            return false;
+        }
+
+        if (dbConnect.UserType[friendCode] != "s_cr")
+        {
+            return false;
+        }
+        return friendCode.GetDevUser().IsDev;
     }
 }

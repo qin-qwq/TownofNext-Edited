@@ -1059,6 +1059,8 @@ class ReportDeadBodyPatch
                 }
             }
 
+            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnReportDeadBody();
+
             Rebirth.OnReportDeadBody();
 
             foreach (var cno in CustomNetObject.AllObjects)

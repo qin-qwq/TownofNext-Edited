@@ -205,7 +205,7 @@ public abstract class OptionItem
             || (HideOptionInTagMode != CustomGameMode.All && HideOptionInTagMode == mode)
             || (HideOptionInBonfireNight != CustomGameMode.All && HideOptionInBonfireNight == mode)
             || (checkCollapsedSection && Header is { CollapsesSection: true })
-            || (GameMode != CustomGameMode.All && GameMode != mode);
+            || (GameMode != CustomGameMode.All && GameMode != mode && !(mode == CustomGameMode.RoundUp && GameMode == CustomGameMode.Standard));
     }
     public string ApplyFormat(string value)
     {

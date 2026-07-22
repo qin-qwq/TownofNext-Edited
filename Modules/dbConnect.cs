@@ -10,7 +10,7 @@ namespace TONE;
 public class dbConnect
 {
     private static bool InitOnce = false;
-    private static Dictionary<string, string> UserType = [];
+    public static Dictionary<string, string> UserType = [];
 
     private const string ApiUrl = "https://raw.githubusercontent.com/qin-qwq/TONE-Record/main";
     private const string FallBackUrl = "https://ghproxy.net/https://raw.githubusercontent.com/qin-qwq/TONE-Record/main";
@@ -177,6 +177,10 @@ public class dbConnect
                                 upName: userData["name"].ToString()));
                         }
                         tempUserType[userData["friendcode"].ToString()] = userData["type"].ToString(); // Store the data in the temporary dictionary
+                        if (DevManager.IsDevUser(userData["friendcode"].ToString()) && !tempUserType.ContainsKey(userData["friendcode"].ToString()))
+                        {
+                            DevManager.DevUserList.Remove(DevManager.GetDevUser(userData["friendcode"].ToString()));
+                        }
                     }
                     if (tempUserType.Count > 1)
                     {

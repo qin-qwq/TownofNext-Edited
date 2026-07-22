@@ -534,6 +534,7 @@ public static class LobbyViewSettingsPanePatch
             switch (currentGameMode)
             {
                 case CustomGameMode.Standard:
+                case CustomGameMode.RoundUp:
                     buttonTab.gameObject.SetActive(true);
                     break;
                 default:
@@ -785,7 +786,7 @@ public static class LobbyViewSettingsPanePatch
                 if (option.Tab != tabName) continue;
                 if (option.GameMode is not CustomGameMode.All && option.GameMode != LastGameModeSelected)
                 {
-                    if (!(option.GameMode == CustomGameMode.Standard))
+                    if (!(LastGameModeSelected == CustomGameMode.RoundUp && option.GameMode == CustomGameMode.Standard))
                         continue;
                 }
 
@@ -879,7 +880,7 @@ public static class LobbyViewSettingsPanePatch
                             if (role.OnlySpawnsWithPetsRole()) titleName += GetString("RequiresPet");
                             if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) titleName += GetString("SupportsPet");
                             if (role.GetStaticRoleClass().IsBalance) titleName += GetString("SupportsBalance");
-                            if (role.NotAssignInVanillaServer()) titleName += GetString("NotSupportsVanilla");
+                            if (role.NotAssignInVanillaServer() || (LastGameModeSelected == CustomGameMode.RoundUp && role.NotSpawnInRoundUp())) titleName += GetString("NotSupportsVanilla");
 
                             var chanceAddOnPerGame = Options.CustomAdtRoleSpawnRate.TryGetValue(role, out var valueAddOnOpt) ? valueAddOnOpt.GetInt() : 0;
                             int numPerGame = Options.CustomRoleCounts.TryGetValue(role, out var valueInt) ? valueInt.GetInt() : 0;
