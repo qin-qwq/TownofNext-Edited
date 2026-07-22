@@ -309,7 +309,7 @@ internal class ChatCommands
             }
         }
 
-        if (text.StartsWith('/'))
+        if (text.StartsWith('/') && !AmongUsClient.Instance.AmHost)
         {
             foreach (Command command in Command.AllCommands)
             {
