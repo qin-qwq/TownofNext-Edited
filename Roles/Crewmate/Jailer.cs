@@ -68,6 +68,7 @@ internal class Jailer : RoleBase
     }
     public override void Remove(byte playerId)
     {
+        JailerTarget.Remove(playerId);
         JailerHasExe.Remove(playerId);
         JailerDidVote.Remove(playerId);
     }
