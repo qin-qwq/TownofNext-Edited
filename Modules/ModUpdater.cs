@@ -232,10 +232,9 @@ public class ModUpdater
             string[] versionString = Main.PluginDisplayVersion?.ToString().Split(".");
             string[] tag = data["tag_name"]?.ToString()[1..].Split(".");
 
-            var pluginNum = int.Parse(versionString[0]) * 1000000 + int.Parse(versionString[1]) * 10000 + int.Parse($"{versionString[2][0]}") * 100
-                + (versionString[2].Length > 2 && versionString[2][2] == 'B' ? int.Parse($"{versionString[2][7]}") * 10 : versionString[2].Length > 2 && versionString[2][2] == 'A' ? int.Parse($"{versionString[2][8]}") : 99);
+            var pluginNum = int.Parse(versionString[0]) * 10000000 + int.Parse(versionString[1]) * 100000 + ParseVersion(versionString[2]);
             pluginNum += Main.ExtraPluginVersion;
-            var versionNum = int.Parse(tag[0]) * 1000000 + int.Parse(tag[1]) * 10000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) * 10 : 99);
+            var versionNum = int.Parse(tag[0]) * 10000000 + int.Parse(tag[1]) * 100000 + ParseTag(tag[2]);
 
             Logger.Info($"Found local version: {pluginNum}; github version: {versionNum}", "CheckRelease");
 
@@ -277,6 +276,52 @@ public class ModUpdater
 
         isFail = false;
         yield break;
+    }
+    public static int ParseVersion(string versionPart)
+    {
+        if (string.IsNullOrWhiteSpace(versionPart))
+            return 999; 
+
+        var tokens = versionPart.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (tokens.Length == 0)
+            return 999;
+
+        int patch = int.Parse(tokens[0]);
+        int preReleaseValue = 999;
+
+        if (tokens.Length >= 3)
+        {
+            string type = tokens[1];
+            if (type.Equals("Beta", StringComparison.OrdinalIgnoreCase))
+            {
+                int betaNum = int.Parse(tokens[2]);
+                preReleaseValue = betaNum * 100;
+
+                if (tokens.Length >= 5 && tokens[3].Equals("Hotfix", StringComparison.OrdinalIgnoreCase))
+                {
+                    int hotfixNum = int.Parse(tokens[4]);
+                    preReleaseValue += hotfixNum;
+                }
+            }
+            else if (type.Equals("Alpha", StringComparison.OrdinalIgnoreCase))
+            {
+                int alphaNum = int.Parse(tokens[2]);
+                preReleaseValue = alphaNum * 10;
+
+                if (tokens.Length >= 5 && tokens[3].Equals("Hotfix", StringComparison.OrdinalIgnoreCase))
+                {
+                    int hotfixNum = int.Parse(tokens[4]);
+                    preReleaseValue += hotfixNum;
+                }
+            }
+            // RC?
+        }
+
+        return patch * 1000 + preReleaseValue;
+    }
+    public static int ParseTag(string tagPart)
+    {
+        return ParseVersion(tagPart.Replace("a", " Alpha ").Replace("b", " Beta ").Replace("h", " Hotfix "));
     }
     public static void StartUpdate(string url)
     {

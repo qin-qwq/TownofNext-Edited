@@ -131,4 +131,8 @@
 >
 > - Next button sprites (Inactive and Active)
 >
+### :star: [UnityDoorstop](https://github.com/Pietrodjaowjao/UnityDoorstop)
+>
+> - Modified doorstop_config.ini and winhttp.dll for packaging
+>
 ---

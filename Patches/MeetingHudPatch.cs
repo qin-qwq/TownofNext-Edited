@@ -1687,7 +1687,7 @@ class MeetingHudRpcClosePatch
     {
         Logger.Info("MeetingHud.RpcClose is being called", "MeetingHudRpcClosePatch");
         // Send SetName rpc together with Close rpc
-        if (GameModeBase.GetGameMode() is CustomGameMode.Standard)
+        if (GameModeBase.GetGameMode() is CustomGameMode.Standard && !Main.CurrentServerIsVanilla)
         {
             if (AmongUsClient.Instance.AmClient)
             {

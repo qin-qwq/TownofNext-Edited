@@ -56,7 +56,7 @@ internal class BonfireNight : GameModeBase
 
     public override void SetupCustomOption()
     {
-        TextOptionItem.Create(10000038, "MenuTitle.BonfireNight", TabGroup.ModSettings)
+        TextOptionItem.Create(10000039, "MenuTitle.BonfireNight", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue));
 

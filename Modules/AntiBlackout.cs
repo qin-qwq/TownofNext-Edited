@@ -20,6 +20,7 @@ public static class AntiBlackout
     //this is simply just called in less places, because antiblackout with role-basis changing is OP
     public static int ExilePlayerId = -1;
     public static bool SkipTasks = false;
+    public static bool ResetName = true;
 
     ///<summary>
     /// Count alive players and check black out 
@@ -271,12 +272,11 @@ public static class AntiBlackout
     {
         var timeNotify = 0f;
 
-        if (BlackOutIsActive && CheckForEndVotingPatch.TempExileMsg != null)
+        if ((BlackOutIsActive || ResetName) && CheckForEndVotingPatch.TempExileMsg != string.Empty && Main.CurrentServerIsVanilla)
         {
-            timeNotify = 4f;
             foreach (var pc in Main.EnumeratePlayerControls().Where(p => !p.IsModded()).ToArray())
             {
-                pc.Notify(CheckForEndVotingPatch.TempExileMsg, time: timeNotify);
+                pc.Notify(CheckForEndVotingPatch.TempExileMsg);
             }
         }
 

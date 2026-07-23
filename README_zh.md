@@ -129,4 +129,8 @@
 >
 > - 下一个按钮图像
 >
+### :star: [UnityDoorstop](https://github.com/Pietrodjaowjao/UnityDoorstop)
+>
+> - 修改了 doorstop_config.ini 和 winhttp.dll
+>
 ---
