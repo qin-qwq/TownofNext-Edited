@@ -693,7 +693,7 @@ class InnerNetClientSpawnPatch
                         if (!AmongUsClient.Instance.IsGameStarted && client.Character != null)
                         {
                             Main.isChatCommand = true;
-                            Utils.ShowLastRoles(client.Character.PlayerId);
+                            Utils.SendMessage("\n", client.Character.PlayerId, Main.LastSummaryMessage, ShouldSplit: true);
                         }
                     }, 3.1f, "DisplayLastRoles");
                 }

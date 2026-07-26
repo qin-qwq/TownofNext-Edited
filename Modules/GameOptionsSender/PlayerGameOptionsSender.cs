@@ -67,9 +67,12 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             Logger.Info($"PackedWriter flush queued - Length: {PackedWriter.Length}, Messages: {PackedWriterMessages}", "SendOptionsArray");
         }
 
-        PackedWriter = MessageWriter.Get(SendOption.Reliable);
-        PackedWriter.StartMessage(26);
-        PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+        if (!GameStates.IsLocalGame)
+        {
+            PackedWriter = MessageWriter.Get(SendOption.Reliable);
+            PackedWriter.StartMessage(26);
+            PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+        }
         PackedWriterMessages = 0;
 
         for (var index = 0; index < AllSenders.Count; index++)
@@ -194,8 +197,11 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
             }
 
             PackedWriter.Clear(SendOption.Reliable);
-            PackedWriter.StartMessage(26);
-            PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+            if (!GameStates.IsLocalGame)
+            {
+                PackedWriter.StartMessage(26);
+                PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+            }
         }
 
         yield return WaitFrameIfNecessary();
@@ -269,9 +275,12 @@ public class PlayerGameOptionsSender(PlayerControl player) : GameOptionsSender
                 capturedWriter.Recycle();
             }, cleanup: capturedWriter.Recycle);
             PackedWriterMessages = 0;
-            PackedWriter = MessageWriter.Get(SendOption.Reliable);
-            PackedWriter.StartMessage(26);
-            PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+            if (!GameStates.IsLocalGame)
+            {
+                PackedWriter = MessageWriter.Get(SendOption.Reliable);
+                PackedWriter.StartMessage(26);
+                PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+            }
         }
 
         PackedWriterMessages++;

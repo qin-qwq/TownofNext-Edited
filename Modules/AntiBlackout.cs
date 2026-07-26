@@ -276,7 +276,7 @@ public static class AntiBlackout
         {
             foreach (var pc in Main.EnumeratePlayerControls().Where(p => !p.IsModded()).ToArray())
             {
-                pc.Notify(CheckForEndVotingPatch.TempExileMsg);
+                pc.Notify(CheckForEndVotingPatch.TempExileMsg, 15f);
             }
         }
 

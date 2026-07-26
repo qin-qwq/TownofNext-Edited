@@ -71,11 +71,9 @@ internal class Balancer : RoleBase
                 return false;
             }
             voter.RpcRemoveAbilityUse();
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
             Choose = true;
             Choose2 = true;
+            RpcVotingCompleteV2();
             return false;
         }
         Target1 = target.PlayerId;
@@ -112,11 +110,9 @@ internal class Balancer : RoleBase
                 return;
             }
             voter.RpcRemoveAbilityUse();
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
             Choose = true;
             Choose2 = true;
+            RpcVotingCompleteV2();
             return;
         }
         Target1 = target.PlayerId;

@@ -215,9 +215,7 @@ internal class RoundUp : Standard
                 target.SetNewOutfit(PlayerOutfit, false, false);
             }
             Deputy = byte.MaxValue;
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
+            RpcVotingCompleteV2();
         }
     }
 }

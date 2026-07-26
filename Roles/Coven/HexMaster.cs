@@ -1,6 +1,7 @@
 using Hazel;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -319,6 +320,8 @@ internal class HexMaster : CovenManager
     }
     public override void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
     {
+        if (Balancer.Choose || President.EndMeeting) return;
+
         foreach (var id in exileIds)
         {
             if (HexedPlayer.ContainsKey(id))
@@ -350,7 +353,7 @@ internal class HexMaster : CovenManager
     }
     public override void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
-        RemoveHexedPlayer();
+        if (!Balancer.Choose) RemoveHexedPlayer();
     }
     private static void RemoveHexedPlayer()
     {

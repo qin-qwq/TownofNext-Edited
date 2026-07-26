@@ -97,9 +97,7 @@ internal class President : RoleBase
                     MeetingHud.Instance.RpcClearVote(pva.TargetPlayerId);
             }
             EndMeeting = true;
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
+            Utils.RpcVotingCompleteV2();
         }
         else if (operate == 2)
         {

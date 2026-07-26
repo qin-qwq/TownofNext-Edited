@@ -100,9 +100,12 @@ public abstract class GameOptionsSender
                 if (GameStates.InGame)
                 {
                     PackedWriterMessages = 0;
-                    PackedWriter = MessageWriter.Get(SendOption.Reliable);
-                    PackedWriter.StartMessage(26);
-                    PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+                    if (!GameStates.IsLocalGame)
+                    {
+                        PackedWriter = MessageWriter.Get(SendOption.Reliable);
+                        PackedWriter.StartMessage(26);
+                        PackedWriter.WritePacked(AmongUsClient.Instance.GameId);
+                    }
                 }
 
                 for (var index = 0; index < AllSenders.Count; index++)

@@ -132,19 +132,28 @@ namespace TONE.Modules
             int messages = 0;
 
             MessageWriter packedWriter = MessageWriter.Get(SendOption.Reliable);
-            packedWriter.StartMessage(26);
-            packedWriter.WritePacked(AmongUsClient.Instance.GameId);
+            if (!GameStates.IsLocalGame)
+            {
+                packedWriter.StartMessage(26);
+                packedWriter.WritePacked(AmongUsClient.Instance.GameId);
+            }
 
             foreach (PlayerControl player in players)
             {
                 if (packedWriter.Length > 500 || messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
                 {
                     messages = 0;
-                    packedWriter.EndMessage();
+                    if (!GameStates.IsLocalGame)
+                    {
+                        packedWriter.EndMessage();
+                    }
                     AmongUsClient.Instance.SendOrDisconnect(packedWriter);
                     packedWriter.Clear(SendOption.Reliable);
-                    packedWriter.StartMessage(26);
-                    packedWriter.WritePacked(AmongUsClient.Instance.GameId);
+                    if (!GameStates.IsLocalGame)
+                    {
+                        packedWriter.StartMessage(26);
+                        packedWriter.WritePacked(AmongUsClient.Instance.GameId);
+                    }
                 }
 
                 if (Hide(player, packedWriter))
@@ -153,7 +162,10 @@ namespace TONE.Modules
 
             if (messages > 0)
             {
-                packedWriter.EndMessage();
+                if (!GameStates.IsLocalGame)
+                {
+                    packedWriter.EndMessage();
+                }
                 AmongUsClient.Instance.SendOrDisconnect(packedWriter);
             }
 
@@ -325,8 +337,11 @@ namespace TONE.Modules
                 {
                     int messages = 0;
                     MessageWriter stream = MessageWriter.Get(SendOption.Reliable);
-                    stream.StartMessage(26);
-                    stream.WritePacked(AmongUsClient.Instance.GameId);
+                    if (!GameStates.IsLocalGame)
+                    {
+                        stream.StartMessage(26);
+                        stream.WritePacked(AmongUsClient.Instance.GameId);
+                    }
 
                     foreach (PlayerControl pc in Main.EnumeratePlayerControls())
                     {
@@ -334,14 +349,20 @@ namespace TONE.Modules
 
                         if (stream.Length > 500 || messages + 3 > AmongUsClient.Instance.GetMaxMessagePackingLimit())
                         {
-                            stream.EndMessage();
+                            if (!GameStates.IsLocalGame)
+                            {
+                                stream.EndMessage();
+                            }
                             qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(stream), cleanup: stream.Recycle);
                             yield return qa.Wait();
                             if (qa.Dropped) yield break;
                             messages = 0;
                             stream.Clear(SendOption.Reliable);
-                            stream.StartMessage(26);
-                            stream.WritePacked(AmongUsClient.Instance.GameId);
+                            if (!GameStates.IsLocalGame)
+                            {
+                                stream.StartMessage(26);
+                                stream.WritePacked(AmongUsClient.Instance.GameId);
+                            }
                         }
 
                         stream.StartMessage(6);
@@ -366,7 +387,10 @@ namespace TONE.Modules
                         messages += 3;
                     }
 
-                    stream.EndMessage();
+                    if (!GameStates.IsLocalGame)
+                    {
+                        stream.EndMessage();
+                    }
                     qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(stream));
                     yield return qa.Wait();
                     stream.Recycle();

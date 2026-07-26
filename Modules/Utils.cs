@@ -3456,4 +3456,12 @@ public static class Utils
         }
         return friendCode.GetDevUser().IsDev;
     }
+
+    public static void RpcVotingCompleteV2()
+    {
+        CheckForEndVotingPatch.CheckForDeathOnExile(PlayerState.DeathReason.Vote, 0xff);
+        List<MeetingHud.VoterState> statesList = [];
+        MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+        MeetingHud.Instance.RpcClose();
+    }
 }
