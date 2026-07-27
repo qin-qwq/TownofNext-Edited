@@ -622,8 +622,8 @@ class InnerNetClientSpawnPatch
 
             _ = new LateTask(() =>
             {
-                if (Main.OverrideWelcomeMsg != "") Utils.SendMessage(Main.OverrideWelcomeMsg, client.Character.PlayerId);
-                else TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true);
+                if (Main.OverrideWelcomeMsg != "") Utils.SendMessage(Main.OverrideWelcomeMsg, client.Character.PlayerId, sendOption: SendOption.None);
+                else TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true, sendOption: SendOption.None);
             }, 3f, "Welcome Message");
 
             /*_ = new LateTask(() =>

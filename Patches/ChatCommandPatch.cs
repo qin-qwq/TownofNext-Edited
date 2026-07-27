@@ -499,7 +499,7 @@ internal class ChatCommands
     {
         if (GameModeBase.GetGameMode() is not CustomGameMode.Standard and not CustomGameMode.HidenSeekTONE)
         {
-            Utils.SendMessage(GetString($"ModeDescribe.{GameModeBase.GetGameMode()}"), playerId);
+            Utils.SendMessage(GetString($"ModeDescribe.{GameModeBase.GetGameMode()}"), playerId, sendOption: SendOption.None);
             return;
         }
         role = role.Trim().ToLower();
@@ -520,7 +520,7 @@ internal class ChatCommands
 
         if (result == CustomRoles.NotAssigned)
         {
-            Utils.SendMessage(GetString("Message.CanNotFindRoleThePlayerEnter"), playerId);
+            Utils.SendMessage(GetString("Message.CanNotFindRoleThePlayerEnter"), playerId, sendOption: SendOption.None);
             return;
         }
 
@@ -538,7 +538,7 @@ internal class ChatCommands
         {
             if (result.IsGhostRole() || !shouldDevAssign || result.IsAddonAssignedMidGame() || (result.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) || (result.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp))
             {
-                Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId);
+                Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId, sendOption: SendOption.None);
                 return;
             }
 
@@ -554,7 +554,7 @@ internal class ChatCommands
             else
                 RoleAssign.SetRoles[pid] = result;
 
-            Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), Translator.GetActualRoleName(result)), playerId);
+            Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), Translator.GetActualRoleName(result)), playerId, sendOption: SendOption.None);
             return;
         }
 
@@ -726,7 +726,7 @@ internal class ChatCommands
 
     private static void WinnerCommand(PlayerControl player, string text, string[] args)
     {
-        if (Main.winnerNameList.Count == 0) Utils.SendMessage(GetString("NoInfoExists"), player.PlayerId);
+        if (Main.winnerNameList.Count == 0) Utils.SendMessage(GetString("NoInfoExists"), player.PlayerId, sendOption: SendOption.None);
         else Utils.SendMessage("Winner: " + string.Join(", ", Main.winnerNameList), player.PlayerId);
     }
 
@@ -775,7 +775,7 @@ internal class ChatCommands
             if (args.Length < 1) return;
             if (args.Skip(1).Join(delimiter: " ").Length is > 10 or < 1 || args.Skip(1).Join(delimiter: " ")[0] == '<') // <#ffffff>E is a valid name without this
             {
-                Utils.SendMessage(GetString("Message.AllowNameLength"), player.PlayerId);
+                Utils.SendMessage(GetString("Message.AllowNameLength"), player.PlayerId, sendOption: SendOption.None);
                 return;
             }
             var temp = args.Skip(1).Join(delimiter: " ");
@@ -785,7 +785,7 @@ internal class ChatCommands
         }
         else
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
         }
     }
 
@@ -943,7 +943,7 @@ internal class ChatCommands
     {
         if (!Options.EnableKillerLeftCommand.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
@@ -1001,7 +1001,7 @@ internal class ChatCommands
     {
         if (player.IsAlive())
         {
-            Utils.SendMessage(string.Format(GetString("DeathCmd.NotDead"), player.GetRealName(), player.GetCustomRole().ToColoredString()), player.PlayerId);
+            Utils.SendMessage(string.Format(GetString("DeathCmd.NotDead"), player.GetRealName(), player.GetCustomRole().ToColoredString()), player.PlayerId, sendOption: SendOption.None);
         }
         else if (Main.PlayerStates[player.PlayerId].deathReason == PlayerState.DeathReason.Vote)
         {
@@ -1112,7 +1112,7 @@ internal class ChatCommands
             }
             else TemplateManager.SendTemplate(args[1], player.PlayerId);
         }
-        else Utils.SendMessage($"{GetString("ForExample")}:\n{args[0]} test", player.PlayerId);
+        else Utils.SendMessage($"{GetString("ForExample")}:\n{args[0]} test", player.PlayerId, sendOption: SendOption.None);
     }
 
     private static void MessageWaitCommand(PlayerControl player, string text, string[] args)
@@ -1129,7 +1129,7 @@ internal class ChatCommands
     {
         if (!Options.PlayerCanUseTP.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         player.RpcTeleport(new Vector2(0.1f, 3.8f));
@@ -1139,7 +1139,7 @@ internal class ChatCommands
     {
         if (!Options.PlayerCanUseTP.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         player.RpcTeleport(new Vector2(-0.2f, 1.3f));
@@ -1224,20 +1224,20 @@ internal class ChatCommands
         // Check if the ban command is enabled in the settings
         if (!tagCanBan && Options.ApplyModeratorList.GetValue() == 0)
         {
-            Utils.SendMessage(GetString("BanCommandDisabled"), player.PlayerId);
+            Utils.SendMessage(GetString("BanCommandDisabled"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         // Check if the player has the necessary privileges to use the command
         if (!tagCanBan && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.CanUseDev() && !player.IsHost())
         {
-            Utils.SendMessage(GetString("BanCommandNoAccess"), player.PlayerId);
+            Utils.SendMessage(GetString("BanCommandNoAccess"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         string banReason;
         if (args.Length < 3)
         {
-            Utils.SendMessage(GetString("BanCommandNoReason"), player.PlayerId);
+            Utils.SendMessage(GetString("BanCommandNoReason"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         else
@@ -1248,27 +1248,27 @@ internal class ChatCommands
         //subArgs = args.Length < 2 ? "" : args[1];
         if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte banPlayerId))
         {
-            Utils.SendMessage(GetString("BanCommandInvalidID"), player.PlayerId);
+            Utils.SendMessage(GetString("BanCommandInvalidID"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         if (banPlayerId == 0)
         {
-            Utils.SendMessage(GetString("BanCommandBanHost"), player.PlayerId);
+            Utils.SendMessage(GetString("BanCommandBanHost"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         var bannedPlayer = Utils.GetPlayerById(banPlayerId);
         if (bannedPlayer == null)
         {
-            Utils.SendMessage(GetString("BanCommandInvalidID"), player.PlayerId);
+            Utils.SendMessage(GetString("BanCommandInvalidID"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         // Prevent moderators from banning other moderators
         if ((Utils.IsPlayerModerator(bannedPlayer.FriendCode) || TagManager.ReadPermission(bannedPlayer.FriendCode) >= 5) && !player.IsHost())
         {
-            Utils.SendMessage(GetString("BanCommandBanMod"), player.PlayerId);
+            Utils.SendMessage(GetString("BanCommandBanMod"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
@@ -1296,37 +1296,37 @@ internal class ChatCommands
         var tagCanWarn = TagManager.ReadPermission(player.FriendCode) >= 2;
         if (!tagCanWarn && Options.ApplyModeratorList.GetValue() == 0)
         {
-            Utils.SendMessage(GetString("WarnCommandDisabled"), player.PlayerId);
+            Utils.SendMessage(GetString("WarnCommandDisabled"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         if (!tagCanWarn && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.CanUseDev() && !player.IsHost())
         {
-            Utils.SendMessage(GetString("WarnCommandNoAccess"), player.PlayerId);
+            Utils.SendMessage(GetString("WarnCommandNoAccess"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         subArgs = args.Length < 2 ? "" : args[1];
         if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte warnPlayerId))
         {
-            Utils.SendMessage(GetString("WarnCommandInvalidID"), player.PlayerId);
+            Utils.SendMessage(GetString("WarnCommandInvalidID"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         if (warnPlayerId == 0)
         {
-            Utils.SendMessage(GetString("WarnCommandWarnHost"), player.PlayerId);
+            Utils.SendMessage(GetString("WarnCommandWarnHost"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         var warnedPlayer = Utils.GetPlayerById(warnPlayerId);
         if (warnedPlayer == null)
         {
-            Utils.SendMessage(GetString("WarnCommandInvalidID"), player.PlayerId);
+            Utils.SendMessage(GetString("WarnCommandInvalidID"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         // Prevent moderators from warning other moderators
         if ((Utils.IsPlayerModerator(warnedPlayer.FriendCode) || TagManager.ReadPermission(warnedPlayer.FriendCode) >= 2) && !player.IsHost())
         {
-            Utils.SendMessage(GetString("WarnCommandWarnMod"), player.PlayerId);
+            Utils.SendMessage(GetString("WarnCommandWarnMod"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         // warn the specified player
@@ -1358,41 +1358,41 @@ internal class ChatCommands
         // Check if the kick command is enabled in the settings
         if (!tagCanKick && Options.ApplyModeratorList.GetValue() == 0)
         {
-            Utils.SendMessage(GetString("KickCommandDisabled"), player.PlayerId);
+            Utils.SendMessage(GetString("KickCommandDisabled"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         // Check if the player has the necessary privileges to use the command
         if (!tagCanKick && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.CanUseDev() && !player.IsHost())
         {
-            Utils.SendMessage(GetString("KickCommandNoAccess"), player.PlayerId);
+            Utils.SendMessage(GetString("KickCommandNoAccess"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         subArgs = args.Length < 2 ? "" : args[1];
         if (string.IsNullOrEmpty(subArgs) || !byte.TryParse(subArgs, out byte kickPlayerId))
         {
-            Utils.SendMessage(GetString("KickCommandInvalidID"), player.PlayerId);
+            Utils.SendMessage(GetString("KickCommandInvalidID"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         if (kickPlayerId == 0)
         {
-            Utils.SendMessage(GetString("KickCommandKickHost"), player.PlayerId);
+            Utils.SendMessage(GetString("KickCommandKickHost"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         var kickedPlayer = Utils.GetPlayerById(kickPlayerId);
         if (kickedPlayer == null)
         {
-            Utils.SendMessage(GetString("KickCommandInvalidID"), player.PlayerId);
+            Utils.SendMessage(GetString("KickCommandInvalidID"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
         // Prevent moderators from kicking other moderators
         if ((Utils.IsPlayerModerator(kickedPlayer.FriendCode) || TagManager.ReadPermission(kickedPlayer.FriendCode) >= 4) && !player.IsHost())
         {
-            Utils.SendMessage(GetString("KickCommandKickMod"), player.PlayerId);
+            Utils.SendMessage(GetString("KickCommandKickMod"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
@@ -1766,15 +1766,15 @@ internal class ChatCommands
             var color = Utils.MsgToColor(subArgs);
             if (color == byte.MaxValue)
             {
-                Utils.SendMessage(GetString("IllegalColor"), player.PlayerId);
+                Utils.SendMessage(GetString("IllegalColor"), player.PlayerId, sendOption: SendOption.None);
                 return;
             }
             player.RpcSetColor(color);
-            Utils.SendMessage(string.Format(GetString("Message.SetColor"), subArgs), player.PlayerId);
+            Utils.SendMessage(string.Format(GetString("Message.SetColor"), subArgs), player.PlayerId, sendOption: SendOption.None);
         }
         else
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
         }
     }
 
@@ -1803,7 +1803,7 @@ internal class ChatCommands
         }
         else
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
         }
     }
 
@@ -2075,17 +2075,17 @@ internal class ChatCommands
     {
         if (player.IsHost())
         {
-            Utils.SendMessage(GetString("Message.CanNotUseByHost"), player.PlayerId);
+            Utils.SendMessage(GetString("Message.CanNotUseByHost"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         if (!Pollvotes.Any())
         {
-            Utils.SendMessage(GetString("Poll.Inactive"), player.PlayerId);
+            Utils.SendMessage(GetString("Poll.Inactive"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         if (PollVoted.Contains(player.PlayerId))
         {
-            Utils.SendMessage(GetString("Poll.AlreadyVoted"), player.PlayerId);
+            Utils.SendMessage(GetString("Poll.AlreadyVoted"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
@@ -2113,7 +2113,7 @@ internal class ChatCommands
     {
         if (!Options.CanPlayMiniGames.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         var subArgs = args.Length != 2 ? "" : args[1];
@@ -2160,7 +2160,7 @@ internal class ChatCommands
     {
         if (!Options.CanPlayMiniGames.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
@@ -2182,23 +2182,23 @@ internal class ChatCommands
     {
         if (!Options.CanPlayMiniGames.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         if (!GameStates.IsLobby && player.IsAlive())
         {
-            Utils.SendMessage(GetString("GNoCommandInfo"), player.PlayerId);
+            Utils.SendMessage(GetString("GNoCommandInfo"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         var subArgs = args.Length != 2 ? "" : args[1];
         if (subArgs == "" || !int.TryParse(subArgs, out int guessedNo))
         {
-            Utils.SendMessage(GetString("GNoCommandInfo"), player.PlayerId);
+            Utils.SendMessage(GetString("GNoCommandInfo"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         else if (guessedNo < 0 || guessedNo > 99)
         {
-            Utils.SendMessage(GetString("GNoCommandInfo"), player.PlayerId);
+            Utils.SendMessage(GetString("GNoCommandInfo"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         else
@@ -2242,7 +2242,7 @@ internal class ChatCommands
     {
         if (!Options.CanPlayMiniGames.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         var subArgs = args.Length != 3 ? "" : args[1];
@@ -2271,7 +2271,7 @@ internal class ChatCommands
     {
         if (!Options.CanPlayMiniGames.GetBool())
         {
-            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId);
+            Utils.SendMessage(GetString("DisableUseCommand"), player.PlayerId, sendOption: SendOption.None);
             return;
         }
         var rando = IRandom.Instance;
@@ -2530,7 +2530,7 @@ internal class ChatCommands
 
         if (roleToSet.IsGhostRole() || !shouldDevAssign || roleToSet.IsAddonAssignedMidGame() || (roleToSet.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla))
         {
-            Utils.SendMessage(string.Format(GetString("Message.SetRoleSelectFailed"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId);
+            Utils.SendMessage(string.Format(GetString("Message.SetRoleSelectFailed"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId, sendOption: SendOption.None);
             return;
         }
 
@@ -2544,7 +2544,7 @@ internal class ChatCommands
         else
             RoleAssign.SetRoles[resultId] = roleToSet;
 
-        Utils.SendMessage(string.Format(GetString("Message.SetRoleSelected"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId);
+        Utils.SendMessage(string.Format(GetString("Message.SetRoleSelected"), resultId.GetPlayerName(), roleToSet.ToColoredString()), player.PlayerId, sendOption: SendOption.None);
 
         if (targetPc.FriendCode.CanUseDev() && player.PlayerId != resultId)
         {

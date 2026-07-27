@@ -129,7 +129,7 @@ internal class Inspector : RoleBase
 
         if (!pc.IsAlive())
         {
-            SendMessage(GetString("InspectorDead"), pc.PlayerId);
+            SendMessage(GetString("InspectorDead"), pc.PlayerId, sendOption: SendOption.None);
             return true;
         }
 

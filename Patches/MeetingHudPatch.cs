@@ -1369,7 +1369,7 @@ class MeetingHudStartPatch
 
         if (MeetingStates.FirstMeeting)
         {
-            TemplateManager.SendTemplate("OnFirstMeeting", noErr: true);
+            TemplateManager.SendTemplate("OnFirstMeeting", noErr: true, sendOption: SendOption.None);
             if (Options.EnableImpostorChannel.GetBool())
             {
                 foreach (var pc in Main.EnumerateAlivePlayerControls())
@@ -1389,7 +1389,7 @@ class MeetingHudStartPatch
                 }
             }
         }
-        TemplateManager.SendTemplate("OnMeeting", noErr: true);
+        TemplateManager.SendTemplate("OnMeeting", noErr: true, sendOption: SendOption.None);
 
         try
         {
