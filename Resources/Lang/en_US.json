@@ -4374,7 +4374,7 @@
   "SendTargets.Imp": "Send to ：<color=#ff1919> Imposter </color>",
   "SendTargets.Jackal": "Send to ：<color=#00b4eb> Jackal </color>",
   "SendTargets.Jailer": "Send to ：<color=#aa900d> Jailer </color>",
-  "SendTargetSwitchNotice": "（按 Ctrl 切换发送目标）",
+  "SendTargetSwitchNotice": "(Press Ctrl to switch the message target)",
   "SendTargetSwitchNoticeAndroid": "（向上滑动切换发送目标）",
   "CanUseImpostorChannel": "You can use Imposter Channel. Chat command：/cmd imp [content]",
   "CheckRoleNumber": "Maximum number list of occupations",
