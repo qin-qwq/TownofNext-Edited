@@ -2333,7 +2333,7 @@
   "LostRoleByEraser": "You lost your role because of the <color=#ff1919>Eraser</color>",
   "KilledByScavenger": "The Scavenger killed you and thus teleported off-map",
   "SnitchDoneTasks": "Call a meeting to find the Impostors",
-  "SwooperCanVent": "冷却结束，按下变形隐身",
+  "SwooperCanVent": "Cooldown finished,press to become invisible",
   "SwooperInvisState": "You're invisible",
   "SwooperInvisStateOut": "You're now visible",
   "SwooperInvisInCooldown": "Swoop Cooldown isn't up yet. Swooping failed",
