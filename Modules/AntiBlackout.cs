@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 
 namespace TONE;
@@ -274,7 +275,7 @@ public static class AntiBlackout
 
         if ((BlackOutIsActive || ResetName) && CheckForEndVotingPatch.TempExileMsg != string.Empty && Main.CurrentServerIsVanilla)
         {
-            foreach (var pc in Main.EnumeratePlayerControls().Where(p => !p.IsModded()).ToArray())
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
                 pc.Notify(CheckForEndVotingPatch.TempExileMsg, 15f);
             }
@@ -309,6 +310,7 @@ public static class AntiBlackout
     {
         if (CustomWinnerHolder.WinnerTeam != CustomWinner.Default) return;
 
+        Imitator.ChangeRoleMap();
         RpcSetRoleReplacer.ResetRoleMapMidGame();
         List<PlayerControl> selfExiled = [];
 

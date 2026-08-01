@@ -189,7 +189,7 @@ static class ExtendedPlayerControl
                 continue;
             }
 
-            var imp = player.GetCustomRole().IsImpostor() && target.GetCustomRole().IsImpostor();
+            var imp = player.GetCustomRole().IsImpostor() && target.GetCustomRole().IsImpostor() && !CustomRoles.Narc.RoleExist(true);
 
             if (target.IsAlive() || !target.Data.IsDead && !target.Data.Disconnected)
             {
@@ -797,7 +797,7 @@ static class ExtendedPlayerControl
     }
     public static void RpcResetAbilityCooldown(this PlayerControl target)
     {
-        if (!AmongUsClient.Instance.AmHost || target == null) return; // Nothing happens when run by anyone other than the host.
+        if (!AmongUsClient.Instance.AmHost || !target) return; // Nothing happens when run by anyone other than the host.
         Logger.Info($"Ability cooldown reset: {target.name}({target.PlayerId})", "RpcResetAbilityCooldown");
 
         if (target.GetRoleClass() is Glitch gc)
@@ -2131,5 +2131,16 @@ static class ExtendedPlayerControl
     {
         var abilityRangeSorted = player.Data.Role.GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList());
         return abilityRangeSorted.Count <= 0 ? null : abilityRangeSorted[0];
+    }
+
+    // Includes RpcChangeRoleBasis
+    public static void RpcSetCustomRoleV2(this PlayerControl player, CustomRoles role, bool remove = false, bool add = false)
+    {
+        if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || !player || player.GetCustomRole() == role) return;
+        
+        if (remove) player.GetRoleClass()?.OnRemove(player.PlayerId);
+        player.RpcSetCustomRole(role);
+        player.RpcChangeRoleBasis(role);
+        if (add) player.GetRoleClass()?.OnAdd(player.PlayerId);
     }
 }

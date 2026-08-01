@@ -2174,12 +2174,6 @@ public static class Utils
 
                                 TargetPlayerName = GetTragetId;
                             }
-                            // Summoner Dead players ID
-                            if (seer.IsAlive() && !target.IsAlive())
-                            {
-                                if (seer.Is(CustomRoles.Summoner))
-                                    TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
-                            }
                         }
 
                         TargetPlayerName = TargetPlayerName.ApplyNameColorData(seer, target, isForMeeting);
@@ -2522,12 +2516,6 @@ public static class Utils
                                         var GetTragetId = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
 
                                         TargetPlayerName = GetTragetId;
-                                    }
-                                    // Summoner Dead players ID
-                                    if (seer.IsAlive() && !target.IsAlive())
-                                    {
-                                        if (seer.Is(CustomRoles.Summoner))
-                                            TargetPlayerName = ColorString(GetRoleColor(seer.GetCustomRole()), target.GetVisiblePlayerId().ToString()) + " " + TargetPlayerName;
                                     }
                                 }
                             }

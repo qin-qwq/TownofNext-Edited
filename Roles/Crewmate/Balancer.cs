@@ -154,17 +154,14 @@ internal class Balancer : RoleBase
         Choose2 = false;
         var Tar1 = GetPlayerById(Target1);
         var Tar2 = GetPlayerById(Target2);
-        if (CustomRoles.Death.RoleExist() && !Tar1.Is(CustomRoles.Death) && !Tar2.Is(CustomRoles.Death))
-        {
-            foreach (var Tar3 in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Death)))
-                if (!CustomWinnerHolder.CheckForConvertedWinner(Tar3.PlayerId))
-                {
-                    CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Apocalypse);
-                }
-            return;
-        }
+
         _ = new LateTask(() =>
         {
+            if (!Tar1 || !Tar2 || !Tar1.IsAlive() || !Tar2.IsAlive())
+            {
+                Logger.Info("Cancel Balancer Meeting because Target is null or dead", "Balancer");
+                return;
+            }
             Tar1?.NoCheckStartMeeting(null);
         }, 1f);
     }

@@ -219,10 +219,7 @@ internal class Jackal : RoleBase
                     }
                 }
 
-                target.GetRoleClass()?.OnRemove(target.PlayerId);
-                target.RpcChangeRoleBasis(role);
-                target.RpcSetCustomRole(role);
-                target.GetRoleClass()?.OnAdd(target.PlayerId);
+                target.RpcSetCustomRoleV2(role, true, true);
 
                 killer.Notify(Utils.ColorString(Utils.GetRoleColor(role), GetString("GangsterSuccessfullyRecruited")));
                 target.Notify(Utils.ColorString(Utils.GetRoleColor(role), GetString("BeRecruitedByJackal")));
@@ -283,10 +280,7 @@ internal class Jackal : RoleBase
                             Main.PlayerStates[target.PlayerId].SubRoles.Remove(CustomRoles.Rascal);
                         }
                     }
-                    target.GetRoleClass()?.OnRemove(target.PlayerId);
-                    target.RpcChangeRoleBasis(role);
-                    target.RpcSetCustomRole(role);
-                    target.GetRoleClass()?.OnAdd(target.PlayerId);
+                    target.RpcSetCustomRoleV2(role, true, true);
                     if (role is CustomRoles.Sidekick && killer.GetBetrayalAddon() != CustomRoles.NotAssigned)
                         target.RpcSetCustomRole(addon);
                 }
@@ -380,10 +374,7 @@ internal class Jackal : RoleBase
             {
                 Logger.Info($"Assigned new Jackal {newJackal.GetNameWithRole()}", "Jackal");
 
-                newJackal.GetRoleClass()?.OnRemove(newJackal.PlayerId);
-                newJackal.RpcChangeRoleBasis(CustomRoles.Jackal);
-                newJackal.RpcSetCustomRole(CustomRoles.Jackal);
-                newJackal.GetRoleClass()?.OnAdd(newJackal.PlayerId);
+                newJackal.RpcSetCustomRoleV2(CustomRoles.Jackal, true, true);
 
                 Main.PlayerStates[newJackal.PlayerId].RemoveSubRole(CustomRoles.Recruit);
                 newJackal.PlayerId.SetAbilityUseLimit(RestoreLimitOnNewJackal.GetBool() && CanRecruitSidekick.GetBool() ? SidekickRecruitLimitOpt.GetInt() : 0);

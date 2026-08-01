@@ -223,6 +223,7 @@ internal class ChatCommands
             new("Summon", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Summon.Id")]),
             new("Swap", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Swap.Id")]),
             new("Expel", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Expel.Id")]),
+            new("Imitate", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Imitate.Id")]),
         ];
     }
 
@@ -265,6 +266,7 @@ internal class ChatCommands
         if (Summoner.SummonerCheckMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (PlayerControl.LocalPlayer.GetRoleClass() is Swapper sw && sw.SwapMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dt && dt.ExilePlayer(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (Imitator.ImitatorMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Lovers.LoversMsg(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (ImpostorChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (CovenChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
@@ -625,6 +627,7 @@ internal class ChatCommands
         if (player.GetRoleClass() is Dictator dt && dt.ExilePlayer(player, text)) { canceled = true; Logger.Info($"Is Dictator command", "OnReceiveChat"); return; }
         if (Ritualist.RitualistMsgCheck(player, text)) { canceled = true; Logger.Info($"Is Ritualist command", "OnReceiveChat"); return; }
         if (Summoner.SummonerCheckMsg(player, text)) { canceled = true; Logger.Info($"Is Summoner command", "OnReceiveChat"); return; }
+        if (Imitator.ImitatorMsg(player, text)) { canceled = true; Logger.Info($"Is Imitator command", "OnReceiveChat"); return; }
         if (Lovers.LoversMsg(player, text)) { canceled = true; Logger.Info($"Is Lovers Private Chat", "OnReceiveChat"); return; }
         if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
         if (CovenChannel(player, text)) { canceled = true; Logger.Info($"Is Coven Channel", "OnReceiveChat"); return; }
@@ -1846,10 +1849,7 @@ internal class ChatCommands
             var roleName = GetString(rl.ToString()).ToLower().Trim().TrimStart('*').Replace(" ", string.Empty);
             if (setRole == roleName)
             {
-                player.GetRoleClass()?.OnRemove(player.PlayerId);
-                player.RpcChangeRoleBasis(rl);
-                player.RpcSetCustomRole(rl);
-                player.GetRoleClass().OnAdd(player.PlayerId);
+                player.RpcSetCustomRoleV2(rl, true, true);
                 Utils.SendMessage(string.Format("Debug Set your role to {0}", rl.GetActualRoleName()), player.PlayerId);
                 Utils.NotifyRoles(SpecifyTarget: player, NoCache: true);
                 Utils.MarkEveryoneDirtySettings();

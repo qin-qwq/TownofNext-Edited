@@ -147,6 +147,7 @@ internal class Archaeologist : RoleBase
                 player.Notify(GetString("SwooperInvisState"), InvisDuration.GetFloat() - 1);
                 _ = new LateTask(() =>
                 {
+                    if (!GameStates.IsInTask || ExileController.Instance || AntiBlackout.SkipTasks) return;
                     player.RpcMakeVisible();
                     player.RpcGuardAndKill();
                     player.Notify(GetString("SwooperInvisStateOut"), 5f);

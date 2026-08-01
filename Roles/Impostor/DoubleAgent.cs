@@ -246,10 +246,7 @@ internal class DoubleAgent : RoleBase
                 if (Role is CustomRoles.Traitor && player.Is(CustomRoles.Narc)) Role = CustomRoles.Parasite;
 
                 Init();
-                player.GetRoleClass().OnRemove(player.PlayerId);
-                player.RpcChangeRoleBasis(Role);
-                player.RpcSetCustomRole(Role);
-                player.GetRoleClass()?.Add(player.PlayerId);
+                player.RpcSetCustomRoleV2(Role, true, true);
                 player.MarkDirtySettings();
 
                 string RoleName = ColorString(GetRoleColor(player.GetCustomRole()), GetRoleName(player.GetCustomRole()));

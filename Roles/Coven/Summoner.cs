@@ -121,7 +121,7 @@ internal class Summoner : CovenManager
         // Check if the seer is Summoner and alive, and the seen player is dead
         if (!seer.IsAlive() || seen.IsAlive()) return string.Empty;
 
-        return ColorString(GetRoleColor(CustomRoles.Summoner), $" {seen.Data.PlayerId}");
+        return ColorString(GetRoleColor(seer.GetCustomRole()), $" {seen.GetVisiblePlayerId()}");
     }
     public override bool CanUseKillButton(PlayerControl pc) => HasNecronomicon(pc);
     public override bool OnCheckStartMeeting(PlayerControl reporter)
@@ -135,10 +135,6 @@ internal class Summoner : CovenManager
         return true;
     }
 
-    public override void OnVoteKick(PlayerControl pc, PlayerControl target)
-    {
-        SummonerCheckMsg(pc, $"/sm {target.PlayerId}", true);
-    }
     public static bool SummonerCheckMsg(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false; // Skip if system message or not host
@@ -496,8 +492,7 @@ internal class Summoner : CovenManager
             SaveOriginalRole(targetPlayer);
 
             // Assign Summoned role
-            targetPlayer.RpcChangeRoleBasis(CustomRoles.Summoned);
-            targetPlayer.RpcSetCustomRole(CustomRoles.Summoned);
+            targetPlayer.RpcSetCustomRoleV2(CustomRoles.Summoned);
             SummonedPlayerIds.Add(targetPlayer.PlayerId);
             if (!SummonedKillCounts.ContainsKey(targetPlayer.PlayerId))
             {

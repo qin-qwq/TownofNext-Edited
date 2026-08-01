@@ -27,10 +27,7 @@ internal class SchrodingersCat : RoleBase
         var addon = killer.GetBetrayalAddon(true);
         var role = killer.GetCustomRole();
 
-        target.GetRoleClass()?.OnRemove(target.PlayerId);
-        target.RpcSetCustomRole(role);
-        target.RpcChangeRoleBasis(role);
-        target.GetRoleClass()?.OnAdd(target.PlayerId);
+        target.RpcSetCustomRoleV2(role, true, true);
 
         if (killer.GetBetrayalAddon() != CustomRoles.NotAssigned)
             target.RpcSetCustomRole(addon);

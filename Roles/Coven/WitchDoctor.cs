@@ -95,10 +95,7 @@ internal class WitchDoctor : CovenManager
                     Main.PlayerStates[player.PlayerId].RemoveSubRole(CustomRoles.Enchanted);
                 }
 
-                player.GetRoleClass().OnRemove(player.PlayerId);
-                player.RpcSetCustomRole(role);
-                player.RpcChangeRoleBasis(role);
-                player.GetRoleClass().OnAdd(player.PlayerId);
+                player.RpcSetCustomRoleV2(role, true, true);
 
                 Utils.NotifyRoles(SpecifySeer: player);
                 Utils.NotifyRoles(SpecifyTarget: player);

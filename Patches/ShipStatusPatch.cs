@@ -189,7 +189,7 @@ class StartPatch
 
         Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
 
-        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || !GameModeBase.GetGameMode().GetGameModeClass().CanReport)
+        if (Options.SyncButtonMode.GetBool() && Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || !GameModeBase.GetGameMode().GetGameModeClass().CanReport)
         {
             __instance.BreakEmergencyButton();
         }
@@ -210,6 +210,7 @@ class StartPatch
 
         switch (Utils.GetActiveMapName())
         {
+            // 17.3 here
             case MapNames.Skeld:
                 var halloweenDecorationIsActive = Options.EnableHalloweenDecorations.GetBool();
                 var birthdayDecorationIsActive = Options.EnableBirthdayDecorationSkeld.GetBool();

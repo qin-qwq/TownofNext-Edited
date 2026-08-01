@@ -157,7 +157,6 @@ internal class Swooper : RoleBase
             if (swooper == null) continue;
 
             InvisDuration.Remove(swooperId);
-            swooper.RpcMakeVisible();
             SendRPC(swooper);
         }
 

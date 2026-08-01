@@ -13,9 +13,10 @@ class ExileControllerWrapUpPatch
     class ExileControllerBeginPatch
     {
         // This patch is to show exile string for modded players
+        // Due to Innersloth anti-cheat updates, this is visible only to the host
         public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
         {
-            if (GameModeBase.GetGameMode() is CustomGameMode.Standard && init != null && init.outfit != null)
+            if (GameModeBase.GetGameMode() is CustomGameMode.Standard && init != null && init.outfit != null && AmongUsClient.Instance.AmHost)
                 __instance.completeString = CheckForEndVotingPatch.TempExileMsg;
             // TempExileMsg for client is sent in RpcClose
         }
@@ -190,6 +191,11 @@ class ExileControllerWrapUpPatch
             _ = new LateTask(() =>
             {
                 if (GameStates.IsEnded) return;
+
+                Main.PlayerStates.Values.DoIf(x => x.IsBlackOut, x =>
+                {
+                    x.IsBlackOut = false;
+                });
 
                 Main.AfterMeetingDeathPlayers.Do(x =>
                 {

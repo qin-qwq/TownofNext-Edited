@@ -67,7 +67,6 @@ internal class PhantomTONE : RoleBase
         if (IsInvisible.Item1)
         {
             IsInvisible = (false, 0);
-            PhantomAppear(_Player);
         }
     }
 

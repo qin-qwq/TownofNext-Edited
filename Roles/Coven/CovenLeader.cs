@@ -95,10 +95,7 @@ internal class CovenLeader : CovenManager
             Logger.Info($"Coven Leader directly Retraining [{target.PlayerId}]{target.GetNameWithRole()} => {retrainPlayer[target.PlayerId]}", "CovenLeader");
             target.Notify(string.Format(GetString("CovenLeaderRetrainInGameNotif"), CustomRoles.CovenLeader.ToColoredString(), retrainPlayer[target.PlayerId].ToColoredString()));
             killer.Notify(string.Format(GetString("CovenLeaderRetrainInGame"), target.GetRealName(), retrainPlayer[target.PlayerId].ToColoredString()));
-            target.GetRoleClass()?.OnRemove(target.PlayerId);
-            target.RpcChangeRoleBasis(retrainPlayer[target.PlayerId]);
-            target.RpcSetCustomRole(retrainPlayer[target.PlayerId]);
-            target.GetRoleClass()?.OnAdd(target.PlayerId);
+            target.RpcSetCustomRoleV2(retrainPlayer[target.PlayerId], true, true);
             retrainPlayer.Remove(target.PlayerId);
             killer.RpcRemoveAbilityUse();
             if (RetrainConvertsHelpers.GetBool()) PassRecruit(killer, target);

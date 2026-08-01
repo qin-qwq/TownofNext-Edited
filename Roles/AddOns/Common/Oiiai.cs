@@ -26,7 +26,7 @@ public class Oiiai : IAddon
     public static readonly CustomRoles[] NRoleChangeRoles =
     [
         CustomRoles.Amnesiac,
-        CustomRoles.Imitator,
+        //CustomRoles.Imitator,
     ];
 
     public void SetupCustomOption()

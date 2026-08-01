@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.07.27";
+    public const string PluginVersion = "26.08.01";
     public const string PluginDisplayVersion = "2.0.0 Beta 2";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -267,8 +267,8 @@ public class Main : BasePlugin
             if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
             {
                 DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 7, 24, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 7, 31, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 8, 1, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 8, 10, 7, 0, 0, 0, DateTimeKind.Utc);
                 return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
             }
             return false;
@@ -968,6 +968,7 @@ public enum CustomRoles
     FortuneTeller,
     Grenadier,
     Guardian,
+    Imitator,
     Inspector,
     Investigator,
     Jailer,
@@ -1043,7 +1044,6 @@ public enum CustomRoles
     God,
     Hater,
     Huntsman,
-    Imitator,
     Infectious,
     Innocent,
     Inquisitor,

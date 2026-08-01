@@ -344,9 +344,7 @@ internal class Baker : RoleBase
         {
             var bread = BreadedPlayerCount(player.PlayerId);
             Logger.Info($"{player.GetRealName()} transformed to Famine with {bread.Item1}/{bread.Item2} bread", "Baker");
-            player.RpcChangeRoleBasis(CustomRoles.Famine);
-            player.RpcSetCustomRole(CustomRoles.Famine);
-            player.GetRoleClass()?.OnAdd(_Player.PlayerId);
+            player.RpcSetCustomRoleV2(CustomRoles.Famine, false, true);
 
             player.Notify(GetString("BakerToFamine"));
             player.RpcGuardAndKill(player);

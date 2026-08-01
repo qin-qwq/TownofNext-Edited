@@ -83,7 +83,7 @@ public class CustomRpcSender
 
         if (currentState == State.InRootPackedMessage && targetClientId < 0)
         {
-            var errorMsg = $"Tried to start RPC automatically, but State is InRootPackedMessage and the requested targetClientId is negative. Only GameDataTo messages can be started in this state. (in: \"{name}\")";
+            var errorMsg = $"Tried to start Message, but State is InRootPackedMessage and the requested targetClientId is negative. Only GameDataTo messages can be started in this state. (in: \"{name}\")";
 
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
@@ -135,7 +135,7 @@ public class CustomRpcSender
 
         if (currentState != State.Ready)
         {
-            var errorMsg = $"Tried to start Message but State is not Ready (in: \"{name}\")";
+            var errorMsg = $"Tried to start Packed Message but State is not Ready (in: \"{name}\")";
 
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
@@ -163,7 +163,7 @@ public class CustomRpcSender
     {
         if (currentState is not State.InRootMessage and not State.InRootPackedMessage)
         {
-            var errorMsg = $"Tried to exit Message but State is not InRootMessage or InRootPackedMessage (in: \"{name}\")";
+            var errorMsg = $"Tried to end Message but State is not InRootMessage or InRootPackedMessage (in: \"{name}\")";
 
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
@@ -227,8 +227,9 @@ public class CustomRpcSender
 
         if (messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
         {
+            int targetClientId = currentRpcTarget;
             EndMessage(startNew: true);
-            StartMessage(currentRpcTarget);
+            StartMessage(targetClientId);
         }
 
         messages++;
@@ -244,7 +245,7 @@ public class CustomRpcSender
     {
         if (currentState != State.InRpc)
         {
-            var errorMsg = $"Tried to terminate RPC but State is not InRpc (in: \"{name}\")";
+            var errorMsg = $"Tried to end RPC but State is not InRpc (in: \"{name}\")";
 
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
@@ -336,36 +337,21 @@ public class CustomRpcSender
 
             if (currentState == State.InRootPackedMessage)
             {
-                static int GetPackedIntSize(int value)
-                {
-                    uint v = (uint)value;
-                    int count = 0;
-
-                    do
-                    {
-                        v >>= 7;
-                        count++;
-                    }
-                    while (v != 0);
-
-                    return count;
-                }
-
-                if (3 + GetPackedIntSize(AmongUsClient.Instance.GameId) >= stream.Length)
+                if (stream.Length <= 11)
                     dispose = true;
                 else
                     EndMessage();
             }
 
-            if (currentState != State.Ready)
+            if (!dispose && currentState != State.Ready)
             {
                 if (currentState == State.Finished)
                 {
-                    Logger.Warn($"Tried to send RPC but \"{name}\" is already Finished", "CustomRpcSender.Warn");
+                    Logger.Warn($"Tried to send Message but \"{name}\" is already Finished", "CustomRpcSender.Warn");
                     return;
                 }
 
-                var errorMsg = $"Tried to send RPC but State is not Ready (in: \"{name}\", state: {currentState})";
+                var errorMsg = $"Tried to send Message but State is not Ready (in: \"{name}\", state: {currentState})";
 
                 if (isUnsafe)
                     Logger.Warn(errorMsg, "CustomRpcSender.Warn");
@@ -436,7 +422,7 @@ public class CustomRpcSender
     {
         if (currentState != State.InRpc)
         {
-            var errorMsg = $"Tried to write RPC, but State is not InRpc (in: \"{name}\")";
+            var errorMsg = $"Tried to write into RPC, but State is not InRpc (in: \"{name}\")";
 
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");

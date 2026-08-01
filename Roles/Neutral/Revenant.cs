@@ -24,10 +24,7 @@ internal class Revenant : RoleBase
         var role = killer.GetCustomRole();
         if (role.IsTNA()) return false;
 
-        target.GetRoleClass()?.OnRemove(target.PlayerId);
-        target.RpcSetCustomRole(role);
-        target.RpcChangeRoleBasis(role);
-        target.GetRoleClass()?.OnAdd(target.PlayerId);
+        target.RpcSetCustomRoleV2(role, true, true);
 
         if (killer.GetBetrayalAddon() != CustomRoles.NotAssigned)
             target.RpcSetCustomRole(addon);

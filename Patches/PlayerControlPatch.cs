@@ -1031,66 +1031,83 @@ class ReportDeadBodyPatch
             Logger.Info($"target.Object is null? - {target?.Object == null}", "AfterReportTasks");
             Logger.Info($"target.PlayerId is - {target?.PlayerId}", "AfterReportTasks");
 
-            foreach (var playerStates in Main.PlayerStates.Values.ToArray())
+            try
             {
-                try
+                foreach (var playerStates in Main.PlayerStates.Values.ToArray())
                 {
-                    playerStates.RoleClass?.OnReportDeadBody(player, target);
-
-                    foreach (var ventId in player.GetRoleClass().LastBlockedMoveInVentVents)
+                    if (!playerStates.IsDead)
                     {
-                        CustomRoleManager.BlockedVentsList[player.PlayerId].Remove(ventId);
-                    }
-                    player.GetRoleClass().LastBlockedMoveInVentVents.Clear();
-
-                    if (playerStates.IsDead)
-                    {
-                        if (!Main.DeadPassedMeetingPlayers.Contains(playerStates.PlayerId))
-                        {
-                            Main.DeadPassedMeetingPlayers.Add(playerStates.PlayerId);
-                        }
+                        playerStates.IsBlackOut = true;
+                        playerStates.Player.MarkDirtySettings();
                     }
                 }
-                catch (Exception error)
-                {
-                    Utils.ThrowException(error);
-                    Logger.Error($"Role Class Error: {error}", "RoleClass_OnReportDeadBody");
-                    Logger.SendInGame($"Error: {error}");
-                }
+                PlayerGameOptionsSender.SendAllImmediately();
             }
-
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnReportDeadBody();
-
-            Rebirth.OnReportDeadBody();
-
-            foreach (var cno in CustomNetObject.AllObjects)
-            {
-                try
-                {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(cno.playerControl.NetId, (byte)RpcCalls.Shapeshift, SendOption.Reliable);
-                    writer.WriteNetObject(cno.playerControl);
-                    writer.Write(false);
-                    AmongUsClient.Instance.FinishRpcImmediately(writer);
-                }
-                catch (Exception e) { Utils.ThrowException(e); }
-            }
+            catch (Exception e) { Utils.ThrowException(e); }
 
             _ = new LateTask(() =>
             {
-                for (var index = CustomNetObject.AllObjects.Count - 1; index >= 0; index--)
+                foreach (var playerStates in Main.PlayerStates.Values.ToArray())
                 {
-                    try { CustomNetObject.AllObjects[index]?.OnMeetingTasks(); }
+                    try
+                    {
+                        playerStates.RoleClass?.OnReportDeadBody(player, target);
+
+                        foreach (var ventId in player.GetRoleClass().LastBlockedMoveInVentVents)
+                        {
+                            CustomRoleManager.BlockedVentsList[player.PlayerId].Remove(ventId);
+                        }
+                        player.GetRoleClass().LastBlockedMoveInVentVents.Clear();
+
+                        if (playerStates.IsDead)
+                        {
+                            if (!Main.DeadPassedMeetingPlayers.Contains(playerStates.PlayerId))
+                            {
+                                Main.DeadPassedMeetingPlayers.Add(playerStates.PlayerId);
+                            }
+                        }
+                    }
+                    catch (Exception error)
+                    {
+                        Utils.ThrowException(error);
+                        Logger.Error($"Role Class Error: {error}", "RoleClass_OnReportDeadBody");
+                        Logger.SendInGame($"Error: {error}");
+                    }
+                }
+
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnReportDeadBody();
+
+                Rebirth.OnReportDeadBody();
+
+                foreach (var cno in CustomNetObject.AllObjects)
+                {
+                    try
+                    {
+                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(cno.playerControl.NetId, (byte)RpcCalls.Shapeshift, SendOption.Reliable);
+                        writer.WriteNetObject(cno.playerControl);
+                        writer.Write(false);
+                        AmongUsClient.Instance.FinishRpcImmediately(writer);
+                    }
                     catch (Exception e) { Utils.ThrowException(e); }
                 }
-            }, 5f, "CNO OnMeeting");
 
-            // Alchemist & Bloodlust
-            Alchemist.OnReportDeadBodyGlobal();
+                _ = new LateTask(() =>
+                {
+                    for (var index = CustomNetObject.AllObjects.Count - 1; index >= 0; index--)
+                    {
+                        try { CustomNetObject.AllObjects[index]?.OnMeetingTasks(); }
+                        catch (Exception e) { Utils.ThrowException(e); }
+                    }
+                }, 5f, "CNO OnMeeting");
 
-            if (Aware.IsEnable) Aware.OnReportDeadBody();
+                // Alchemist & Bloodlust
+                Alchemist.OnReportDeadBodyGlobal();
 
-            Sleuth.OnReportDeadBody(player, target);
-            Evader.ReportDeadBody();
+                if (Aware.IsEnable) Aware.OnReportDeadBody();
+
+                Sleuth.OnReportDeadBody(player, target);
+                Evader.ReportDeadBody();
+            }, 0.15f, "AfterReportTasks_Part1");
         }
         catch (Exception error)
         {
@@ -1099,45 +1116,53 @@ class ReportDeadBodyPatch
             Logger.SendInGame($"Error: {error}");
         }
 
-        foreach (var pc in Main.EnumeratePlayerControls())
+        _ = new LateTask(() =>
         {
-            pc.RpcRemoveAbilityCD();
-            if (!Main.OvverideOutfit.ContainsKey(pc.PlayerId))
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
-                // Update skins again, since players have different skins
-                // And can be easily distinguished from each other
-                if (Camouflage.IsCamouflage && Options.KPDCamouflageMode.GetValue() is 2 or 3)
+                pc.RpcRemoveAbilityCD();
+                if (Main.Invisible.Contains(pc.PlayerId))
                 {
-                    Camouflage.RpcSetSkin(pc);
+                    pc.RpcMakeVisible();
                 }
 
-                // Check shapeshift and revert skin to default
-                /*if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
+                if (!Main.OvverideOutfit.ContainsKey(pc.PlayerId))
                 {
-                    pc.RpcShapeshift(pc, false);
-                    Camouflage.RpcSetSkin(pc, RevertToDefault: true);
-                }*/
+                    // Update skins again, since players have different skins
+                    // And can be easily distinguished from each other
+                    if (Camouflage.IsCamouflage && Options.KPDCamouflageMode.GetValue() is 2 or 3)
+                    {
+                        Camouflage.RpcSetSkin(pc);
+                    }
+
+                    // Check shapeshift and revert skin to default
+                    if (Main.CheckShapeshift.ContainsKey(pc.PlayerId))
+                    {
+                        pc.RpcShapeshift(pc, false);
+                        Camouflage.RpcSetSkin(pc, RevertToDefault: true);
+                    }
+                }
+
+                if (GameStates.FungleIsActive && (pc.IsMushroomMixupActive() || Utils.IsActive(SystemTypes.MushroomMixupSabotage)))
+                {
+                    pc.FixMixedUpOutfit();
+                }
+
+                //PhantomRolePatch.OnReportDeadBody(pc);
+
+                Logger.Info($"Player {pc?.Data?.PlayerName}: Id {pc.PlayerId} - is alive: {pc.IsAlive()}", "CheckIsAlive");
             }
 
-            if (GameStates.FungleIsActive && (pc.IsMushroomMixupActive() || Utils.IsActive(SystemTypes.MushroomMixupSabotage)))
-            {
-                pc.FixMixedUpOutfit();
-            }
+            RPC.SyncDeadPassedMeetingList();
+            // Set meeting time
+            MeetingTimeManager.OnReportDeadBody();
 
-            //PhantomRolePatch.OnReportDeadBody(pc);
+            // Clear all Notice players
+            NameNotifyManager.Reset();
 
-            Logger.Info($"Player {pc?.Data?.PlayerName}: Id {pc.PlayerId} - is alive: {pc.IsAlive()}", "CheckIsAlive");
-        }
-
-        RPC.SyncDeadPassedMeetingList();
-        // Set meeting time
-        MeetingTimeManager.OnReportDeadBody();
-
-        // Clear all Notice players
-        NameNotifyManager.Reset();
-
-        // Update Notify Roles for Meeting
-        Utils.NotifyRoles(isForMeeting: true, CamouflageIsForMeeting: true);
+            // Update Notify Roles for Meeting
+            Utils.NotifyRoles(isForMeeting: true, CamouflageIsForMeeting: true);
+        }, 0.15f, "AfterReportTasks_Part2");
 
         // Sync all settings on meeting start
         _ = new LateTask(Utils.SyncAllSettings, 3f, "Sync all settings after report");

@@ -264,8 +264,6 @@ public abstract class RoleBase
     /// </summary>
     public virtual void OnShapeshift(PlayerControl shapeshifter, PlayerControl target, bool IsAnimate, bool shapeshifting)
     { }
-    public virtual void OnVoteKick(PlayerControl pc, PlayerControl target)
-    { }
     public virtual void OnMeetingShapeshift(PlayerControl shapeshifter, PlayerControl target)
     { }
     public virtual bool OnCheckVanish(PlayerControl phantom) => true;

@@ -102,7 +102,7 @@ public class ModNews
                     var title = newsElement.GetProperty("Title").GetString();
                     var subTitle = newsElement.GetProperty("Subtitle").GetString();
                     var shortTitle = newsElement.GetProperty("Short").GetString();
-                    var body = newsElement.GetProperty("Body").GetString();
+                    var body = GetBody(newsElement.GetProperty("Body"));
                     var dateString = newsElement.GetProperty("Date").GetString();
                     // Create ModNews object
                     ModNews _ = new(number, title, subTitle, shortTitle, body, dateString);
@@ -151,10 +151,23 @@ public class ModNews
             var title = newsElement.GetProperty("Title").GetString();
             var subTitle = newsElement.GetProperty("Subtitle").GetString();
             var shortTitle = newsElement.GetProperty("Short").GetString();
-            var body = newsElement.GetProperty("Body").GetString();
+            var body = GetBody(newsElement.GetProperty("Body"));
             var dateString = newsElement.GetProperty("Date").GetString();
             // Create ModNews object
             ModNews _ = new(number, title, subTitle, shortTitle, body, dateString);
+        }
+    }
+
+    public static string GetBody(JsonElement body)
+    {
+        if (body.ValueKind == JsonValueKind.Array)
+        {
+            var parts = body.EnumerateArray().Select(e => e.GetString()).ToArray();
+            return string.Join("\n", parts);
+        }
+        else
+        {
+            return body.GetString();
         }
     }
 
