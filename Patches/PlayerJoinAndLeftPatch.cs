@@ -403,7 +403,7 @@ class OnPlayerLeftPatch
             {
                 if (data.Character.Is(CustomRoles.Lovers) && !data.Character.Data.IsDead)
                 {
-                    Lovers.OnPartnerLeft();
+                    Lovers.OnPartnerLeft(data.Character);
                 }
 
                 if (data.Character.Is(CustomRoles.Jackal) && !data.Character.Data.IsDead)

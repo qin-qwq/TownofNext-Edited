@@ -513,20 +513,31 @@ class GameEndCheckerForNormal
                     {
                         if (CustomRoles.Lovers.RoleExist(true))
                         {
-                            var crewLovers = WinnerTeam is CustomWinner.Crewmate && Lovers.LoversPlayers.ToArray().All(p => p?.IsPlayerCrewmateTeam() == true);
-                            var impLovers = WinnerTeam is CustomWinner.Impostor && Lovers.LoversPlayers.ToArray().All(p => p?.IsPlayerImpostorTeam() == true);
-                            var covenLovers = WinnerTeam is CustomWinner.Coven && Lovers.LoversPlayers.ToArray().All(p => p?.IsPlayerCovenTeam() == true);
-
-                            if (crewLovers || impLovers || covenLovers)
+                            foreach (var pc in Lovers.LoversPlayers.Where(p => p.Key.PlayerId < p.Value.PlayerId))
                             {
-                                foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)))
+                                var p1 = pc.Key;
+                                var p2 = pc.Value;
+                                if (WinnerTeam is CustomWinner.Crewmate && p1?.IsPlayerCrewmateTeam() == true && p2?.IsPlayerCrewmateTeam() == true)
                                 {
-                                    WinnerIds.Add(pc.PlayerId);
+                                    WinnerIds.Add(p1.PlayerId);
+                                    WinnerIds.Add(p2.PlayerId);
+                                    AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
+                                }
+                                if (WinnerTeam is CustomWinner.Impostor && p1?.IsPlayerImpostorTeam() == true && p2?.IsPlayerImpostorTeam() == true)
+                                {
+                                    WinnerIds.Add(p1.PlayerId);
+                                    WinnerIds.Add(p2.PlayerId);
+                                    AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
+                                }
+                                if (WinnerTeam is CustomWinner.Coven && p1?.IsPlayerCovenTeam() == true && p2?.IsPlayerCovenTeam() == true)
+                                {
+                                    WinnerIds.Add(p1.PlayerId);
+                                    WinnerIds.Add(p2.PlayerId);
                                     AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
                                 }
                             }
                         }
-                        if (Lovers.LoversPlayers.Any(p => p?.IsPlayerNeutralTeam() == true)) Lovers.CheckAdditionalWin();
+                        Lovers.CheckAdditionalWin();
                         // var loverArray = Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Lovers)).ToArray();
 
                         // foreach (var lover in loverArray)
@@ -717,17 +728,15 @@ class GameEndCheckerForNormal
                 return true;
             }
 
-            else if (Main.AllAlivePlayerControls.Count > 0 && Main.AllAlivePlayerControls.All(p => p.Is(CustomRoles.Lovers))
-            && !Lovers.SameTeammate(neu: false)) // if lover is alive lover wins
+            else if (Main.AllAlivePlayerControls.Count == 2 && Lovers.AreLovers(Main.AllAlivePlayerControls[0], Main.AllAlivePlayerControls[1])
+            && !Utils.IsSameTeammate(Main.AllAlivePlayerControls[0], Main.AllAlivePlayerControls[1], neu: false)) // if lover is alive lover wins
             {
                 reason = GameOverReason.ImpostorsByKill;
                 ResetAndSetWinner(CustomWinner.Lovers);
                 return true;
             }
 
-            else if (Main.AllAlivePlayerControls.Count == 3 && Cupid.IsPolycule([.. Main.AllAlivePlayerControls])
-            && Lovers.LoversPlayers.ToArray().All(p => p.IsAlive())
-            && !Lovers.SameTeammate(neu: false)) // Cupid & Lovers win
+            else if (Main.AllAlivePlayerControls.Count == 3 && Cupid.IsPolycule([.. Main.AllAlivePlayerControls])) // Cupid & Lovers win
             {
                 reason = GameOverReason.ImpostorsByKill;
                 ResetAndSetWinner(CustomWinner.Lovers);

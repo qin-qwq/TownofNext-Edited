@@ -756,7 +756,7 @@ class CheckForEndVotingPatch
 
         foreach (var playerId in playerIds)
         {
-            if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote && !Lovers.isLoversDead && Lovers.LoversPlayers.FirstOrDefault(lp => lp.PlayerId == playerId) != null)
+            if (CustomRoles.Lovers.IsEnable() && deathReason == PlayerState.DeathReason.Vote)
             {
                 Lovers.LoversSuicide(playerId, true);
             }
@@ -1640,13 +1640,8 @@ class MeetingHudOnDestroyPatch
             Main.LastVotedPlayerInfo = null;
             if (Options.UseMeetingShapeshift.GetBool())
             {
-                var pc = Main.EnumerateAlivePlayerControls();
-                pc.DoIf(x => x.UsesMeetingShapeshift() && x.IsHost(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
-                if (!AntiBlackout.SkipTasks)
-                {
-                    pc.DoIf(x => x.UsesMeetingShapeshift(), x => x.RpcSetRoleDesync(x.GetCustomRole().GetRoleTypes(), x.OwnerId));
-                    pc.DoIf(x => x.GetCustomRole().IsImpostor(), x => x.RpcSetRoleGlobal(x.GetCustomRole().GetRoleTypes()));
-                }
+                var pc = PlayerControl.LocalPlayer;
+                if (pc.UsesMeetingShapeshift()) pc.RpcSetRoleDesync(pc.GetCustomRole().GetRoleTypes(), pc.OwnerId);
             }
             EAC.ReportTimes = [];
         }

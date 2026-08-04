@@ -226,7 +226,7 @@ namespace TONE.Modules.Rpc
         private readonly List<byte> snList;
     }
 
-    class RpcSetLoversPlayers : BaseModdedRpc
+    /*class RpcSetLoversPlayers : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.SetLoversPlayers;
         public RpcSetLoversPlayers(uint netId, int count, HashSet<PlayerControl> loversList) : base(netId)
@@ -246,6 +246,28 @@ namespace TONE.Modules.Rpc
 
         private readonly int count;
         private readonly HashSet<PlayerControl> loversList;
+    }*/
+
+    class RpcSetLoverPairs : BaseModdedRpc
+    {
+        public override byte RpcType => (byte)CustomRPC.SetLoverPairs;
+        public RpcSetLoverPairs(uint netId, PlayerControl player, PlayerControl target) : base(netId)
+        {
+            this.player = player;
+            this.target = target;
+        }
+
+        public override void SerializeRpcValues(MessageWriter msg)
+        {
+            if (player && target)
+            {
+                msg.WriteNetObject(player);
+                msg.WriteNetObject(target);
+            }
+        }
+
+        private readonly PlayerControl player;
+        private readonly PlayerControl target;
     }
 
     class RpcSendFireworkerState : BaseModdedRpc

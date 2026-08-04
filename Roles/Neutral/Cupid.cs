@@ -166,7 +166,7 @@ internal class Cupid : RoleBase
 
     private void AddTarget(PlayerControl cupid, PlayerControl target)
     {
-        if (!CustomRolesHelper.CheckAddonConfilct(CustomRoles.Lovers, target, checkLimitAddons: false, checkConditions: false) || CustomRoles.Lovers.RoleExist(true))
+        if (!CustomRolesHelper.CheckAddonConfilct(CustomRoles.Lovers, target, checkLimitAddons: false, checkConditions: false))
         {
             Logger.Info($"Can't Charm {target.GetNameWithRole()}", "Cupid");
             cupid.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cultist), GetString("Cupid.CantCharm")));
@@ -187,17 +187,8 @@ internal class Cupid : RoleBase
 
             PlayerControl p = first.GetValueOrDefault(0xff).GetPlayer();
 
-            Lovers.LoversPlayers.Clear();
-            Lovers.isLoversDead = false;
-
-            Lovers.LoversPlayers.Add(p);
-            Lovers.LoversPlayers.Add(target);
-
             p.RpcSetCustomRole(CustomRoles.Lovers, false, true);
             target.RpcSetCustomRole(CustomRoles.Lovers, false, true);
-
-            if (Lovers.LoversPlayers.Any())
-                RPC.SyncLoversPlayers();
 
             if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
             {
@@ -272,7 +263,8 @@ internal class Cupid : RoleBase
 
         return cupidArrows.TryGetValue(poly.cupid.PlayerId, out var pair) && pair != null &&
             ((pair.Value.Item1 == poly.p1.PlayerId && pair.Value.Item2 == poly.p2.PlayerId)
-            || (pair.Value.Item1 == poly.p2.PlayerId && pair.Value.Item2 == poly.p1.PlayerId));
+            || (pair.Value.Item1 == poly.p2.PlayerId && pair.Value.Item2 == poly.p1.PlayerId))
+            && !Utils.IsSameTeammate(poly.p1, poly.p2, neu: false);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)

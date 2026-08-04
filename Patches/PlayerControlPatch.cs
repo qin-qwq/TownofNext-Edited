@@ -267,7 +267,7 @@ class CheckMurderPatch
 
         if (target.CheckFirstDied() && MeetingStates.FirstMeeting)
         {
-            killer.SetKillCooldown(5f);
+            killer.SetKillCooldown(Main.AllPlayerKillCooldown.TryGetValue(killer.PlayerId, out var killTimer) && killTimer > 5f ? 5f : killTimer);
             killer.RpcGuardAndKill(target);
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(killer.GetCustomRole()), GetString("PlayerIsShieldedByGame")));
             Logger.Info($"Canceled from ShieldPersonDiedFirst", "FirstDied");
@@ -1393,9 +1393,6 @@ class FixedUpdateInNormalGamePatch
                         DisableDevice.FixedUpdate();
 
                         CovenManager.NecronomiconCheck();
-
-                        if (CustomRoles.Lovers.IsEnable())
-                            Lovers.LoversSuicide();
 
                         if (Rainbow.IsEnabled && Main.IntroDestroyed)
                             Rainbow.OnFixedUpdate();

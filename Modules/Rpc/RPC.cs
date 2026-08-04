@@ -81,7 +81,8 @@ public enum CustomRPC : byte // 184/255 USED
     DoSpell,
     DoHex,
     SniperSync,
-    SetLoversPlayers,
+    // SetLoversPlayers,
+    SetLoverPairs,
     SendFireworkerState,
 
     // BetterAmongUs (BAU) RPC, This is sent to allow other BAU users know who's using BAU!
@@ -491,7 +492,7 @@ internal class RPCHandlerPatch
                 case CustomRPC.UndertakerLocationSync:
                     Undertaker.ReceiveRPC(reader);
                     break;
-                case CustomRPC.SetLoversPlayers:
+                case CustomRPC.SetLoverPairs:
                     Lovers.ReceiveRPC(reader);
                     break;
                 case CustomRPC.BetterCheck: // Better Among Us RPC
@@ -1067,13 +1068,13 @@ internal static class RPC
             Logger.Error($" Error RPC:{error}", "SyncRoleSkillReader");
         }
     }
-    public static void SyncLoversPlayers()
+    /*public static void SyncLoversPlayers()
     {
         if (!AmongUsClient.Instance.AmHost) return;
 
         var msg = new RpcSetLoversPlayers(PlayerControl.LocalPlayer.NetId, Lovers.LoversPlayers.Count, Lovers.LoversPlayers);
         RpcUtils.LateBroadcastReliableMessage(msg);
-    }
+    }*/
     public static void SyncDeadPassedMeetingList()
     {
         if (!AmongUsClient.Instance.AmHost) return;

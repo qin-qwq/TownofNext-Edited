@@ -423,7 +423,7 @@ class BeginCrewmatePatch
         {
             teamToDisplay = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
             teamToDisplay.Add(PlayerControl.LocalPlayer);
-            teamToDisplay.Add(Main.EnumerateAlivePlayerControls().FirstOrDefault(p => Lovers.AreLovers(p, PlayerControl.LocalPlayer)));
+            teamToDisplay.Add(Lovers.LoversPlayers[PlayerControl.LocalPlayer]);
 
             // foreach (var pc in Main.EnumerateAlivePlayerControls())
             // {

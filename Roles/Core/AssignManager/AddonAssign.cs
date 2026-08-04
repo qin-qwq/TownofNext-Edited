@@ -9,6 +9,7 @@ public static class AddonAssign
 {
     private static readonly HashSet<CustomRoles> AddonRolesList = [];
     public static Dictionary<byte, HashSet<CustomRoles>> SetAddOns = [];
+    private static readonly HashSet<PlayerControl> LoversList = [];
 
     private static bool NotAssignAddOnInGameStarted(CustomRoles role)
     {
@@ -17,7 +18,7 @@ public static class AddonAssign
 
         switch (role)
         {
-            case CustomRoles.Lovers:
+            //case CustomRoles.Lovers:
             case CustomRoles.Workhorse:
             case CustomRoles.LastImpostor:
             case CustomRoles.Narc:
@@ -37,6 +38,7 @@ public static class AddonAssign
         if (!GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons) return;
 
         AddonRolesList.Clear();
+        LoversList.Clear();
         foreach (var cr in CustomRolesHelper.AllRoles)
         {
             CustomRoles role = (CustomRoles)Enum.Parse(typeof(CustomRoles), cr.ToString());
@@ -113,6 +115,12 @@ public static class AddonAssign
             {
                 if (!CustomRolesHelper.CheckAddonConfilct(addon, player)) continue;
 
+                if (addon is CustomRoles.Lovers)
+                {
+                    LoversList.Add(player);
+                    continue;
+                }
+
                 // Set Add-on
                 Main.PlayerStates[player.PlayerId].SetSubRole(addon);
                 Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {addon}", $"Assign {addon}");
@@ -120,6 +128,41 @@ public static class AddonAssign
                 addonsList.Remove(addon);
             }
 
+        }
+
+        if (LoversList.Count > CustomRoles.Lovers.GetCount())
+        {
+            for (var i = 0; i < LoversList.Count - CustomRoles.Lovers.GetCount(); i++)
+            {
+                var player = LoversList.RandomElement();
+                LoversList.Remove(player);
+            }
+        }
+
+        if (LoversList.Count % 2 != 0)
+        {
+            var addon = CustomRoles.Lovers;
+            var allAlivePlayers = Main.EnumerateAlivePlayerControls().Where(x => CustomRolesHelper.CheckAddonConfilct(addon, x)).ToList();
+            if (!allAlivePlayers.Any()) return;
+            var pc = allAlivePlayers.RandomElement();
+            var player = LoversList.RandomElement();
+            Main.PlayerStates[pc.PlayerId].SetSubRole(addon);
+            Main.PlayerStates[player.PlayerId].SetSubRole(addon);
+            Logger.Info($"Registered Add-on: {pc?.Data?.PlayerName} = {pc.GetCustomRole()} + {addon}", $"Assign {addon}");
+            Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {addon}", $"Assign {addon}");
+            addonsList.Remove(addon);
+        }
+        else if (LoversList.Count > 0)
+        {
+            var addon = CustomRoles.Lovers;
+            foreach (var player in LoversList)
+            {
+                // Set Add-on
+                Main.PlayerStates[player.PlayerId].SetSubRole(addon);
+                Logger.Info($"Registered Add-on: {player?.Data?.PlayerName} = {player.GetCustomRole()} + {addon}", $"Assign {addon}");
+
+                addonsList.Remove(addon);
+            }
         }
 
         // Assign add-ons
@@ -154,6 +197,18 @@ public static class AddonAssign
 
             if (RawCount == -1) count = Math.Clamp(role.GetCount(), 0, eligiblePlayers.Count);
 
+            if (role == CustomRoles.Lovers)
+            {
+                if (count % 2 != 0)
+                {
+                    count = Math.Max(0, count - 1);
+                }
+
+                var maxEven = eligiblePlayers.Count;
+                if (maxEven % 2 != 0) maxEven -= 1;
+                count = Math.Min(count, maxEven);
+            }
+
             if (count <= 0) return;
 
             for (var i = 0; i < count; i++)
@@ -172,7 +227,7 @@ public static class AddonAssign
         }
     }
 
-    public static void InitAndStartAssignLovers()
+    /*public static void InitAndStartAssignLovers()
     {
         var rd = IRandom.Instance;
         if (CustomRoles.Lovers.IsEnable() && (CustomRoles.Hater.IsEnable() ? -1 : rd.Next(1, 100)) <= CustomRoles.Lovers.GetMode())
@@ -232,7 +287,7 @@ public static class AddonAssign
         }
         if (Lovers.LoversPlayers.Any())
             RPC.SyncLoversPlayers();
-    }
+    }*/
 
     public static void StartAssigningNarc()
     {

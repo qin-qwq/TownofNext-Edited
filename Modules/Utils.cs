@@ -680,7 +680,7 @@ public static class Utils
                 case CustomRoles.Soulless:
                 case CustomRoles.Enchanted:
                 case CustomRoles.Rascal:
-                case CustomRoles.Lovers when !Lovers.LoversPlayers.All(x => x?.IsPlayerCrewmateTeam() == true):
+                case CustomRoles.Lovers when !States.Player.IsPlayerCrewmateTeam() || !Lovers.LoversPlayers[States.Player].IsPlayerCrewmateTeam():
                     hasTasks &= !ForRecompute;
                     break;
                 case CustomRoles.Mundane:

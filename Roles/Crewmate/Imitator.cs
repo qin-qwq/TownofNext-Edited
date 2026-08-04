@@ -55,14 +55,9 @@ internal class Imitator : RoleBase
             if (!player || !player.IsAlive() || role == CustomRoles.NotAssigned) continue;
 
             player.RpcSetCustomRole(role);
-            // AntiBlackout skip host
-            if (player.IsHost())
-            {
-                player.RpcChangeRoleBasis(role);
-                player.GetRoleClass()?.OnAdd(player.PlayerId);
-                player.SyncSettings();
-                // AntiBlackout ResetAllCooldown
-            }
+            if (player.IsHost()) player.RpcChangeRoleBasis(role);
+            player.GetRoleClass()?.OnAdd(player.PlayerId);
+            player.SyncSettings();
             ImitateRole[player.PlayerId] = CustomRoles.NotAssigned;
         }
     }

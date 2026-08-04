@@ -1,4 +1,5 @@
 using Hazel;
+using InnerNet;
 using TONE.Modules.Rpc;
 using TONE.Roles.Neutral;
 using static TONE.Options;
@@ -19,8 +20,8 @@ public class Lovers : IAddon
     public static OptionItem NeutralCanBeInLove;
     public static OptionItem CovenCanBeInLove;
 
-    public static bool isLoversDead = true;
-    public static readonly HashSet<PlayerControl> LoversPlayers = [];
+    public static PlayerControl loverless = null;
+    public static readonly Dictionary<PlayerControl, PlayerControl> LoversPlayers = [];
 
     public void SetupCustomOption()
     {
@@ -72,64 +73,85 @@ public class Lovers : IAddon
         CustomRoleCounts.Add(CustomRoles.Lovers, countOption);
     }
     public void Init()
-    { }
+    {
+        loverless = null;
+        LoversPlayers.Clear();
+    }
     public void Add(byte playerId, bool gameIsLoading = true)
-    { }
+    {
+        var player = Utils.GetPlayerById(playerId);
+        if (!loverless)
+        {
+            loverless = player;
+        }
+        else
+        {
+            LoversPlayers[loverless] = player;
+            LoversPlayers[player] = loverless;
+            SendRPC(loverless, player);
+            loverless = null;
+        }
+    }
     public void Remove(byte playerId)
-    { }
+    {
+        var player = Utils.GetPlayerById(playerId);
+        if (LoversPlayers.TryGetValue(player, out var partner))
+        {
+            LoversPlayers.Remove(player);
+            LoversPlayers.Remove(partner);
+
+            Main.PlayerStates[partner.PlayerId].RemoveSubRole(CustomRoles.Lovers);
+        }
+    }
 
     public static byte GetLoverId(PlayerControl player)
     {
-        if (!LoversPlayers.Any())
+        if (!LoversPlayers.ContainsKey(player))
             return byte.MaxValue;
 
-        return LoversPlayers.FirstOrDefault(lp => lp.PlayerId != player.PlayerId).PlayerId;
+        return LoversPlayers[player].PlayerId;
     }
-    public static byte GetLoverId(byte playerId) => GetLoverId(playerId.GetPlayer());
-    public static bool AreLovers(PlayerControl player, PlayerControl target) => player.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers);
-    public static bool AreLovers(byte player, byte target) => AreLovers(player.GetPlayer(), target.GetPlayer());
+    public static bool AreLovers(PlayerControl player, PlayerControl target)
+    {
+        if (!LoversPlayers.ContainsKey(player) || !LoversPlayers.ContainsKey(target)) return false;
+
+        return true;
+    }
 
     public static void LoversSuicide(byte deathId = 0x7f, bool isExiled = false)
     {
-        if (LoverSuicide.GetBool() && isLoversDead == false)
+        if (LoverSuicide.GetBool())
         {
-            foreach (var loversPlayer in LoversPlayers.ToArray())
+            var deadPlayer = Utils.GetPlayerById(deathId);
+            if (!deadPlayer) return;
+
+            if (!LoversPlayers.TryGetValue(deadPlayer, out var partnerPlayer)) return;
+
+            if (!partnerPlayer || !partnerPlayer.IsAlive()) return;
+
+            if (partnerPlayer.Is(CustomRoles.Lovers))
             {
-                if (loversPlayer.IsAlive() && loversPlayer.PlayerId != deathId) continue;
+                partnerPlayer.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
 
-                isLoversDead = true;
-                foreach (var partnerPlayer in LoversPlayers.ToArray())
+                if (isExiled)
                 {
-                    if (loversPlayer.PlayerId == partnerPlayer.PlayerId) continue;
-
-                    if (partnerPlayer.PlayerId != deathId && partnerPlayer.IsAlive())
+                    //if (Main.PlayersDiedInMeeting.Contains(deathId))
+                    //{
+                    partnerPlayer.RpcExileV3();
+                    if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
                     {
-                        if (partnerPlayer.Is(CustomRoles.Lovers))
-                        {
-                            partnerPlayer.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
-
-                            if (isExiled)
-                            {
-                                //if (Main.PlayersDiedInMeeting.Contains(deathId))
-                                //{
-                                partnerPlayer.RpcExileV3();
-                                if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
-                                {
-                                    MeetingHud.Instance?.CheckForEndVoting();
-                                }
-                                _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
-                                //}
-                                //else
-                                //{
-                                //CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
-                                //}
-                            }
-                            else
-                            {
-                                partnerPlayer.RpcMurderPlayer(partnerPlayer);
-                            }
-                        }
+                        MeetingHud.Instance?.CheckForEndVoting();
                     }
+                    _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
+                    //}
+                    //else
+                    //{
+                    //CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
+                    //}
+                }
+                else
+                {
+                    partnerPlayer.RpcMurderPlayer(partnerPlayer);
                 }
             }
         }
@@ -151,62 +173,69 @@ public class Lovers : IAddon
         return "";
     }
 
+    public static void SendRPC(PlayerControl player, PlayerControl target)
+    {
+        if (!AmongUsClient.Instance.AmHost) return;
+        if (!player || !target) return;
+
+        var msg = new RpcSetLoverPairs(PlayerControl.LocalPlayer.NetId, player, target);
+        RpcUtils.LateBroadcastReliableMessage(msg);
+    }
+
     public static void ReceiveRPC(MessageReader reader)
     {
         LoversPlayers.Clear();
-        int count = reader.ReadInt32();
-        for (int i = 0; i < count; i++)
-            LoversPlayers.Add(Utils.GetPlayerById(reader.ReadByte()));
+        var player = reader.ReadNetObject<PlayerControl>();
+        var target = reader.ReadNetObject<PlayerControl>();
+
+        if (player && target)
+        {
+            LoversPlayers[player] = target;
+            LoversPlayers[target] = player;
+        }
     }
 
     public static void CheckWin()
     {
-        var alivePairs = !(!LoversPlayers.ToArray().All(p => p.IsAlive()) && LoverSuicide.GetBool());
+        var eligiblePairs = LoversPlayers.Where(x => x.Key.PlayerId < x.Value.PlayerId && !Utils.IsSameTeammate(x.Key, x.Value, neu: false) && (!LoverSuicide.GetBool() || (x.Key.IsAlive() && x.Value.IsAlive()))).ToList();
 
-        if (!alivePairs) return;
-        if (SameTeammate(neu: false)) return;
+        if (!eligiblePairs.Any()) return;
         // if not (some lovers dead and lovers suicide)
         if (CustomWinnerHolder.WinnerTeam is CustomWinner.Crewmate or CustomWinner.Impostor or CustomWinner.Jackal or CustomWinner.Pelican or CustomWinner.Coven)
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Lovers);
-            Main.AllPlayerControls
-                .Where(p => p.Is(CustomRoles.Lovers))
-                .Do(p => CustomWinnerHolder.WinnerIds.Add(p.PlayerId));
+            foreach (var pair in eligiblePairs)
+            {
+                CustomWinnerHolder.WinnerIds.Add(pair.Key.PlayerId);
+                CustomWinnerHolder.WinnerIds.Add(pair.Value.PlayerId);
+            }
         }
     }
     public static void CheckAdditionalWin()
     {
-        var loverArray = Main.AllPlayerControls.Where(x => x.Is(CustomRoles.Lovers)).ToArray();
+        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers) && p.GetPlayer().IsPlayerNeutralTeam());
 
-        foreach (var lover in loverArray)
+        foreach (var lover in loverWinners)
         {
-            if (CustomWinnerHolder.WinnerIds.Any(x => Utils.GetPlayerById(x).Is(CustomRoles.Lovers)) && !CustomWinnerHolder.WinnerIds.Contains(lover.PlayerId))
+            var loverId = GetLoverId(lover.GetPlayer());
+            if (!CustomWinnerHolder.WinnerIds.Contains(loverId))
             {
-                CustomWinnerHolder.WinnerIds.Add(lover.PlayerId);
+                CustomWinnerHolder.WinnerIds.Add(loverId);
                 CustomWinnerHolder.AdditionalWinnerTeams.Add(AdditionalWinners.Lovers);
             }
         }
     }
 
-    public static void OnPartnerLeft()
+    public static void OnPartnerLeft(PlayerControl player)
     {
-        foreach (var lovers in LoversPlayers.ToArray())
+        if (LoversPlayers.TryGetValue(player, out var partner))
         {
-            isLoversDead = true;
-            LoversPlayers.Remove(lovers);
-            Main.PlayerStates[lovers.PlayerId].RemoveSubRole(CustomRoles.Lovers);
+            LoversPlayers.Remove(player);
+            LoversPlayers.Remove(partner);
+
+            Main.PlayerStates[player.PlayerId].RemoveSubRole(CustomRoles.Lovers);
+            Main.PlayerStates[partner.PlayerId].RemoveSubRole(CustomRoles.Lovers);
         }
-    }
-
-    public static bool SameTeammate(bool crew = true, bool imp = true, bool neu = true, bool coven = true)
-    {
-        if (!LoversPlayers.Any())
-            return false;
-
-        var lovers = LoversPlayers.ToArray();
-
-        var first = lovers[0];
-        return lovers.All(p => Utils.IsSameTeammate(first, p, crew, imp, neu, coven));
     }
 
     public static bool LoversMsg(PlayerControl pc, string msg, bool check = true)
