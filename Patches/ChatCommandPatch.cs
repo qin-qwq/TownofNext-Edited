@@ -118,8 +118,9 @@ internal class ChatCommands
     private static readonly Dictionary<char, string> PollQuestions = [];
     private static readonly List<byte> PollVoted = [];
     private static Dictionary<int, int> TempCurrentOptions = [];
-    private static float Polltimer = 120f;
+    private static float Polltimer = 60f;
     private static string PollMSG = "";
+    private static bool MapPoll;
 
     public const string Csize = "85%"; // CustomRole Settings Font-Size
     public const string Asize = "75%"; // All Appended Addons Font-Size
@@ -208,6 +209,7 @@ internal class ChatCommands
             new("EnableAllRoles", "", Command.UsageLevels.Host, Command.UsageTimes.InLobby, EnableAllRolesCommand, true, false),
             new("Preset", "{mode} {preset_id}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, PresetCommand, true, false, [GetString("CommandArgs.Preset.Mode"), GetString("CommandArgs.Preset.PresetId")]),
             new("SetRole", "{id} [role]", Command.UsageLevels.Up, Command.UsageTimes.InLobby, SetRoleCommand, true, false, [GetString("CommandArgs.SetRole.Id"), GetString("CommandArgs.SetRole.Role")]),
+            new("MapPoll", "", Command.UsageLevels.Host, Command.UsageTimes.InLobby, MapPollCommand, true, false),
 
             new("Guess", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]),
             new("Trial", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Trial.Id")]),
@@ -1921,7 +1923,9 @@ internal class ChatCommands
         Pollvotes.Clear();
         PollQuestions.Clear();
         PollVoted.Clear();
-        Polltimer = 120f;
+        Polltimer = 60f;
+
+        MapPoll = args[1] == $"{GetString("MapPollTitle")}?";
 
         static System.Collections.IEnumerator StartPollCountdown()
         {
@@ -1987,6 +1991,12 @@ internal class ChatCommands
                 }
                 msg += "</size>";
 
+                var winnerId = winners.First().Key - 65;
+                if (MapPoll)
+                {
+                    if (GameStates.IsNormalGame) Main.NormalOptions.MapId = (byte)winnerId;
+                    else if (GameStates.IsHideNSeek) Main.HideNSeekOptions.MapId = (byte)winnerId;
+                }
 
                 Utils.SendMessage(msg, title: tytul);
             }
@@ -2550,6 +2560,13 @@ internal class ChatCommands
         {
             Utils.SendMessage(string.Format(GetString("Message.SetRoleTestTip"), roleToSet.ToColoredString()), resultId);
         }
+    }
+
+    private static void MapPollCommand(PlayerControl player, string text, string[] args)
+    {
+        var map = string.Join(' ', Main.MapNamesValues);
+        var msg = $"/poll {GetString("MapPollTitle")}? {map}";
+        PollCommand(player, msg, msg.Split(' '));
     }
 
     private static IEnumerator UploadCurrentPreset(PlayerControl player)

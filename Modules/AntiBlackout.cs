@@ -323,7 +323,6 @@ public static class AntiBlackout
             var target = targetId.GetPlayer();
 
             if (seer == null || target == null) continue;
-            if (target.GetCustomRole().GetRoleTypes() is RoleTypes.Detective) continue;
 
             var isSelf = seerId == targetId;
             var isDead = target.Data.IsDead;
@@ -379,20 +378,6 @@ public static class AntiBlackout
         }
 
         ResetAllCooldown();
-    }
-    public static void RevertDetective()
-    {
-        if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetCustomRole().GetRoleTypes() is RoleTypes.Detective)
-        {
-            foreach (var player in Main.EnumeratePlayerControls())
-            {
-                if (player != PlayerControl.LocalPlayer)
-                {
-                    var message = new RpcSetRoleMessage(PlayerControl.LocalPlayer.NetId, RoleTypes.Detective, true);
-                    RpcUtils.LateSpecificSendMessage(message, player.GetClientId());
-                }
-            }
-        }
     }
     private static void ResetAllCooldown()
     {

@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.08.03";
+    public const string PluginVersion = "26.08.06";
     public const string PluginDisplayVersion = "2.0.0 Beta 3";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -184,6 +184,8 @@ public class Main : BasePlugin
     public static string Star_Path = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
     public static readonly string Path = OperatingSystem.IsAndroid() ? Star_Path : ".";
     public const string LANGUAGE_FOLDER_NAME = "TONE-DATA/Language";
+
+    public static readonly MapNames[] MapNamesValues = Enum.GetValues<MapNames>();
 
     public static bool IsFixedCooldown => CustomRoles.Vampire.IsEnable() || CustomRoles.Poisoner.IsEnable();
     public static float RefixCooldownDelay = 0f;
@@ -1309,6 +1311,7 @@ public enum CustomWinner
     RedTeam = CustomRoles.RWoodCollector,
     BlueTeam = CustomRoles.BWoodCollector,
     FireThief = CustomRoles.FireThief,
+    Pixie = CustomRoles.Pixie,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners

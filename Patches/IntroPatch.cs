@@ -2,7 +2,6 @@ using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using Il2CppInterop.Runtime.InteropTypes;
 using System;
-using System.Collections;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -34,7 +33,7 @@ static class ShowRoleMoveNextPatch
 
         Logger.Info($"IntroCutScene.CoShowRole {wrapper.State} + {__result}", "IntroCutScene.CoShowRole.Prefix");
         if (wrapper.State != 1 || !__result) return;
-        GameStates.InGame = true;
+
         SetUpRoleTextPatch.Postfix(wrapper.Instance);
     }
 }
@@ -42,9 +41,9 @@ static class ShowRoleMoveNextPatch
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.CoShowIntro))]
 class CoShowIntroPatch
 {
-    public static bool Prefix(HudManager __instance, ref Il2CppSystem.Collections.IEnumerator __result)
+    public static void Prefix()
     {
-        if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost || GameStates.IsHideNSeek) return true;
+        if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost || GameStates.IsHideNSeek) return;
 
         _ = new LateTask(() =>
         {
@@ -84,85 +83,20 @@ class CoShowIntroPatch
                 Logger.Warn($"Game ended? {GameStates.IsEnded}", "ShipStatus.Begin");
             }
         }, 4f, "Assigning Task For All");
+    }
+}
+[HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
+class CoBeginPatch
+{
+    public static void Prefix()
+    {
+        Logger.Info("IntroCutscene.CoBegin.Start", "IntroCutScene.CoBegin");
+        CriticalErrorManager.CheckEndGame();
 
-        __result = CoShowIntro().WrapToIl2Cpp();
-        return false;
+        RPC.RpcVersionCheck();
+        GameStates.InGame = true;
 
-        IEnumerator CoShowIntro()
-        {
-            while (!ShipStatus.Instance || !HudManager.InstanceExists) yield return null;
-
-            GameStates.InGame = true;
-
-            __instance.IsIntroDisplayed = true;
-            __instance.LobbyTimerExtensionUI.HideAll();
-            __instance.SetMapButtonEnabled(false);
-            __instance.FullScreen.transform.localPosition = new Vector3(0.0f, 0.0f, -250f);
-
-            yield return __instance.ShowEmblem(true);
-            yield return CoBegin(Object.Instantiate(__instance.IntroPrefab, __instance.transform));
-
-            PlayerControl.LocalPlayer.SetKillTimer(10f);
-            ShipStatus.Instance.Systems[SystemTypes.Sabotage].CastFast<SabotageSystemType>().SetInitialSabotageCooldown();
-
-            if (ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Doors, out ISystemType systemType) && systemType.TryCast<IDoorSystem>() != null)
-                systemType.CastFast<IDoorSystem>().SetInitialSabotageCooldown();
-
-            yield return ShipStatus.Instance.PrespawnStep();
-            PlayerControl.LocalPlayer.AdjustLighting();
-            yield return __instance.CoFadeFullScreen(Color.black, Color.clear);
-            __instance.FullScreen.transform.localPosition = new Vector3(0.0f, 0.0f, -500f);
-            __instance.IsIntroDisplayed = false;
-            __instance.SetMapButtonEnabled(true);
-            __instance.SetHudActive(true);
-            __instance.CrewmatesKilled.gameObject.SetActive(GameManager.Instance.ShowCrewmatesKilled());
-            GameManager.Instance.StartGame();
-            
-            RPC.RpcVersionCheck();
-        }
-
-        IEnumerator CoBegin(IntroCutscene introCutscene)
-        {
-            Logger.Info("IntroCutscene.CoBegin.Start", "IntroCutScene.CoBegin");
-
-            CriticalErrorManager.CheckEndGame();
-            GameStates.InGame = true;
-
-            FFAManager.SetData();
-
-            SoundManager.Instance.PlaySound(introCutscene.IntroStinger, false);
-
-            introCutscene.LogPlayerRoleData();
-            introCutscene.HideAndSeekPanels.SetActive(false);
-            introCutscene.CrewmateRules.SetActive(false);
-            introCutscene.ImpostorRules.SetActive(false);
-            introCutscene.ImpostorName.gameObject.SetActive(false);
-            introCutscene.ImpostorTitle.gameObject.SetActive(false);
-
-            var show = IntroCutscene.SelectTeamToShow((Func<NetworkedPlayerInfo, bool>)(pcd => !PlayerControl.LocalPlayer.Data.Role.IsImpostor || pcd.Role.TeamType == PlayerControl.LocalPlayer.Data.Role.TeamType));
-
-            if (show == null || show.Count < 1)
-            {
-                show = new();
-                show.Add(PlayerControl.LocalPlayer);
-            }
-
-            if (PlayerControl.LocalPlayer.Data.Role.IsImpostor)
-                introCutscene.ImpostorText.gameObject.SetActive(false);
-            else
-            {
-                int adjustedNumImpostors = GameManager.Instance.LogicOptions.GetAdjustedNumImpostors(GameData.Instance.PlayerCount);
-                introCutscene.ImpostorText.text = adjustedNumImpostors == 1 ? TranslationController.Instance.GetString(StringNames.NumImpostorsS) : TranslationController.Instance.GetString(StringNames.NumImpostorsP, adjustedNumImpostors);
-                introCutscene.ImpostorText.text = introCutscene.ImpostorText.text.Replace("[FF1919FF]", "<color=#FF1919FF>");
-                introCutscene.ImpostorText.text = introCutscene.ImpostorText.text.Replace("[]", "</color>");
-            }
-
-            yield return introCutscene.ShowTeam(show, 3f);
-            yield return introCutscene.ShowRole();
-
-            ShipStatus.Instance.StartSFX();
-            Object.Destroy(introCutscene.gameObject);
-        }
+        FFAManager.SetData();
     }
 }
 

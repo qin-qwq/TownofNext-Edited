@@ -16,7 +16,7 @@ class ExileControllerWrapUpPatch
         // Due to Innersloth anti-cheat updates, this is visible only to the host
         public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
         {
-            if (GameModeBase.GetGameMode() is CustomGameMode.Standard && init != null && init.outfit != null && AmongUsClient.Instance.AmHost)
+            if (GameModeBase.GetGameMode() is CustomGameMode.Standard && init != null && init.outfit != null && (AmongUsClient.Instance.AmHost || !Main.CurrentServerIsVanilla))
                 __instance.completeString = CheckForEndVotingPatch.TempExileMsg;
             // TempExileMsg for client is sent in RpcClose
         }
@@ -178,13 +178,6 @@ class ExileControllerWrapUpPatch
                     exiled.Object.RpcExileV2();
                 }
             }, GameModeBase.GetGameMode() is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
-
-            _ = new LateTask(() =>
-            {
-                if (GameStates.IsEnded) return;
-
-                AntiBlackout.RevertDetective();
-            }, GameModeBase.GetGameMode() is CustomGameMode.Standard ? 0.51f : 1.41f, "Revert Detective");
 
             _ = new LateTask(AntiBlackout.ResetAfterMeeting, 0.6f, "ResetAfterMeeting");
 

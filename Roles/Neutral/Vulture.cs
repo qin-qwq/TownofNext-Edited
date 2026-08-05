@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using System;
 using System.Text;
 using TONE.Modules;
 using TONE.Roles.Core;
@@ -192,11 +193,19 @@ internal class Vulture : RoleBase
     }
     private void CheckDeadBody(PlayerControl killer, PlayerControl target, bool inMeeting)
     {
-        var vulture = _Player;
-        if (!vulture.IsAlive() || inMeeting || target.IsDisconnected()) return;
-        if (!ArrowsPointingToDeadBody.GetBool()) return;
+        try
+        {
+            var vulture = _Player;
+            if (!target.Data.GetDeadBody()) return;
+            if (!vulture.IsAlive() || inMeeting || target.IsDisconnected()) return;
+            if (!ArrowsPointingToDeadBody.GetBool()) return;
 
-        LocateArrow.Add(vulture.PlayerId, target.Data.GetDeadBody().transform.position);
+            LocateArrow.Add(vulture.PlayerId, target.Data.GetDeadBody().transform.position);
+        }
+        catch (Exception e)
+        {
+            ThrowException(e);
+        }
     }
     public override string GetSuffix(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false)
     {

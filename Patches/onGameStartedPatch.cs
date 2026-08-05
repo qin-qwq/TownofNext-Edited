@@ -208,6 +208,8 @@ internal class ChangeRoleSettings
                 ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
                 ReportDeadBodyPatch.WaitReport[pc.PlayerId] = [];
 
+                Main.PlayerStates[pc.PlayerId].IsBlackOut = false;
+
                 VentSystemDeterioratePatch.LastClosestVent[pc.PlayerId] = 99;
                 VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime[pc.PlayerId] = false;
 
@@ -278,10 +280,6 @@ internal class ChangeRoleSettings
 
             SetEverythingUpPatch.LastWinsText = "";
             SetEverythingUpPatch.LastWinsReason = "";
-
-            GC.Collect();
-            Resources.UnloadUnusedAssets();
-            GC.Collect();
 
             Logger.Msg("End", "Initialization");
         }
@@ -359,6 +357,13 @@ internal class StartGameHostPatch
             ShipStatus.Instance = result.GetComponent<ShipStatus>();
             thiz.Spawn(ShipStatus.Instance, -2, SpawnFlags.None);
         }
+        try
+        {
+            GC.Collect();
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
+        }
+        catch (Exception e) { Utils.ThrowException(e); }
         float timer = 0f;
         var start = DateTime.Now;
         while (true)
@@ -537,13 +542,13 @@ internal class StartGameHostPatch
             foreach (var pair in Main.PlayerStates)
             {
                 var message = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, pair.Value.MainRole);
-                RpcUtils.LateBroadcastReliableMessage(message);
+                RpcUtils.SendMessageImmediately(message);
 
                 // Set Add-ons
                 foreach (var subRole in pair.Value.SubRoles.ToArray())
                 {
                     var message2 = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, subRole);
-                    RpcUtils.LateBroadcastReliableMessage(message2);
+                    RpcUtils.SendMessageImmediately(message2);
                 }
             }
 
@@ -624,7 +629,7 @@ internal class StartGameHostPatch
             }
 
             var message = new RpcSetRoleMessage(pc.NetId, roleType, true);
-            RpcUtils.LateSpecificSendMessage(message, pc.GetClientId());
+            RpcUtils.SendMessageImmediately(message, pc.GetClientId());
         }
     }
 
@@ -910,6 +915,12 @@ public static class RpcSetRoleReplacer
                 }
 
                 if (selfRoleTypes is RoleTypes.Noisemaker)
+                {
+                    RoleMap[(seer.PlayerId, target.PlayerId)] = (selfRoleTypes, MainRole);
+                    continue;
+                }
+
+                if (target.PlayerId == PlayerControl.LocalPlayer.PlayerId && selfRoleTypes is RoleTypes.Detective)
                 {
                     RoleMap[(seer.PlayerId, target.PlayerId)] = (selfRoleTypes, MainRole);
                     continue;

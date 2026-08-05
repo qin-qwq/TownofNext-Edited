@@ -542,7 +542,7 @@ public static class GuessManager
         var meetingHud = MeetingHud.Instance;
         var hudManager = DestroyableSingleton<HudManager>.Instance;
         SoundManager.Instance.PlaySound(pc.KillSfx, false, 0.8f);
-        hudManager.KillOverlay.ShowKillAnimation(pc.Data, pc.Data);
+        if (!Options.DisableKillAnimationOnGuess.GetBool()) hudManager.KillOverlay.ShowKillAnimation(pc.Data, pc.Data);
         if (amOwner)
         {
             hudManager.ShadowQuad.gameObject.SetActive(false);

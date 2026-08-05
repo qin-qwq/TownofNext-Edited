@@ -22,7 +22,7 @@ internal class Mortician : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Mortician);
-        ShowArrows = BooleanOptionItem.Create(Id + 2, "ShowArrows", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Mortician]);
+        ShowArrows = BooleanOptionItem.Create(Id + 2, "ShowArrows", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Mortician]);
     }
     public override void Init()
     {
@@ -42,6 +42,7 @@ internal class Mortician : RoleBase
 
         var player = _Player;
         if (player == null || !player.IsAlive()) return;
+        if (!target.Data.GetDeadBody()) return;
         LocateArrow.Add(player.PlayerId, target.Data.GetDeadBody().transform.position);
     }
     public override void OnReportDeadBody(PlayerControl pc, NetworkedPlayerInfo target)

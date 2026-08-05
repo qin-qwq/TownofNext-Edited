@@ -18,13 +18,14 @@ internal class Pixie : RoleBase
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pirate);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
+    public override Custom_RoleType ThisRoleType => CanSnatchesWin() ? Custom_RoleType.NeutralEvil : Custom_RoleType.NeutralBenign;
     //==================================================================\\
 
     public static OptionItem PixiePointsToWin;
     private static OptionItem PixieMaxTargets;
     private static OptionItem PixieMarkCD;
     private static OptionItem PixieSuicideOpt;
+    public static OptionItem SnatchesWin;
 
     private static readonly Dictionary<byte, HashSet<byte>> PixieTargets = [];
 
@@ -38,6 +39,8 @@ internal class Pixie : RoleBase
         PixieMarkCD = FloatOptionItem.Create(Id + 12, "MarkCooldown", new(0f, 180f, 2.5f), 10f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pixie])
             .SetValueFormat(OptionFormat.Seconds);
         PixieSuicideOpt = BooleanOptionItem.Create(Id + 13, "PixieSuicide", false, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Pixie]);
+        SnatchesWin = BooleanOptionItem.Create(Id + 14, GeneralOption.SnatchesWin, false, TabGroup.NeutralRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Pixie]);
     }
     public override void Init()
     {
@@ -141,6 +144,14 @@ internal class Pixie : RoleBase
                 if (PixieTargets[pixieId].Contains(exiled.PlayerId))
                 {
                     pc.RpcIncreaseAbilityUseLimitBy(1);
+                    if (SnatchesWin.GetBool() && pc.GetAbilityUseLimit() >= PixiePointsToWin.GetInt())
+                    {
+                        if (!CustomWinnerHolder.CheckForConvertedWinner(pc.PlayerId))
+                        {
+                            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Pixie);
+                            CustomWinnerHolder.WinnerIds.Add(pc.PlayerId);
+                        }
+                    }
                 }
                 else if (PixieSuicideOpt.GetBool()
                     && PixieTargets[pixieId].Any(eid => eid.GetPlayer()?.IsAlive() == true))
@@ -157,11 +168,13 @@ internal class Pixie : RoleBase
     public static void PixieWinCondition(PlayerControl pc)
     {
         if (pc == null) return;
+        if (SnatchesWin.GetBool()) return;
         if (pc.GetAbilityUseLimit() >= PixiePointsToWin.GetInt())
         {
             CustomWinnerHolder.WinnerIds.Add(pc.PlayerId);
             CustomWinnerHolder.AdditionalWinnerTeams.Add(AdditionalWinners.Pixie);
         }
     }
+    public static bool CanSnatchesWin() => SnatchesWin == null ? false : SnatchesWin.GetBool();
 }
 
