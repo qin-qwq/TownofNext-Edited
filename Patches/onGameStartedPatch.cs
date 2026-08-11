@@ -11,7 +11,6 @@ using TONE.Modules.Rpc;
 using TONE.Patches;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
-using TONE.Roles.Core.DraftAssign;
 using UnityEngine;
 using static TONE.Translator;
 

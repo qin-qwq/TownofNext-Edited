@@ -315,7 +315,7 @@ public static class LobbyViewSettingsPanePatch
             void OnRightPassiveClick()
             {
                 LastGameModeSelected++;
-                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^3];
+                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^2];
                 if ((int)LastGameModeSelected > enumGameModes.Length)
                 {
                     LastGameModeSelected = CustomGameMode.Standard;
@@ -338,7 +338,7 @@ public static class LobbyViewSettingsPanePatch
             void OnLeftPassiveClick()
             {
                 LastGameModeSelected--;
-                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^3];
+                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^2];
                 if ((int)LastGameModeSelected < 0x01)
                 {
                     LastGameModeSelected = (CustomGameMode)enumGameModes.Length;

@@ -355,6 +355,13 @@ public class RoleAssign
                 break;
         }
 
+        if (Options.DraftMode.GetBool() && Options.SpawnOneRandomKillingFraction.GetBool() && !DraftAssign.DraftRoles.Values.All(x => x is CustomRoles.NotAssigned))
+        {
+            spawnNK = DraftAssign.KillingFractions.Contains("NK");
+            spawnNA = DraftAssign.KillingFractions.Contains("NA");
+            spawnCoven = DraftAssign.KillingFractions.Contains("Coven");
+        }
+
         Logger.Info($"Spawn NK: {spawnNK}, Spawn NA: {spawnNA}, Spawn Coven: {spawnCoven}", "SpawnKillingFractions");
 
         playerCount = AllPlayers.Count;

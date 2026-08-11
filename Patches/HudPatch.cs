@@ -96,6 +96,7 @@ class HudManagerUpdatePatch
                 {
                     case CustomGameMode.Standard:
                     case CustomGameMode.BonfireNight:
+                    case CustomGameMode.CopsAndRobbers:
                         var roleClass = player.GetRoleClass();
                         LowerInfoText.text = roleClass?.GetLowerText(player, player, isForMeeting: Main.MeetingIsStarted, isForHud: true) ?? string.Empty;
 

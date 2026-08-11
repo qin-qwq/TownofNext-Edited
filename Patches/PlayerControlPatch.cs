@@ -1432,6 +1432,9 @@ class FixedUpdateInNormalGamePatch
 
                     player.OnFixedAddonUpdate(lowLoad);
 
+                    if (GameModeBase.GetGameMode() == CustomGameMode.BonfireNight) BonfireNight.FixedUpdate();
+                    if (GameModeBase.GetGameMode() == CustomGameMode.CopsAndRobbers) CopsAndRobbers.FixedUpdate();
+
                     if (!lowLoad && Main.AllPlayerSpeed.TryGetValue(playerId, out var speed))
                     {
                         if (!Main.LastAllPlayerSpeed.ContainsKey(playerId))
@@ -1722,15 +1725,23 @@ class FixedUpdateInNormalGamePatch
         }
     }
 }
-[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Start))]
+[HarmonyPatch]
 class PlayerStartPatch
 {
-    public static void Postfix(PlayerControl __instance)
+    public static MethodBase TargetMethod()
     {
+        return Utils.GetStateMachineMoveNext<PlayerControl>(nameof(PlayerControl._Start_d__82));
+    }
+
+    public static void Postfix(PlayerControl._Start_d__82 __instance, ref bool __result)
+    {
+        if (__result) return;
+        var instance = __instance.__4__this;
+
         if (GameStates.IsHideNSeek) return;
 
-        var roleText = Object.Instantiate(__instance.cosmetics.nameText);
-        roleText.transform.SetParent(__instance.cosmetics.nameText.transform);
+        var roleText = Object.Instantiate(instance.cosmetics.nameText);
+        roleText.transform.SetParent(instance.cosmetics.nameText.transform);
         roleText.fontMaterial.SetFloat("_StencilComp", 7f);
         roleText.fontMaterial.SetFloat("_Stencil", 2f);
         roleText.transform.localPosition = new Vector3(0f, 0.2f, 0f);

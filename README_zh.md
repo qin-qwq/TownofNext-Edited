@@ -131,6 +131,10 @@
 >
 ### :star: [UnityDoorstop](https://github.com/Pietrodjaowjao/UnityDoorstop)
 >
-> - 修改了 doorstop_config.ini 和 winhttp.dll
+> - 修改 doorstop_config.ini 和 winhttp.dll
+>
+### :star: [Kevin MacLeod](https://www.youtube.com/user/kmmusic)
+>
+> - 使用音乐
 >
 ---

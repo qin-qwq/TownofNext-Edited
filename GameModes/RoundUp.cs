@@ -15,7 +15,6 @@ internal class RoundUp : Standard
 {
     public override CustomGameMode GameMode => CustomGameMode.RoundUp;
     private const int Id = 67_229_001;
-    public override bool OpeningHours => Main.IsSummer;
 
     public static OptionItem ImpostorCanBecomeDeputy;
     public static OptionItem NeutralCanBecomeDeputy;

@@ -687,7 +687,7 @@ public static class Utils
                 case CustomRoles.Soulless:
                 case CustomRoles.Enchanted:
                 case CustomRoles.Rascal:
-                case CustomRoles.Lovers when !States.Player.IsPlayerCrewmateTeam() || !Lovers.LoversPlayers[States.Player].IsPlayerCrewmateTeam():
+                case CustomRoles.Lovers when States.Player && Lovers.LoversPlayers.TryGetValue(States.Player, out var partner) && partner && (!States.Player.IsPlayerCrewmateTeam() || !partner.IsPlayerCrewmateTeam()):
                     hasTasks &= !ForRecompute;
                     break;
                 case CustomRoles.Mundane:
@@ -1986,6 +1986,9 @@ public static class Utils
                 SelfSuffix.Append(Radar.GetPlayerArrow(seer, seer, isForMeeting: isForMeeting));
                 SelfSuffix.Append(Spurt.GetSuffix(seer, isformeeting: isForMeeting));
 
+                if (!isForMeeting && Main.Invisible.Contains(seer.PlayerId) && !seer.Is(CustomRoles.Chameleon) && !seer.Is(CustomRoles.Swooper)) 
+                    SelfSuffix.Append(ColorString(GetRoleColor(seer.GetCustomRole()), GetString("IsInvisible")));
+
                 switch (GameModeBase.GetGameMode())
                 {
                     case CustomGameMode.FFA:
@@ -2310,6 +2313,8 @@ public static class Utils
                 SelfSuffix.Append(Radar.GetPlayerArrow(seer, seer, isForMeeting: isForMeeting));
                 SelfSuffix.Append(Spurt.GetSuffix(seer, isformeeting: isForMeeting));
 
+                if (!isForMeeting && Main.Invisible.Contains(seer.PlayerId) && !seer.Is(CustomRoles.Chameleon) && !seer.Is(CustomRoles.Swooper)) 
+                    SelfSuffix.Append(ColorString(GetRoleColor(seer.GetCustomRole()), GetString("IsInvisible")));
 
                 switch (GameModeBase.GetGameMode())
                 {
@@ -3197,12 +3202,13 @@ public static class Utils
             return;
         }
 
-        if (packedWriter == null) DataFlagRateLimiter.Enqueue(Action, calls: 3);
+        if (packedWriter == null) DataFlagRateLimiter.Enqueue(Action);
         else Action();
         return;
 
         void Action()
         {
+            if (!player || player.Pointer == IntPtr.Zero) return;
             bool dead = player.Data.IsDead;
             MessageWriter writer = packedWriter ?? MessageWriter.Get(SendOption.Reliable);
             writer.StartMessage(6);
@@ -3259,7 +3265,36 @@ public static class Utils
     public static int PlayersCount(CountTypes countTypes) => Main.PlayerStates.Values.Count(state => state.countTypes == countTypes);
     public static int AlivePlayersCount(CountTypes countTypes) => Main.AllAlivePlayerControls.Count(pc => pc.Is(countTypes));
 
-    public static Vector2 GetAllRandomSpawnLocation()
+    public static Vector2 GetRandomSpawnLocation()
+    {
+        RandomSpawn.SpawnMap map;
+        switch (Main.NormalOptions.MapId)
+        {
+            case 0:
+                map = new RandomSpawn.SkeldSpawnMap();
+                return map.GetRandomLocation();
+            case 1:
+                map = new RandomSpawn.MiraHQSpawnMap();
+                return map.GetRandomLocation();
+            case 2:
+                map = new RandomSpawn.PolusSpawnMap();
+                return map.GetRandomLocation();
+            case 3:
+                map = new RandomSpawn.DleksSpawnMap();
+                return map.GetRandomLocation();
+            case 4:
+                map = new RandomSpawn.AirshipSpawnMap();
+                return map.GetRandomLocation();
+            case 5:
+                map = new RandomSpawn.FungleSpawnMap();
+                return map.GetRandomLocation();
+            case 7:
+                return ShipStatus.Instance.AllRooms.Select(x => new Vector2(x.transform.position.x, x.transform.position.y)).ToList().RandomElement();
+        }
+        return Vector2.zero;
+    }
+
+    public static IEnumerable<Vector2> GetAllRandomSpawnLocation()
     {
         RandomSpawn.SpawnMap map;
         switch (Main.NormalOptions.MapId)
@@ -3282,10 +3317,8 @@ public static class Utils
             case 5:
                 map = new RandomSpawn.FungleSpawnMap();
                 return map.GetAllLocation();
-            case 7:
-                return ShipStatus.Instance.AllRooms.Select(x => new Vector2(x.transform.position.x, x.transform.position.y)).ToList().RandomElement();
         }
-        return Vector2.zero;
+        return ShipStatus.Instance.AllRooms.Select(x => new Vector2(x.transform.position.x, x.transform.position.y)).ToArray();
     }
 
     // Next 2: From MoreGamemodes by Rabek009

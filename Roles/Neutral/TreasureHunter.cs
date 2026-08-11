@@ -57,7 +57,7 @@ internal class TreasureHunter : RoleBase
     public override void AfterMeetingTasks()
     {
         if (!_Player.IsAlive()) return;
-        var location = GetAllRandomSpawnLocation();
+        var location = GetRandomSpawnLocation();
         TreasurePlace = location;
         TreasureLocation.Add(location, new(location, _Player));
     }

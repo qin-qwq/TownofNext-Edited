@@ -655,6 +655,36 @@ namespace TONE.Modules
             // this.OwnerId = OwnerId;
         }
     }
+    internal sealed class Jewel : CustomNetObject
+    {
+        internal Jewel(Vector2 position)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            var rd = IRandom.Instance.Next(1, 3);
+            var color = rd == 1 ? "00bfff" : "e0115f";
+
+            CreateNetObject($"<size=20><#{color}>◆</color></size>", position);
+            // this.OwnerId = OwnerId;
+        }
+    }
+    internal sealed class Bag : CustomNetObject
+    {
+        internal Bag(Vector2 position)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            CreateNetObject("<size=20><#8b4513>「 」</color></size>", position);
+            // this.OwnerId = OwnerId;
+        }
+    }
+    internal sealed class Prison : CustomNetObject
+    {
+        internal Prison(Vector2 position)
+        {
+            if (!AmongUsClient.Instance.AmHost) return;
+            CreateNetObject("<size=20><#a9a9a9>▥</color></size>", position);
+            // this.OwnerId = OwnerId;
+        }
+    }
     internal sealed class ShapeshiftMenuElement : CustomNetObject
     {
         public ShapeshiftMenuElement(PlayerControl guesser)

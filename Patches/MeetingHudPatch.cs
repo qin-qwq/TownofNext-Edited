@@ -1268,7 +1268,7 @@ class MeetingHudStartPatch
             var IdNumber = LevelDisplay.transform.Find("LevelNumber");
             Object.Destroy(IdLabel.GetComponent<TextTranslatorTMP>());
             IdLabel.GetComponent<TextMeshPro>().text = "ID";
-            IdNumber.GetComponent<TextMeshPro>().text = pva.TargetPlayerId.ToString();
+            IdNumber.GetComponent<TextMeshPro>().text = target.GetVisiblePlayerId().ToString();
             IdLabel.name = "IdLabel";
             IdNumber.name = "IdNumber";
 
@@ -1766,7 +1766,7 @@ class MeetingHudHandleRpcPatch
     }
 }
 
-/*[HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.Serialize))]
+[HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.Serialize))]
 class NetworkedPlayerInfoSerializePatch
 {
     private static string LastName = string.Empty;
@@ -1791,4 +1791,4 @@ class NetworkedPlayerInfoSerializePatch
             __instance.PlayerName = LastName;
         }
     }
-}*/
+}

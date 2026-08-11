@@ -1,18 +1,18 @@
 using System.Text;
 using TONE.Modules;
-using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using static TONE.Translator;
 
-namespace TONE.Roles.Core.DraftAssign;
+namespace TONE.Roles.Core.AssignManager;
 
 public static class DraftAssign
 {
     public static List<CustomRoles> AllRoles = [];
     public static Dictionary<byte, List<CustomRoles>> DraftPools = [];
     public static Dictionary<byte, CustomRoles> DraftRoles = [];
+    public static readonly List<string> KillingFractions = [];
 
     public static void GetNeutralCounts(int NKmaxOpt, int NKminOpt, int NNKmaxOpt, int NNKminOpt, int NAmaxOpt, int NAminOpt, ref int ResultNKnum, ref int ResultNNKnum, ref int ResultNAnum)
     {
@@ -81,6 +81,7 @@ public static class DraftAssign
             DraftPools[pc.PlayerId] = [];
             DraftRoles[pc.PlayerId] = CustomRoles.NotAssigned;
         }
+        KillingFractions.Clear();
         FactionOption.ChangeSettings();
     }
 
@@ -101,8 +102,6 @@ public static class DraftAssign
         GetCovenCounts(Options.CovenRolesMaxPlayer.GetInt(), Options.CovenRolesMinPlayer.GetInt(), ref optCovenNum);
         GetImpCounts(Options.ImpRolesMaxPlayer.GetInt(), Options.ImpRolesMinPlayer.GetInt(), ref optImpNum);
 
-        List<string> KillingFractions = [];
-
         if (optNeutralKillingNum > 0)
         {
             KillingFractions.Add("NK");
@@ -119,6 +118,8 @@ public static class DraftAssign
         if (Options.SpawnOneRandomKillingFraction.GetBool() && KillingFractions.Any())
         {
             var randomType = KillingFractions.RandomElement();
+            KillingFractions.Clear();
+            KillingFractions.Add(randomType);
             switch (randomType)
             {
                 case "NK":

@@ -1219,7 +1219,6 @@ static class ExtendedPlayerControl
         if (pc.Is(CustomRoles.Killer) || pc.Is(CustomRoles.Nimble)) return true;
         if (DollMaster.IsDoll(pc.PlayerId) || Circumvent.CantUseVent(pc)) return false;
         if (Necromancer.Killer && !pc.Is(CustomRoles.Necromancer)) return false;
-        if (Amnesiac.PreviousAmnesiacCanVent(pc)) return true; //this is done because amnesiac has imp basis and if amnesiac remembers a role with different basis then player will not vent as `CanUseImpostorVentButton` is false
 
         var playerRoleClass = pc.GetRoleClass();
         if (playerRoleClass != null && playerRoleClass.CanUseImpostorVentButton(pc)) return true;
@@ -2115,6 +2114,7 @@ static class ExtendedPlayerControl
     public static Color32 GetPlayerColor(this byte playerId)
     {
         var player = Utils.GetPlayerById(playerId);
+        if (OperatingSystem.IsAndroid() && !player) return Color.white;
         if (Main.PlayerColors.TryGetValue(playerId, out var color)) return color;
         return Palette.PlayerColors[player.Data.DefaultOutfit.ColorId];
     }

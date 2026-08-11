@@ -35,6 +35,7 @@ public class GameSettingMenuPatch
             CustomGameMode.SpeedRun => TabGroupValues.Skip(2).ToArray(),
             CustomGameMode.TagMode => TabGroupValues.Skip(2).ToArray(),
             CustomGameMode.BonfireNight => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.CopsAndRobbers => TabGroupValues.Skip(4).ToArray(),
             _ => []
         };
 

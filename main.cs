@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.08.06";
+    public const string PluginVersion = "26.08.10";
     public const string PluginDisplayVersion = "2.0.0 Beta 3";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -176,6 +176,7 @@ public class Main : BasePlugin
         [CustomGameMode.FFA] = new Color32(0, 255, 165, byte.MaxValue),
         [CustomGameMode.SpeedRun] = new Color32(255, 251, 0, byte.MaxValue),
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
+        [CustomGameMode.CopsAndRobbers] = new Color32(135, 206, 250, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
         [CustomGameMode.RoundUp] = new Color32(248, 216, 110, byte.MaxValue),
         [CustomGameMode.BonfireNight] = new Color32(255, 140, 0, byte.MaxValue),
@@ -248,20 +249,6 @@ public class Main : BasePlugin
             return utcNow >= t && utcNow <= t2;
         }
     }
-    public static bool IsBirthday
-    {
-        get
-        {
-            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
-            {
-                DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 6, 17, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 6, 29, 7, 0, 0, 0, DateTimeKind.Utc);
-                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
-            }
-            return false;
-        }
-    }
     public static bool IsSummer
     {
         get
@@ -269,8 +256,8 @@ public class Main : BasePlugin
             if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
             {
                 DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 8, 1, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 8, 10, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 8, 13, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 8, 25, 7, 0, 0, 0, DateTimeKind.Utc);
                 return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
             }
             return false;
@@ -1143,6 +1130,10 @@ public enum CustomRoles
     BWoodCollector,
     FireThief,
 
+    // C&R
+    Cop,
+    Robber,
+
     // Sub-role after 500
     NotAssigned = 500,
 
@@ -1312,6 +1303,8 @@ public enum CustomWinner
     BlueTeam = CustomRoles.BWoodCollector,
     FireThief = CustomRoles.FireThief,
     Pixie = CustomRoles.Pixie,
+    Cop = CustomRoles.Cop,
+    Robber = CustomRoles.Robber,
 }
 [Obfuscation(Exclude = true)]
 public enum AdditionalWinners

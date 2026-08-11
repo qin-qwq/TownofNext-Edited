@@ -78,6 +78,7 @@ public static class AbilityTimeManager
             CustomRoles.Dreamer => (int)Dreamer.FantasyCooldown.GetFloat(),
             CustomRoles.NiceHacker => (int)NiceHacker.HackerCooldown.GetFloat(),
             CustomRoles.Fury => (int)Fury.AngryCooldown.GetFloat(),
+            CustomRoles.Robber => CopsAndRobbers.RobberJailbreakCooldown.GetInt(),
             _ => -10
         };
 

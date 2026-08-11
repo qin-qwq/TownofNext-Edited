@@ -230,7 +230,7 @@ internal class AuthTimeoutPatch
         }
     }
 }
-/*[HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.UpdateName))]
+[HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.UpdateName))]
 public class NetworkedPlayerInfoPatch
 {
     // Prevent mark dirty here
@@ -240,4 +240,4 @@ public class NetworkedPlayerInfoPatch
         client.UpdatePlayerName(playerName);
         return false;
     }
-}*/
+}

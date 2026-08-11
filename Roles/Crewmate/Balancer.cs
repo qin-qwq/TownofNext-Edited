@@ -123,8 +123,24 @@ internal class Balancer : RoleBase
     {
         var Tar1 = GetPlayerById(Target1);
         var Tar2 = GetPlayerById(Target2);
-        if (Choose) MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), ColorString(Target1.GetPlayerColor(), Tar1.GetRealName()), ColorString(Target2.GetPlayerColor(), Tar2.GetRealName()),
-            255, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper())));
+        if (Choose)
+        {
+            MeetingHudStartPatch.AddMsg(string.Format(GetString("SpecialMeeting"), ColorString(Target1.GetPlayerColor(), Tar1.GetRealName()), ColorString(Target2.GetPlayerColor(), Tar2.GetRealName()),
+                255, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper())));
+            if (!Tar1 && !Tar2 || !Tar1.IsAlive() && !Tar2.IsAlive())
+            {
+                RpcVotingCompleteV2();
+                return;
+            }
+            if (!Tar1 || !Tar1.IsAlive())
+            {
+                CheckBalancerTarget(Target2);
+            }
+            if (!Tar2 || !Tar2.IsAlive())
+            {
+                CheckBalancerTarget(Target1);
+            }
+        }
         else
         {
             Target1 = 253;
@@ -157,11 +173,6 @@ internal class Balancer : RoleBase
 
         _ = new LateTask(() =>
         {
-            if (!Tar1 || !Tar2 || !Tar1.IsAlive() || !Tar2.IsAlive())
-            {
-                Logger.Info("Cancel Balancer Meeting because Target is null or dead", "Balancer");
-                return;
-            }
             Tar1?.NoCheckStartMeeting(null);
         }, 1f);
     }

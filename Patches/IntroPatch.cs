@@ -729,6 +729,15 @@ class BeginCrewmatePatch
                 __instance.ImpostorText.gameObject.SetActive(true);
                 __instance.ImpostorText.text = GetString("BonfireNightInfo");
                 break;
+            case CustomGameMode.CopsAndRobbers:
+                __instance.TeamTitle.text = GetString("CopsAndRobbers");
+                __instance.TeamTitle.color = __instance.BackgroundBar.material.color = new Color32(135, 206, 250, byte.MaxValue);
+                CustomSoundsManager.Play("Unity", loop: true);
+                if (PlayerControl.LocalPlayer.Is(CustomRoles.Cop)) PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Detective);
+                else PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Viper);
+                __instance.ImpostorText.gameObject.SetActive(true);
+                __instance.ImpostorText.text = GetString("CopsAndRobbersInfo");
+                break;
         }
 
         // I hope no one notices this in code
@@ -1015,6 +1024,7 @@ internal static class IntroCutsceneDestroyPatch
 
                 CustomGameMode.FFA => FFAManager.FFA_ShowChatInGame.GetBool(),
                 CustomGameMode.SpeedRun => SpeedRun.SpeedRun_ShowChatInGame.GetBool(),
+                CustomGameMode.CopsAndRobbers => CopsAndRobbers.ShowChatInGame.GetBool(),
 
                 _ => false
             };

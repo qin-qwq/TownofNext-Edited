@@ -142,10 +142,10 @@ public static class AddonAssign
         if (LoversList.Count % 2 != 0)
         {
             var addon = CustomRoles.Lovers;
-            var allAlivePlayers = Main.EnumerateAlivePlayerControls().Where(x => CustomRolesHelper.CheckAddonConfilct(addon, x)).ToList();
+            var player = LoversList.RandomElement();
+            var allAlivePlayers = Main.EnumerateAlivePlayerControls().Where(x => CustomRolesHelper.CheckAddonConfilct(addon, x) && x != player).ToList();
             if (!allAlivePlayers.Any()) return;
             var pc = allAlivePlayers.RandomElement();
-            var player = LoversList.RandomElement();
             Main.PlayerStates[pc.PlayerId].SetSubRole(addon);
             Main.PlayerStates[player.PlayerId].SetSubRole(addon);
             Logger.Info($"Registered Add-on: {pc?.Data?.PlayerName} = {pc.GetCustomRole()} + {addon}", $"Assign {addon}");

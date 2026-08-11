@@ -264,5 +264,7 @@
   "RWoodCollector": "#ff0000",
   "BWoodCollector": "#0000ff",
   "FireThief": "#a9a9a9",
-  "RDeputy": "#f8d86e"
+  "RDeputy": "#f8d86e",
+  "Cop": "#007bff",
+  "Robber": "#ff8c00"
 }

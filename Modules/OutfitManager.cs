@@ -95,6 +95,7 @@ public static class OutfitManager
         }
 
         var setOutfit = new RpcSetOutfit(player.NetId, player.Data.NetId, newOutfit, setName, setNamePlate);
-        RpcUtils.LateBroadcastReliableMessage(setOutfit);
+        if (Main.MeetingIsStarted) RpcUtils.SendMessageImmediately(setOutfit);
+        else RpcUtils.LateBroadcastReliableMessage(setOutfit);
     }
 }

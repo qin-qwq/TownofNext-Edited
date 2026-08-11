@@ -10,7 +10,6 @@ using TONE.Modules.Rpc;
 using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core.AssignManager;
-using TONE.Roles.Core.DraftAssign;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Neutral;
 using static TONE.Translator;
@@ -106,7 +105,7 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode/BonfireNight in H&S game, set HideNSeekTONE
+                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode/BonfireNight/C&R in H&S game, set HideNSeekTONE
                     if (GameModeBase.GetGameMode() != CustomGameMode.HidenSeekTONE)
                     {
                         var hns = CustomGameModeManager.gameModes.Length - 1;
@@ -416,6 +415,11 @@ class OnPlayerLeftPatch
                     Sheriff.OnSheriffLeft();
                 }
 
+                if (GameModeBase.GetGameMode() == CustomGameMode.CopsAndRobbers)
+                {
+                    CopsAndRobbers.OnPlayerLeft(data.Character.PlayerId);
+                }
+
                 Spiritualist.RemoveTarget(data.Character.PlayerId);
 
                 var state = Main.PlayerStates[data.Character.PlayerId];
@@ -693,7 +697,7 @@ class InnerNetClientSpawnPatch
                         if (!AmongUsClient.Instance.IsGameStarted && client.Character != null)
                         {
                             Main.isChatCommand = true;
-                            Utils.SendMessage("\n", client.Character.PlayerId, Main.LastSummaryMessage, ShouldSplit: true);
+                            Utils.SendMessage("\n", client.Character.PlayerId, Main.LastSummaryMessage);
                         }
                     }, 3.1f, "DisplayLastRoles");
                 }

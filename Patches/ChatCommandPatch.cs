@@ -13,7 +13,6 @@ using TONE.Modules.Rpc;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
-using TONE.Roles.Core.DraftAssign;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
@@ -2706,7 +2705,7 @@ internal class ChatCommands
             return;
         }
 
-        Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerImpostorTeam() && x.GetCustomRole().IsImpostor())
+        Main.EnumerateAlivePlayerControls().Where(x => x.GetCustomRole().IsImpostor())
             .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.ImpostorTONE), $"{GetString("MessageFromImpostor")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 
@@ -2740,7 +2739,7 @@ internal class ChatCommands
 
     public static void SendCovenChannelMsg(PlayerControl pc, string msg)
     {
-        Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerCovenTeam() && x.GetCustomRole().IsCoven())
+        Main.EnumerateAlivePlayerControls().Where(x => x.GetCustomRole().IsCoven())
             .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.WitchDoctor), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.WitchDoctor), $"{GetString("MessageFromCoven")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 

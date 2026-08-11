@@ -18,7 +18,7 @@ internal class BonfireNight : GameModeBase
 {
     public override CustomGameMode GameMode => CustomGameMode.BonfireNight;
     private const int Id = 67_228_001;
-    public override bool OpeningHours => Main.IsBirthday;
+    public override bool OpeningHours => false;
 
     public static OptionItem GameTime;
     public static OptionItem WoodToWin;
@@ -417,66 +417,59 @@ internal class BonfireNight : GameModeBase
         public long Grow;
     }
 
-    [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
-    class FixedUpdateInGameModeBonfireNightPatch
+    private static long LastFixedUpdate;
+
+    public static void FixedUpdate()
     {
-        private static long LastFixedUpdate;
-        public static void Postfix()
+        var now = GetTimeStamp();
+
+        if (LastFixedUpdate == now) return;
+        LastFixedUpdate = now;
+
+        if ((StartedAt + GameTime.GetInt() - TimeStamp) <= 60)
         {
-            if (!GameStates.IsInTask || GetGameMode() != CustomGameMode.BonfireNight) return;
-
-            var now = GetTimeStamp();
-
-            if (LastFixedUpdate == now) return;
-            LastFixedUpdate = now;
-
-            if (!AmongUsClient.Instance.AmHost) return;
-
-            if ((StartedAt + GameTime.GetInt() - TimeStamp) <= 60)
-            {
-                NotifyRoles();
-            }
-
-            var maxWood = CachedMaxWoodRefresh;
-            var growTime = CachedWoodGrowthTime;
-
-            Tree1 = UpdateTree(Tree1, maxWood, growTime);
-            Tree2 = UpdateTree(Tree2, maxWood, growTime);
-            Tree3 = UpdateTree(Tree3, maxWood, growTime);
-            Tree4 = UpdateTree(Tree4, maxWood, growTime);
-
-            var maxSakura = CachedMaxSakuraRefresh;
-            var sakuraGrow = CachedSakuraGrowthTime;
-
-            SakuraTree1 = UpdateSakuraTree(SakuraTree1, maxSakura, sakuraGrow);
-            SakuraTree2 = UpdateSakuraTree(SakuraTree2, maxSakura, sakuraGrow);
+            NotifyRoles();
         }
 
-        private static TreeState UpdateTree(TreeState tree, int maxWood, int growTime)
-        {
-            if (tree.Wood >= maxWood) return tree;
+        var maxWood = CachedMaxWoodRefresh;
+        var growTime = CachedWoodGrowthTime;
 
-            if (tree.Grow + growTime > TimeStamp) return tree;
+        Tree1 = UpdateTree(Tree1, maxWood, growTime);
+        Tree2 = UpdateTree(Tree2, maxWood, growTime);
+        Tree3 = UpdateTree(Tree3, maxWood, growTime);
+        Tree4 = UpdateTree(Tree4, maxWood, growTime);
 
-            tree.Wood++;
-            tree.Grow = GetTimeStamp();
-            if (tree.Wood == 1)
-                tree.Tree = new Tree(tree.Position);
-            return tree;
-        }
+        var maxSakura = CachedMaxSakuraRefresh;
+        var sakuraGrow = CachedSakuraGrowthTime;
 
-        private static SakuraTreeState UpdateSakuraTree(SakuraTreeState tree, int maxWood, int growTime)
-        {
-            if (tree.Wood >= maxWood) return tree;
+        SakuraTree1 = UpdateSakuraTree(SakuraTree1, maxSakura, sakuraGrow);
+        SakuraTree2 = UpdateSakuraTree(SakuraTree2, maxSakura, sakuraGrow);
+    }
 
-            if (tree.Grow + growTime > TimeStamp) return tree;
+    private static TreeState UpdateTree(TreeState tree, int maxWood, int growTime)
+    {
+        if (tree.Wood >= maxWood) return tree;
 
-            tree.Wood++;
-            tree.Grow = GetTimeStamp();
-            if (tree.Wood == 1)
-                tree.SakuraTree = new SakuraTree(tree.Position);
-            return tree;
-        }
+        if (tree.Grow + growTime > TimeStamp) return tree;
+
+        tree.Wood++;
+        tree.Grow = GetTimeStamp();
+        if (tree.Wood == 1)
+            tree.Tree = new Tree(tree.Position);
+        return tree;
+    }
+
+    private static SakuraTreeState UpdateSakuraTree(SakuraTreeState tree, int maxWood, int growTime)
+    {
+        if (tree.Wood >= maxWood) return tree;
+
+        if (tree.Grow + growTime > TimeStamp) return tree;
+
+        tree.Wood++;
+        tree.Grow = GetTimeStamp();
+        if (tree.Wood == 1)
+            tree.SakuraTree = new SakuraTree(tree.Position);
+        return tree;
     }
 }
 

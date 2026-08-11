@@ -11,6 +11,14 @@ public static class ShouldShowTogglePatch
         __result = false;
     }
 }*/
+[HarmonyPatch(typeof(AprilFoolsMode), nameof(AprilFoolsMode.ShouldClassicMode))]
+public static class ShouldClassicModePatch
+{
+    public static void Postfix(ref bool __result)
+    {
+        __result = Main.ClassicMode.Value || AprilFoolsMode.ShouldShowAprilFoolsToggle() && AprilFoolsMode.IsAprilFoolsModeToggledOn;
+    }
+}
 #region GameManager Patches
 [HarmonyPatch(typeof(NormalGameManager), nameof(NormalGameManager.GetBodyType))]
 public static class GetNormalBodyType_Patch

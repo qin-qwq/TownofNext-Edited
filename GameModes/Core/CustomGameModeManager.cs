@@ -11,9 +11,10 @@ public enum CustomGameMode
     SpeedRun = 0x03,
     TagMode = 0x04,
     RoundUp = 0x05,
-    BonfireNight = 0x06,
+    CopsAndRobbers = 0x06,
+    BonfireNight = 0x07,
 
-    HidenSeekTONE = 0x08, // HidenSeekTONE must be after other game modes
+    HidenSeekTONE = 0x99, // HidenSeekTONE must be after other game modes
     All = int.MaxValue
 }
 
@@ -32,6 +33,7 @@ public static class CustomGameModeManager
         "SpeedRun",
         "TagMode",
         "RoundUp",
+        "CopsAndRobbers",
 
         "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
     ];
