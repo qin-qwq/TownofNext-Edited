@@ -472,6 +472,27 @@ public abstract class RoleBase
 
         return min;
     }
+    /// <summary>
+    /// Command when using ability
+    /// </summary>
+    public virtual bool RoleCommand(PlayerControl pc, string msg, bool isUI = false) => false;
+    /// <summary>
+    /// Conditions for Create Ability Button
+    /// </summary>
+    public virtual bool CreateAbilityButton(PlayerControl pc) => false;
+    /// <summary>
+    /// Show the Ability button on that target
+    /// </summary>
+    public virtual bool ShowAbilityButtonFor(PlayerControl target) => false;
+    /// <summary>
+    /// Ability Button Icno Name
+    /// </summary>
+    public virtual string AbilityButtonName => string.Empty;
+    /// <summary>
+    /// After clicking the ability button
+    /// </summary>
+    public virtual void OnClickAbilityButton(byte targetId)
+    { }
 
     public virtual void ReceiveRPC(MessageReader reader, PlayerControl pc)
     { }

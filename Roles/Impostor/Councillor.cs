@@ -61,10 +61,10 @@ internal class Councillor : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        MurderMsg(pc, $"/tl {target.PlayerId}");
+        RoleCommand(pc, $"/tl {target.PlayerId}");
     }
 
-    public bool MurderMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || _Player == null || GameStates.IsExilling) return false;
@@ -350,50 +350,17 @@ internal class Councillor : RoleBase
         return false;
     }
 
-    private static void SendRPC(byte playerId)
-    {
-        var msg = new RpcCouncillorJudge(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
-    public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
-    {
-        int PlayerId = reader.ReadByte();
-        if (pc.GetRoleClass() is Councillor cl) cl.MurderMsg(pc, $"/tl {PlayerId}", true);
-    }
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Councillor) && pc.IsAlive() && pc.GetAbilityUseLimit() > 0;
 
-    private static void CouncillorOnClick(byte playerId/*, MeetingHud __instance*/)
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive();
+
+    public override string AbilityButtonName => "MeetingKillButton";
+
+    public override void OnClickAbilityButton(byte playerId)
     {
         Logger.Msg($"Click: ID {playerId}", "Councillor UI");
         var pc = Utils.GetPlayerById(playerId);
-        if (pc == null || !pc.IsAlive() || !GameStates.IsVoting) return;
-        if (AmongUsClient.Instance.AmHost && PlayerControl.LocalPlayer.GetRoleClass() is Councillor cl) cl.MurderMsg(PlayerControl.LocalPlayer, $"/tl {playerId}", true);
-        else SendRPC(playerId);
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Councillor) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
-                CreateCouncillorButton(__instance);
-        }
-    }
-    private static void CreateCouncillorButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            var pc = Utils.GetPlayerById(pva.TargetPlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("MeetingKillButton");
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => CouncillorOnClick(pva.TargetPlayerId/*, __instance*/)));
-        }
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/tl {playerId}", true);
     }
 }

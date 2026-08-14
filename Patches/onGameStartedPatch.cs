@@ -106,7 +106,6 @@ internal class ChangeRoleSettings
             OnPlayerLeftPatch.LeftPlayerId = byte.MaxValue;
             FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
             Main.Invisible.Clear();
-            CheckForEndVotingPatch.SomeoneExiled = false;
             ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();

@@ -182,54 +182,18 @@ internal class Balancer : RoleBase
         Target2 = 253;
         Choose = false;
     }
-    private static void SendRPC(byte targetId)
-    {
-        var msg = new RpcBalancer(PlayerControl.LocalPlayer.NetId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
-    public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
-    {
-        byte targetId = reader.ReadByte();
-        var target = GetPlayerById(targetId);
 
-        BalancerMsg(pc, target);
-    }
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Balancer) && pc.IsAlive() && pc.GetAbilityUseLimit() > 0;
 
-    private static void BalancerOnClick(byte targetId /*, MeetingHud __instance*/)
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive();
+
+    public override string AbilityButtonName => "BalancerIcon";
+
+    public override void OnClickAbilityButton(byte targetId)
     {
         Logger.Msg($"Click: ID {targetId}", "Balancer UI");
         var target = targetId.GetPlayer();
-        if (target == null || !target.IsAlive() || !GameStates.IsVoting || PlayerControl.LocalPlayer.GetAbilityUseLimit() < 1) return;
-        if (AmongUsClient.Instance.AmHost) BalancerMsg(PlayerControl.LocalPlayer, target);
-        else SendRPC(targetId);
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Balancer) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
-                CreateBalancerButton(__instance);
-        }
-    }
-    public static void CreateBalancerButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            var pc = GetPlayerById(pva.TargetPlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
-
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = Object.Instantiate(template, pva.transform);
-            targetBox.name = "BalancerButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("BalancerIcon");
-            if (Target1 == pva.TargetPlayerId || Target2 == pva.TargetPlayerId) renderer.color = Color.green;
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => BalancerOnClick(pva.TargetPlayerId/*, __instance*/)));
-        }
+        if (!target || !target.IsAlive() || !GameStates.IsVoting) return;
+        BalancerMsg(_Player, target);
     }
 }

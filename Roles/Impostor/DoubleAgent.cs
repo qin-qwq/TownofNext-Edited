@@ -321,57 +321,21 @@ internal class DoubleAgent : RoleBase
         CurrentBombedTime = timer;
     }
 
-    // Use button for Modded!
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.DoubleAgent) && PlayerControl.LocalPlayer.IsAlive() && CanBombInMeeting && !BombIsActive)
-                CreatePlantBombButton(__instance);
-        }
-    }
-    public static void CreatePlantBombButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            var pc = GetPlayerById(pva.TargetPlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
-            if (pc.GetCustomRole().GetCustomRoleTeam() == Custom_Team.Impostor || PlayerControl.LocalPlayer == pc) continue;
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = Object.Instantiate(template, pva.transform);
-            targetBox.name = "PlantBombButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            createdButtonsList.Add(targetBox);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("PocketBomb");
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => DestroyButtons(targetBox)));
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => PlantBombOnClick(pva.TargetPlayerId /*, __instance*/)));
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => CustomSoundsManager.Play("Line")));
-        }
-    }
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.DoubleAgent) && pc.IsAlive() && CanBombInMeeting && !BombIsActive;
 
-    private static void PlantBombOnClick(byte targetId /*, MeetingHud __instance*/)
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive() && target.GetCustomRole().GetCustomRoleTeam() != Custom_Team.Impostor && PlayerControl.LocalPlayer != target;
+
+    public override string AbilityButtonName => "PocketBomb";
+
+    public override void OnClickAbilityButton(byte targetId)
     {
         if (BombIsActive) return;
 
         CurrentBombedTime = -1;
         CurrentBombedPlayers.Add(targetId);
         BombIsActive = true;
-    }
 
-    private static void DestroyButtons(GameObject pressedButton)
-    {
-        foreach (var button in createdButtonsList.Where(button => button != pressedButton))
-            Object.Destroy(button);
-        createdButtonsList.Clear();
-
-        pressedButton.GetComponent<PassiveButton>().enabled = false;
-        Transform highlightTransform = pressedButton.transform.Find("ControllerHighlight");
-        GameObject highlightObject = highlightTransform?.gameObject;
-        highlightObject?.SetActive(false);
+        _Player.RPCPlayCustomSound("Line");
     }
 }
 // FieryFlower was here ඞ

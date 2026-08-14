@@ -67,7 +67,7 @@ internal class Nemesis : RoleBase
             AddMsg(GetString("NemesisDeadMsg"), player.PlayerId);
     }
 
-    public static bool NemesisMsgCheck(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsInGame || pc == null) return false;
@@ -186,17 +186,6 @@ internal class Nemesis : RoleBase
         return true;
     }
 
-    private static void SendRPC(byte playerId)
-    {
-        var msg = new RpcNemesisRevenge(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
-    public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
-    {
-        int PlayerId = reader.ReadByte();
-        NemesisMsgCheck(pc, $"/rv {PlayerId}", true);
-    }
-
     public override bool CanUseKillButton(PlayerControl pc) => true;
 
     public static bool CheckCanUseKillButton(PlayerControl pc)
@@ -216,15 +205,6 @@ internal class Nemesis : RoleBase
         return pc.Is(CustomRoles.Narc) ? !CustomRoles.Sheriff.RoleExist() : LivingImpostorsNum <= 0;
     }
 
-    private static void NemesisOnClick(byte playerId /*, MeetingHud __instance*/)
-    {
-        Logger.Msg($"Click: ID {playerId}", "Nemesis UI");
-        var pc = Utils.GetPlayerById(playerId);
-        if (pc == null || !pc.IsAlive() || !GameStates.IsVoting) return;
-        if (AmongUsClient.Instance.AmHost) NemesisMsgCheck(PlayerControl.LocalPlayer, $"/rv {playerId}", true);
-        else SendRPC(playerId);
-    }
-
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
     {
         seen ??= seer;
@@ -235,31 +215,17 @@ internal class Nemesis : RoleBase
         return string.Empty;
     }
 
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Nemesis) && !PlayerControl.LocalPlayer.IsAlive())
-                CreateJudgeButton(__instance);
-        }
-    }
-    public static void CreateJudgeButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates.ToArray())
-        {
-            var pc = Utils.GetPlayerById(pva.TargetPlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Nemesis) && !pc.IsAlive();
 
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("MeetingKillButton");
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => NemesisOnClick(pva.TargetPlayerId/*, __instance*/)));
-        }
+    public override bool ShowAbilityButtonFor(PlayerControl target) => !target.IsAlive();
+
+    public override string AbilityButtonName => "MeetingKillButton";
+
+    public override void OnClickAbilityButton(byte playerId)
+    {
+        Logger.Msg($"Click: ID {playerId}", "Nemesis UI");
+        var pc = Utils.GetPlayerById(playerId);
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/rv {playerId}", true);
     }
 }

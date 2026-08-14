@@ -109,13 +109,13 @@ internal class Inspector : RoleBase
                 CheckId = byte.MaxValue;
                 return;
             }
-            InspectCheckMsg(pc, $"/cmp {CheckId} {target.PlayerId}");
+            RoleCommand(pc, $"/cmp {CheckId} {target.PlayerId}");
             CheckId = byte.MaxValue;
             return;
         }
     }
 
-    public static bool InspectCheckMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;

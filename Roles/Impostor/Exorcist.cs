@@ -73,10 +73,10 @@ internal class Exorcist : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        CheckCommand(pc, $"/ex");
+        RoleCommand(pc, $"/ex");
     }
 
-    public bool CheckCommand(PlayerControl player, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl player, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || player == null || GameStates.IsExilling) return false;
@@ -236,7 +236,7 @@ internal class Exorcist : RoleBase
                 PlayerControl.LocalPlayer.ShowInfoMessage(true, GetString("ExorcistOutOfUsages"));
                 return;
             }
-            exorcist.CheckCommand(PlayerControl.LocalPlayer, "/ex", true);
+            exorcist.RoleCommand(PlayerControl.LocalPlayer, "/ex", true);
         }
         else if (PlayerControl.LocalPlayer.GetRoleClass() is Exorcist exorcist1)
         {
@@ -259,7 +259,7 @@ internal class Exorcist : RoleBase
             byte exorcistId = reader.ReadByte();
             PlayerControl exorcistPlayer = Utils.GetPlayerById(exorcistId);
             if (exorcistPlayer == null) return;
-            exorcist.CheckCommand(exorcistPlayer, "/ex", false);
+            exorcist.RoleCommand(exorcistPlayer, "/ex", false);
         }
     }
 }

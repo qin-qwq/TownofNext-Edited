@@ -174,7 +174,7 @@ internal class Pirate : RoleBase
         PirateTarget = byte.MaxValue;
         SendRPC(target: byte.MaxValue);
     }
-    public static bool DuelCheckMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;

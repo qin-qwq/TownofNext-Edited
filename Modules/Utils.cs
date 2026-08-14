@@ -2850,15 +2850,13 @@ public static class Utils
                 AFKDetector.RecordPosition(player);
             }
 
-            if (Options.ShowExileMsgAfterMeeting.GetBool() && !CheckForEndVotingPatch.SomeoneExiled) ExileMsgAfterMeeting();
+            if (Options.ShowExileMsgAfterMeeting.GetBool() && !CheckForEndVotingPatch.TempExiledPlayer) ExileMsgAfterMeeting();
 
             if (Statue.IsEnable) Statue.AfterMeetingTasks();
             if (Burst.IsEnable) Burst.AfterMeetingTasks();
 
             if (CustomRoles.CopyCat.HasEnabled()) CopyCat.UnAfterMeetingTasks(); // All crew hast to be before this
             if (CustomRoles.Necromancer.HasEnabled()) Necromancer.UnAfterMeetingTasks();
-
-            CheckForEndVotingPatch.SomeoneExiled = false;
         }
         catch (Exception error)
         {
@@ -2904,7 +2902,7 @@ public static class Utils
             foreach (var player in Main.EnumerateAlivePlayerControls())
             {
                 var name = sub.ToString();
-                if (!string.IsNullOrEmpty(name)) player.Notify(name.TrimStart('，'));
+                if (!string.IsNullOrEmpty(name)) player.Notify(name.TrimStart('，'), 15f);
             }
         }
     }

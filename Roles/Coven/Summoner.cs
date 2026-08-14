@@ -135,7 +135,7 @@ internal class Summoner : CovenManager
         return true;
     }
 
-    public static bool SummonerCheckMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false; // Skip if system message or not host
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false; // Only during meetings

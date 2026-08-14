@@ -41,13 +41,14 @@ internal class Imitator : RoleBase
 
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        if (!seer.IsAlive() || seen.IsAlive() || seen.GetCustomRole().IsCrewmate()) return string.Empty;
+        if (!seer.IsAlive() || seen.IsAlive() || !seen.GetCustomRole().IsCrewmate()) return string.Empty;
 
         return ColorString(GetRoleColor(seer.GetCustomRole()), $" {seen.GetVisiblePlayerId()}");
     }
 
     public static void ChangeRoleMap()
     {
+        if (Balancer.Choose2) return;
         foreach (var apc in ImitateRole)
         {
             var player = apc.Key.GetPlayer();
@@ -62,7 +63,7 @@ internal class Imitator : RoleBase
         }
     }
 
-    public static bool ImitatorMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || !pc || GameStates.IsExilling) return false;

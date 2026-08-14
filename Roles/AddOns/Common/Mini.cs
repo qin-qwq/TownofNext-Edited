@@ -55,7 +55,7 @@ public class Mini : IAddon
         {
             SendRPC();
         }
-        Main.AllPlayerSpeed[playerId] = MiniSpeed.GetFloat();
+        if (Age < 18) Main.AllPlayerSpeed[playerId] = MiniSpeed.GetFloat();
     }
     public void Remove(byte playerId)
     {

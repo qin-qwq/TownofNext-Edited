@@ -392,7 +392,6 @@ public static class AntiBlackout
             {
                 if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
                 {
-                    pc.ResetKillCooldown();
                     if (pc.Is(CustomRoles.Saboteur) && Utils.AnySabotageIsActive())
                     {
                         pc.SetKillCooldown(Saboteur.SaboteurMinCD.GetFloat());

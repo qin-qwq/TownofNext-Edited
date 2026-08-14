@@ -18,6 +18,7 @@ namespace TONE;
 public static class GuessManager
 {
     public static GameObject guesserUI;
+    public static bool GuessButtonCreated = false;
 
     public static string GetFormatString()
     {
@@ -625,6 +626,7 @@ public static class GuessManager
     {
         public static void Postfix(MeetingHud __instance)
         {
+            GuessButtonCreated = false;
 
             if (Options.GuesserMode.GetBool())
             {
@@ -678,7 +680,7 @@ public static class GuessManager
             if (pc == null || !pc.IsAlive()) continue;
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
             GameObject targetBox = Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
+            targetBox.name = "GuessButton";
             targetBox.transform.localPosition = new Vector3(-0.95f, 0.03f, -1.31f);
             SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
             renderer.sprite = CustomButton.Get("TargetIcon");
@@ -686,6 +688,7 @@ public static class GuessManager
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => GuesserOnClick(pva.TargetPlayerId, __instance)));
         }
+        GuessButtonCreated = true;
     }
 
     public const int MaxOneScreenRole = 40;

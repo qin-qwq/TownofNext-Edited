@@ -2,7 +2,6 @@ using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Coven;
 using UnityEngine;
@@ -100,9 +99,9 @@ internal class Judge : RoleBase
     }
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        TrialMsg(pc, $"/tl {target.PlayerId}");
+        RoleCommand(pc, $"/tl {target.PlayerId}");
     }
-    public static bool TrialMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
@@ -327,52 +326,17 @@ internal class Judge : RoleBase
         return false;
     }
 
-    private static void SendRPC(byte targetId)
-    {
-        var msg = new RpcJudge(PlayerControl.LocalPlayer.NetId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
-    public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
-    {
-        byte targetId = reader.ReadByte();
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Judge) && pc.IsAlive() && pc.GetAbilityUseLimit() > 0;
 
-        TrialMsg(pc, $"/tl {targetId}", true);
-    }
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive();
 
-    private static void JudgeOnClick(byte targetId /*, MeetingHud __instance*/)
+    public override string AbilityButtonName => "JudgeIcon";
+
+    public override void OnClickAbilityButton(byte targetId)
     {
         Logger.Msg($"Click: ID {targetId}", "Judge UI");
         var target = targetId.GetPlayer();
-        if (target == null || !target.IsAlive() || !GameStates.IsVoting) return;
-        if (AmongUsClient.Instance.AmHost) TrialMsg(PlayerControl.LocalPlayer, $"/tl {targetId}", true);
-        else SendRPC(targetId);
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Judge) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
-                CreateJudgeButton(__instance);
-        }
-    }
-    public static void CreateJudgeButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            var pc = GetPlayerById(pva.TargetPlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
-
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("JudgeIcon");
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => JudgeOnClick(pva.TargetPlayerId/*, __instance*/)));
-        }
+        if (!target || !target.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/tl {targetId}", true);
     }
 }

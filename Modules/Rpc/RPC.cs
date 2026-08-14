@@ -19,7 +19,7 @@ namespace TONE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 184/255 USED
+public enum CustomRPC : byte // 178/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -48,12 +48,8 @@ public enum CustomRPC : byte // 184/255 USED
     DumpLog,
     SetNameColorData,
     GuessKill,
-    Judge,
     Guess,
     KNChat = 119, // Kill network chat, may conflicts with judge and guess calls
-    CouncillorJudge,
-    NemesisRevenge,
-    RetributionistRevenge,
     SetFriendCode,
     SyncLobbyTimer,
     SyncPlayerSetting,
@@ -84,13 +80,13 @@ public enum CustomRPC : byte // 184/255 USED
     // SetLoversPlayers,
     SetLoverPairs,
     SendFireworkerState,
+    SetCurrentDousingTarget,
+    SetEvilTrackerTarget,
+    SetDrawPlayer,
 
     // BetterAmongUs (BAU) RPC, This is sent to allow other BAU users know who's using BAU!
     BetterCheck = 150,
 
-    SetCurrentDousingTarget,
-    SetEvilTrackerTarget,
-    SetDrawPlayer,
     SetCrewpostorTasksDone,
     SetCurrentDrawTarget,
     SyncJailerData,
@@ -104,21 +100,17 @@ public enum CustomRPC : byte // 184/255 USED
     SetGreedy,
     SetInquisitor,
     BenefactorRPC,
-    SetSwapperVotes,
     SetMarkedPlayer,
-    PresidentEnd,
-    PresidentReveal,
     SetInvestgatorLimit,
     SetOverseerRevealedPlayer,
     SetOverseerTimer,
     SetChameleonTimer,
     SyncAdmiredList,
-    DictatorRPC,
     Necronomicon,
     ExorcistExorcise,
     Invisibility,
-    Balancer,
     SyncMiniAge,
+    ClickAbilityButton,
 
     //FFA
     SyncFFAPlayer,
@@ -160,20 +152,13 @@ internal class RPCHandlerPatch
     => (CustomRPC)id is CustomRPC.VersionCheck
         or CustomRPC.RequestRetryVersionCheck
         or CustomRPC.AntiBlackout
-        or CustomRPC.Judge
         or CustomRPC.ExorcistExorcise
-        or CustomRPC.CouncillorJudge
-        or CustomRPC.NemesisRevenge
-        or CustomRPC.RetributionistRevenge
         or CustomRPC.Guess
-        or CustomRPC.PresidentEnd
-        or CustomRPC.SetSwapperVotes
         or CustomRPC.DumpLog
         or CustomRPC.SetFriendCode
         or CustomRPC.BetterCheck
-        or CustomRPC.DictatorRPC
-        or CustomRPC.Balancer
-        or CustomRPC.SendChannelMsg;
+        or CustomRPC.SendChannelMsg
+        or CustomRPC.ClickAbilityButton;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
         var rpcType = (RpcCalls)callId;
@@ -637,29 +622,11 @@ internal class RPCHandlerPatch
                 case CustomRPC.SyncNameNotify:
                     NameNotifyManager.ReceiveRPC(reader);
                     break;
-                case CustomRPC.Judge:
-                    Judge.ReceiveRPC_Custom(reader, __instance);
-                    break;
                 case CustomRPC.ExorcistExorcise:
                     Exorcist.ReceiveRPC_Custom(reader, __instance);
                     break;
-                case CustomRPC.PresidentEnd:
-                    President.ReceiveRPC(reader, __instance);
-                    break;
-                case CustomRPC.PresidentReveal:
-                    President.ReceiveRPC(reader, __instance, isEnd: false);
-                    break;
-                case CustomRPC.CouncillorJudge:
-                    Councillor.ReceiveRPC_Custom(reader, __instance);
-                    break;
                 case CustomRPC.Guess:
                     GuessManager.ReceiveRPC(reader, __instance);
-                    break;
-                case CustomRPC.NemesisRevenge:
-                    Nemesis.ReceiveRPC_Custom(reader, __instance);
-                    break;
-                case CustomRPC.RetributionistRevenge:
-                    Retributionist.ReceiveRPC_Custom(reader, __instance);
                     break;
                 case CustomRPC.SetChameleonTimer:
                     Chameleon.ReceiveRPC_Custom(reader);
@@ -708,12 +675,6 @@ internal class RPCHandlerPatch
                 case CustomRPC.KeeperRPC:
                     Keeper.ReceiveRPC(reader);
                     break;
-                case CustomRPC.SetSwapperVotes:
-                    Swapper.ReceiveSwapRPC(reader, __instance);
-                    break;
-                case CustomRPC.DictatorRPC:
-                    Dictator.OnReceiveDictatorRPC(reader, __instance);
-                    break;
                 case CustomRPC.SyncShieldPersonDiedFirst:
                     Main.FirstDied = reader.ReadString();
                     Main.FirstDiedPrevious = reader.ReadString();
@@ -755,11 +716,11 @@ internal class RPCHandlerPatch
 
                         break;
                     }
-                case CustomRPC.Balancer:
-                    Balancer.ReceiveRPC_Custom(reader, __instance);
-                    break;
                 case CustomRPC.SyncMiniAge:
                     Mini.ReceiveRPC(reader, __instance);
+                    break;
+                case CustomRPC.ClickAbilityButton:
+                    RPC.ClickAbilityButtonReader(reader, __instance);
                     break;
             }
         }
@@ -1066,6 +1027,19 @@ internal static class RPC
         catch (Exception error)
         {
             Logger.Error($" Error RPC:{error}", "SyncRoleSkillReader");
+        }
+    }
+    public static void ClickAbilityButtonReader(MessageReader reader, PlayerControl pc)
+    {
+        try
+        {
+            var targetId = reader.ReadByte();
+
+            pc.GetRoleClass().OnClickAbilityButton(targetId);
+        }
+        catch (Exception error)
+        {
+            Logger.Error($" Error RPC:{error}", "ClickAbilityButtonReader");
         }
     }
     /*public static void SyncLoversPlayers()

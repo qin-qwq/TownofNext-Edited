@@ -19,70 +19,6 @@ namespace TONE.Modules.Rpc
         private readonly byte playerId;
     }
 
-    class RpcJudge : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.Judge;
-        public RpcJudge(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
-
-    class RpcCouncillorJudge : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.CouncillorJudge;
-        public RpcCouncillorJudge(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
-
-    class RpcNemesisRevenge : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.NemesisRevenge;
-        public RpcNemesisRevenge(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
-
-    class RpcRetributionistRevenge : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.RetributionistRevenge;
-        public RpcRetributionistRevenge(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
-
     class RpcSetBountyTarget : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.SetBountyTarget;
@@ -632,21 +568,6 @@ namespace TONE.Modules.Rpc
         private readonly byte targetId;
         private readonly string shieldedPlayers;
     }
-    class RpcSetSwapperVotes : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.SetSwapperVotes;
-        public RpcSetSwapperVotes(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
     class RpcSetMarkedPlayer : BaseModdedRpc // Ninja
     {
         public override byte RpcType => (byte)CustomRPC.SetMarkedPlayer;
@@ -664,39 +585,6 @@ namespace TONE.Modules.Rpc
 
         private readonly byte playerId;
         private readonly byte targetId;
-    }
-    class RpcPresidentEnd : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.PresidentEnd;
-        public RpcPresidentEnd(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
-    class RpcPresidentReveal : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.PresidentReveal;
-        public RpcPresidentReveal(uint netId, byte playerId, bool checkReveal) : base(netId)
-        {
-            this.playerId = playerId;
-            this.checkReveal = checkReveal;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-            msg.Write(checkReveal);
-        }
-
-        private readonly byte playerId;
-        private readonly bool checkReveal;
     }
     class RpcSetInvestigatorLimit : BaseModdedRpc
     {
@@ -806,21 +694,6 @@ namespace TONE.Modules.Rpc
         private readonly byte playerId;
         private readonly byte targetId;
     }
-    class RpcDictator : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.DictatorRPC;
-        public RpcDictator(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
-    }
     class RpcNecronomicon : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.Necronomicon;
@@ -868,20 +741,5 @@ namespace TONE.Modules.Rpc
 
         private readonly int playerId;
         private readonly int role;
-    }
-    class RpcBalancer : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.Balancer;
-        public RpcBalancer(uint netId, byte playerId) : base(netId)
-        {
-            this.playerId = playerId;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(playerId);
-        }
-
-        private readonly byte playerId;
     }
 }

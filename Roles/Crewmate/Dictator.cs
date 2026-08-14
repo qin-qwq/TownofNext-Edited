@@ -27,7 +27,7 @@ internal class Dictator : RoleBase
 
     public static bool CheckVotingForTarget(PlayerControl pc, PlayerVoteArea pva)
         => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedFor && pva.VotedFor < 253 && !pc.Data.IsDead;
-    public bool ExilePlayer(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!ChangeCommandToExpel.GetBool()) return false;
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -129,81 +129,17 @@ internal class Dictator : RoleBase
         return true;
     }
 
-    private void SendDictatorRPC(byte playerId)
-    {
-        var msg = new RpcDictator(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Dictator) && pc.IsAlive() && ChangeCommandToExpel.GetBool();
 
-    public static void OnReceiveDictatorRPC(MessageReader reader, PlayerControl pc)
-    {
-        byte pid = reader.ReadByte();
-        if (pc.Is(CustomRoles.Dictator) && pc.IsAlive() && GameStates.IsVoting)
-        {
-            if (pc.GetRoleClass() is Dictator dictator)
-                dictator.ExilePlayer(pc, $"/exp {pid}", true);
-        }
-    }
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive();
 
-    private void DictatorOnClick(byte playerId, MeetingHud __instance)
+    public override string AbilityButtonName => "JudgeIcon";
+
+    public override void OnClickAbilityButton(byte playerId)
     {
         Logger.Msg($"Click: ID {playerId}", "Dictator UI");
         var pc = playerId.GetPlayer();
-        if (pc == null || !pc.IsAlive() || !GameStates.IsVoting) return;
-
-        if (AmongUsClient.Instance.AmHost) ExilePlayer(PlayerControl.LocalPlayer, $"/exp {playerId}");
-        else SendDictatorRPC(playerId);
-
-        CreateDictatorButton(__instance);
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dictator && PlayerControl.LocalPlayer.IsAlive())
-                if (ChangeCommandToExpel.GetBool())
-                    dictator.CreateDictatorButton(__instance);
-        }
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.OnDestroy))]
-    class OnDestroyPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            foreach (var pva in __instance.playerStates)
-            {
-                if (pva?.transform?.Find("DictatorButton") != null)
-                    Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
-            }
-        }
-    }
-
-    private void CreateDictatorButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            if (pva.transform.Find("DictatorButton") != null) Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
-
-            var pc = pva.TargetPlayerId.GetPlayer();
-            var local = PlayerControl.LocalPlayer;
-            if (pc == null || !pc.IsAlive()) continue;
-
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = Object.Instantiate(template, pva.transform);
-            targetBox.name = "DictatorButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            renderer.sprite = CustomButton.Get("JudgeIcon");
-
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
-            {
-                DictatorOnClick(pva.TargetPlayerId, __instance);
-            }));
-        }
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/exp {playerId}", true);
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using TMPro;
 using TONE.Modules;
+using TONE.Modules.Rpc;
 using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
@@ -47,7 +48,6 @@ class CheckForEndVotingPatch
 {
     public static string TempExileMsg;
     public static NetworkedPlayerInfo TempExiledPlayer;
-    public static bool SomeoneExiled;
     public static bool Prefix(MeetingHud __instance)
     {
         if (!AmongUsClient.Instance.AmHost) return true;
@@ -526,8 +526,6 @@ class CheckForEndVotingPatch
 
         if (Options.PlayEjectSfx.GetBool())
             CustomSoundsManager.RPCPlayCustomSoundAll("Dramatic");
-
-        SomeoneExiled = true;
 
         var realName = Main.AllPlayerNames[exiledPlayer.PlayerId];
         Main.LastVotedPlayer = realName;
@@ -1044,6 +1042,7 @@ class MeetingHudStartPatch
     public static List<(string, byte, string)> msgToSend = [];
     public static void AddMsg(string text, byte sendTo = 255, string title = "")
         => msgToSend.Add((text, sendTo, title));
+    public static bool AbilityButtonCreated = false;
     public static void NotifyRoleSkillOnMeetingStart()
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -1206,6 +1205,7 @@ class MeetingHudStartPatch
         GameStates.AlreadyDied |= !IsAllAlive;
         Main.EnumeratePlayerControls().Do(x => ReportDeadBodyPatch.WaitReport[x.PlayerId].Clear());
         MeetingStates.MeetingCalled = true;
+        AbilityButtonCreated = false;
 
         CheckForEndVotingPatch.TempExiledPlayer = null;
         CheckForEndVotingPatch.TempExileMsg = string.Empty;
@@ -1508,6 +1508,34 @@ class MeetingHudStartPatch
         __instance.SortButtons();
 
         TextBoxPatch.OnMeetingStart();
+
+        if (PlayerControl.LocalPlayer.GetRoleClass().CreateAbilityButton(PlayerControl.LocalPlayer))
+        {
+            foreach (var pva in __instance.playerStates)
+            {
+                var pc = GetPlayerById(pva.TargetPlayerId);
+                if (!pc || !PlayerControl.LocalPlayer.GetRoleClass().ShowAbilityButtonFor(pc) || Balancer.Choose && !(pc.PlayerId == Balancer.Target1 || pc.PlayerId == Balancer.Target2)) continue;
+
+                GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
+                GameObject targetBox = Object.Instantiate(template, pva.transform);
+                targetBox.name = "ShootButton";
+                targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
+                SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
+                renderer.sprite = CustomButton.Get(PlayerControl.LocalPlayer.GetRoleClass().AbilityButtonName);
+                PassiveButton button = targetBox.GetComponent<PassiveButton>();
+                button.OnClick.RemoveAllListeners();
+                button.OnClick.AddListener((Action)(() =>
+                {
+                    if (AmongUsClient.Instance.AmHost) PlayerControl.LocalPlayer.GetRoleClass().OnClickAbilityButton(pva.TargetPlayerId);
+                    else
+                    {
+                        var msg = new RpcClickAbilityButton(PlayerControl.LocalPlayer.NetId, pva.TargetPlayerId);
+                        RpcUtils.LateBroadcastReliableMessage(msg);
+                    }
+                }));
+            }
+            AbilityButtonCreated = true;
+        }
     }
 }
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
@@ -1515,7 +1543,9 @@ class MeetingHudUpdatePatch
 {
     private static int bufferTime = 10;
     private static void ClearShootButton(MeetingHud __instance, bool forceAll = false)
-     => __instance.playerStates.ToList().ForEach(x => { if ((forceAll || (!Main.PlayerStates.TryGetValue(x.TargetPlayerId, out var ps) || ps.IsDead)) && x.transform.FindChild("ShootButton") != null) Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
+     => __instance.playerStates.ToList().ForEach(x => { if ((forceAll || !Main.PlayerStates.TryGetValue(x.TargetPlayerId, out var ps) || ps.IsDead) && x.transform.FindChild("ShootButton")) Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
+    private static void ClearGuessButton(MeetingHud __instance, bool forceAll = false)
+     => __instance.playerStates.ToList().ForEach(x => { if ((forceAll || !Main.PlayerStates.TryGetValue(x.TargetPlayerId, out var ps) || ps.IsDead) && x.transform.FindChild("GuessButton")) Object.Destroy(x.transform.FindChild("GuessButton").gameObject); });
 
     // Force call RpcClose here
     public static bool Prefix(MeetingHud __instance)
@@ -1581,16 +1611,20 @@ class MeetingHudUpdatePatch
             //__instance.playerStates.Where(x => !x.TargetPlayerId.GetPlayer().IsAlive() && !x.AmDead)
             //    .Do(x => x.SetDead(x.DidReport, true, x.GAIcon));
 
-            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper or CustomRoles.Balancer or CustomRoles.Dictator && !PlayerControl.LocalPlayer.IsAlive())
+            if (MeetingHudStartPatch.AbilityButtonCreated && !PlayerControl.LocalPlayer.GetRoleClass().CreateAbilityButton(PlayerControl.LocalPlayer))
+            {
                 ClearShootButton(__instance, true);
+                MeetingHudStartPatch.AbilityButtonCreated = false;
+            }
 
-            if (myRole is CustomRoles.Nemesis && !PlayerControl.LocalPlayer.IsAlive() && GameObject.Find("ShootButton") == null)
-                Nemesis.CreateJudgeButton(__instance);
-            if (myRole is CustomRoles.Retributionist && !PlayerControl.LocalPlayer.IsAlive() && GameObject.Find("ShootButton") == null)
-                Retributionist.CreateJudgeButton(__instance);
+            if (GuessManager.GuessButtonCreated && !PlayerControl.LocalPlayer.IsAlive())
+            {
+                ClearGuessButton(__instance, true);
+                GuessManager.GuessButtonCreated = false;
+            }
 
             ClearShootButton(__instance);
-
+            ClearGuessButton(__instance);
         }
     }
 }

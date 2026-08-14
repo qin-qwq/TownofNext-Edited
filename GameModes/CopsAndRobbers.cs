@@ -298,8 +298,8 @@ internal class CopsAndRobbers : GameModeBase
 
     public override void AppendKcount(StringBuilder builder)
     {
-        int CopCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Cop));
-        int RobberCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Robber));
+        int CopCount = Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Cop));
+        int RobberCount = Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Robber));
 
         builder.Append(string.Format(GetString("Remaining.C&R.Cop"), CopCount));
         builder.Append(string.Format("\n\r" + GetString("Remaining.C&R.Robber"), RobberCount));
@@ -371,22 +371,22 @@ class CopsAndRobbersGameEndPredicate : GameEndPredicate
     {
         reason = GameOverReason.ImpostorsByKill;
 
-        if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Robber)) == CopsAndRobbers.CaptureList.Count ||
-            !Main.AllAlivePlayerControls.Any(x => x.Is(CustomRoles.Robber)) ||
+        if (Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Robber)) == CopsAndRobbers.CaptureList.Count ||
+            !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.Robber)) ||
             CopsAndRobbers.StartedAt != 0 && GetTimeStamp() - CopsAndRobbers.StartedAt >= CopsAndRobbers.GameTime.GetInt())
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Cop);
-            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Cop)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Cop)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
 
         if (CopsAndRobbers.NumJewels >= CopsAndRobbers.RobberJewels.GetInt() ||
-            !Main.AllAlivePlayerControls.Any(x => x.Is(CustomRoles.Cop)))
+            !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.Cop)))
         {
             reason = GameOverReason.CrewmatesByTask;
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Robber);
-            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Robber)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Robber)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
