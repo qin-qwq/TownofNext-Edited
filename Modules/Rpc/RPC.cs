@@ -194,7 +194,7 @@ internal class RPCHandlerPatch
                 Logger.Info($"{__instance.GetNameWithRole()} => {p?.GetNameWithRole() ?? "null"}", "StartMeeting");
                 break;
         }
-        if (!(Main.LIMap && callId == 255))
+        if (!(Main.HasLIPlugin && callId == 255))
         {
             if (!__instance.IsHost() &&
                 (Enum.IsDefined(typeof(CustomRPC), callId) && !TrustedRpc(callId) // Is Custom RPC
