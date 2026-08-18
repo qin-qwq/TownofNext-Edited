@@ -218,6 +218,14 @@ public static class DraftAssign
         {
             SendDraftPoolMsg(player);
         }
+
+        _ = new LateTask(() =>
+        {
+            foreach (var player in Main.EnumeratePlayerControls())
+            {
+                SendDraftPoolMsg(player);
+            }
+        }, 25f, "Re Send Draft Pool Msg");
     }
 
     public static List<CustomRoles> GetDraftPool(this PlayerControl player) => DraftPools[player.PlayerId];

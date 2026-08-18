@@ -22,9 +22,18 @@ internal class CopyCat : RoleBase
     private static OptionItem CopyCrewVar;
     private static OptionItem CopyTeamChangingAddon;
     private static OptionItem CopyOnlyEnabledRoles;
+    private static OptionItem CopyCatFailedMode;
 
     private static float CurrentKillCooldown = new();
     public static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
+
+    [Obfuscation(Exclude = true)]
+    private enum CopyCatFailedModeSelectList
+    {
+        CopyCat_OnlyNotify,
+        CopyCat_CopyRandomRole,
+        CopyCat_Misfire,
+    }
 
     public override void SetupCustomOption()
     {
@@ -34,6 +43,8 @@ internal class CopyCat : RoleBase
         CopyCrewVar = BooleanOptionItem.Create(Id + 13, "CopyCrewVar", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
         CopyTeamChangingAddon = BooleanOptionItem.Create(Id + 14, "CopyTeamChangingAddon", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
         CopyOnlyEnabledRoles = BooleanOptionItem.Create(Id + 15, "CopyOnlyEnabledRoles", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
+        CopyCatFailedMode = StringOptionItem.Create(Id + 16, "CopyCatFailedMode", EnumHelper.GetAllNames<CopyCatFailedModeSelectList>(), 0, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat])
+            .SetHidden(false);
     }
 
     public override void Init()
@@ -166,6 +177,8 @@ internal class CopyCat : RoleBase
                 _ => role
             };
         }
+        // Copy random role
+        if (!role.IsCrewmate() && CopyCatFailedMode.GetInt() == 1) role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement();
         if (Lich.IsCursed(target)) role = CustomRoles.Lich;
         if (role.IsCrewmate() && (role.IsEnable() || !CopyOnlyEnabledRoles.GetBool()))
         {
@@ -211,9 +224,18 @@ internal class CopyCat : RoleBase
             return false;
 
         }
-        killer.Notify(GetString("CopyCatCanNotCopy"));
-        killer.ResetKillCooldown();
-        killer.SetKillCooldown();
+        switch (CopyCatFailedMode.GetInt())
+        {
+            case 0: // Only notify
+                killer.Notify(GetString("CopyCatCanNotCopy"));
+                killer.ResetKillCooldown();
+                killer.SetKillCooldown();
+                break;
+            case 2: // Misfire
+                killer.SetDeathReason(PlayerState.DeathReason.Misfire);
+                killer.RpcMurderPlayer(killer);
+                break;
+        }
         return false;
     }
     public static string CopycatReminder(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)

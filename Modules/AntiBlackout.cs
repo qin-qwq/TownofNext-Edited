@@ -273,7 +273,7 @@ public static class AntiBlackout
     {
         var timeNotify = 0f;
 
-        if ((BlackOutIsActive || ResetName) && CheckForEndVotingPatch.TempExileMsg != string.Empty && Main.CurrentServerIsVanilla)
+        if ((BlackOutIsActive || ResetName) && CheckForEndVotingPatch.TempExileMsg != string.Empty && (Main.CurrentServerIsVanilla || Main.LIMap))
         {
             foreach (var pc in Main.EnumeratePlayerControls())
             {

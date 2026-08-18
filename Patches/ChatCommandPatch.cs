@@ -13,7 +13,6 @@ using TONE.Modules.Rpc;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
-using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
@@ -50,7 +49,7 @@ internal class Command(string key, string arguments, Command.UsageLevels usageLe
 
     public static List<Command> AllCommands = [];
 
-    public string[] CommandForms = GetString($"CommandForms.{key}", SupportedLangs.SChinese).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    public string[] CommandForms = GetString($"CommandForms.{key}").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
     public string Key => key;
     public string Arguments => arguments;
     public string Description => GetString($"CommandDescription.{key}");
@@ -209,6 +208,7 @@ internal class ChatCommands
             new("Preset", "{mode} {preset_id}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, PresetCommand, true, false, [GetString("CommandArgs.Preset.Mode"), GetString("CommandArgs.Preset.PresetId")]),
             new("SetRole", "{id} [role]", Command.UsageLevels.Up, Command.UsageTimes.InLobby, SetRoleCommand, true, false, [GetString("CommandArgs.SetRole.Id"), GetString("CommandArgs.SetRole.Role")]),
             new("MapPoll", "", Command.UsageLevels.Host, Command.UsageTimes.InLobby, MapPollCommand, true, false),
+            new("Achievements", "[role]", Command.UsageLevels.Host, Command.UsageTimes.Always, AchievementsCommand, true, false, [GetString("CommandArgs.Achievements.Role")]),
 
             new("Guess", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]),
             new("Trial", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Trial.Id")]),
@@ -2372,13 +2372,6 @@ internal class ChatCommands
             return;
         }
         DraftAssign.StartSelect();
-        _ = new LateTask(() =>
-        {
-            foreach (var player in Main.EnumeratePlayerControls())
-            {
-                DraftAssign.SendDraftPoolMsg(player);
-            }
-        }, 25f, "Re Send Draft Pool Msg");
     }
 
     private static void DraftCommand(PlayerControl player, string text, string[] args)
@@ -2542,6 +2535,11 @@ internal class ChatCommands
         var map = string.Join(' ', Main.MapNamesValues);
         var msg = $"/poll {GetString("MapPollTitle")}? {map}";
         PollCommand(player, msg, msg.Split(' '));
+    }
+
+    private static void AchievementsCommand(PlayerControl player, string text, string[] args)
+    {
+        AchievementManager.ShowAchievements(player.PlayerId, args.Length > 1 ? args[1] : null);
     }
 
     private static IEnumerator UploadCurrentPreset(PlayerControl player)

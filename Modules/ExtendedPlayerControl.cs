@@ -1562,6 +1562,7 @@ static class ExtendedPlayerControl
             3 => new Vector2(27f, 3.3f), // dlekS ehT
             4 => new Vector2(-16.8f, -6.2f), // Airship
             5 => new Vector2(10.2f, 18.1f), // The Fungle
+            7 => new(50f, 50f), // LIMap
             _ => throw new NotImplementedException(),
         };
     }

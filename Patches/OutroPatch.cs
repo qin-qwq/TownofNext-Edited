@@ -78,6 +78,8 @@ class EndGamePatch
 
         AFKDetector.ExemptedPlayers.Clear();
 
+        AchievementManager.OnGameEnd();
+
         if (Options.DumpLogAfterGameEnd.GetBool()) Utils.DumpLog(false);
 
         var sb = new StringBuilder(GetString("KillLog") + ":");

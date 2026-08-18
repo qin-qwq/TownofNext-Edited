@@ -247,11 +247,11 @@ public static class OnPlayerJoinedPatch
                     return;
                 }
 
-                /*if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
+                if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
                 {
                     var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                     RpcUtils.LateSpecificSendMessage(message, client.Id);
-                }*/
+                }
             }
             catch { }
         }, 4.5f, "Green Bean Kick LateTask", false);
@@ -630,7 +630,7 @@ class InnerNetClientSpawnPatch
                 else TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true, sendOption: SendOption.None);
             }, 3f, "Welcome Message");
 
-            /*_ = new LateTask(() =>
+            _ = new LateTask(() =>
             {
                 if (client == null || client.Character == null)
                 {
@@ -640,7 +640,7 @@ class InnerNetClientSpawnPatch
 
                 var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                 RpcUtils.LateSpecificSendMessage(message, client.Id);
-            }, 3f, "RPC Request Retry Version Check");*/
+            }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame)
             {
@@ -712,17 +712,17 @@ class InnerNetClientSpawnPatch
                         }
                     }, 3.2f, "DisplayLastResult");
                 }
-                if (PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp && Options.EnableUpMode.GetBool())
-                {
+                //if (PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp && Options.EnableUpMode.GetBool())
+                //{
                     _ = new LateTask(() =>
                     {
-                        if (!AmongUsClient.Instance.IsGameStarted && client.Character != null)
+                        if (!AmongUsClient.Instance.IsGameStarted && client.Character?.IsHost() == true)
                         {
                             Main.isChatCommand = true;
-                            //Utils.SendMessage($"{GetString("Message.YTPlanNotice")} {PlayerControl.LocalPlayer.FriendCode.GetDevUser().UpName}", client.Character.PlayerId);
+                            AchievementManager.ShowCompletedThisGame();
                         }
-                    }, 3.3f, "DisplayUpWarnning");
-                }
+                    }, 3.3f, "DisplayAchievementResult");
+                //}
             }
         }
     }

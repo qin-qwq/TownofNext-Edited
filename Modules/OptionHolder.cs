@@ -14,6 +14,7 @@ public static class Options
     public static void OptionsLoadStart_Postfix()
     {
         Logger.Msg("Mod option loading start", "Load Options");
+        AchievementManager.Load();
         ChatCommands.LoadCommands();
         FactionOption.Load();
         try

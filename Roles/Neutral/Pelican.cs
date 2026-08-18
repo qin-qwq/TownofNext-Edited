@@ -127,6 +127,7 @@ internal class Pelican : RoleBase
             3 => new Vector2(27f, 3.3f), // dlekS ehT
             4 => new Vector2(-16.8f, -6.2f), // Airship
             5 => new Vector2(9.6f, 23.2f), // The Fungle
+            7 => new(50f, 50f), // LIMap
             _ => throw new System.NotImplementedException(),
         };
     }
@@ -154,6 +155,7 @@ internal class Pelican : RoleBase
 
         eatenList[pc.PlayerId].Add(target.PlayerId);
         SyncEatenList();
+        AchievementManager.OnRoleAbility(CustomRoles.Pelican, AchievementBase.AchievementEventType.PelicanEat, pc);
 
         originalSpeed.Remove(target.PlayerId);
         originalSpeed.Add(target.PlayerId, Main.AllPlayerSpeed[target.PlayerId]);

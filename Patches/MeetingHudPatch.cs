@@ -1695,8 +1695,8 @@ class MeetingHudOnDestroyPatch
             yield return new WaitForSeconds(1f);
             if (!ExileController.Instance || GameStates.IsEnded) yield break;
 
-            if (CheckForEndVotingPatch.TempExileMsg.EndsWith("<size=0>") && GameModeBase.GetGameMode() is CustomGameMode.Standard && CheckForEndVotingPatch.TempExiledPlayer != null)
-                ExileController.Instance.completeString = CheckForEndVotingPatch.TempExileMsg[..^8];
+            if (GameModeBase.GetGameMode() is CustomGameMode.Standard && CheckForEndVotingPatch.TempExiledPlayer != null)
+                ExileController.Instance.completeString = CheckForEndVotingPatch.TempExileMsg;
 
             while (ExileController.Instance) yield return null;
 

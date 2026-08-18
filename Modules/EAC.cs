@@ -384,7 +384,7 @@ internal class EAC
     }
     public static bool RpcUpdateSystemCheck(PlayerControl player, SystemTypes systemType, byte amount)
     {
-        if (GameStates.IsLocalGame)
+        if (GameStates.IsLocalGame || Main.LIMap)
         {
             return false;
         }

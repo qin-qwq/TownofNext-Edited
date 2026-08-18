@@ -123,6 +123,8 @@ class CheckMurderPatch
 
         Logger.Info($"End: CustomRoleManager.OnCheckMurder", "CheckMurder");
 
+        AchievementManager.OnPlayerKilled(__instance, target);
+
         //== Kill target ==
         __instance.RpcMurderPlayer(target);
         //============
@@ -2239,7 +2241,7 @@ public static class PlayerControlDiePatch
 
         __instance.RpcRemovePet();
 
-        if (Main.NormalOptions.MapId != 7) return;
+        if (!Main.LIMap) return;
 
         _ = new LateTask(() =>
         {
@@ -2259,7 +2261,7 @@ static class PlayerControlRevivePatch
 {
     public static void Postfix(PlayerControl __instance)
     {
-        if (!AmongUsClient.Instance.AmHost || Main.NormalOptions.MapId != 7) return;
+        if (!AmongUsClient.Instance.AmHost || !Main.LIMap) return;
 
         _ = new LateTask(() =>
         {

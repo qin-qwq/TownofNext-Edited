@@ -43,6 +43,8 @@ internal class Cleaner : RoleBase
 
             reporter.Notify(Translator.GetString("CleanerCleanBody"));
 
+            AchievementManager.OnRoleAbility(CustomRoles.Cleaner, AchievementBase.AchievementEventType.CleanerCleanedBody, reporter);
+
             reporter.RpcAddAbilityCD();
 
             if (SharedCooldown.GetBool()) reporter.SetKillCooldown();

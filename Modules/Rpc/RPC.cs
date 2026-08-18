@@ -19,7 +19,7 @@ namespace TONE;
 
 
 [Obfuscation(Exclude = true)]
-public enum CustomRPC : byte // 178/255 USED
+public enum CustomRPC : byte // 177/255 USED
 {
     // RpcCalls can increase with each AU version
     // On version 2024.6.18 the last id in RpcCalls: 65
@@ -194,18 +194,21 @@ internal class RPCHandlerPatch
                 Logger.Info($"{__instance.GetNameWithRole()} => {p?.GetNameWithRole() ?? "null"}", "StartMeeting");
                 break;
         }
-        if (!__instance.IsHost() &&
-            (Enum.IsDefined(typeof(CustomRPC), callId) && !TrustedRpc(callId) // Is Custom RPC
-            || !Enum.IsDefined(typeof(CustomRPC), callId) && !Enum.IsDefined(typeof(RpcCalls), callId))) //Is not Custom RPC and not Vanilla RPC
+        if (!(Main.LIMap && callId == 255))
         {
-            Logger.Warn($"{__instance?.Data?.PlayerName}:{callId}({RPC.GetRpcName(callId)}) has been canceled because it was sent by someone other than the host", "CustomRPC");
-            if (AmongUsClient.Instance.AmHost)
+            if (!__instance.IsHost() &&
+                (Enum.IsDefined(typeof(CustomRPC), callId) && !TrustedRpc(callId) // Is Custom RPC
+                || !Enum.IsDefined(typeof(CustomRPC), callId) && !Enum.IsDefined(typeof(RpcCalls), callId))) //Is not Custom RPC and not Vanilla RPC
             {
-                AmongUsClient.Instance.KickPlayer(__instance.GetClientId(), false);
-                Logger.Warn($"Received an uncredited RPC from {__instance?.Data?.PlayerName} and kicked it out", "Kick");
-                Logger.SendInGame(string.Format(GetString("Warning.InvalidRpc"), __instance?.Data?.PlayerName));
+                Logger.Warn($"{__instance?.Data?.PlayerName}:{callId}({RPC.GetRpcName(callId)}) has been canceled because it was sent by someone other than the host", "CustomRPC");
+                if (AmongUsClient.Instance.AmHost)
+                {
+                    AmongUsClient.Instance.KickPlayer(__instance.GetClientId(), false);
+                    Logger.Warn($"Received an uncredited RPC from {__instance?.Data?.PlayerName} and kicked it out", "Kick");
+                    Logger.SendInGame(string.Format(GetString("Warning.InvalidRpc"), __instance?.Data?.PlayerName));
+                }
+                return false;
             }
-            return false;
         }
         return true;
     }

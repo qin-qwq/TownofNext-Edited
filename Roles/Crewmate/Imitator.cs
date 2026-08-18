@@ -41,7 +41,7 @@ internal class Imitator : RoleBase
 
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        if (!seer.IsAlive() || seen.IsAlive() || !seen.GetCustomRole().IsCrewmate()) return string.Empty;
+        if (!seer.IsAlive() || seen.IsAlive() || !seen.GetCustomRole().IsCrewmate() || seen.Is(CustomRoles.GM)) return string.Empty;
 
         return ColorString(GetRoleColor(seer.GetCustomRole()), $" {seen.GetVisiblePlayerId()}");
     }
@@ -111,7 +111,7 @@ internal class Imitator : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("Imitator.AlreadyImitate"), ColorString(GetRoleColor(CustomRoles.Imitator), GetString("Imitator").ToUpper()));
                     return true;
                 }
-                if (!target.GetCustomRole().IsCrewmate())
+                if (!target.GetCustomRole().IsCrewmate() || target.Is(CustomRoles.GM))
                 {
                     pc.ShowInfoMessage(isUI, GetString("Imitator.CantImitateNonCrewmate"), ColorString(GetRoleColor(CustomRoles.Imitator), GetString("Imitator").ToUpper()));
                     return true;

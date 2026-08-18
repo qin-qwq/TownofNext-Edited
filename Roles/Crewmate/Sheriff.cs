@@ -130,6 +130,7 @@ internal class Sheriff : RoleBase
         }
         killer.SetDeathReason(PlayerState.DeathReason.Misfire);
         killer.RpcMurderPlayer(killer);
+        AchievementManager.OnRoleAbility(CustomRoles.Sheriff, AchievementBase.AchievementEventType.SheriffMisfire, killer);
         return MisfireKillsTarget.GetBool();
     }
     public static bool CanBeKilledBySheriff(PlayerControl player)

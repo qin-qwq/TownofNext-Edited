@@ -59,7 +59,7 @@ class ExileControllerWrapUpPatch
 
         public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
         {
-            if (Main.NormalOptions.MapId == 7) return;
+            if (Main.LIMap) return;
 
             var instance = __instance.__4__this;
             if (!__result)
@@ -171,11 +171,12 @@ class ExileControllerWrapUpPatch
                 AntiBlackout.SendGameData();
                 AntiBlackout.SetRealPlayerRoles();
 
-                if (AntiBlackout.BlackOutIsActive && // State in which the expulsion target is overwritten (need not be executed if the expulsion target is not overwritten)
+                if ((AntiBlackout.BlackOutIsActive || Main.LIMap) && // State in which the expulsion target is overwritten (need not be executed if the expulsion target is not overwritten)
                     exiled != null && // Exiled is not null
                     exiled.Object != null) //exiled.Object is not null
                 {
                     exiled.Object.RpcExileV2();
+                    exiled.Object.SetDeathReason(PlayerState.DeathReason.Vote);
                 }
             }, GameModeBase.GetGameMode() is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
 

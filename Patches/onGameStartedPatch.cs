@@ -57,6 +57,7 @@ internal class ChangeRoleSettings
             KillTimerManager.Initializate();
             AbilityUseManager.Initializate();
             AbilityTimeManager.Initializate();
+            AchievementManager.OnGameStart();
 
             Main.AllPlayerKillCooldown.Clear();
             Main.AllPlayerSpeed.Clear();
