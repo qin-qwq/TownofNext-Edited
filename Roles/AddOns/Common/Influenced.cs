@@ -49,11 +49,11 @@ public class Influenced : IAddon
         foreach (var playerId in influencedPlayerIds)
         {
             PlayerVoteArea pva = CheckForEndVotingPatch.GetPlayerVoteArea(playerId);
-            if (pva != null && pva.VotedFor != exileId)
+            if (pva != null && pva.VotedForId != exileId)
             {
-                pva.VotedFor = exileId;
+                pva.VotedForId = exileId;
                 CheckForEndVotingPatch.ReturnChangedPva(pva);
-                Logger.Info($"changed influenced {playerId} {pva.TargetPlayerId} vote target to {exileId}", "InfluencedChangeVote");
+                Logger.Info($"changed influenced {playerId} {pva.PlayerId} vote target to {exileId}", "InfluencedChangeVote");
             }
         }
     }

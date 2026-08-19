@@ -312,7 +312,7 @@ static class ExtendedPlayerControl
             writer.SendMessage();
         }
     }
-    public static void RpcClearVoteDelay(this MeetingHud meeting, int clientId)
+    public static void RpcClearVoteDelay(this MeetingHud meeting, PlayerId voterPlayerId)
     {
         _ = new LateTask(() =>
         {
@@ -321,14 +321,14 @@ static class ExtendedPlayerControl
                 Logger.Info($"Cannot be cleared because meetinghud is null", "RpcClearVoteDelay");
                 return;
             }
-            if (AmongUsClient.Instance.ClientId == clientId)
+            meeting.RpcClearVote(voterPlayerId);
+            /*if (PlayerControl.LocalPlayer.Data.PlayerId == voterPlayerId)
             {
-                meeting.ClearVote();
-                return;
+                meeting.ClearVote(voterPlayerId, true);
             }
             var writer = CustomRpcSender.Create("Clear Vote", SendOption.Reliable);
-            writer.AutoStartRpc(meeting.NetId, (byte)RpcCalls.ClearVote, clientId).EndRpc();
-            writer.SendMessage();
+            writer.AutoStartRpc(meeting.NetId, (byte)RpcCalls.ClearVote, voterPlayerId).EndRpc();
+            writer.SendMessage();*/
         }, 0.5f, "Clear Vote");
     }
     public static void RpcSetNameEx(this PlayerControl player, string name)
@@ -1037,7 +1037,7 @@ static class ExtendedPlayerControl
     }
 
     public static float GetKillDistances(bool ovverideValue = false, int newValue = 2)
-        => NormalGameOptionsV10.KillDistances[Mathf.Clamp(ovverideValue ? newValue : Main.NormalOptions.KillDistance, 0, 2)];
+        => NormalGameOptionsV11.KillDistances[Mathf.Clamp(ovverideValue ? newValue : Main.NormalOptions.KillDistance, 0, 2)];
 
     public static void MarkDirtySettings(this PlayerControl player)
     {
@@ -1907,7 +1907,7 @@ static class ExtendedPlayerControl
     public static bool UsesMeetingShapeshift(this PlayerControl player)
     {
         CustomRoles role = player.GetCustomRole();
-        if (player.IsModded() && role is CustomRoles.Judge or CustomRoles.Swapper or CustomRoles.Balancer or CustomRoles.Councillor or CustomRoles.DoubleAgent
+        if (player.IsModded() && role is CustomRoles.Justice or CustomRoles.Swapper or CustomRoles.Balancer or CustomRoles.Councillor or CustomRoles.DoubleAgent
             or CustomRoles.Exorcist) return false;
         return player.IsMeetingShapeshifterRole();
     }

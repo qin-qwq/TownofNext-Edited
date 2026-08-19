@@ -127,7 +127,7 @@ internal class RoundUp : Standard
                     target = GetPlayerById(VoodooMaster.Dolls[target.PlayerId].Where(x => GetPlayerById(x).IsAlive()).ToList().RandomElement());
                     SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
                 }
-                if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.Animating)
                 {
                     pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                     return true;
@@ -159,7 +159,7 @@ internal class RoundUp : Standard
                 }
 
                 List<MeetingHud.VoterState> statesList = [];
-                MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), target.Data, false);
+                MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), target.Data, false, true, target.PlayerId);
                 ConfirmEjections(target.Data);
             }
         }

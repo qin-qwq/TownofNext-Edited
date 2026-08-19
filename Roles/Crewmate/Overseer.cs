@@ -61,7 +61,7 @@ internal class Overseer : RoleBase
         CustomRoles.Oracle,
         CustomRoles.Tracefinder,
         //CustomRoles.Glitch,
-        CustomRoles.Judge,
+        CustomRoles.Justice,
         CustomRoles.Mortician,
         CustomRoles.Medium,
         CustomRoles.Observer,

@@ -55,6 +55,7 @@ public static class CustomRolesHelper
             CustomRoles.TrackerTONE => CustomRoles.Tracker,
             CustomRoles.DetectiveTONE => CustomRoles.Detective,
             CustomRoles.ViperTONE => CustomRoles.Viper,
+            CustomRoles.JudgeTONE => CustomRoles.Judge,
             _ => role.IsImpostor() ? CustomRoles.Impostor : CustomRoles.Crewmate,
         };
     }
@@ -584,7 +585,7 @@ public static class CustomRolesHelper
                     return false;
                 if (pc.Is(CustomRoles.EvilGuesser)
                     || pc.Is(CustomRoles.NiceGuesser)
-                    || pc.Is(CustomRoles.Judge)
+                    || pc.Is(CustomRoles.Justice)
                     || pc.Is(CustomRoles.CopyCat)
                     || pc.Is(CustomRoles.Doomsayer)
                     || pc.Is(CustomRoles.Nemesis)
@@ -1363,7 +1364,7 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Addict)
                     || pc.Is(CustomRoles.NoisemakerTONE)
                     || pc.Is(CustomRoles.Spy)
-                    || pc.Is(CustomRoles.Judge)
+                    || pc.Is(CustomRoles.Justice)
                     || pc.Is(CustomRoles.Councillor)
                     || pc.Is(CustomRoles.ChiefOfPolice)
                     || pc.Is(CustomRoles.Shaman)
@@ -1392,6 +1393,7 @@ public static class CustomRolesHelper
             CustomRoles.Tracker => RoleTypes.Tracker,
             CustomRoles.Detective => RoleTypes.Detective,
             CustomRoles.Viper => RoleTypes.Viper,
+            CustomRoles.Judge => RoleTypes.Judge,
             _ => role.IsImpostor() ? RoleTypes.Impostor : RoleTypes.Crewmate,
         };
 
@@ -1410,6 +1412,7 @@ public static class CustomRolesHelper
             CustomRoles.Tracker => RoleTypes.Tracker,
             CustomRoles.Detective => RoleTypes.Detective,
             CustomRoles.Viper => RoleTypes.Viper,
+            CustomRoles.Judge => RoleTypes.Judge,
             _ => role.IsImpostor() ? RoleTypes.Impostor : RoleTypes.Crewmate,
         };
     }
@@ -1455,7 +1458,8 @@ public static class CustomRolesHelper
             CustomRoles.Phantom or
             CustomRoles.Tracker or
             CustomRoles.Detective or
-            CustomRoles.Viper;
+            CustomRoles.Viper or
+            CustomRoles.Judge;
     }
     public static Custom_Team GetCustomRoleTeam(this CustomRoles role)
     {
@@ -1489,6 +1493,7 @@ public static class CustomRolesHelper
                 CustomRoles.Tracker => roleOpt.GetNumPerGame(RoleTypes.Tracker),
                 CustomRoles.Detective => roleOpt.GetNumPerGame(RoleTypes.Detective),
                 CustomRoles.Viper => roleOpt.GetNumPerGame(RoleTypes.Viper),
+                CustomRoles.Judge => roleOpt.GetNumPerGame(RoleTypes.Judge),
                 _ => 0
             };
         }
@@ -1515,6 +1520,7 @@ public static class CustomRolesHelper
                 CustomRoles.Tracker => roleOpt.GetChancePerGame(RoleTypes.Tracker),
                 CustomRoles.Detective => roleOpt.GetChancePerGame(RoleTypes.Detective),
                 CustomRoles.Viper => roleOpt.GetChancePerGame(RoleTypes.Viper),
+                CustomRoles.Judge => roleOpt.GetChancePerGame(RoleTypes.Judge),
                 _ => 0
             } / 100f;
         }

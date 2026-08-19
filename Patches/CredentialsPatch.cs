@@ -85,7 +85,7 @@ class PingTrackerUpdatePatch
     private static Vector3 GetPingPosition()
     {
         var settingButtonTransformPosition = DestroyableSingleton<HudManager>.Instance.SettingsButton.transform.localPosition;
-        var offset_x = settingButtonTransformPosition.x - 1.58f;
+        var offset_x = HudManager.Instance.MatchInfoButton.isActiveAndEnabled ? settingButtonTransformPosition.x - 2.45f : settingButtonTransformPosition.x - 1.58f;
         var offset_y = settingButtonTransformPosition.y + 3.2f;
         Vector3 position;
         if (!Main.ShowTextOverlay.Value)
@@ -94,7 +94,7 @@ class PingTrackerUpdatePatch
         }
         if (AmongUsClient.Instance.IsGameStarted)
         {
-            if (DestroyableSingleton<HudManager>.Instance && !HudManager.Instance.Chat.isActiveAndEnabled)
+            if (DestroyableSingleton<HudManager>.Instance && (!HudManager.Instance.Chat.isActiveAndEnabled || !MeetingHud.Instance))
             {
                 offset_x += 0.7f; // Additional offsets for chat button if present
             }

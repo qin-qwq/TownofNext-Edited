@@ -85,8 +85,8 @@ internal class Collector : RoleBase
     }
     public static void CollectorVotes(PlayerControl target, PlayerVoteArea ps)
     {
-        if (CheckForEndVotingPatch.CheckRole(ps.TargetPlayerId, CustomRoles.Collector))
-            CollectorVoteFor.TryAdd(target.PlayerId, ps.TargetPlayerId);
+        if (CheckForEndVotingPatch.CheckRole(ps.PlayerId, CustomRoles.Collector))
+            CollectorVoteFor.TryAdd(target.PlayerId, ps.PlayerId);
     }
     public override void AfterMeetingTasks() => calculated = false;
     public void CollectAmount(Dictionary<byte, int> VotingData, MeetingHud __instance)
@@ -96,7 +96,7 @@ internal class Collector : RoleBase
         foreach (var pva in __instance.playerStates)
         {
             if (pva == null) continue;
-            PlayerControl pc = pva.TargetPlayerId.GetPlayer();
+            PlayerControl pc = ((byte)pva.PlayerId).GetPlayer();
             if (pc == null) continue;
             foreach (var data in VotingData)
             {

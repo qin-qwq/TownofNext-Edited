@@ -666,7 +666,7 @@ public static class CheckShapeshiftPatch
         var shapeshifterRoleClass = __instance.GetRoleClass();
         if (Options.UseMeetingShapeshift.GetBool() && GameStates.IsMeeting)
         {
-            if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted)
+            if (MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.Voted or MeetingHud.MeetingStates.NotVoted)
                 shapeshifterRoleClass?.OnMeetingShapeshift(__instance, target);
             __instance.RpcRejectShapeshift();
             return false;
@@ -2405,6 +2405,7 @@ class PlayerControlLocalSetRolePatch
                 RoleTypes.Tracker => CustomRoles.TrackerTONE,
                 RoleTypes.Detective => CustomRoles.DetectiveTONE,
                 RoleTypes.Viper => CustomRoles.ViperTONE,
+                RoleTypes.Judge => CustomRoles.JudgeTONE,
                 _ => CustomRoles.NotAssigned,
             };
             if (modRole != CustomRoles.NotAssigned)

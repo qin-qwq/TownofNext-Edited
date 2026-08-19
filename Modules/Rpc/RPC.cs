@@ -22,7 +22,7 @@ namespace TONE;
 public enum CustomRPC : byte // 177/255 USED
 {
     // RpcCalls can increase with each AU version
-    // On version 2024.6.18 the last id in RpcCalls: 65
+    // On version 2026.8.18 the last id in RpcCalls: 66
 
     // Adding Role rpcs that overrides TONE section and changing BetterCheck will be rejected
     // Sync Role Skill can be used under most cases so you should not make a new rpc unless it's necessary
@@ -49,7 +49,7 @@ public enum CustomRPC : byte // 177/255 USED
     SetNameColorData,
     GuessKill,
     Guess,
-    KNChat = 119, // Kill network chat, may conflicts with judge and guess calls
+    KNChat = 119, // Kill network chat, may conflicts with Justice and guess calls
     SetFriendCode,
     SyncLobbyTimer,
     SyncPlayerSetting,

@@ -55,12 +55,12 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.08.18";
+    public const string PluginVersion = "26.08.19";
     public const string PluginDisplayVersion = "2.0.0 Beta 3";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2026, 6, 5, 0) // 2026.6.5 & 17.4
+            (2026, 8, 18, 0) // 2026.8.18 & 18.0.0
         ];
 
     // Change this to change alpha/beta/full release
@@ -105,8 +105,8 @@ public class Main : BasePlugin
     public static string credentialsText;
     public Coroutines coroutines;
     public Dispatcher dispatcher;
-    public static NormalGameOptionsV10 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-    public static HideNSeekGameOptionsV10 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+    public static NormalGameOptionsV11 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+    public static HideNSeekGameOptionsV11 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
     //Client Options
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
@@ -256,8 +256,8 @@ public class Main : BasePlugin
             if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
             {
                 DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 8, 13, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 8, 25, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 8, 19, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 8, 31, 7, 0, 0, 0, DateTimeKind.Utc);
                 return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
             }
             return false;
@@ -778,9 +778,9 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalGameOptionsV10.RecommendedImpostors = NormalGameOptionsV10.MaxImpostors = Enumerable.Repeat(1, 128).ToArray();
-        NormalGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
-        HideNSeekGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        NormalGameOptionsV11.RecommendedImpostors = NormalGameOptionsV11.MaxImpostors = Enumerable.Repeat(1, 128).ToArray();
+        NormalGameOptionsV11.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        HideNSeekGameOptionsV11.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -798,7 +798,7 @@ public class Main : BasePlugin
         if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();
 
         // InitializeFileHash();
-        FileHash = "Support_2025_09_09";
+        FileHash = "Support_2026_08_18";
         TONE.Logger.Msg("========= TONE loaded! =========", "Plugin Load");
     }
 }
@@ -813,6 +813,7 @@ public enum CustomRoles
     Scientist,
     Tracker,
     Detective,
+    Judge,
 
     // Impostor(Vanilla)
     Impostor,
@@ -828,6 +829,7 @@ public enum CustomRoles
     ScientistTONE,
     TrackerTONE,
     DetectiveTONE,
+    JudgeTONE,
 
     // Impostor Vanilla Remakes
     ImpostorTONE,
@@ -962,7 +964,7 @@ public enum CustomRoles
     Inspector,
     Investigator,
     Jailer,
-    Judge,
+    Justice,
     Keeper,
     Knight,
     LazyGuy,

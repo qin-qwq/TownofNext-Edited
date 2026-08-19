@@ -199,6 +199,7 @@ public class Oiiai : IAddon
                 RoleTypes.Phantom => CustomRoles.PhantomTONE,
                 RoleTypes.Detective => CustomRoles.DetectiveTONE,
                 RoleTypes.Viper => CustomRoles.ViperTONE,
+                RoleTypes.Judge => CustomRoles.JudgeTONE,
                 _ => role,
             };
     }

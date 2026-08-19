@@ -457,7 +457,7 @@ internal class EAC
             //Normal clients will never directly send MushroomMixupSabotage
         }
 
-        if ((GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.VoteStates.Animating) || GameStates.IsExilling)
+        if ((GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.MeetingStates.Animating) || GameStates.IsExilling)
         {
             if (!ReportDeadBodyPatch.PreventEAC)
             {

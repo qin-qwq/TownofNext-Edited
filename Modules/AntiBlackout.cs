@@ -221,11 +221,11 @@ public static class AntiBlackout
         player.IsDead = player.Disconnected = false;
         SendGameData();
     }
-    public static void AntiBlackRpcVotingComplete(this MeetingHud __instance, MeetingHud.VoterState[] states, NetworkedPlayerInfo exiled, bool tie)
+    public static void AntiBlackRpcVotingComplete(this MeetingHud __instance, MeetingHud.VoterState[] states, NetworkedPlayerInfo exiled, bool tie, bool wasOverruled, ushort overruleNonce)
     {
         if (AmongUsClient.Instance.AmClient)
         {
-            __instance.VotingComplete(states, exiled, tie);
+            __instance.VotingComplete(states, exiled, tie, wasOverruled, overruleNonce);
         }
 
         foreach (var pc in Main.EnumeratePlayerControls())
@@ -246,6 +246,8 @@ public static class AntiBlackout
                     }
                     sender.Write(exiled != null ? exiled.PlayerId : byte.MaxValue);
                     sender.Write(tie);
+                    sender.Write(wasOverruled);
+                    sender.Write(overruleNonce);
                     sender.EndRpc();
                 }
             }
@@ -262,6 +264,8 @@ public static class AntiBlackout
                     }
                     sender.Write(byte.MaxValue);
                     sender.Write(true);
+                    sender.Write(false);
+                    sender.Write(0);
                     sender.EndRpc();
                 }
             }

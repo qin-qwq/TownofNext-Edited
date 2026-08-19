@@ -632,7 +632,7 @@ internal class ChatCommands
             return;
         }
 
-        if (text.StartsWith('/') && (!GameStates.IsMeeting || MeetingHud.Instance.state is not MeetingHud.VoteStates.Results and not MeetingHud.VoteStates.Proceeding))
+        if (text.StartsWith('/') && (!GameStates.IsMeeting || MeetingHud.Instance.state is not MeetingHud.MeetingStates.Results and not MeetingHud.MeetingStates.Proceeding))
         {
             foreach (Command command in Command.AllCommands)
             {
@@ -947,7 +947,7 @@ internal class ChatCommands
             return;
         }
 
-        if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating or MeetingHud.VoteStates.Results)
+        if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.Animating or MeetingHud.MeetingStates.Results)
         {
             Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), player.PlayerId);
             return;

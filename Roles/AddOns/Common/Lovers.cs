@@ -138,7 +138,7 @@ public class Lovers : IAddon
                     //if (Main.PlayersDiedInMeeting.Contains(deathId))
                     //{
                     partnerPlayer.RpcExileV3();
-                    if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                    if (MeetingHud.Instance?.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                     {
                         MeetingHud.Instance?.CheckForEndVoting();
                     }

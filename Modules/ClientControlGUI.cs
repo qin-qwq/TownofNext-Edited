@@ -452,11 +452,11 @@ public class ClientControlGUI : MonoBehaviour
                         {
                             if (pva == null) continue;
 
-                            if (pva.VotedFor < 253)
-                                MeetingHud.Instance.RpcClearVote(pva.TargetPlayerId);
+                            if (pva.VotedForId < 253)
+                                MeetingHud.Instance.RpcClearVote(pva.PlayerId);
                         }
                         List<MeetingHud.VoterState> statesList = [];
-                        MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+                        MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true, false, 0);
                         MeetingHud.Instance.RpcClose();
                     }, true));
                     ingameButtons.Add((Label(GetString("EndByVotes"), "F6"), _sHost, () => { shouldSkip = true; MeetingHud.Instance.CheckForEndVoting(); }, true));

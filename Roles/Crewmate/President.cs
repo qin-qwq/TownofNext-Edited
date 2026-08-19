@@ -93,8 +93,8 @@ internal class President : RoleBase
             {
                 if (pva == null) continue;
 
-                if (pva.VotedFor < 253)
-                    MeetingHud.Instance.RpcClearVote(pva.TargetPlayerId);
+                if (pva.VotedForId < 253)
+                    MeetingHud.Instance.RpcClearVote(pva.PlayerId);
             }
             EndMeeting = true;
             Utils.RpcVotingCompleteV2();

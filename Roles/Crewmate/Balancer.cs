@@ -155,13 +155,13 @@ internal class Balancer : RoleBase
         if (Target1 == deadid)
         {
             List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target2.GetPlayer().Data, false);
+            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target2.GetPlayer().Data, false, true, Target2);
             ConfirmEjections(Target2.GetPlayer().Data);
         }
         if (Target2 == deadid)
         {
             List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target1.GetPlayer().Data, false);
+            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), Target1.GetPlayer().Data, false, true, Target1);
             ConfirmEjections(Target1.GetPlayer().Data);
         }
     }

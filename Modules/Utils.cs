@@ -2753,7 +2753,7 @@ public static class Utils
             PlayerState.DeathReason.PissedOff => (CustomRoles.Pestilence.IsEnable() || CustomRoles.Provocateur.IsEnable()),
             PlayerState.DeathReason.Dismembered => (CustomRoles.Butcher.IsEnable()),
             PlayerState.DeathReason.LossOfHead => (CustomRoles.Hangman.IsEnable()),
-            PlayerState.DeathReason.Trialed => (CustomRoles.Judge.IsEnable() || CustomRoles.Councillor.IsEnable()),
+            PlayerState.DeathReason.Trialed => (CustomRoles.Justice.IsEnable() || CustomRoles.Councillor.IsEnable()),
             PlayerState.DeathReason.Infected => (CustomRoles.Infectious.IsEnable()),
             PlayerState.DeathReason.Hack => false,
             PlayerState.DeathReason.Pirate => (CustomRoles.Pirate.IsEnable()),
@@ -2850,7 +2850,7 @@ public static class Utils
                 AFKDetector.RecordPosition(player);
             }
 
-            if (Options.ShowExileMsgAfterMeeting.GetBool() && !CheckForEndVotingPatch.TempExiledPlayer) ExileMsgAfterMeeting();
+            if (Options.ShowExileMsgAfterMeeting.GetBool() && CheckForEndVotingPatch.TempExileMsg == string.Empty) ExileMsgAfterMeeting();
 
             if (Statue.IsEnable) Statue.AfterMeetingTasks();
             if (Burst.IsEnable) Burst.AfterMeetingTasks();
@@ -3455,7 +3455,7 @@ public static class Utils
         }
 
         //Crewmates
-        if (seer.Is(CustomRoles.Judge) || seer.Is(CustomRoles.Inspector) || seer.Is(CustomRoles.Lookout) || seer.Is(CustomRoles.Swapper) ||
+        if (seer.Is(CustomRoles.Justice) || seer.Is(CustomRoles.Inspector) || seer.Is(CustomRoles.Lookout) || seer.Is(CustomRoles.Swapper) ||
             (seer.Is(CustomRoles.Dictator) && Dictator.ChangeCommandToExpel.GetBool()) || seer.Is(CustomRoles.NiceGuesser)) return true;
 
         //Impostors
@@ -3487,7 +3487,7 @@ public static class Utils
     {
         CheckForEndVotingPatch.CheckForDeathOnExile(PlayerState.DeathReason.Vote, 0xff);
         List<MeetingHud.VoterState> statesList = [];
-        MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+        MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true, false, 0);
         MeetingHud.Instance.RpcClose();
     }
 }

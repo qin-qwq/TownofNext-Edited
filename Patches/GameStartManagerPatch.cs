@@ -4,6 +4,7 @@ using InnerNet;
 using System;
 using TMPro;
 using TONE.Patches;
+using TONE.Roles.Vanilla;
 using UnityEngine;
 using static TONE.Translator;
 
@@ -383,6 +384,8 @@ public class GameStartManagerBeginGamePatch
 
             Main.LastGuardianAngelCooldown.Value = Options.DefaultAngelCooldown.GetFloat();
             AURoleOptions.GuardianAngelCooldown = 0f;
+
+            AURoleOptions.JudgeTaskRequirementPercentage = JudgeTONE.JudgeTaskRequirementPercentage.GetInt();
         }
 
         GameManager.Instance.LogicOptions.SetDirty();

@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Condition="$(Platform)=='Windows'" Include="AmongUs.GameLibs.Steam" Version="2026.6.5" PrivateAssets="all" />
+		<PackageReference Condition="$(Platform)=='Windows'" Include="AmongUs.GameLibs.Steam" Version="2026.8.18" PrivateAssets="all" />
 		<PackageReference Condition="$(Platform)=='Android'" Include="AmongUs.GameLibs.Android" Version="2026.3.17" PrivateAssets="all" />
 
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1">

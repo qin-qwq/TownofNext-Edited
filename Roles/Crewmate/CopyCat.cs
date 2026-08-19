@@ -144,7 +144,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
                 CustomRoles.Workaholic or CustomRoles.Philosopher => CustomRoles.Snitch, // 工作狂，哲学家 => 告密者
                 CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
-                CustomRoles.Councillor => CustomRoles.Judge, // 邪恶法官 => 法官
+                CustomRoles.Councillor => CustomRoles.Justice, // 邪恶法官 => 正义法官
                 CustomRoles.Taskinator => CustomRoles.Benefactor, // 任务执行者 => 恩人
                 CustomRoles.EvilTracker => CustomRoles.TrackerTONE, // 邪恶追踪者 => 侦查员
                 CustomRoles.AntiAdminer => CustomRoles.Telecommunication, // 监管者 => 通信员

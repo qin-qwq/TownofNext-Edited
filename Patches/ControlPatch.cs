@@ -1,3 +1,4 @@
+using InnerNet;
 using System;
 using TONE.Modules;
 using TONE.Patches;
@@ -166,11 +167,11 @@ internal class ControllerManagerUpdatePatch
                     {
                         if (pva == null) continue;
 
-                        if (pva.VotedFor < 253)
-                            MeetingHud.Instance.RpcClearVote(pva.TargetPlayerId);
+                        if (pva.VotedForId < 253)
+                            MeetingHud.Instance.RpcClearVote(pva.PlayerId);
                     }
                     List<MeetingHud.VoterState> statesList = [];
-                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true, false, 0);
                     MeetingHud.Instance.RpcClose();
                 }
                 else
@@ -267,7 +268,7 @@ internal class ControllerManagerUpdatePatch
             // Clear self vote only in local game
             if (GetKeysDown(KeyCode.Return, KeyCode.V, KeyCode.LeftShift) && GameStates.IsMeeting && !GameStates.IsOnlineGame)
             {
-                MeetingHud.Instance.RpcClearVote(AmongUsClient.Instance.ClientId);
+                MeetingHud.Instance.RpcClearVote(PlayerControl.LocalPlayer.PlayerId);
             }
 
             // Open all the doors in Airship map
