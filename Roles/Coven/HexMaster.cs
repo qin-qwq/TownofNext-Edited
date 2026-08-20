@@ -1,6 +1,7 @@
 using Hazel;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -118,10 +119,7 @@ internal class HexMaster : CovenManager
         }
     }
 
-    //public override void ApplyGameOptions(IGameOptions opt, byte id) => opt.SetVision(HasImpostorVision.GetBool());
-
     public override bool CanUseKillButton(PlayerControl pc) => true;
-    // public override bool CanUseImpostorVentButton(PlayerControl pc) => true;
     public override void SetKillCooldown(byte id) => HexCooldown.GetFloat();
 
     /*
@@ -311,7 +309,9 @@ internal class HexMaster : CovenManager
                 var min = targetDistance.OrderBy(c => c.Value).FirstOrDefault();
                 var target = min.Key.GetPlayer();
                 var KillRange = ExtendedPlayerControl.GetKillDistances();
-                if (min.Value <= KillRange && !player.inVent && !player.inMovingPlat && !target.inVent && !target.inMovingPlat && player.RpcCheckAndMurder(target, true))
+                var vector = target.GetCustomPosition() - playerPos;
+                var magnitude = vector.magnitude;
+                if (min.Value <= KillRange && !player.inVent && !player.inMovingPlat && !target.inVent && !target.inMovingPlat && player.RpcCheckAndMurder(target, true) && !PhysicsHelpers.AnyNonTriggersBetween(playerPos, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
                 {
                     PassHex(player, target);
                 }
@@ -320,6 +320,8 @@ internal class HexMaster : CovenManager
     }
     public override void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
     {
+        if (Balancer.Choose || President.EndMeeting) return;
+
         foreach (var id in exileIds)
         {
             if (HexedPlayer.ContainsKey(id))
@@ -351,7 +353,7 @@ internal class HexMaster : CovenManager
     }
     public override void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
-        RemoveHexedPlayer();
+        if (!Balancer.Choose) RemoveHexedPlayer();
     }
     private static void RemoveHexedPlayer()
     {

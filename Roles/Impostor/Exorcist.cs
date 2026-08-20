@@ -73,10 +73,10 @@ internal class Exorcist : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        CheckCommand(pc, $"/ex");
+        RoleCommand(pc, $"/ex");
     }
 
-    public bool CheckCommand(PlayerControl player, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl player, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || player == null || GameStates.IsExilling) return false;
@@ -99,7 +99,7 @@ internal class Exorcist : RoleBase
                     player.ShowInfoMessage(isUI, GetString("ExorcistOutOfUsages"));
                     return true;
                 }
-                if (Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                if (GuessManager.CantUseAbilityDuringDiscussionTime())
                 {
                     player.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                     return true;
@@ -208,7 +208,7 @@ internal class Exorcist : RoleBase
 
         GameObject parent = GameObject.Find("Main Camera").transform.Find("Hud").Find("ChatUi").Find("ChatScreenRoot").Find("ChatScreenContainer").gameObject;
         GameObject template = __instance.transform.Find("MeetingContents").Find("ButtonStuff").Find("button_skipVoting").gameObject;
-        GameObject exorcistButton = UnityEngine.Object.Instantiate(template, parent.transform);
+        GameObject exorcistButton = Object.Instantiate(template, parent.transform);
         exorcistButton.name = "ExorcistButton";
         exorcistButton.transform.localPosition = new Vector3(3.46f, 0f, 45f);
         exorcistButton.SetActive(true);
@@ -236,7 +236,7 @@ internal class Exorcist : RoleBase
                 PlayerControl.LocalPlayer.ShowInfoMessage(true, GetString("ExorcistOutOfUsages"));
                 return;
             }
-            exorcist.CheckCommand(PlayerControl.LocalPlayer, "/ex", true);
+            exorcist.RoleCommand(PlayerControl.LocalPlayer, "/ex", true);
         }
         else if (PlayerControl.LocalPlayer.GetRoleClass() is Exorcist exorcist1)
         {
@@ -259,7 +259,7 @@ internal class Exorcist : RoleBase
             byte exorcistId = reader.ReadByte();
             PlayerControl exorcistPlayer = Utils.GetPlayerById(exorcistId);
             if (exorcistPlayer == null) return;
-            exorcist.CheckCommand(exorcistPlayer, "/ex", false);
+            exorcist.RoleCommand(exorcistPlayer, "/ex", false);
         }
     }
 }

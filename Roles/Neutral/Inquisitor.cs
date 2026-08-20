@@ -41,9 +41,7 @@ internal class Inquisitor : RoleBase
         CustomRoles.PunchingBag,
         CustomRoles.Solsticer,
         CustomRoles.GM,
-        CustomRoles.SuperStar,
-        CustomRoles.NiceMini,
-        CustomRoles.EvilMini
+        CustomRoles.SuperStar
     ];
 
     public override void SetupCustomOption()
@@ -86,6 +84,7 @@ internal class Inquisitor : RoleBase
                 if (playerId == target.PlayerId) continue;
                 else if (Targets[inquisitor.PlayerId].Contains(target.PlayerId)) continue;
                 if (NotTargetable.Contains(target.GetCustomRole())) continue;
+                if (target.Is(CustomRoles.Mini)) continue;
                 if (Lovers.AreLovers(inquisitor, target)) continue;
 
                 targetList.Add(target);

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 
 namespace TONE;
@@ -20,6 +21,7 @@ public static class AntiBlackout
     //this is simply just called in less places, because antiblackout with role-basis changing is OP
     public static int ExilePlayerId = -1;
     public static bool SkipTasks = false;
+    public static bool ResetName = true;
 
     ///<summary>
     /// Count alive players and check black out 
@@ -124,7 +126,7 @@ public static class AntiBlackout
         {
             // Dead > Modded > not Impostor/Shapeshifter/Phantom/Viper
             dummyImp = Main.EnumeratePlayerControls()
-                .Where(pc => pc.PlayerId != PlayerControl.LocalPlayer.PlayerId)
+                .Where(pc => pc.PlayerId != PlayerControl.LocalPlayer.PlayerId && pc.GetCustomRole().GetRoleTypes() != RoleTypes.Detective)
                 .OrderByDescending(pc => !pc.IsAlive())
                 .ThenByDescending(pc => pc.IsModded())
                 .ThenByDescending(pc => pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
@@ -143,6 +145,11 @@ public static class AntiBlackout
 
         foreach (var player in Main.EnumeratePlayerControls())
         {
+            if (player.GetCustomRole().GetRoleTypes() is RoleTypes.Shapeshifter && !Main.UnShapeShifter.Contains(player.PlayerId))
+            {
+                player.RpcShapeshift(player, false);
+            }
+
             if (player.PlayerId == dummyImp.PlayerId)
             {
                 sender.StartRpc(player.NetId, (byte)RpcCalls.SetRole);
@@ -150,7 +157,7 @@ public static class AntiBlackout
                 sender.Write(true);
                 sender.EndRpc();
             }
-            else
+            else if (player.GetCustomRole().GetRoleTypes() != RoleTypes.Detective)
             {
                 sender.StartRpc(player.NetId, (byte)RpcCalls.SetRole);
                 sender.Write((ushort)RoleTypes.Crewmate);
@@ -214,11 +221,11 @@ public static class AntiBlackout
         player.IsDead = player.Disconnected = false;
         SendGameData();
     }
-    public static void AntiBlackRpcVotingComplete(this MeetingHud __instance, MeetingHud.VoterState[] states, NetworkedPlayerInfo exiled, bool tie)
+    public static void AntiBlackRpcVotingComplete(this MeetingHud __instance, MeetingHud.VoterState[] states, NetworkedPlayerInfo exiled, bool tie, bool wasOverruled, ushort overruleNonce)
     {
         if (AmongUsClient.Instance.AmClient)
         {
-            __instance.VotingComplete(states, exiled, tie);
+            __instance.VotingComplete(states, exiled, tie, wasOverruled, overruleNonce);
         }
 
         foreach (var pc in Main.EnumeratePlayerControls())
@@ -239,6 +246,8 @@ public static class AntiBlackout
                     }
                     sender.Write(exiled != null ? exiled.PlayerId : byte.MaxValue);
                     sender.Write(tie);
+                    sender.Write(wasOverruled);
+                    sender.Write(overruleNonce);
                     sender.EndRpc();
                 }
             }
@@ -255,6 +264,8 @@ public static class AntiBlackout
                     }
                     sender.Write(byte.MaxValue);
                     sender.Write(true);
+                    sender.Write(false);
+                    sender.Write(0);
                     sender.EndRpc();
                 }
             }
@@ -266,12 +277,11 @@ public static class AntiBlackout
     {
         var timeNotify = 0f;
 
-        if (BlackOutIsActive && CheckForEndVotingPatch.TempExileMsg != null)
+        if ((BlackOutIsActive || ResetName) && CheckForEndVotingPatch.TempExileMsg != string.Empty && (Main.CurrentServerIsVanilla || Main.LIMap))
         {
-            timeNotify = 4f;
-            foreach (var pc in Main.EnumeratePlayerControls().Where(p => !p.IsModded()).ToArray())
+            foreach (var pc in Main.EnumeratePlayerControls())
             {
-                pc.Notify(CheckForEndVotingPatch.TempExileMsg, time: timeNotify);
+                pc.Notify(CheckForEndVotingPatch.TempExileMsg, 15f);
             }
         }
 
@@ -304,6 +314,7 @@ public static class AntiBlackout
     {
         if (CustomWinnerHolder.WinnerTeam != CustomWinner.Default) return;
 
+        Imitator.ChangeRoleMap();
         RpcSetRoleReplacer.ResetRoleMapMidGame();
         List<PlayerControl> selfExiled = [];
 
@@ -385,7 +396,6 @@ public static class AntiBlackout
             {
                 if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
                 {
-                    pc.ResetKillCooldown();
                     if (pc.Is(CustomRoles.Saboteur) && Utils.AnySabotageIsActive())
                     {
                         pc.SetKillCooldown(Saboteur.SaboteurMinCD.GetFloat());

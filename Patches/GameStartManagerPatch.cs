@@ -4,9 +4,9 @@ using InnerNet;
 using System;
 using TMPro;
 using TONE.Patches;
+using TONE.Roles.Vanilla;
 using UnityEngine;
 using static TONE.Translator;
-using Object = UnityEngine.Object;
 
 namespace TONE;
 
@@ -282,7 +282,7 @@ public class GameStartManagerPatch
                     Logger.SendInGame(GetString("Error.InvalidColorPreventStart"));
                     var msg = GetString("Error.InvalidColor");
                     msg += "\n" + string.Join(",", invalidColor.Select(p => $"{p.GetRealName()}"));
-                    Utils.SendMessage(msg);
+                    Utils.SendMessage(msg, sendOption: Hazel.SendOption.None);
                 }
 
                 GameStartManagerBeginGamePatch.DoTasksForBeginGame();
@@ -312,7 +312,15 @@ public class GameStartManagerBeginGamePatch
             Logger.SendInGame(GetString("Error.InvalidColorPreventStart"));
             var msg = GetString("Error.InvalidColor");
             msg += "\n" + string.Join(",", invalidColor.Select(p => $"{p.GetRealName()}"));
-            Utils.SendMessage(msg);
+            Utils.SendMessage(msg, sendOption: Hazel.SendOption.None);
+            return false;
+        }
+
+        if (GameStates.IsNormalGame && !Options.CurrentGameMode.GetGameModeClass().OpeningHours && (!PlayerControl.LocalPlayer.FriendCode.CanUseDev() || Main.BetaBuildURL.Value == ""))
+        {
+            Logger.SendInGame(string.Format(GetString("Warning.GameModeNotEnabled"), GetString($"{Options.CurrentGameMode}")));
+            Options.GameMode.SetValue(0);
+            Options.prevGameMode = Options.GameMode.GetInt();
             return false;
         }
 
@@ -376,6 +384,8 @@ public class GameStartManagerBeginGamePatch
 
             Main.LastGuardianAngelCooldown.Value = Options.DefaultAngelCooldown.GetFloat();
             AURoleOptions.GuardianAngelCooldown = 0f;
+
+            AURoleOptions.JudgeTaskRequirementPercentage = JudgeTONE.JudgeTaskRequirementPercentage.GetInt();
         }
 
         GameManager.Instance.LogicOptions.SetDirty();
@@ -463,7 +473,6 @@ class UnrestrictedNumImpostorsPatch
 {
     public static bool Prefix(ref int __result)
     {
-        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame) return true;
         __result = GameOptionsManager.Instance.CurrentGameOptions.NumImpostors;
         return false;
     }

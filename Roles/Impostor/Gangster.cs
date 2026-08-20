@@ -1,8 +1,8 @@
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Translator;
 
@@ -23,7 +23,7 @@ internal class Gangster : RoleBase
     public static OptionItem SheriffCanBeMadmate;
     public static OptionItem MayorCanBeMadmate;
     public static OptionItem NGuesserCanBeMadmate;
-    public static OptionItem JudgeCanBeMadmate;
+    public static OptionItem JusticeCanBeMadmate;
     public static OptionItem RetributionistCanBeMadmate;
     public static OptionItem MarshallCanBeMadmate;
     public static OptionItem OverseerCanBeMadmate;
@@ -41,7 +41,7 @@ internal class Gangster : RoleBase
         SheriffCanBeMadmate = BooleanOptionItem.Create(Id + 14, "GanSheriffCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
         MayorCanBeMadmate = BooleanOptionItem.Create(Id + 15, "GanMayorCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
         NGuesserCanBeMadmate = BooleanOptionItem.Create(Id + 16, "GanNGuesserCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
-        JudgeCanBeMadmate = BooleanOptionItem.Create(Id + 17, "GanJudgeCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
+        JusticeCanBeMadmate = BooleanOptionItem.Create(Id + 17, "GanJusticeCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
         MarshallCanBeMadmate = BooleanOptionItem.Create(Id + 18, "GanMarshallCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
         RetributionistCanBeMadmate = BooleanOptionItem.Create(Id + 20, "GanRetributionistCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
         OverseerCanBeMadmate = BooleanOptionItem.Create(Id + 19, "GanOverseerCanBeMadmate", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Gangster]);
@@ -65,7 +65,7 @@ internal class Gangster : RoleBase
             return true;
         }
 
-        if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
         {
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Gangster), GetString("CantRecruit")));
             return true;
@@ -114,7 +114,7 @@ internal class Gangster : RoleBase
     {
         return pc != null && (pc.GetCustomRole().IsCrewmate() || pc.GetCustomRole().IsImpostor() || pc.GetCustomRole().IsCoven())
             && !pc.Is(CustomRoles.Soulless) && !pc.Is(CustomRoles.Lovers) && !pc.Is(CustomRoles.Loyal)
-            && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)
+            && !(pc.Is(CustomRoles.Mini) && Mini.Age < 18)
             && !(pc.GetCustomSubRoles().Contains(CustomRoles.Hurried) && !Hurried.CanBeConverted.GetBool()) && !(CovenManager.HasNecronomicon(pc.PlayerId) && pc.Is(CustomRoles.CovenLeader));
     }
 }

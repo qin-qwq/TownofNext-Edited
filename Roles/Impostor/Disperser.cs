@@ -12,7 +12,7 @@ internal class Disperser : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Disperser;
     private const int Id = 24400;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
     public override void SetAbilityButtonText(HudManager hud, byte id)
@@ -32,9 +32,9 @@ internal class Disperser : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = DisperserShapeshiftCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = DisperserShapeshiftCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         foreach (var pc in Main.EnumerateAlivePlayerControls())
         {
@@ -48,6 +48,5 @@ internal class Disperser : RoleBase
             pc.RpcRandomVentTeleport();
             pc.Notify(ColorString(GetRoleColor(CustomRoles.Disperser), GetString("TeleportedInRndVentByDisperser")));
         }
-        return false;
     }
 }

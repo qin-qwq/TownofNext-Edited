@@ -66,5 +66,7 @@ class LadderPatch
     public static void Postfix(PlayerPhysics __instance, Ladder source)
     {
         FallFromLadder.OnClimbLadder(__instance, source);
+        var player = __instance.myPlayer;
+        if (player.shouldAppearInvisible || player.invisibilityAlpha < 1f) player.RpcResetInvisibility();
     }
 }

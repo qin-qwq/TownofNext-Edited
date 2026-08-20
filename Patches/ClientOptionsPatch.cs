@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace TONE;
@@ -20,7 +21,10 @@ public static class OptionsMenuBehaviourStartPatch
     private static ClientOptionItem ForceOwnLanguageRoleName;
     private static ClientOptionItem EnableCustomButton;
     private static ClientOptionItem EnableCustomSoundEffect;
-    private static ClientOptionItem EnableCustomDecorations;
+    //private static ClientOptionItem EnableCustomDecorations;
+    private static ClientOptionItem EnableMapVentIcon;
+    private static ClientOptionItem EnableCommandHelper;
+    private static ClientOptionItem EnableClientControlGUI;
     private static ClientOptionItem SwitchVanilla;
 
 #if DEBUG
@@ -42,13 +46,13 @@ public static class OptionsMenuBehaviourStartPatch
             Main.AutoRehost.Value = false;
         }
 
-#if ANDROID
-        Main.UnlockFPS.Value = false;
-        Main.EnableCustomSoundEffect.Value = false;
-#endif
+        if (OperatingSystem.IsAndroid())
+        {
+            Main.UnlockFPS.Value = false;
+            Main.EnableCustomSoundEffect.Value = false;
+        }
 
-#if !ANDROID
-        if (UnlockFPS == null || UnlockFPS.ToggleButton == null)
+        if ((UnlockFPS == null || UnlockFPS.ToggleButton == null) && !OperatingSystem.IsAndroid())
         {
             UnlockFPS = ClientOptionItem.Create("UnlockFPS", Main.UnlockFPS, __instance, UnlockFPSButtonToggle);
             static void UnlockFPSButtonToggle()
@@ -57,7 +61,6 @@ public static class OptionsMenuBehaviourStartPatch
                 Logger.SendInGame(string.Format(Translator.GetString("FPSSetTo"), Application.targetFrameRate));
             }
         }
-#endif
 
         if (EnableGM == null || EnableGM.ToggleButton == null)
         {
@@ -162,29 +165,52 @@ public static class OptionsMenuBehaviourStartPatch
         {
             EnableCustomButton = ClientOptionItem.Create("EnableCustomButton", Main.EnableCustomButton, __instance);
         }
-#if !ANDROID
-        if (EnableCustomSoundEffect == null || EnableCustomSoundEffect.ToggleButton == null)
+        if ((EnableCustomSoundEffect == null || EnableCustomSoundEffect.ToggleButton == null) && !OperatingSystem.IsAndroid())
         {
             EnableCustomSoundEffect = ClientOptionItem.Create("EnableCustomSoundEffect", Main.EnableCustomSoundEffect, __instance);
         }
-#endif
 
-        if (EnableCustomDecorations == null || EnableCustomDecorations.ToggleButton == null)
+        /*if (EnableCustomDecorations == null || EnableCustomDecorations.ToggleButton == null)
         {
             EnableCustomDecorations = ClientOptionItem.Create("EnableCustomDecorations", Main.EnableCustomDecorations, __instance);
+        }*/
+        if (EnableMapVentIcon == null || EnableMapVentIcon.ToggleButton == null)
+        {
+            EnableMapVentIcon = ClientOptionItem.Create("EnableMapVentIcon", Main.EnableMapVentIcon, __instance);
+        }
+        if (EnableCommandHelper == null || EnableCommandHelper.ToggleButton == null)
+        {
+            EnableCommandHelper = ClientOptionItem.Create("EnableCommandHelper", Main.EnableCommandHelper, __instance);
+        }
+        if (EnableClientControlGUI == null || EnableClientControlGUI.ToggleButton == null)
+        {
+            EnableClientControlGUI = ClientOptionItem.Create("EnableClientControlGUI", Main.EnableClientControlGUI, __instance, EnableClientControlGUIButtonToggle);
+
+            static void EnableClientControlGUIButtonToggle()
+            {
+                switch (Main.EnableClientControlGUI.Value)
+                {
+                    case true when !ClientControlGUI.Instance:
+                        Main.Instance.AddComponent<ClientControlGUI>();
+                        break;
+                    case false when ClientControlGUI.Instance:
+                        Object.Destroy(ClientControlGUI.Instance);
+                        break;
+                }
+            }
         }
 
-#if !ANDROID
-        if (SwitchVanilla == null || SwitchVanilla.ToggleButton == null)
+        if ((SwitchVanilla == null || SwitchVanilla.ToggleButton == null) && !OperatingSystem.IsAndroid())
         {
             SwitchVanilla = ClientOptionItem.Create("SwitchVanilla", Main.SwitchVanilla, __instance, SwitchVanillaButtonToggle);
             static void SwitchVanillaButtonToggle()
             {
+                if (ClientControlGUI.Instance) Object.Destroy(ClientControlGUI.Instance);
+                if (UpdateFriendCodeUIPatch.VersionShower) Object.Destroy(UpdateFriendCodeUIPatch.VersionShower);
                 Harmony.UnpatchAll();
                 Main.Instance.Unload();
             }
         }
-#endif
 
 #if DEBUG
         if (EOSManager.Instance.friendCode.GetDevUser().DeBug)

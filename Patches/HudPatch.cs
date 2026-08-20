@@ -4,7 +4,6 @@ using System.Text;
 using TMPro;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.SabotageSystemPatch;
 using static TONE.Translator;
@@ -52,7 +51,7 @@ class HudManagerUpdatePatch
 
         if (SetHudActivePatch.IsActive)
         {
-            if (Options.CurrentGameMode == CustomGameMode.FFA)
+            if (GameModeBase.GetGameMode() == CustomGameMode.FFA)
             {
                 if (LowerInfoText == null)
                 {
@@ -85,7 +84,7 @@ class HudManagerUpdatePatch
                 // Set lower info text for modded players
                 if (LowerInfoText == null)
                 {
-                    LowerInfoText = UnityEngine.Object.Instantiate(__instance.KillButton.cooldownTimerText, __instance.transform, true);
+                    LowerInfoText = Object.Instantiate(__instance.KillButton.cooldownTimerText, __instance.transform, true);
                     LowerInfoText.alignment = TextAlignmentOptions.Center;
                     LowerInfoText.transform.localPosition = new(0, -2f, 0);
                     LowerInfoText.overflowMode = TextOverflowModes.Overflow;
@@ -93,9 +92,11 @@ class HudManagerUpdatePatch
                     LowerInfoText.color = Color.white;
                     LowerInfoText.fontSize = LowerInfoText.fontSizeMax = LowerInfoText.fontSizeMin = 2.8f;
                 }
-                switch (Options.CurrentGameMode)
+                switch (GameModeBase.GetGameMode())
                 {
                     case CustomGameMode.Standard:
+                    case CustomGameMode.BonfireNight:
+                    case CustomGameMode.CopsAndRobbers:
                         var roleClass = player.GetRoleClass();
                         LowerInfoText.text = roleClass?.GetLowerText(player, player, isForMeeting: Main.MeetingIsStarted, isForHud: true) ?? string.Empty;
 
@@ -124,8 +125,8 @@ class HudManagerUpdatePatch
                 __instance.ImpostorVentButton.ToggleVisible(player.CanUseImpostorVentButton());
                 player.Data.Role.CanVent = player.CanUseVents();
 
-                // Sometimes sabotage button was visible for non-host modded clients
-                if (!AmongUsClient.Instance.AmHost && !player.CanUseSabotage())
+                // Sometimes sabotage button was visible for modded clients
+                if (!player.CanUseSabotage())
                     __instance.SabotageButton.Hide();
             }
             else
@@ -218,10 +219,19 @@ class SetHudActivePatch
 
         IsActive = isActive;
 
-        if (GameStates.IsLobby || !isActive) return;
+        if (GameStates.IsLobby) return;
         if (player == null) return;
+        if (!isActive)
+        {
+            if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted &&
+                Options.UseMeetingShapeshift.GetBool() && player.UsesMeetingShapeshift())
+            {
+                __instance.AbilityButton.ToggleVisible(true);
+            }
+            return;
+        }
 
-        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || Options.CurrentGameMode != CustomGameMode.Standard)
+        if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || !GameModeBase.GetGameMode().GetGameModeClass().CanReport)
             __instance.ReportButton.ToggleVisible(false);
 
         if (player.Is(CustomRoles.Mare) && !Utils.IsActive(SystemTypes.Electrical))
@@ -258,11 +268,6 @@ class MapBehaviourShowPatch
 
         var player = PlayerControl.LocalPlayer;
 
-        if (player.GetCustomRole() == CustomRoles.NiceHacker && opts.Mode is not MapOptions.Modes.CountOverlay)
-        {
-            Logger.Info("Modded Client uses Map", "Hacker");
-            NiceHacker.MapHandle(player, __instance, opts);
-        }
         if (opts.Mode is MapOptions.Modes.Normal or MapOptions.Modes.Sabotage)
         {
             if (player.CanUseSabotage())
@@ -291,7 +296,7 @@ class TaskPanelBehaviourPatch
         var taskText = __instance.taskText.text;
         if (taskText == "None") return;
 
-        if (player == null) return;
+        if (!player) return;
 
         // Display Description
         if (!player.GetCustomRole().IsVanilla())
@@ -301,74 +306,35 @@ class TaskPanelBehaviourPatch
 
             var AllText = Utils.ColorString(player.GetRoleColor(), RoleWithInfo);
 
-            switch (Options.CurrentGameMode)
+            if (GameModeBase.GetGameMode().GetGameModeClass().NormalTaskText)
             {
-                case CustomGameMode.Standard:
-                case CustomGameMode.TagMode:
+                var lines = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
+                StringBuilder sb = new();
+                foreach (var eachLine in lines)
+                {
+                    var line = eachLine.Trim();
+                    if ((line.StartsWith("<color=#FF1919FF>") || line.StartsWith("<color=#FF0000FF>")) && sb.Length < 1 && !line.Contains('(')) continue;
+                    sb.Append(line + "\r\n");
+                }
 
-                    var lines = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
-                    StringBuilder sb = new();
-                    foreach (var eachLine in lines)
-                    {
-                        var line = eachLine.Trim();
-                        if ((line.StartsWith("<color=#FF1919FF>") || line.StartsWith("<color=#FF0000FF>")) && sb.Length < 1 && !line.Contains('(')) continue;
-                        sb.Append(line + "\r\n");
-                    }
+                if (sb.Length > 1)
+                {
+                    var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
+                    if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
+                        text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
+                    AllText += $"\r\n\r\n<size=85%>{text}</size>";
+                }
 
-                    if (sb.Length > 1)
-                    {
-                        var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
-                            text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
-                        AllText += $"\r\n\r\n<size=85%>{text}</size>";
-                    }
-
-                    if (MeetingStates.FirstMeeting && Options.CurrentGameMode is CustomGameMode.Standard && !OperatingSystem.IsAndroid())
-                    {
-                        AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
-                        AllText += "</size>";
-                    }
-                    break;
-                case CustomGameMode.FFA:
-                    Dictionary<byte, string> SummaryText2 = [];
-                    foreach (var id in Main.PlayerStates.Keys)
-                    {
-                        string name = Main.AllPlayerNames[id].RemoveHtmlTags().Replace("\r\n", string.Empty);
-                        string summary = $"{Utils.GetProgressText(id)}  {Utils.ColorString(id.GetPlayerColor(), name)}";
-                        if (Utils.GetProgressText(id).Trim() == string.Empty) continue;
-                        SummaryText2[id] = summary;
-                    }
-
-                    List<(int, byte)> list2 = [];
-                    foreach (var id in Main.PlayerStates.Keys) list2.Add((FFAManager.GetRankOfScore(id), id));
-                    list2.Sort();
-                    foreach (var id in list2.Where(x => SummaryText2.ContainsKey(x.Item2))) AllText += "\r\n" + SummaryText2[id.Item2];
-
-                    AllText = $"<size=70%>{AllText}</size>";
-
-                    break;
-                case CustomGameMode.SpeedRun:
-                    var lines2 = taskText.Split("\r\n</color>\n")[0].Split("\r\n\n")[0].Split("\r\n");
-                    StringBuilder sb2 = new();
-                    foreach (var eachLine in lines2)
-                    {
-                        var line = eachLine.Trim();
-                        if ((line.StartsWith("<color=#FF1919FF>") || line.StartsWith("<color=#FF0000FF>")) && sb2.Length < 1 && !line.Contains('(')) continue;
-                        sb2.Append(line + "\r\n");
-                    }
-
-                    if (sb2.Length > 1)
-                    {
-                        var text = sb2.ToString().TrimEnd('\n').TrimEnd('\r');
-                        if (!Utils.HasTasks(player.Data, false) && sb2.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
-                            text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
-                        AllText += $"\r\n\r\n<size=85%>{text}</size>";
-                    }
-
-                    AllText += $"\r\n\r\n<size=80%>{SpeedRun.GetGameState()}</size>";
-
-                    break;
+                if (MeetingStates.FirstMeeting && GameModeBase.GetGameMode() is CustomGameMode.Standard && !OperatingSystem.IsAndroid())
+                {
+                    AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
+                    AllText += "</size>";
+                }
             }
+
+            AllText += GameModeBase.GetGameMode().GetGameModeClass().GetGameState(taskText);
+
+            if (GameModeBase.GetGameMode() is CustomGameMode.FFA) AllText = $"<size=70%>{AllText}</size>";
 
             __instance.taskText.text = AllText;
         }
@@ -475,7 +441,7 @@ internal static class SabotageMapPatch
 
             if (!TimerTexts.TryGetValue(room, out TextMeshPro timerText))
             {
-                TimerTexts[room] = timerText = UnityEngine.Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, mr.special.transform, true);
+                TimerTexts[room] = timerText = Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, mr.special.transform, true);
                 timerText.alignment = TextAlignmentOptions.Center;
                 timerText.transform.localPosition = mr.special.transform.localPosition;
                 timerText.transform.localPosition = new(0, -0.4f, 0f);
@@ -563,7 +529,7 @@ internal static class MapRoomDoorsUpdatePatch
 
         if (!DoorTimerTexts.TryGetValue(room, out TextMeshPro doorTimerText))
         {
-            DoorTimerTexts[room] = doorTimerText = UnityEngine.Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, __instance.door.transform, true);
+            DoorTimerTexts[room] = doorTimerText = Object.Instantiate(HudManager.Instance.KillButton.cooldownTimerText, __instance.door.transform, true);
             doorTimerText.alignment = TextAlignmentOptions.Center;
             doorTimerText.transform.localPosition = __instance.door.transform.localPosition;
             doorTimerText.transform.localPosition = new(0, -0.4f, 0f);

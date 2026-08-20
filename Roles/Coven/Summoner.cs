@@ -121,7 +121,7 @@ internal class Summoner : CovenManager
         // Check if the seer is Summoner and alive, and the seen player is dead
         if (!seer.IsAlive() || seen.IsAlive()) return string.Empty;
 
-        return ColorString(GetRoleColor(CustomRoles.Summoner), $" {seen.Data.PlayerId}");
+        return ColorString(GetRoleColor(seer.GetCustomRole()), $" {seen.GetVisiblePlayerId()}");
     }
     public override bool CanUseKillButton(PlayerControl pc) => HasNecronomicon(pc);
     public override bool OnCheckStartMeeting(PlayerControl reporter)
@@ -135,11 +135,7 @@ internal class Summoner : CovenManager
         return true;
     }
 
-    public override void OnVoteKick(PlayerControl pc, PlayerControl target)
-    {
-        SummonerCheckMsg(pc, $"/sm {target.PlayerId}", true);
-    }
-    public static bool SummonerCheckMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false; // Skip if system message or not host
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false; // Only during meetings
@@ -153,14 +149,14 @@ internal class Summoner : CovenManager
         if (!pc.IsAlive())
         {
             Logger.Warn("Summoner is dead and cannot use commands.", "Summoner");
-            SendMessage(GetString("Summoner.SummonerDead"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            SendMessage(GetString("Summoner.SummonerDead"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper(), sendOption: SendOption.None);
             return true;
         }
 
         if (!byte.TryParse(msg, out var targetId))
         {
             Logger.Warn("Invalid target ID for /summon command.", "Summoner");
-            SendMessage(GetString("Summoner.InvalidID"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            SendMessage(GetString("Summoner.InvalidID"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper(), sendOption: SendOption.None);
             return true;
         }
 
@@ -169,7 +165,7 @@ internal class Summoner : CovenManager
         if (targetPlayer == null)
         {
             Logger.Warn("Target player is invalid or does not exist.", "Summoner");
-            SendMessage(GetString("Summoner.NullPlayer"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
+            SendMessage(GetString("Summoner.NullPlayer"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper(), sendOption: SendOption.None);
             return true;
         }
 
@@ -177,7 +173,7 @@ internal class Summoner : CovenManager
         bool allowResummoning = AllowSummoningRevivedPlayers.GetBool();
 
         // Handle the case where reviving already summoned players is allowed
-        if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+        if (GuessManager.CantUseAbilityDuringDiscussionTime())
         {
             SendMessage(GetString("UseAbilityDuringDiscussion"), pc.PlayerId, CustomRoles.Summoner.ToColoredString().ToUpper());
             return true;
@@ -264,7 +260,7 @@ internal class Summoner : CovenManager
         // Send global message
         string summonMessage = RevealSummonedPlayer.GetBool()
             ? string.Format(GetString("Summoner.SummonAnnouncement"), targetPlayer.GetRealName())
-            : GetString("Summoner.SummonAnnoucementNameless");
+            : GetString("Summoner.SummonAnnouncementNameless");
         SendMessage(summonMessage, byte.MaxValue, CustomRoles.Summoner.ToColoredString().ToUpper());
 
         // Send private message to the summoned player if hidden
@@ -496,8 +492,7 @@ internal class Summoner : CovenManager
             SaveOriginalRole(targetPlayer);
 
             // Assign Summoned role
-            targetPlayer.RpcChangeRoleBasis(CustomRoles.Summoned);
-            targetPlayer.RpcSetCustomRole(CustomRoles.Summoned);
+            targetPlayer.RpcSetCustomRoleV2(CustomRoles.Summoned);
             SummonedPlayerIds.Add(targetPlayer.PlayerId);
             if (!SummonedKillCounts.ContainsKey(targetPlayer.PlayerId))
             {
@@ -623,7 +618,7 @@ internal class Summoned : RoleBase
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        if ((lowLoad || GameStates.IsMeeting) || player.Data.IsDead) return; // Skip if low-load or during meetings
+        if (lowLoad || GameStates.IsMeeting || player.Data.IsDead) return; // Skip if low-load or during meetings
 
         var playerId = player.PlayerId;
 

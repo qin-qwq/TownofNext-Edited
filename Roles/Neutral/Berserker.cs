@@ -74,7 +74,6 @@ internal class Berserker : RoleBase
     }
     public override void Add(byte playerId)
     {
-        Main.AllPlayerKillCooldown[playerId] = BerserkerKillCooldown.GetFloat();
         playerId.SetAbilityUseLimit(0);
     }
 
@@ -90,6 +89,11 @@ internal class Berserker : RoleBase
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
         => opt.SetVision(BerserkerHasImpostorVision.GetBool());
     public override bool CanUseKillButton(PlayerControl pc) => true;
+    public override void SetKillCooldown(byte id)
+    {
+        Main.AllPlayerKillCooldown[id] = id.GetAbilityUseLimit() >= BerserkerKillCooldownLevel.GetInt() && BerserkerOneCanKillCooldown.GetBool() ?
+        BerserkerOneKillCooldown.GetFloat() : BerserkerKillCooldown.GetFloat();
+    }
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (target.IsNeutralApocalypse() && !BerserkerCanKillTeamate.GetBool() && !Main.PlayerStates[target.PlayerId].IsNecromancer) return false;

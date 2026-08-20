@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -19,6 +19,7 @@ internal class Anonymous : RoleBase
     //==================================================================\\
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Hack");
 
+    private static OptionItem HackCooldown;
     private static OptionItem HackLimitOpt;
     private static OptionItem KillCooldown;
 
@@ -31,6 +32,8 @@ internal class Anonymous : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         HackLimitOpt = IntegerOptionItem.Create(Id + 4, "HackLimit", new(1, 15, 1), 3, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Anonymous])
             .SetValueFormat(OptionFormat.Times);
+        HackCooldown = IntegerOptionItem.Create(Id + 5, GeneralOption.AbilityCooldown, new(1, 180, 1), 30, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Anonymous])
+            .SetValueFormat(OptionFormat.Seconds);
     }
     public override void Init()
     {
@@ -43,7 +46,7 @@ internal class Anonymous : RoleBase
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.ShapeshifterCooldown = 1f;
+        AURoleOptions.ShapeshifterCooldown = HackCooldown.GetInt();
         AURoleOptions.ShapeshifterDuration = 1f;
     }
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
@@ -67,7 +70,7 @@ internal class Anonymous : RoleBase
     }
     public override void OnShapeshift(PlayerControl shapeshifter, PlayerControl ssTarget, bool IsAnimate, bool shapeshifting)
     {
-        if (!shapeshifting || shapeshifter.GetAbilityUseLimit() <= 0 || ssTarget == null || ssTarget.Is(CustomRoles.LazyGuy) || ssTarget.Is(CustomRoles.Lazy) || ssTarget.Is(CustomRoles.NiceMini) && Mini.Age < 18) return;
+        if (!shapeshifting || shapeshifter.GetAbilityUseLimit() <= 0 || ssTarget == null || ssTarget.Is(CustomRoles.LazyGuy) || ssTarget.Is(CustomRoles.Lazy) || ssTarget.Is(CustomRoles.Mini) && Mini.Age < 18) return;
 
         shapeshifter.RpcRemoveAbilityUse();
 

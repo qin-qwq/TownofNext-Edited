@@ -22,9 +22,18 @@ internal class CopyCat : RoleBase
     private static OptionItem CopyCrewVar;
     private static OptionItem CopyTeamChangingAddon;
     private static OptionItem CopyOnlyEnabledRoles;
+    private static OptionItem CopyCatFailedMode;
 
     private static float CurrentKillCooldown = new();
     public static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
+
+    [Obfuscation(Exclude = true)]
+    private enum CopyCatFailedModeSelectList
+    {
+        CopyCat_OnlyNotify,
+        CopyCat_CopyRandomRole,
+        CopyCat_Misfire,
+    }
 
     public override void SetupCustomOption()
     {
@@ -34,6 +43,8 @@ internal class CopyCat : RoleBase
         CopyCrewVar = BooleanOptionItem.Create(Id + 13, "CopyCrewVar", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
         CopyTeamChangingAddon = BooleanOptionItem.Create(Id + 14, "CopyTeamChangingAddon", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
         CopyOnlyEnabledRoles = BooleanOptionItem.Create(Id + 15, "CopyOnlyEnabledRoles", false, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat]);
+        CopyCatFailedMode = StringOptionItem.Create(Id + 16, "CopyCatFailedMode", EnumHelper.GetAllNames<CopyCatFailedModeSelectList>(), 0, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CopyCat])
+            .SetHidden(false);
     }
 
     public override void Init()
@@ -66,10 +77,12 @@ internal class CopyCat : RoleBase
         {
             var pc = playerId.GetPlayer();
             if (pc == null) continue;
+            var pcRole = pc.GetCustomRole();
+            var change = pcRole is not CustomRoles.Sidekick and not CustomRoles.Jackal and not CustomRoles.Refugee;
 
             if (!pc.IsAlive())
             {
-                if (!pc.HasGhostRole() && !pc.Is(CustomRoles.CopyCat))
+                if (!pc.HasGhostRole() && !pc.Is(CustomRoles.CopyCat) && change)
                 {
                     pc.RpcSetCustomRole(CustomRoles.CopyCat, false, false);
                 }
@@ -77,8 +90,7 @@ internal class CopyCat : RoleBase
             }
             ////////////           /*remove the settings for current role*/             /////////////////////
 
-            var pcRole = pc.GetCustomRole();
-            if (pcRole is not CustomRoles.Sidekick and not CustomRoles.Jackal and not CustomRoles.Refugee && !(!pc.IsAlive() && pcRole is CustomRoles.Retributionist))
+            if (change && !(!pc.IsAlive() && pcRole is CustomRoles.Retributionist))
             {
                 if (pcRole != CustomRoles.CopyCat)
                 {
@@ -132,7 +144,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Visionary => CustomRoles.Oracle, // 幻想家 => 神谕
                 CustomRoles.Workaholic or CustomRoles.Philosopher => CustomRoles.Snitch, // 工作狂，哲学家 => 告密者
                 CustomRoles.Sunnyboy => CustomRoles.Doctor, // 阳光开朗大男孩 => 法医
-                CustomRoles.Councillor => CustomRoles.Judge, // 邪恶法官 => 法官
+                CustomRoles.Councillor => CustomRoles.Justice, // 邪恶法官 => 正义法官
                 CustomRoles.Taskinator => CustomRoles.Benefactor, // 任务执行者 => 恩人
                 CustomRoles.EvilTracker => CustomRoles.TrackerTONE, // 邪恶追踪者 => 侦查员
                 CustomRoles.AntiAdminer => CustomRoles.Telecommunication, // 监管者 => 通信员
@@ -141,7 +153,7 @@ internal class CopyCat : RoleBase
                 CustomRoles.Swooper => CustomRoles.Chameleon, // 隐匿者 => 变色龙
                 CustomRoles.Vindicator or CustomRoles.Pickpocket => CustomRoles.Mayor, // 卫道士，小偷 => 市长
                 CustomRoles.Opportunist or CustomRoles.BloodKnight or CustomRoles.Wildling => CustomRoles.Guardian, // 投机者，嗜血骑士，野人 => 守护者
-                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist => CustomRoles.Admirer, // 魅魔，病毒，歹徒，大祭司 => 仰慕者
+                CustomRoles.Cultist or CustomRoles.Virus or CustomRoles.Gangster or CustomRoles.Ritualist or CustomRoles.WitchDoctor => CustomRoles.Admirer, // 魅魔，病毒，歹徒，大祭司，巫医 => 仰慕者
                 CustomRoles.Arrogance or CustomRoles.Juggernaut or CustomRoles.Berserker => CustomRoles.Reverie, // 狂妄杀手，天启，狂战士 => 遐想者
                 CustomRoles.Baker when Baker.CurrentBread() is 0 => CustomRoles.Overseer, // 面包师 0 => 预言家
                 CustomRoles.Baker when Baker.CurrentBread() is 1 => CustomRoles.Deputy, // 面包师 1 => 捕快
@@ -165,6 +177,8 @@ internal class CopyCat : RoleBase
                 _ => role
             };
         }
+        // Copy random role
+        if (!role.IsCrewmate() && CopyCatFailedMode.GetInt() == 1) role = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate() && !BlackList(role)).ToList().RandomElement();
         if (Lich.IsCursed(target)) role = CustomRoles.Lich;
         if (role.IsCrewmate() && (role.IsEnable() || !CopyOnlyEnabledRoles.GetBool()))
         {
@@ -210,9 +224,18 @@ internal class CopyCat : RoleBase
             return false;
 
         }
-        killer.Notify(GetString("CopyCatCanNotCopy"));
-        killer.ResetKillCooldown();
-        killer.SetKillCooldown();
+        switch (CopyCatFailedMode.GetInt())
+        {
+            case 0: // Only notify
+                killer.Notify(GetString("CopyCatCanNotCopy"));
+                killer.ResetKillCooldown();
+                killer.SetKillCooldown();
+                break;
+            case 2: // Misfire
+                killer.SetDeathReason(PlayerState.DeathReason.Misfire);
+                killer.RpcMurderPlayer(killer);
+                break;
+        }
         return false;
     }
     public static string CopycatReminder(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)

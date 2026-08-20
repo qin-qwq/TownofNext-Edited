@@ -94,6 +94,7 @@
 > - Improved Role Spawns
 > - Improve text box (TextBoxPatch.cs)
 > - Some ideas to improve performance
+> - Some ideas to support Android
 >
 ### :star: [TONEX (Formerly TOHEX)](https://github.com/XtremeWave/TownOfNewEpic_Xtreme)
 >
@@ -129,5 +130,13 @@
 ### :star: [MiraAPI](https://github.com/All-Of-Us-Mods/MiraAPI)
 >
 > - Next button sprites (Inactive and Active)
+>
+### :star: [UnityDoorstop](https://github.com/Pietrodjaowjao/UnityDoorstop)
+>
+> - Modified doorstop_config.ini and winhttp.dll for packaging
+>
+### :star: [Kevin MacLeod](https://www.youtube.com/user/kmmusic)
+>
+> - Using music
 >
 ---

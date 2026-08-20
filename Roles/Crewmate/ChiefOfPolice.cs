@@ -80,10 +80,7 @@ internal class ChiefOfPolice : RoleBase
                 killer.ResetKillCooldown();
                 killer.SetKillCooldown();
 
-                target.GetRoleClass()?.OnRemove(target.PlayerId);
-                target.RpcChangeRoleBasis(CustomRoles.Sheriff);
-                target.RpcSetCustomRole(CustomRoles.Sheriff);
-                target.GetRoleClass()?.OnAdd(target.PlayerId);
+                target.RpcSetCustomRoleV2(CustomRoles.Sheriff, true, true);
 
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
@@ -102,7 +99,7 @@ internal class ChiefOfPolice : RoleBase
             {
                 suidice = true;
             }
-            else if (target.Is(CustomRoles.Zombie) || target.Is(CustomRoles.EvilMini) || target.Is(CustomRoles.Loyal))
+            else if (target.Is(CustomRoles.Zombie) || target.Is(CustomRoles.Mini) || target.Is(CustomRoles.Loyal))
             {
                 suidice = true;
             }
@@ -119,10 +116,7 @@ internal class ChiefOfPolice : RoleBase
                     killer.ResetKillCooldown();
                     killer.SetKillCooldown();
 
-                    target.GetRoleClass()?.OnRemove(target.PlayerId);
-                    target.RpcChangeRoleBasis(CustomRoles.Sheriff);
-                    target.RpcSetCustomRole(CustomRoles.Sheriff);
-                    target.GetRoleClass()?.OnAdd(target.PlayerId);
+                    target.RpcSetCustomRoleV2(CustomRoles.Sheriff, true, true);
                     if (Main.PlayerStates[target.PlayerId].IsNecromancer) Main.PlayerStates[target.PlayerId].IsNecromancer = false;
 
                     target.ResetKillCooldown();

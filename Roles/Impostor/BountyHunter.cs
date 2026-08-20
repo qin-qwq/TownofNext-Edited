@@ -95,10 +95,12 @@ internal class BountyHunter : RoleBase
             Main.AllPlayerKillCooldown[killer.PlayerId] = SuccessKillCooldown;
             killer.SyncSettings();
             ResetTarget(killer);
+            AchievementManager.OnRoleAbility(CustomRoles.BountyHunter, AchievementBase.AchievementEventType.BountyHunterKilledTarget, killer);
         }
         else
         {
             Logger.Info($"{killer?.Data?.PlayerName}: non-target kills", "BountyHunter");
+            AchievementManager.OnRoleAbility(CustomRoles.BountyHunter, AchievementBase.AchievementEventType.BountyHunterKilledNonTarget, killer);
             if (!killer.IsModded())
             {
                 killer.RpcMurderPlayer(target);

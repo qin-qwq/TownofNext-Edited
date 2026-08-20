@@ -16,13 +16,11 @@ namespace TONE.Modules.ChatManager
         private static readonly Dictionary<byte, string> LastSystemChatMsg = [];
         private const int maxHistorySize = 20;
         public static List<string> ChatSentBySystem = [];
-        public static bool NeedHide;
         public static QuickChatSpamMode quickChatSpamMode => (QuickChatSpamMode)UseQuickChatSpamCheat.GetInt();
         public static void ResetHistory()
         {
             chatHistory.Clear();
             LastSystemChatMsg.Clear();
-            NeedHide = false;
         }
         public static void ClearLastSysMsg()
         {
@@ -109,7 +107,7 @@ namespace TONE.Modules.ChatManager
 
             if (GameStates.IsInGame) operate = 3;
             if (CheckCommond(ref msg, "id|guesslist|gl编号|玩家编号|玩家id|id列表|玩家列表|列表|所有id|全部id|編號|玩家編號")) operate = 1;
-            else if (CheckCommond(ref msg, "shoot|guess|bet|st|gs|bt|猜|赌|賭|sp|jj|tl|trial|审判|判|审|審判|審|compare|cmp|比较|比較|duel|sw|swap|st|换票|换|換票|換|finish|结束|结束会议|結束|結束會議|reveal|展示|rt|rit|ritual|bloodritual|summon|sm", false)) operate = 2;
+            else if (CheckCommond(ref msg, "shoot|guess|bet|st|gs|bt|猜|赌|賭|sp|jj|tl|trial|审判|判|审|審判|審|compare|cmp|比较|比較|duel|sw|swap|st|换票|换|換票|換|finish|结束|结束会议|結束|結束會議|reveal|展示|rt|rit|ritual|bloodritual|summon|sm|lo|恋人|imp|伪装者|ja|豺狼|ji|狱警|co|巫师|roundup|ru|lassoes|ls|围捕|imi|imitate|效仿", false)) operate = 2;
             else if (ChatSentBySystem.Contains(GetTextHash(msg))) operate = 5;
 
             if ((operate == 1 || Blackmailer.CheckBlackmaile(player)) && player.IsAlive())
@@ -173,74 +171,6 @@ namespace TONE.Modules.ChatManager
         {
             if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost) return;
             //This should never function for non host
-            if (Main.CurrentServerIsVanilla)
-            {
-                if (GameStates.IsExilling)
-                {
-                    NeedHide = true;
-                    return;
-                }
-                var pc = PlayerControl.LocalPlayer;
-
-                var title = "​";
-                var name = pc?.Data?.PlayerName;
-
-                var alive = pc.IsAlive();
-                if (!alive)
-                {
-                    pc.Data.IsDead = false;
-                    pc.Data.SendGameData();
-                }
-
-                for (int i = 0; i < 30; i++)
-                {
-                    int clientId = -1;
-                    pc.SetName(title);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(pc, String.Empty);
-                    pc.SetName(name);
-                    var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-                    writer.StartMessage(clientId);
-                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SetName)
-                        .Write(pc.Data.NetId)
-                        .Write(title)
-                        .EndRpc();
-                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SendChat)
-                        .Write(String.Empty)
-                        .EndRpc();
-                    writer.StartRpc(pc.NetId, (byte)RpcCalls.SetName)
-                        .Write(pc.Data.NetId)
-                        .Write(name)
-                        .EndRpc();
-                    writer.EndMessage();
-                    writer.SendMessage();
-                }
-                _ = new LateTask(() =>
-                {
-                    foreach (var playerId in LastSystemChatMsg.Keys.ToArray())
-                    {
-                        var pc = playerId.GetPlayer();
-                        if (pc == null && playerId != byte.MaxValue) continue;
-                        var title = "<color=#FF0000>" + GetString("LastMessageReplay") + "</color>";
-                        Utils.SendMessage(LastSystemChatMsg[playerId], playerId, title: title, noReplay: true);
-                    }
-                    StringBuilder sb = new();
-                    chatHistory.ForEach(dict =>
-                    {
-                        foreach (var kvp in dict)
-                        {
-                            byte id = kvp.Key;
-                            string msg = kvp.Value;
-
-                            sb.Append(id.ColoredPlayerName());
-                            sb.Append(':');
-                            sb.Append(' ');
-                            sb.AppendLine(msg);
-                        }
-                    });
-                    Utils.SendMessage("\n", title: sb.ToString().Trim(), noReplay: true);
-                }, 0.5f);
-                return;
-            }
             if (GameStates.IsExilling && chatHistory.Count < 20)
             {
                 if (quickChatSpamMode != QuickChatSpamMode.QuickChatSpam_Disabled)

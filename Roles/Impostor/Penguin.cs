@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using Hazel;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using UnityEngine;
 using static TONE.Options;
@@ -90,6 +91,7 @@ internal class Penguin : RoleBase
     {
         if (AbductVictim != null)
         {
+            Mini.RecoverySpeed(AbductVictim);
             Main.PlayerStates[AbductVictim.PlayerId].CanUseMovingPlatform = true;
             AbductVictim = null;
         }

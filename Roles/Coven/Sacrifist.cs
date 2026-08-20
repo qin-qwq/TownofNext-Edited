@@ -15,7 +15,7 @@ internal class Sacrifist : CovenManager
     public override CustomRoles Role => CustomRoles.Sacrifist;
     private const int Id = 30600;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
     //==================================================================\\
 
@@ -84,10 +84,10 @@ internal class Sacrifist : CovenManager
     {
         DebuffID = reader.ReadByte();
     }
-    public override bool CanUseImpostorVentButton(PlayerControl pc) => true;
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = 1f;
+        AURoleOptions.ShapeshifterCooldown = 1f;
+        base.ApplyGameOptions(opt, playerId);
     }
     // Sacrifist shouldn't be able to kill at all but if there's solo Sacrifist the game is unwinnable so they can kill when solo
     public override bool CanUseKillButton(PlayerControl pc) => Main.EnumerateAlivePlayerControls().Where(pc => pc.Is(Custom_Team.Coven)).Count() == 1;
@@ -101,7 +101,7 @@ internal class Sacrifist : CovenManager
         killer.Notify(GetString("CovenDontKillOtherCoven"));
         return false;
     }
-    public override bool OnCheckVanish(PlayerControl pc)
+    public override void UnShapeShiftButton(PlayerControl pc)
     {
         var rand = IRandom.Instance;
         DebuffID = (byte)rand.Next(0, 9);
@@ -125,7 +125,7 @@ internal class Sacrifist : CovenManager
                 {
                     Main.AllPlayerKillCooldown[cov.PlayerId] -= Main.AllPlayerKillCooldown[cov.PlayerId] * (NecroReducedCooldown.GetFloat() / 100);
                 }
-                return false;
+                return;
             }
             switch (DebuffID)
             {
@@ -254,7 +254,6 @@ internal class Sacrifist : CovenManager
             SendRPC(pc);
             debuffTimer = 0;
         }
-        return false;
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
@@ -329,10 +328,10 @@ internal class Sacrifist : CovenManager
         if (exiled != _Player) return;
 
         List<PlayerControl> killPotentials = [];
-        var votedForExiled = MeetingHud.Instance.playerStates.Where(a => a.VotedFor == exiled.PlayerId && a.TargetPlayerId != exiled.PlayerId).ToArray();
+        var votedForExiled = MeetingHud.Instance.playerStates.Where(a => a.VotedForId == exiled.PlayerId && a.PlayerId != exiled.PlayerId).ToArray();
         foreach (var playerVote in votedForExiled)
         {
-            var crewPlayer = Main.EnumeratePlayerControls().FirstOrDefault(a => a.PlayerId == playerVote.TargetPlayerId);
+            var crewPlayer = Main.EnumeratePlayerControls().FirstOrDefault(a => a.PlayerId == playerVote.PlayerId);
             if (crewPlayer == null || crewPlayer.GetCustomRole().IsCoven() || crewPlayer.GetCustomRole().IsTNA()) return;
             killPotentials.Add(crewPlayer);
         }

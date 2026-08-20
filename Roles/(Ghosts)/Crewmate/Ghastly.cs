@@ -2,8 +2,8 @@ using AmongUs.GameOptions;
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
@@ -84,7 +84,7 @@ internal class Ghastly : RoleBase
     }
     public override bool OnCheckProtect(PlayerControl angel, PlayerControl target)
     {
-        if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
         {
             angel.Notify(ColorString(GetRoleColor(CustomRoles.Gangster), GetString("CantPosses")));
             return true;

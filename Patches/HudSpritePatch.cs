@@ -22,7 +22,7 @@ public static class HudSpritePatch
     private static Sprite OriginalPet;
     public static void Postfix(HudManager __instance, [HarmonyArgument(0)] PlayerControl localPlayer, [HarmonyArgument(2)] bool isActive)
     {
-        if (!Main.EnableCustomButton.Value || __instance == null || !isActive || !localPlayer.IsAlive()) return;
+        if (!Main.EnableCustomButton.Value || __instance == null || !isActive || (!localPlayer.IsAlive() && !localPlayer.Is(CustomRoles.Wraithh))) return;
         if (GameStates.IsEnded || GameStates.IsLobby || GameStates.IsHideNSeek || !GameStates.IsModHost) return;
 
         if (!AmongUsClient.Instance.IsGameStarted || !Main.IntroDestroyed)
@@ -109,7 +109,7 @@ public static class AbilityButtonPatch
     public static bool Prefix(AbilityButton __instance, AbilityButtonSettings settings)
     {
         var localPlayer = PlayerControl.LocalPlayer;
-        if (!localPlayer.IsAlive() || localPlayer.Data.IsDead) return true;
+        if ((!localPlayer.IsAlive() || localPlayer.Data.IsDead) && !localPlayer.Is(CustomRoles.Wraithh)) return true;
 
         __instance.SetInfiniteUses();
         if (localPlayer.GetRoleClass()?.GetAbilityButtonSprite(localPlayer, Main.CheckShapeshift.GetValueOrDefault(localPlayer.PlayerId, false)) is Sprite Abilitybutton)

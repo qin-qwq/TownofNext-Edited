@@ -207,12 +207,12 @@ public static class BanManager
     }
     public static bool CheckEACList(string code, string hashedPuid)
     {
-        var splitCode = code.Split("#")[0].ToLower().Trim();
+        var splitCode = code.Replace(':', '#');
         if (string.IsNullOrEmpty(splitCode) && string.IsNullOrEmpty(hashedPuid)) return false;
 
         foreach (var user in EACDict)
         {
-            var splitUser = user["friendcode"].ToString().Split('#')[0].ToLower().Trim();
+            var splitUser = user["friendcode"].ToString().Replace(':', '#');
 
             if ((!string.IsNullOrEmpty(splitCode) && (splitCode == splitUser))
                 || !hashedPuid.IsNullOrWhiteSpace() && (user["hashPUID"].ToString().ToLower().Trim() == hashedPuid.ToLower().Trim()))

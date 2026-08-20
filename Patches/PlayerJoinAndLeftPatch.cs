@@ -10,7 +10,6 @@ using TONE.Modules.Rpc;
 using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core.AssignManager;
-using TONE.Roles.Core.DraftAssign;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Neutral;
 using static TONE.Translator;
@@ -83,6 +82,9 @@ class OnGameJoinedPatch
                     if (Main.NormalOptions.KillCooldown == 0f)
                         Main.NormalOptions.KillCooldown = Main.LastKillCooldown.Value;
 
+                    if (Main.NormalOptions.KillCooldown == 300f)
+                        Main.NormalOptions.KillCooldown = 25f;
+
                     AURoleOptions.SetOpt(Main.NormalOptions.CastFast<IGameOptions>());
 
                     if (AURoleOptions.ShapeshifterCooldown == 0f)
@@ -92,7 +94,7 @@ class OnGameJoinedPatch
                         AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
 
                     // If custom Gamemode is HideNSeekTONE in normal game, set Standard
-                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTONE)
+                    if (GameModeBase.GetGameMode() == CustomGameMode.HidenSeekTONE)
                     {
                         // Select Standard
                         Options.GameMode.SetValue(0);
@@ -103,11 +105,12 @@ class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode in H&S game, set HideNSeekTONE
-                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekTONE)
+                    // If custom Gamemode is Standard/FFA/Speedrun/TagMode/BonfireNight/C&R in H&S game, set HideNSeekTONE
+                    if (GameModeBase.GetGameMode() != CustomGameMode.HidenSeekTONE)
                     {
+                        var hns = CustomGameModeManager.gameModes.Length - 1;
                         // Select HideNSeekTONE
-                        Options.GameMode.SetValue(4);
+                        Options.GameMode.SetValue(hns);
                     }
                     break;
 
@@ -119,6 +122,8 @@ class OnGameJoinedPatch
                     Logger.Info(" No found", "Game Mode");
                     break;
             }
+
+            Options.prevGameMode = Options.GameMode.GetInt();
 
             _ = new LateTask(() =>
             {
@@ -179,6 +184,7 @@ class DisconnectInternalPatch
         GameStates.InGame = false;
         Logger.Info($"Disconnect (Reason:{reason}:{stringReason}, ping:{__instance.Ping})", "Reason Disconnect");
         RehostManager.OnDisconnectInternal(reason);
+        DataFlagRateLimiter.DropQueue();
     }
 }
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))]
@@ -241,11 +247,11 @@ public static class OnPlayerJoinedPatch
                     return;
                 }
 
-                /*if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
+                if (AmongUsClient.Instance.AmHost && !Main.playerVersion.TryGetValue(client.Id, out _))
                 {
                     var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                     RpcUtils.LateSpecificSendMessage(message, client.Id);
-                }*/
+                }
             }
             catch { }
         }, 4.5f, "Green Bean Kick LateTask", false);
@@ -396,13 +402,7 @@ class OnPlayerLeftPatch
             {
                 if (data.Character.Is(CustomRoles.Lovers) && !data.Character.Data.IsDead)
                 {
-                    Lovers.OnPartnerLeft(data.Character.PlayerId);
-                    // foreach (var lovers in Main.LoversPlayers.ToArray())
-                    // {
-                    //     Main.isLoversDead = true;
-                    //     Main.LoversPlayers.Remove(lovers);
-                    //     Main.PlayerStates[lovers.PlayerId].RemoveSubRole(CustomRoles.Lovers);
-                    // }
+                    Lovers.OnPartnerLeft(data.Character);
                 }
 
                 if (data.Character.Is(CustomRoles.Jackal) && !data.Character.Data.IsDead)
@@ -413,6 +413,11 @@ class OnPlayerLeftPatch
                 if (data.Character.Is(CustomRoles.Sheriff) && !data.Character.Data.IsDead)
                 {
                     Sheriff.OnSheriffLeft();
+                }
+
+                if (GameModeBase.GetGameMode() == CustomGameMode.CopsAndRobbers)
+                {
+                    CopsAndRobbers.OnPlayerLeft(data.Character.PlayerId);
                 }
 
                 Spiritualist.RemoveTarget(data.Character.PlayerId);
@@ -567,7 +572,7 @@ class OnPlayerLeftPatch
                     Balancer.CheckBalancerTarget(data.Character.PlayerId);
 
                     // Prevent double check end voting
-                    if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                    if (MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                     {
                         MeetingHud.Instance.CheckForEndVoting();
                     }
@@ -621,11 +626,11 @@ class InnerNetClientSpawnPatch
 
             _ = new LateTask(() =>
             {
-                if (Main.OverrideWelcomeMsg != "") Utils.SendMessage(Main.OverrideWelcomeMsg, client.Character.PlayerId);
-                else TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true);
+                if (Main.OverrideWelcomeMsg != "") Utils.SendMessage(Main.OverrideWelcomeMsg, client.Character.PlayerId, sendOption: SendOption.None);
+                else TemplateManager.SendTemplate("welcome", client.Character.PlayerId, true, sendOption: SendOption.None);
             }, 3f, "Welcome Message");
 
-            /*_ = new LateTask(() =>
+            _ = new LateTask(() =>
             {
                 if (client == null || client.Character == null)
                 {
@@ -635,7 +640,7 @@ class InnerNetClientSpawnPatch
 
                 var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
                 RpcUtils.LateSpecificSendMessage(message, client.Id);
-            }, 3f, "RPC Request Retry Version Check");*/
+            }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame)
             {
@@ -707,17 +712,17 @@ class InnerNetClientSpawnPatch
                         }
                     }, 3.2f, "DisplayLastResult");
                 }
-                if (PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp && Options.EnableUpMode.GetBool())
-                {
+                //if (PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp && Options.EnableUpMode.GetBool())
+                //{
                     _ = new LateTask(() =>
                     {
-                        if (!AmongUsClient.Instance.IsGameStarted && client.Character != null)
+                        if (!AmongUsClient.Instance.IsGameStarted && client.Character?.IsHost() == true)
                         {
                             Main.isChatCommand = true;
-                            //Utils.SendMessage($"{GetString("Message.YTPlanNotice")} {PlayerControl.LocalPlayer.FriendCode.GetDevUser().UpName}", client.Character.PlayerId);
+                            AchievementManager.ShowCompletedThisGame();
                         }
-                    }, 3.3f, "DisplayUpWarnning");
-                }
+                    }, 3.3f, "DisplayAchievementResult");
+                //}
             }
         }
     }

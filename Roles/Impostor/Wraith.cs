@@ -1,8 +1,7 @@
 using AmongUs.GameOptions;
-using Hazel;
 using System.Text;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -14,7 +13,7 @@ internal class Wraith : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Wraith;
     private const int Id = 18500;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -40,13 +39,12 @@ internal class Wraith : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = SuicideCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = SuicideCooldown.GetFloat();
     }
 
-    public override bool OnCheckVanish(PlayerControl phantom)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
-        phantom.RpcMurderPlayer(phantom);
-        return false;
+        player.RpcMurderPlayer(player);
     }
 
     public override void OnMeetingHudStart(PlayerControl pc)
@@ -101,7 +99,7 @@ internal class Wraith : RoleBase
 
     public override bool CanUseKillButton(PlayerControl pc) => false;
 
-    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Suidce");
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("UnleashWraith");
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
@@ -139,7 +137,7 @@ internal class Wraithh : RoleBase
 
     public override bool OnCheckProtect(PlayerControl killer, PlayerControl target)
     {
-        if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18 || !killer.RpcCheckAndMurder(target, true)) return true;
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18 || !killer.RpcCheckAndMurder(target, true)) return true;
 
         if (target.GetCustomRole().IsImpostor()) return false;
 
@@ -149,4 +147,6 @@ internal class Wraithh : RoleBase
     }
     // EAC bans players when GA uses sabotage
     public override bool CanUseSabotage(PlayerControl pc) => false;
+
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Wraith");
 }

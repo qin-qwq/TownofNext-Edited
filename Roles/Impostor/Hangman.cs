@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Options;
 
@@ -36,7 +36,7 @@ internal class Hangman : RoleBase
     }
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
             return true;
 
         if (target.IsTransformedNeutralApocalypse() || target.Is(CustomRoles.Solsticer))

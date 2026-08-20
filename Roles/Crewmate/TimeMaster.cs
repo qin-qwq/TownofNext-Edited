@@ -8,7 +8,6 @@ using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
-using Object = UnityEngine.Object;
 
 namespace TONE.Roles.Crewmate;
 
@@ -33,7 +32,7 @@ internal class TimeMaster : RoleBase
 
     private static readonly Dictionary<byte, long> TimeMasterInProtect = [];
     private static Dictionary<long, Dictionary<byte, Vector2>> BackTrack = [];
-    private static readonly Dictionary<byte, float> originalSpeed = [];
+    public static readonly Dictionary<byte, float> originalSpeed = [];
     public static bool Rewinding;
 
     public override void SetupCustomOption()
@@ -108,6 +107,8 @@ internal class TimeMaster : RoleBase
                 player.Notify(notify, Math.Max((length * delay) + 0.55f, 4f));
                 player.MarkDirtySettings();
             }
+
+            yield return PlayerGameOptionsSender.SendAllImmediately()?.Wait();
 
             yield return new WaitForSecondsRealtime(0.55f);
 
@@ -227,5 +228,22 @@ internal class TimeMaster : RoleBase
     {
         if (UsePets.GetBool()) return CustomButton.Get("Time Master");
         return null;
+    }
+    public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
+    {
+        AfterMeetingTasks();
+    }
+
+    public override void AfterMeetingTasks()
+    {
+        if (Rewinding)
+        {
+            Rewinding = false;
+            foreach (var pc in Main.EnumeratePlayerControls())
+            {
+                Main.AllPlayerSpeed[pc.PlayerId] = Main.AllPlayerSpeed[pc.PlayerId] - Main.MinSpeed + originalSpeed[pc.PlayerId];
+                ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
+            }
+        }
     }
 }

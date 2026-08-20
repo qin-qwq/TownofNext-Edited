@@ -9,8 +9,6 @@ using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;
 
-// 贴图来源 : https://github.com/Dolly1016/Nebula-Public
-
 internal class Sniper : RoleBase
 {
     //===========================SETUP================================\\
@@ -432,7 +430,7 @@ internal class Sniper : RoleBase
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
     {
-        if (UsePhantomBasis.GetBool() || (!UsePhantomBasis.GetBool() && player.GetAbilityUseLimit() > 0)) return CustomButton.Get("Sniper");
+        if (UsePhantomBasis.GetBool() || player.GetAbilityUseLimit() > 0) return CustomButton.Get("Rifle");
         return null;
     }
 }

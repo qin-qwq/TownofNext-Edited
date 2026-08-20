@@ -1,4 +1,4 @@
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -32,9 +32,9 @@ internal class Provocateur : RoleBase
     public override bool CanUseKillButton(PlayerControl pc) => true;
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
-        if (Mini.Age < 18 && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)))
+        if (Mini.Age < 18 && target.Is(CustomRoles.Mini))
         {
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.NiceMini), GetString("CantBoom")));
+            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Mini), GetString("CantBoom")));
             return false;
         }
         target.SetDeathReason(PlayerState.DeathReason.PissedOff);

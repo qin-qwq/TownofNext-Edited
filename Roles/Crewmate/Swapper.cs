@@ -54,9 +54,9 @@ internal class Swapper : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        if (CNO == null) CNO = CanSwapSelf.GetBool() ? new ShapeshiftMenuElement(pc.PlayerId) : null;
+        if (CNO == null) CNO = CanSwapSelf.GetBool() ? new ShapeshiftMenuElement(pc) : null;
         else if (CNO.playerControl.NetId == target.NetId) target = pc;
-        SwapMsg(pc, $"/sw {target.PlayerId}");
+        RoleCommand(pc, $"/sw {target.PlayerId}");
     }
 
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
@@ -65,10 +65,10 @@ internal class Swapper : RoleBase
         CNO = null;
     }
 
-    public bool SwapMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
-        if (!GameStates.IsMeeting || _Player == null || GameStates.IsExilling) return false;
+        if (!GameStates.IsMeeting || !_Player || GameStates.IsExilling) return false;
 
         int operate;
         msg = msg.ToLower().TrimStart().TrimEnd();
@@ -104,7 +104,7 @@ internal class Swapper : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("SwapperTrialMax"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
                     return true;
                 }
-                if (Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                if (GuessManager.CantUseAbilityDuringDiscussionTime())
                 {
                     pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                     return true;
@@ -240,17 +240,17 @@ internal class Swapper : RoleBase
 
         foreach (var pva in __instance.playerStates.ToArray())
         {
-            if (pva.VotedFor != target1.PlayerId || pva.AmDead) continue;
-            templist.Add(pva.TargetPlayerId);
-            pva.VotedFor = target2.PlayerId;
+            if (pva.VotedForId != target1.PlayerId || pva.AmDead) continue;
+            templist.Add(pva.PlayerId);
+            pva.VotedForId = target2.PlayerId;
             ReturnChangedPva(pva);
         }
 
         foreach (var pva in __instance.playerStates.ToArray())
         {
-            if (pva.VotedFor != target2.PlayerId || pva.AmDead) continue;
-            if (templist.Contains(pva.TargetPlayerId)) continue;
-            pva.VotedFor = target1.PlayerId;
+            if (pva.VotedForId != target2.PlayerId || pva.AmDead) continue;
+            if (templist.Contains(pva.PlayerId)) continue;
+            pva.VotedForId = target1.PlayerId;
             ReturnChangedPva(pva);
         }
 
@@ -324,82 +324,31 @@ internal class Swapper : RoleBase
         }
         return false;
     }
-    private static void SendSwapRPC(byte playerId)
+
+    public override void OnMeetingHudStart(PlayerControl pc)
     {
-        var msg = new RpcSetSwapperVotes(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        if (pc.IsAlive())
+        {
+            Vote.Item1 = 253;
+            Vote.Item2 = 253;
+
+            MeetingHudStartPatch.msgToSend.Add((GetString("SwapHelp"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper())));
+
+            ResultSent.Clear(); 
+        }
     }
-    public static void ReceiveSwapRPC(MessageReader reader, PlayerControl pc)
-    {
-        byte PlayerId = reader.ReadByte();
-        if (pc.GetRoleClass() is Swapper sw) sw.SwapMsg(pc, $"/sw {PlayerId}");
-    }
-    private void SwapperOnClick(byte playerId, MeetingHud __instance)
+
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Swapper) && pc.IsAlive() && pc.GetAbilityUseLimit() > 0;
+
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive();
+
+    public override string AbilityButtonName => "SwapNo";
+
+    public override void OnClickAbilityButton(byte playerId)
     {
         Logger.Msg($"Click: ID {playerId}", "Swapper UI");
         var pc = playerId.GetPlayer();
-        if (pc == null || !pc.IsAlive() || !GameStates.IsVoting) return;
-
-        if (AmongUsClient.Instance.AmHost) SwapMsg(PlayerControl.LocalPlayer, $"/sw {playerId}");
-        else SendSwapRPC(playerId);
-
-        if (PlayerControl.LocalPlayer.Is(CustomRoles.Swapper) && PlayerControl.LocalPlayer.IsAlive())
-        {
-            CreateSwapperButton(__instance);
-        }
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (AmongUsClient.Instance.AmHost)
-            {
-                foreach (var pc in Main.EnumerateAlivePlayerControls().ToArray())
-                {
-                    if (!pc.Is(CustomRoles.Swapper) || !pc.IsAlive()) continue;
-
-                    Vote.Item1 = 253;
-                    Vote.Item2 = 253;
-
-                    MeetingHudStartPatch.msgToSend.Add((GetString("SwapHelp"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper())));
-
-                    ResultSent.Clear();
-                }
-            }
-
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Swapper sp && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
-                sp.CreateSwapperButton(__instance);
-        }
-    }
-    public void CreateSwapperButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            if (pva.transform.Find("SwapButton") != null) UnityEngine.Object.Destroy(pva.transform.Find("SwapButton").gameObject);
-
-            var pc = pva.TargetPlayerId.GetPlayer();
-            var local = PlayerControl.LocalPlayer;
-            if (pc == null || !pc.IsAlive()) continue;
-
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
-            targetBox.name = "SwapButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            var isSelected = false;
-            byte localId = PlayerControl.LocalPlayer.PlayerId;
-            isSelected = (Vote.Item1 == pva.TargetPlayerId) ||
-                        (Vote.Item2 == pva.TargetPlayerId);
-            renderer.sprite = CustomButton.Get(isSelected ? "SwapYes" : "SwapNo");
-
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
-            {
-                SwapperOnClick(pva.TargetPlayerId, __instance);
-            }));
-        }
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/sw {playerId}", true);
     }
 }

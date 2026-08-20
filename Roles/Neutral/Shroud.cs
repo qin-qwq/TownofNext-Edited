@@ -2,8 +2,8 @@ using AmongUs.GameOptions;
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -81,9 +81,9 @@ internal class Shroud : RoleBase
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (ShroudList.ContainsKey(target.PlayerId)) return false;
-        if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
         {
-            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.NiceMini), GetString("CantShroud")));
+            killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Mini), GetString("CantShroud")));
             return false;
         }
 
@@ -124,7 +124,10 @@ internal class Shroud : RoleBase
                 var min = targetDistance.OrderBy(c => c.Value).FirstOrDefault();
                 var target = min.Key.GetPlayer();
                 var KillRange = ExtendedPlayerControl.GetKillDistances();
-                if (min.Value <= KillRange && !shroud.inVent && !shroud.inMovingPlat && !target.inVent && !target.inMovingPlat)
+                var playerPos = shroud.GetCustomPosition();
+                var vector = target.GetCustomPosition() - playerPos;
+                var magnitude = vector.magnitude;
+                if (min.Value <= KillRange && !shroud.inVent && !shroud.inMovingPlat && !target.inVent && !target.inMovingPlat && !PhysicsHelpers.AnyNonTriggersBetween(playerPos, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
                 {
                     if (shroud.RpcCheckAndMurder(target, true))
                     {

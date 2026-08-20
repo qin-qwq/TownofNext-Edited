@@ -8,6 +8,15 @@ internal class Bard : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
+    public static float BardKillCooldown;
+
+    public override void Init()
+    {
+        BardKillCooldown = Options.DefaultKillCooldown;
+    }
+
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = BardKillCooldown;
+
     public static bool CheckSpawn()
     {
         var Rand = IRandom.Instance;
@@ -16,6 +25,6 @@ internal class Bard : RoleBase
 
     public override void OnPlayerExiled(PlayerControl bard, NetworkedPlayerInfo exiled)
     {
-        if (exiled != null) Main.AllPlayerKillCooldown[bard.PlayerId] /= 2;
+        if (exiled != null) BardKillCooldown /= 2;
     }
 }

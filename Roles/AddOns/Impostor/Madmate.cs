@@ -1,6 +1,6 @@
 using AmongUs.GameOptions;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using static TONE.Options;
 
@@ -21,7 +21,7 @@ public static class Madmate
     public static OptionItem SnitchCanBeMadmate;
     public static OptionItem MadSnitchTasks;
     public static OptionItem RetributionistCanBeMadmate;
-    public static OptionItem JudgeCanBeMadmate;
+    public static OptionItem JusticeCanBeMadmate;
 
     public static OptionItem ImpKnowWhosMadmate;
     public static OptionItem ImpCanKillMadmate;
@@ -63,7 +63,7 @@ public static class Madmate
         SnitchCanBeMadmate = BooleanOptionItem.Create(Id2 + 11, "SnitchCanBeMadmate", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Madmate]);
         MadSnitchTasks = IntegerOptionItem.Create(Id2 + 12, "MadSnitchTasks", new(1, 30, 1), 3, TabGroup.Addons, false).SetParent(SnitchCanBeMadmate)
             .SetValueFormat(OptionFormat.Pieces);
-        JudgeCanBeMadmate = BooleanOptionItem.Create(Id2 + 13, "JudgeCanBeMadmate", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Madmate]);
+        JusticeCanBeMadmate = BooleanOptionItem.Create(Id2 + 13, "JusticeCanBeMadmate", false, TabGroup.Addons, false).SetParent(CustomRoleSpawnChances[CustomRoles.Madmate]);
     }
 
     public static void ApplyGameOptions(IGameOptions opt)
@@ -105,13 +105,12 @@ public static class Madmate
             pc.Is(CustomRoles.Lazy) ||
             pc.Is(CustomRoles.Loyal) ||
             pc.Is(CustomRoles.SuperStar) ||
-            pc.Is(CustomRoles.Celebrity) ||
             pc.Is(CustomRoles.TaskManager) ||
             //   pc.Is(CustomRoles.Cyber) ||
             pc.Is(CustomRoles.Egoist) ||
             pc.Is(CustomRoles.Paranoia) ||
             pc.Is(CustomRoles.Vigilante) ||
-            (pc.Is(CustomRoles.NiceMini) && Mini.Age >= 18) ||
+            (pc.Is(CustomRoles.Mini) && Mini.Age >= 18) ||
             (pc.Is(CustomRoles.Hurried) && !Hurried.CanBeOnMadMate.GetBool()) ||
             (CovenManager.HasNecronomicon(pc.PlayerId) && pc.Is(CustomRoles.CovenLeader))
             );
@@ -123,7 +122,7 @@ public static class Madmate
             (pc.Is(CustomRoles.Mayor) && (!forGangster ? !MayorCanBeMadmate.GetBool() : !Gangster.MayorCanBeMadmate.GetBool())) ||
             (pc.Is(CustomRoles.NiceGuesser) && (!forGangster ? !NGuesserCanBeMadmate.GetBool() : !Gangster.NGuesserCanBeMadmate.GetBool())) ||
             (pc.Is(CustomRoles.Snitch) && !SnitchCanBeMadmate.GetBool()) ||
-            (pc.Is(CustomRoles.Judge) && (!forGangster ? !JudgeCanBeMadmate.GetBool() : !Gangster.JudgeCanBeMadmate.GetBool())) ||
+            (pc.Is(CustomRoles.Justice) && (!forGangster ? !JusticeCanBeMadmate.GetBool() : !Gangster.JusticeCanBeMadmate.GetBool())) ||
             (pc.Is(CustomRoles.Marshall) && (!forGangster ? !MarshallCanBeMadmate.GetBool() : !Gangster.MarshallCanBeMadmate.GetBool())) ||
             (pc.Is(CustomRoles.Retributionist) && (!forGangster ? !RetributionistCanBeMadmate.GetBool() : !Gangster.RetributionistCanBeMadmate.GetBool())) ||
             (pc.Is(CustomRoles.Overseer) && (!forGangster ? !OverseerCanBeMadmate.GetBool() : !Gangster.OverseerCanBeMadmate.GetBool())) ||

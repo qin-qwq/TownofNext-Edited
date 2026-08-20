@@ -34,7 +34,7 @@ internal class Cupid : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Cupid);
+        SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Cupid, 1, zeroOne: false);
         CharmCooldown = FloatOptionItem.Create(Id + 10, "CupidSettings.CharmCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid])
             .SetValueFormat(OptionFormat.Seconds);
         LoversKnowCupid = BooleanOptionItem.Create(Id + 11, "CupidSettings.LoversKnowCupid", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Cupid]);
@@ -84,7 +84,7 @@ internal class Cupid : RoleBase
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
         cupidArrows.Clear();
-        var count = reader.ReadInt16();
+        var count = reader.ReadInt32();
 
         for (int i = 0; i < count; i++)
         {
@@ -177,13 +177,6 @@ internal class Cupid : RoleBase
             firstArrow[cupid.PlayerId] = target.PlayerId;
             Logger.Info($"{target.GetRealName()} is Lover1", "Cupid");
 
-            if (Lovers.loverless != byte.MaxValue)
-            {
-                var newTarget = Lovers.loverless;
-                Lovers.loverless = byte.MaxValue;
-                AddTarget(cupid, newTarget.GetPlayer());
-            }
-
             cupid.Notify(string.Format(GetString("Cupid.PlayerAdded"), target.GetRealName()));
         }
         else if (first.Value != target.PlayerId)
@@ -199,7 +192,7 @@ internal class Cupid : RoleBase
 
             if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
             {
-                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
             }
             else
             {
@@ -234,7 +227,7 @@ internal class Cupid : RoleBase
 
     public static void CheckAdditionalWin()
     {
-        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers));
+        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers)).ToList();
 
         foreach (var lover in loverWinners)
         {
@@ -270,7 +263,8 @@ internal class Cupid : RoleBase
 
         return cupidArrows.TryGetValue(poly.cupid.PlayerId, out var pair) && pair != null &&
             ((pair.Value.Item1 == poly.p1.PlayerId && pair.Value.Item2 == poly.p2.PlayerId)
-            || (pair.Value.Item1 == poly.p2.PlayerId && pair.Value.Item2 == poly.p1.PlayerId));
+            || (pair.Value.Item1 == poly.p2.PlayerId && pair.Value.Item2 == poly.p1.PlayerId))
+            && !Utils.IsSameTeammate(poly.p1, poly.p2, neu: false);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)

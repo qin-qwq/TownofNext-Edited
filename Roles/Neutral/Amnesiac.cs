@@ -61,7 +61,6 @@ internal class Amnesiac : RoleBase
         AURoleOptions.EngineerCooldown = VentCoolDown.GetFloat();
         AURoleOptions.EngineerInVentMaxTime = VentDuration.GetFloat();
     }
-    public static bool PreviousAmnesiacCanVent(PlayerControl pc) => CanUseVent.TryGetValue(pc.PlayerId, out var canUse) && canUse;
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.ReportButton.OverrideText(GetString("RememberButtonText"));
@@ -115,10 +114,7 @@ internal class Amnesiac : RoleBase
             {
                 if (GhostRoleAssign.GhostGetPreviousRole.TryGetValue(targetPlayerStates.PlayerId, out var role) && !role.IsGhostRole())
                 {
-                    __instance.GetRoleClass()?.OnRemove(__instance.PlayerId);
-                    __instance.RpcSetRoleDesync(role.GetRoleTypes(), __instance.GetClientId());
-                    __instance.RpcSetCustomRole(role);
-                    __instance.GetRoleClass()?.OnAdd(__instance.PlayerId);
+                    __instance.RpcSetCustomRoleV2(role, true, true);
                     if (targetPlayerStates.SubRoles.Contains(CustomRoles.Narc)) __instance.RpcSetCustomRole(CustomRoles.Narc);
 
                     __instance.RpcGuardAndKill();
@@ -137,10 +133,7 @@ internal class Amnesiac : RoleBase
             else
             {
                 var role = targetPlayerStates.MainRole;
-                __instance.GetRoleClass()?.OnRemove(__instance.PlayerId);
-                __instance.RpcSetRoleDesync(role.GetRoleTypes(), __instance.GetClientId());
-                __instance.RpcSetCustomRole(role);
-                __instance.GetRoleClass()?.OnAdd(__instance.PlayerId);
+                __instance.RpcSetCustomRoleV2(role, true, true);
                 if (targetPlayerStates.SubRoles.Contains(CustomRoles.Narc)) __instance.RpcSetCustomRole(CustomRoles.Narc);
 
                 __instance.RpcGuardAndKill();

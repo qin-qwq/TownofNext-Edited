@@ -67,7 +67,7 @@ internal class Oracle : RoleBase
 
         if (player.PlayerId == target.PlayerId)
         {
-            SendMessage(GetString("OracleCheckSelfMsg") + "\n\n" + string.Format(GetString("OracleCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.Oracle), GetString("Oracle").ToUpper()));
+            SendMessage(GetString("OracleCheckSelfMsg") + "\n\n" + string.Format(GetString("OracleCheckLimit"), abilityUse), player.PlayerId, ColorString(GetRoleColor(CustomRoles.Oracle), GetString("Oracle").ToUpper()), sendOption: Hazel.SendOption.None);
             return true;
         }
 

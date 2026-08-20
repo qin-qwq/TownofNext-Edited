@@ -3,10 +3,10 @@ using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using UnityEngine;
 using static TONE.Translator;
 
@@ -24,10 +24,10 @@ internal class Councillor : RoleBase
 
     private static OptionItem MurderLimitPerMeeting;
     private static OptionItem MurderLimitPerGame;
-    private static OptionItem MakeEvilJudgeClear;
+    private static OptionItem MakeEvilJusticeClear;
     private static OptionItem CanMurderMadmate;
     private static OptionItem CanMurderImpostor;
-    private static OptionItem SuicideOnJudgeImpTeam;
+    private static OptionItem SuicideOnJusticeImpTeam;
     private static OptionItem CanMurderTaskDoneSnitch;
     private static OptionItem KillCooldown;
 
@@ -41,13 +41,13 @@ internal class Councillor : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         MurderLimitPerMeeting = IntegerOptionItem.Create(Id + 11, "CouncillorMurderLimitPerMeeting", new(1, 15, 1), 1, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
             .SetValueFormat(OptionFormat.Times);
-        MurderLimitPerGame = IntegerOptionItem.Create(Id + 12, "CouncillorMurderLimitPerGame", new(1, 15, 1), 4, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
+        MurderLimitPerGame = IntegerOptionItem.Create(Id + 12, GeneralOption.SkillLimitTimes, new(1, 15, 1), 4, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor])
             .SetValueFormat(OptionFormat.Times);
-        MakeEvilJudgeClear = BooleanOptionItem.Create(Id + 18, "CouncillorMakeEvilJudgeClear", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
+        MakeEvilJusticeClear = BooleanOptionItem.Create(Id + 18, "CouncillorMakeEvilJusticeClear", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
         CanMurderMadmate = BooleanOptionItem.Create(Id + 13, "CouncillorCanMurderMadmate", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
         CanMurderImpostor = BooleanOptionItem.Create(Id + 14, "CouncillorCanMurderImpostor", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
         CanMurderTaskDoneSnitch = BooleanOptionItem.Create(Id + 16, "CouncillorCanMurderTaskDoneSnitch", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
-        SuicideOnJudgeImpTeam = BooleanOptionItem.Create(Id + 17, "CouncillorSuicideOnJudgeImpTeam", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
+        SuicideOnJusticeImpTeam = BooleanOptionItem.Create(Id + 17, "CouncillorSuicideOnJusticeImpTeam", true, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Councillor]);
     }
     public override void Add(byte playerId)
     {
@@ -61,10 +61,10 @@ internal class Councillor : RoleBase
 
     public override void OnMeetingShapeshift(PlayerControl pc, PlayerControl target)
     {
-        MurderMsg(pc, $"/tl {target.PlayerId}");
+        RoleCommand(pc, $"/tl {target.PlayerId}");
     }
 
-    public bool MurderMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || _Player == null || GameStates.IsExilling) return false;
@@ -77,7 +77,7 @@ internal class Councillor : RoleBase
 
         if (!pc.IsAlive())
         {
-            Utils.SendMessage(GetString("CouncillorDead"), pc.PlayerId);
+            Utils.SendMessage(GetString("CouncillorDead"), pc.PlayerId, sendOption: SendOption.None);
             return true;
         }
 
@@ -119,10 +119,23 @@ internal class Councillor : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("CanNotTrialJailed"), Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jailer), GetString("Jailer").ToUpper()));
                     return true;
                 }
-                if (Options.CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+                if (GuessManager.CantUseAbilityDuringDiscussionTime())
                 {
                     pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                     return true;
+                }
+                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
+                {
+                    if (target.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
+                        return true;
+                    }
+                    if (pc.PlayerId == RoundUp.Deputy)
+                    {
+                        pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
+                        return true;
+                    }
                 }
                 if (Balancer.Choose && !(targetId == Balancer.Target1 || targetId == Balancer.Target2))
                 {
@@ -136,7 +149,7 @@ internal class Councillor : RoleBase
                     goto SkipToPerform;
                 }
 
-                if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+                if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
                 {
                     pc.ShowInfoMessage(isUI, GetString("GuessMini"));
                     return true;
@@ -150,7 +163,7 @@ internal class Councillor : RoleBase
 
                 if (target.Is(CustomRoles.Rebound))
                 {
-                    Logger.Info($"{pc.GetNameWithRole()} judged {target.GetNameWithRole()}, councillor sucide = true because target rebound", "CouncillorTrialMsg");
+                    Logger.Info($"{pc.GetNameWithRole()} Justiced {target.GetNameWithRole()}, councillor sucide = true because target rebound", "CouncillorTrialMsg");
                     CouncillorSuicide = true;
                 }
                 else if (target.Is(CustomRoles.Solsticer))
@@ -200,7 +213,7 @@ internal class Councillor : RoleBase
                     {
                         CouncillorSuicide = false;
                     }
-                    else if (!SuicideOnJudgeImpTeam.GetBool())
+                    else if (!SuicideOnJusticeImpTeam.GetBool())
                     {
                         pc.ShowInfoMessage(isUI, GetString("Councillor_CannotMurderImpTeam"));
                         return true;
@@ -221,7 +234,7 @@ internal class Councillor : RoleBase
                     {
                         CouncillorSuicide = false;
                     }
-                    else if (!SuicideOnJudgeImpTeam.GetBool())
+                    else if (!SuicideOnJusticeImpTeam.GetBool())
                     {
                         pc.ShowInfoMessage(isUI, GetString("Councillor_CannotMurderImpTeam"));
                         return true;
@@ -262,9 +275,9 @@ internal class Councillor : RoleBase
 
                         _ = new LateTask(() =>
                         {
-                            if (!MakeEvilJudgeClear.GetBool())
+                            if (!MakeEvilJusticeClear.GetBool())
                             {
-                                Utils.SendMessage(string.Format(GetString("Judge_TrialKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Judge), GetString("Judge_TrialKillTitle")), true);
+                                Utils.SendMessage(string.Format(GetString("Justice_TrialKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Justice), GetString("Justice_TrialKillTitle")), true);
                             }
                             else
                             {
@@ -337,50 +350,17 @@ internal class Councillor : RoleBase
         return false;
     }
 
-    private static void SendRPC(byte playerId)
-    {
-        var msg = new RpcCouncillorJudge(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
-    public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
-    {
-        int PlayerId = reader.ReadByte();
-        if (pc.GetRoleClass() is Councillor cl) cl.MurderMsg(pc, $"/tl {PlayerId}", true);
-    }
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Councillor) && pc.IsAlive() && pc.GetAbilityUseLimit() > 0;
 
-    private static void CouncillorOnClick(byte playerId/*, MeetingHud __instance*/)
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive();
+
+    public override string AbilityButtonName => "MeetingKillButton";
+
+    public override void OnClickAbilityButton(byte playerId)
     {
         Logger.Msg($"Click: ID {playerId}", "Councillor UI");
         var pc = Utils.GetPlayerById(playerId);
-        if (pc == null || !pc.IsAlive() || !GameStates.IsVoting) return;
-        if (AmongUsClient.Instance.AmHost && PlayerControl.LocalPlayer.GetRoleClass() is Councillor cl) cl.MurderMsg(PlayerControl.LocalPlayer, $"/tl {playerId}", true);
-        else SendRPC(playerId);
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Councillor) && PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetAbilityUseLimit() > 0)
-                CreateCouncillorButton(__instance);
-        }
-    }
-    private static void CreateCouncillorButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            var pc = Utils.GetPlayerById(pva.TargetPlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("MeetingKillButton");
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => CouncillorOnClick(pva.TargetPlayerId/*, __instance*/)));
-        }
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/tl {playerId}", true);
     }
 }

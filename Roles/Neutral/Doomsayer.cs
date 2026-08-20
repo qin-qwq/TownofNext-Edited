@@ -1,9 +1,7 @@
 using AmongUs.GameOptions;
-using Hazel;
 using System;
 using System.Text;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
@@ -21,11 +19,13 @@ internal class Doomsayer : RoleBase
     private const int Id = 14100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Doomsayer);
     public override bool IsDesyncRole => EasyMode.GetBool();
+    public override bool IsBalance => true;
     public override CustomRoles ThisRoleBase => EasyMode.GetBool() ? CustomRoles.Impostor : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;
     //==================================================================\\
 
     private static OptionItem DoomsayerAmountOfGuessesToWin;
+    private static OptionItem DoomsayerMinimumAmountOfGuessesToWin;
     private static OptionItem DCanGuessImpostors;
     private static OptionItem DCanGuessCrewmates;
     private static OptionItem DCanGuessNeutrals;
@@ -51,11 +51,15 @@ internal class Doomsayer : RoleBase
     private int GuessesCount = 0;
     private int GuessesCountPerMeeting = 0;
     private static bool CantGuess = false;
+    private static int AmountOfGuesses;
 
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Doomsayer);
         DoomsayerAmountOfGuessesToWin = IntegerOptionItem.Create(Id + 10, "DoomsayerAmountOfGuessesToWin", new(1, 10, 1), 3, TabGroup.NeutralRoles, false)
+            .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer])
+            .SetValueFormat(OptionFormat.Times);
+        DoomsayerMinimumAmountOfGuessesToWin = IntegerOptionItem.Create(Id + 11, "DoomsayerMinimumAmountOfGuessesToWin", new(1, 10, 1), 2, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer])
             .SetValueFormat(OptionFormat.Times);
         DCanGuessImpostors = BooleanOptionItem.Create(Id + 12, "DCanGuessImpostors", true, TabGroup.NeutralRoles, true)
@@ -82,7 +86,7 @@ internal class Doomsayer : RoleBase
 
         ImpostorVision = BooleanOptionItem.Create(Id + 25, GeneralOption.ImpostorVision, true, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
-        EasyMode = BooleanOptionItem.Create(Id + 27, "DoomsayerEasyMode", false, TabGroup.NeutralRoles, true)
+        EasyMode = BooleanOptionItem.Create(Id + 27, "DoomsayerEasyMode", false, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Doomsayer]);
         ObserveCooldown = FloatOptionItem.Create(Id + 29, "DoomsayerObserveCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(EasyMode)
             .SetValueFormat(OptionFormat.Seconds);
@@ -106,6 +110,7 @@ internal class Doomsayer : RoleBase
     {
         playerId.SetAbilityUseLimit(GuessesCount);
         DoomsayerTarget[playerId] = byte.MaxValue;
+        AmountOfGuesses = base.CalculatePlayers(DoomsayerAmountOfGuessesToWin.GetInt(), DoomsayerMinimumAmountOfGuessesToWin.GetInt());
     }
     public override void ApplyGameOptions(IGameOptions opt, byte id) => opt.SetVision(ImpostorVision.GetBool());
     public override string GetProgressText(byte playerId, bool comms)
@@ -114,16 +119,16 @@ internal class Doomsayer : RoleBase
         Color TextColor = GetRoleColor(CustomRoles.Doomsayer).ShadeColor(0.25f);
 
         //ProgressText.Append(GetTaskCount(playerId, comms));
-        ProgressText.Append(ColorString(TextColor, ColorString(Color.white, " - ") + $"({playerId.GetAbilityUseLimit()}/{DoomsayerAmountOfGuessesToWin.GetInt()})"));
+        ProgressText.Append(ColorString(TextColor, ColorString(Color.white, " - ") + $"({playerId.GetAbilityUseLimit()}/{AmountOfGuesses})"));
         return ProgressText.ToString();
     }
     public static bool CheckCantGuess = CantGuess;
 
     private void CheckCountGuess(PlayerControl doomsayer)
     {
-        if (doomsayer.GetAbilityUseLimit() < DoomsayerAmountOfGuessesToWin.GetInt()) return;
+        if (doomsayer.GetAbilityUseLimit() < AmountOfGuesses) return;
 
-        GuessesCount = DoomsayerAmountOfGuessesToWin.GetInt();
+        GuessesCount = AmountOfGuesses;
         if (!CustomWinnerHolder.CheckForConvertedWinner(doomsayer.PlayerId))
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Doomsayer);
@@ -240,7 +245,6 @@ internal class Doomsayer : RoleBase
             {
                 guesser.ShowInfoMessage(isUI, GetString("DoomsayerNotCorrectlyGuessRole"));
                 if (guesser.IsHost()) FlashColor(GetRoleColor(CustomRoles.Doomsayer));
-                //else SendRPC(guesser);
 
                 if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
                 {
@@ -369,16 +373,4 @@ internal class Doomsayer : RoleBase
         DoomsayerTarget[_Player.PlayerId] = byte.MaxValue;
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("prophecies");
-
-    public void SendRPC(PlayerControl pc)
-    {
-        if (!pc.IsNonHostModdedClient()) return;
-        var writer = MessageWriter.Get(SendOption.Reliable);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
-    }
-
-    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
-    {
-        FlashColor(GetRoleColor(CustomRoles.Doomsayer));
-    }
 }

@@ -215,7 +215,7 @@ public static class FindAGameManagerPatch
         List<GameContainer> list = __instance.gameContainers.ToList<GameContainer>();
         for (int i = 0; i < 5; i++)
         {
-            GameContainer gameContainer3 = UnityEngine.Object.Instantiate<GameContainer>(gameContainer, gameObject.transform);
+            GameContainer gameContainer3 = Object.Instantiate<GameContainer>(gameContainer, gameObject.transform);
             Vector3 position2 = gameContainer3.transform.position;
             gameContainer3.transform.position = new Vector3(position2.x, position2.y - 0.75f * (float)(i + 1), 25f);
             list.Add(gameContainer3);

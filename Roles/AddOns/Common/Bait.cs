@@ -64,6 +64,8 @@ public class Bait : IAddon
     }
     public static void BaitAfterDeathTasks(PlayerControl killer, PlayerControl target)
     {
+        if (target.IsDisconnected()) return;
+
         _ = new LateTask(() =>
         {
             var realkiller = target.GetRealKiller();

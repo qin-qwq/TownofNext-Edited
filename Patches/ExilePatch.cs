@@ -13,9 +13,10 @@ class ExileControllerWrapUpPatch
     class ExileControllerBeginPatch
     {
         // This patch is to show exile string for modded players
+        // Due to Innersloth anti-cheat updates, this is visible only to the host
         public static void Postfix(ExileController __instance, [HarmonyArgument(0)] ExileController.InitProperties init)
         {
-            if (Options.CurrentGameMode is CustomGameMode.Standard && init != null && init.outfit != null)
+            if (GameModeBase.GetGameMode() is CustomGameMode.Standard && init != null && init.outfit != null && (AmongUsClient.Instance.AmHost || !Main.CurrentServerIsVanilla))
                 __instance.completeString = CheckForEndVotingPatch.TempExileMsg;
             // TempExileMsg for client is sent in RpcClose
         }
@@ -31,7 +32,7 @@ class ExileControllerWrapUpPatch
         }
         public static void Postfix(ExileController __instance)
         {
-            if (Main.NormalOptions.MapId == 7) return;
+            if (Main.LIMap) return;
 
             try
             {
@@ -48,32 +49,41 @@ class ExileControllerWrapUpPatch
         }
     }
 
-    [HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
+    [HarmonyPatch]
     class AirshipExileControllerPatch
     {
-        public static void Postfix(AirshipExileController __instance)
+        public static MethodBase TargetMethod()
         {
-            if (Main.NormalOptions.MapId == 7) return;
+            return Utils.GetStateMachineMoveNext<AirshipExileController>(nameof(AirshipExileController._WrapUpAndSpawn_d__11));
+        }
 
-            Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
-            try
+        public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
+        {
+            if (Main.LIMap) return;
+
+            var instance = __instance.__4__this;
+            if (!__result)
             {
-                WrapUpPostfix(__instance.initData.networkedPlayer);
-            }
-            catch (Exception error)
-            {
-                Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
-            }
-            finally
-            {
-                WrapUpFinalizer(__instance.initData.networkedPlayer);
+                Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
+                try
+                {
+                    WrapUpPostfix(instance.initData.networkedPlayer);
+                }
+                catch (Exception error)
+                {
+                    Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
+                }
+                finally
+                {
+                    WrapUpFinalizer(instance.initData.networkedPlayer);
+                }
             }
         }
     }
     private static void CheckAndDoRandomSpawn()
     {
-        if (!AmongUsClient.Instance.AmHost) return;
-        if (RandomSpawn.IsRandomSpawn() || Options.CurrentGameMode == CustomGameMode.FFA)
+        if (!AmongUsClient.Instance.AmHost || Main.LIMap) return;
+        if (RandomSpawn.IsRandomSpawn() || GameModeBase.GetGameMode() == CustomGameMode.FFA)
         {
             RandomSpawn.SpawnMap spawnMap = Utils.GetActiveMapName() switch
             {
@@ -119,6 +129,7 @@ class ExileControllerWrapUpPatch
             var emptyString = string.Empty;
 
             exiledRoleClass?.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString);
+            if (exiled.Object.Is(CustomRoles.Mini)) Mini.CheckExile(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString);
             CustomRoleManager.AllEnabledRoles.Do(roleClass => roleClass.CheckExileTarget(exiled, ref DecidedWinner, isMeetingHud: false, name: ref emptyString));
 
             if (CustomWinnerHolder.WinnerTeam != CustomWinner.Terrorist) Main.PlayerStates[exiled.PlayerId].SetDead();
@@ -133,7 +144,6 @@ class ExileControllerWrapUpPatch
         foreach (var player in Main.EnumeratePlayerControls())
         {
             player.GetRoleClass()?.OnPlayerExiled(player, exiled);
-            Lovers.OnPlayerExiled(exiled);
 
             // Check for remove Pet
             player.RpcRemovePet();
@@ -145,7 +155,7 @@ class ExileControllerWrapUpPatch
         Main.MeetingIsStarted = false;
         Main.MeetingsPassed++;
 
-        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: Options.CurrentGameMode is CustomGameMode.Standard);
+        Utils.CountAlivePlayers(sendLog: true, checkGameEnd: GameModeBase.GetGameMode() is CustomGameMode.Standard);
     }
 
     public static void WrapUpFinalizer(NetworkedPlayerInfo exiled)
@@ -161,19 +171,25 @@ class ExileControllerWrapUpPatch
                 AntiBlackout.SendGameData();
                 AntiBlackout.SetRealPlayerRoles();
 
-                if (AntiBlackout.BlackOutIsActive && // State in which the expulsion target is overwritten (need not be executed if the expulsion target is not overwritten)
+                if ((AntiBlackout.BlackOutIsActive || Main.LIMap) && // State in which the expulsion target is overwritten (need not be executed if the expulsion target is not overwritten)
                     exiled != null && // Exiled is not null
                     exiled.Object != null) //exiled.Object is not null
                 {
                     exiled.Object.RpcExileV2();
+                    exiled.Object.SetDeathReason(PlayerState.DeathReason.Vote);
                 }
-            }, Options.CurrentGameMode is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
+            }, GameModeBase.GetGameMode() is CustomGameMode.Standard ? 0.5f : 1.4f, "Restore IsDead Task");
 
             _ = new LateTask(AntiBlackout.ResetAfterMeeting, 0.6f, "ResetAfterMeeting");
 
             _ = new LateTask(() =>
             {
                 if (GameStates.IsEnded) return;
+
+                Main.PlayerStates.Values.DoIf(x => x.IsBlackOut, x =>
+                {
+                    x.IsBlackOut = false;
+                });
 
                 Main.AfterMeetingDeathPlayers.Do(x =>
                 {
@@ -200,7 +216,7 @@ class ExileControllerWrapUpPatch
 
                 if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
                 {
-                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
                 }
                 else
                 {

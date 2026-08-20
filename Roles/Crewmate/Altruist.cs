@@ -104,6 +104,7 @@ internal class Altruist : RoleBase
             //AllRevivedPlayerId.Add(deadPlayerId);
 
             _Player.SetDeathReason(PlayerState.DeathReason.Sacrificed);
+            _Player.SetRealKiller(_Player);
             _Player.RpcExileV3();
 
             deadPlayer.RpcTeleport(deadBodyObject.transform.position);
@@ -165,7 +166,7 @@ internal class Altruist : RoleBase
         }
         else if ((RevivedDeadBodyCannotBeReported.GetBool() || reporter.PlayerId == RevivedPlayerId) && deadBody.PlayerId == RevivedPlayerId)
         {
-            var countDeadBody = UnityEngine.Object.FindObjectsOfType<DeadBody>().Count(bead => bead.ParentId == deadBody.PlayerId);
+            var countDeadBody = Object.FindObjectsOfType<DeadBody>().Count(bead => bead.ParentId == deadBody.PlayerId);
             if (countDeadBody >= 2) return true;
 
             reporter.Notify(Translator.GetString("Altruist_YouTriedReportRevivedDeadBody"));

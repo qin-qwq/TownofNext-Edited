@@ -1,6 +1,5 @@
 using AmongUs.GameOptions;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 
@@ -83,89 +82,10 @@ public class RoleAssign
     }
     public static void StartSelect()
     {
-        switch (Options.CurrentGameMode)
+        if (!GameModeBase.GetGameMode().GetGameModeClass().NormalSelectRoles)
         {
-            case CustomGameMode.FFA:
-                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
-                {
-                    if (Main.EnableGM.Value && pc.IsHost())
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        continue;
-                    }
-                    else if (TagManager.AssignGameMaster(pc.FriendCode))
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
-                        continue;
-                    }
-                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;
-                    }
-                    RoleResult[pc.PlayerId] = CustomRoles.Killer;
-                }
-                return;
-
-            case CustomGameMode.SpeedRun:
-                foreach (PlayerControl pc in Main.EnumeratePlayerControls())
-                {
-                    if (Main.EnableGM.Value && pc.IsHost())
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        continue;
-                    }
-                    else if (TagManager.AssignGameMaster(pc.FriendCode))
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
-                        continue;
-                    }
-                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;
-                    }
-                    RoleResult[pc.PlayerId] = CustomRoles.Runner;
-                }
-                return;
-
-            case CustomGameMode.TagMode:
-                var random = IRandom.Instance;
-                List<PlayerControl> AllPlayers2 = Main.EnumeratePlayerControls().Shuffle(random).ToList();
-                var ZombieNum = TagMode.ZombieMaximun.GetInt();
-                foreach (PlayerControl pc in AllPlayers2)
-                {
-                    if (Main.EnableGM.Value && pc.IsHost())
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        continue;
-                    }
-                    else if (TagManager.AssignGameMaster(pc.FriendCode))
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
-                        continue;
-                    }
-                    else if (SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.GM;
-                        Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
-                        continue;
-                    }
-                    else if (ZombieNum > 0)
-                    {
-                        RoleResult[pc.PlayerId] = CustomRoles.TZombie;
-                        ZombieNum--;
-                        Logger.Info($"将感染者分配给 [{pc.PlayerId}]{pc.GetRealName()}", "TagModeAssign");
-                        continue;
-                    }
-                    RoleResult[pc.PlayerId] = CustomRoles.TCrewmate;
-                }
-                return;
+            GameModeBase.GetGameMode().GetGameModeClass().SelectRoles();
+            return;
         }
 
         var rd = IRandom.Instance;
@@ -204,6 +124,7 @@ public class RoleAssign
         {
             int chance = role.GetMode();
             if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) continue;
+            if ((role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) || (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) continue;
             switch (role)
             {
                 case CustomRoles.Stalker when GameStates.FungleIsActive:
@@ -214,8 +135,6 @@ public class RoleAssign
                 case CustomRoles.RuthlessRomantic:
                 case CustomRoles.GM:
                 case CustomRoles.NotAssigned:
-                case CustomRoles.NiceMini:
-                case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
                 case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
                     continue;
@@ -224,7 +143,7 @@ public class RoleAssign
             int count = role.GetCount();
             RoleAssignInfo info = new(role, chance, count);
 
-            if (role is CustomRoles.Mini)
+            /*if (role is CustomRoles.Mini)
             {
                 if (Mini.CheckSpawnEvilMini())
                 {
@@ -237,7 +156,7 @@ public class RoleAssign
                     Roles[RoleAssignType.Crewmate].Add(info);
                 }
                 continue;
-            }
+            }*/
 
             if (role.IsImpostor())
             {
@@ -434,6 +353,13 @@ public class RoleAssign
                 spawnNA = true;
                 spawnCoven = true;
                 break;
+        }
+
+        if (Options.DraftMode.GetBool() && Options.SpawnOneRandomKillingFraction.GetBool() && !DraftAssign.DraftRoles.Values.All(x => x is CustomRoles.NotAssigned))
+        {
+            spawnNK = DraftAssign.KillingFractions.Contains("NK");
+            spawnNA = DraftAssign.KillingFractions.Contains("NA");
+            spawnCoven = DraftAssign.KillingFractions.Contains("Coven");
         }
 
         Logger.Info($"Spawn NK: {spawnNK}, Spawn NA: {spawnNA}, Spawn Coven: {spawnCoven}", "SpawnKillingFractions");
@@ -1095,6 +1021,7 @@ public class RoleAssign
     public static int AddTrackerNum;
     public static int AddDetectiveNum;
     public static int AddViperNum;
+    public static int AddJudgeNum;
     public static void CalculateVanillaRoleCount()
     {
         // Calculate the number of base roles
@@ -1106,6 +1033,7 @@ public class RoleAssign
         AddTrackerNum = 0;
         AddDetectiveNum = 0;
         AddViperNum = 0;
+        AddJudgeNum = 0;
 
         foreach (var role in AllRoles)
         {
@@ -1134,6 +1062,9 @@ public class RoleAssign
                     break;
                 case CustomRoles.Detective:
                     AddDetectiveNum++;
+                    break;
+                case CustomRoles.Judge:
+                    AddJudgeNum++;
                     break;
             }
         }

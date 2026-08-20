@@ -36,7 +36,7 @@ internal class Inspector : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Inspector);
-        InspectCheckLimitMax = IntegerOptionItem.Create(Id + 11, "MaxInspectCheckLimit", new(0, 20, 1), 5, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Inspector])
+        InspectCheckLimitMax = IntegerOptionItem.Create(Id + 11, GeneralOption.SkillLimitTimes, new(0, 20, 1), 5, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Inspector])
             .SetValueFormat(OptionFormat.Times);
         InspectCheckLimitPerMeeting = IntegerOptionItem.Create(Id + 12, "InspectCheckLimitPerMeeting", new(1, 20, 1), 1, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Inspector])
             .SetValueFormat(OptionFormat.Times);
@@ -109,13 +109,13 @@ internal class Inspector : RoleBase
                 CheckId = byte.MaxValue;
                 return;
             }
-            InspectCheckMsg(pc, $"/cmp {CheckId} {target.PlayerId}");
+            RoleCommand(pc, $"/cmp {CheckId} {target.PlayerId}");
             CheckId = byte.MaxValue;
             return;
         }
     }
 
-    public static bool InspectCheckMsg(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
@@ -129,7 +129,7 @@ internal class Inspector : RoleBase
 
         if (!pc.IsAlive())
         {
-            SendMessage(GetString("InspectorDead"), pc.PlayerId);
+            SendMessage(GetString("InspectorDead"), pc.PlayerId, sendOption: SendOption.None);
             return true;
         }
 
@@ -145,7 +145,7 @@ internal class Inspector : RoleBase
                 SendMessage(error, pc.PlayerId);
                 return true;
             }
-            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            if (GuessManager.CantUseAbilityDuringDiscussionTime())
             {
                 pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                 return true;

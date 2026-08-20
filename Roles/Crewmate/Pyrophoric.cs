@@ -1,6 +1,6 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -108,7 +108,7 @@ internal partial class Pyrophoric : RoleBase
     {
         if (Revenge)
         {
-            var pcList = Main.EnumerateAlivePlayerControls().Where(pc => !Medic.IsProtected(pc.PlayerId) && !pc.GetCustomRole().IsTNA() && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !((pc.Is(CustomRoles.NiceMini) || pc.Is(CustomRoles.EvilMini)) && Mini.Age < 18)).ToList();
+            var pcList = Main.EnumerateAlivePlayerControls().Where(pc => !Medic.IsProtected(pc.PlayerId) && !pc.GetCustomRole().IsTNA() && !pc.Is(CustomRoles.Necromancer) && !pc.Is(CustomRoles.PunchingBag) && !pc.Is(CustomRoles.Solsticer) && !(pc.Is(CustomRoles.Mini) && Mini.Age < 18)).ToList();
             if (pcList.Any())
             {
                 PlayerControl re = pcList.RandomElement();

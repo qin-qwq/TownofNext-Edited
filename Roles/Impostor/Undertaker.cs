@@ -10,7 +10,7 @@ internal class Undertaker : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Undertaker;
     private const int Id = 4900;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -47,7 +47,7 @@ internal class Undertaker : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = SSCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = SSCooldown.GetFloat();
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
 
@@ -70,14 +70,13 @@ internal class Undertaker : RoleBase
         else
             MarkedLocation.Add(PlayerId, ExtendedPlayerControl.GetBlackRoomPosition());
     }
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         var shapeshifterId = shapeshifter.PlayerId;
         MarkedLocation[shapeshifterId] = shapeshifter.GetCustomPosition();
         SendRPC(shapeshifterId);
 
         shapeshifter.Notify(Translator.GetString("RejectShapeshift.AbilityWasUsed"), time: 2f);
-        return false;
     }
 
     private static void FreezeUndertaker(PlayerControl player)

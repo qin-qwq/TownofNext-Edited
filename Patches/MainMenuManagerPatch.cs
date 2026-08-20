@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static TONE.Translator;
-using Object = UnityEngine.Object;
 
 namespace TONE;
 
@@ -82,13 +81,16 @@ public static class MainMenuManagerPatch
             template = __instance.creditsButton;
         }
 
-#if !ANDROID
-        // FPS
-        Application.targetFrameRate = Main.UnlockFPS.Value ? 165 : 60;
-        // In Starlight there is a official patch for this.
-#else
-        Main.UnlockFPS.Value = false;
-#endif
+        if (OperatingSystem.IsAndroid())
+        {
+            // In Starlight there is a official patch for this.
+            Main.UnlockFPS.Value = false;
+        }
+        else
+        {
+            // FPS
+            Application.targetFrameRate = Main.UnlockFPS.Value ? 165 : 60;
+        }
 
         __instance.screenTint.gameObject.transform.localPosition += new Vector3(1000f, 0f);
         __instance.screenTint.enabled = false;
@@ -270,5 +272,19 @@ public static class MainMenuManagerPatch
     public static void ResetScreen_Postfix()
     {
         if (MainMenuManagerStartPatch.ToheLogo != null) MainMenuManagerStartPatch.ToheLogo.gameObject.SetActive(true);
+    }
+}
+[HarmonyPatch(typeof(EjectMainMenu), nameof(EjectMainMenu.EjectCrewmate))]
+class EjectMainMenuEjectCrewmatePatch
+{
+    public static void Postfix(EjectMainMenu __instance)
+    {
+        try
+        {
+            __instance.pressState.SetActive(false);
+            __instance.ejectButton.SetActive(true);
+            __instance.onCooldown = false;
+        }
+        catch { }
     }
 }

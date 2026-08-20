@@ -84,7 +84,7 @@ public static class NameColorManager
         // Necroview
         if (seer.Is(CustomRoles.Necroview) && seer.IsAlive())
         {
-            if (target.Data.IsDead && !target.IsAlive())
+            if (target.Data.IsDead && !target.IsAlive() && isMeeting)
             {
                 color = Necroview.NameColorOptions(target);
             }
@@ -94,6 +94,9 @@ public static class NameColorManager
         if (Jackal.JackalKnowRole(seer, target)) color = Main.roleColors[CustomRoles.Jackal];
 
         if (target.Is(CustomRoles.Mare) && Utils.IsActive(SystemTypes.Electrical) && !isMeeting) color = Main.roleColors[CustomRoles.Mare];
+
+        // Round Up
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && RoundUp.Deputy == target.PlayerId) color = Main.roleColors[CustomRoles.RDeputy];
 
         // Balancer
         if (Balancer.Choose && (Balancer.Target1 == target.PlayerId || Balancer.Target2 == target.PlayerId) && isMeeting) color = Main.roleColors[CustomRoles.Balancer];
@@ -108,7 +111,7 @@ public static class NameColorManager
 
         else return seer == target
             || (Main.GodMode.Value && seer.IsHost())
-            || (Options.CurrentGameMode == CustomGameMode.FFA)
+            || (GameModeBase.GetGameMode() == CustomGameMode.FFA)
             || seer.Is(CustomRoles.GM) || target.Is(CustomRoles.GM)
             || target.GetRoleClass().OthersKnowTargetRoleColor(seer, target)
             || PotionMaster.CovenKnowRoleTarget(seer, target)

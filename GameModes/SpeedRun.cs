@@ -3,15 +3,19 @@ using Hazel;
 using System.Text;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
 using UnityEngine;
 using static TONE.Translator;
 using static TONE.Utils;
 
 namespace TONE;
 
-public static class SpeedRun
+internal class SpeedRun : GameModeBase
 {
+    public override CustomGameMode GameMode => CustomGameMode.SpeedRun;
     private const int Id = 67_225_001;
+    public override bool CanCloseDoors => SpeedRun_AllowCloseDoor.GetBool();
+    public override bool NormalTaskText => true;
 
     public static OptionItem SpeedRun_NumCommonTasks;
     public static OptionItem SpeedRun_NumShortTasks;
@@ -45,7 +49,7 @@ public static class SpeedRun
     public static Dictionary<byte, long> PlayerTaskFinishedAt = [];
     public static Dictionary<byte, byte> PlayerNumKills = [];
 
-    public static void SetupCustomOption()
+    public override void SetupCustomOption()
     {
         TextOptionItem.Create(10000029, "MenuTitle.SpeedRun", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.SpeedRun)
@@ -142,13 +146,46 @@ public static class SpeedRun
             .SetValueFormat(OptionFormat.Seconds);
     }
 
-    public static void Init()
+    public override void Init()
     {
         StartedAt = GetTimeStamp();
         PlayerTaskCounts = [];
         PlayerTaskFinishedAt = [];
         PlayerNumKills = [];
     }
+
+    public override void Add()
+    {
+        StartedAt = GetTimeStamp();
+        RpcSyncSpeedRunStates();
+    }
+
+    public override void SelectRoles()
+    {
+        foreach (PlayerControl pc in Main.EnumeratePlayerControls())
+        {
+            if (Main.EnableGM.Value && pc.IsHost())
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                continue;
+            }
+            else if (TagManager.AssignGameMaster(pc.FriendCode))
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
+                continue;
+            }
+            else if (RoleAssign.SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                continue;
+            }
+            RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.Runner;
+        }
+    }
+
+    public override void SetPredicate() => GameEndCheckerForNormal.predicate = new SpeedRunGameEndPredicate();
 
     public static void RpcSyncSpeedRunStates(byte specificPlayerId = 255) // Not 255, Sync single single player
     {
@@ -179,7 +216,7 @@ public static class SpeedRun
                     writer.Write(false);
                 }
 
-                var sender = new RpcSyncSpeedRunStates(PlayerControl.LocalPlayer.NetId, writer);
+                var sender = new RpcSyncGameModeStates(PlayerControl.LocalPlayer.NetId, writer);
                 RpcUtils.LateSpecificSendMessage(sender, player.OwnerId);
             }
 
@@ -208,12 +245,12 @@ public static class SpeedRun
                     writer.Write(false);
                 }
             }
-            var sender = new RpcSyncSpeedRunStates(PlayerControl.LocalPlayer.NetId, writer);
+            var sender = new RpcSyncGameModeStates(PlayerControl.LocalPlayer.NetId, writer);
             RpcUtils.LateBroadcastReliableMessage(sender);
         }
     }
 
-    public static void HandleSyncSpeedRunStates(MessageReader reader)
+    public override void ReceiveRPC(MessageReader reader)
     {
         var start = reader.ReadString();
         if (!long.TryParse(start, out StartedAt))
@@ -274,9 +311,17 @@ public static class SpeedRun
         NotifyRoles();
     }
 
-    public static string GetGameState(bool forGameEnd = false)
+    public override string GetGameState(string taskText = null, bool forGameEnd = false)
     {
         StringBuilder builder = new();
+
+        if (!forGameEnd)
+        {
+            builder.AppendLine();
+            builder.AppendLine();
+            builder.Append("<size=80%>");
+        }
+
         var playerInfoList = new List<(byte playerId, string playerName, bool isAlive, bool finishedTasks, int kills, long finishTime, int completedTasks, int totalTasks)>();
 
         foreach (var kvp in Main.PlayerStates)
@@ -349,10 +394,17 @@ public static class SpeedRun
             }
         }
 
+        if (!forGameEnd) builder.Append("</size>");
+
         return builder.ToString();
     }
 
-    public static void AppendSpeedRunKcount(StringBuilder builder)
+    public override void SummaryText(StringBuilder sb, List<byte> cloneRoles, bool sendMessage = false)
+    {
+        sb.Clear();
+        sb.Append(GetGameState(null, true));
+    }
+    public override void AppendKcount(StringBuilder builder)
     {
         int aliveKillerCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Runner) && ((Runner)x.GetRoleClass()).BasisChanged);
         int aliveRunnerCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Runner) && !((Runner)x.GetRoleClass()).BasisChanged);

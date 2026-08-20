@@ -81,7 +81,7 @@ public static class SpamManager
                         kick = true;
                     }
                 }
-                if (msg != "") Utils.SendMessage(msg);
+                if (msg != "") Utils.SendMessage(msg, sendOption: Hazel.SendOption.None);
                 if (kick) AmongUsClient.Instance.KickPlayer(player.GetClientId(), Options.AutoKickStartAsBan.GetBool());
                 return true;
             }
@@ -106,11 +106,11 @@ public static class SpamManager
 
         if (msg != "")
         {
-            if (kick || !GameStates.IsInGame) Utils.SendMessage(msg);
+            if (kick || !GameStates.IsInGame) Utils.SendMessage(msg, sendOption: Hazel.SendOption.None);
             else
             {
                 foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.IsAlive() == player.IsAlive()).ToArray())
-                    Utils.SendMessage(msg, pc.PlayerId);
+                    Utils.SendMessage(msg, pc.PlayerId, sendOption: Hazel.SendOption.None);
             }
         }
         if (kick) AmongUsClient.Instance.KickPlayer(player.GetClientId(), Options.AutoKickStartAsBan.GetBool());

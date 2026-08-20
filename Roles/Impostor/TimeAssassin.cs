@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Neutral;
 using static TONE.Options;
@@ -13,7 +14,7 @@ internal class TimeAssassin : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.TimeAssassin;
     private const int Id = 32200;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
 
@@ -40,19 +41,21 @@ internal class TimeAssassin : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = TimeAssassinSkillCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = TimeAssassinSkillCooldown.GetFloat();
     }
 
-    public override bool OnCheckVanish(PlayerControl player)
+    public override void UnShapeShiftButton(PlayerControl player)
     {
-        if (TimeStop || TimeMaster.Rewinding) return false;
+        if (TimeStop || TimeMaster.Rewinding) return;
         if (AnySabotageIsActive())
         {
             player.Notify(ColorString(GetRoleColor(CustomRoles.TimeAssassin), GetString("TimeStopError")));
-            return false;
+            return;
         }
-        foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => !x.Is(CustomRoles.TimeAssassin)))
+        foreach (var target in Main.EnumerateAlivePlayerControls())
         {
+            if (target.Is(CustomRoles.TimeAssassin)) continue;
+
             player.Notify(GetString("TimeStopStart"));
             TimeStop = true;
             Main.PlayerStates[target.PlayerId].IsBlackOut = true;
@@ -68,6 +71,7 @@ internal class TimeAssassin : RoleBase
                 player.RpcResetAbilityCooldown();
                 if (PelicanList.Contains(target)) Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + Pelican.originalSpeed[target.PlayerId];
                 else Main.AllPlayerSpeed[target.PlayerId] = Main.AllPlayerSpeed[target.PlayerId] - Main.MinSpeed + tmpSpeed;
+                Mini.RecoverySpeed(target);
                 Main.PlayerStates[target.PlayerId].IsBlackOut = false;
                 RPC.PlaySoundRPC(Sounds.TaskComplete, target.PlayerId);
                 ReportDeadBodyPatch.CanReport[target.PlayerId] = true;
@@ -75,7 +79,6 @@ internal class TimeAssassin : RoleBase
                 PelicanList.Clear();
             }, TimeAssassinSkillDuration.GetFloat(), "TimeAssassin Stop Time");
         }
-        return false;
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {

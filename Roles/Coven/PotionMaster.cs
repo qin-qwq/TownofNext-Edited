@@ -15,7 +15,7 @@ internal class PotionMaster : CovenManager
     public override CustomRoles Role => CustomRoles.PotionMaster;
     private const int Id = 17700;
     public override bool IsDesyncRole => true;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;
     //==================================================================\\
 
@@ -100,12 +100,11 @@ internal class PotionMaster : CovenManager
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = 1f;
+        AURoleOptions.ShapeshifterCooldown = 1f;
+        base.ApplyGameOptions(opt, playerId);
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool CanUseKillButton(PlayerControl pc) => true;
-    //public override bool CanUseSabotage(PlayerControl pc) => true;
-
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
@@ -175,7 +174,7 @@ internal class PotionMaster : CovenManager
                 break;
         }
     }
-    public override bool OnCheckVanish(PlayerControl pm)
+    public override void UnShapeShiftButton(PlayerControl pm)
     {
         switch (PotionMode)
         {
@@ -188,7 +187,6 @@ internal class PotionMaster : CovenManager
                 pm.Notify(string.Format(GetString("PotionMasterPotionSwitch"), GetString("PotionMasterReveal")));
                 break;
         }
-        return false;
     }
     public static byte CurrentPotion() => PotionMode;
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)

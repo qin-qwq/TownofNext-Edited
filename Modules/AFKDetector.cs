@@ -40,7 +40,7 @@ public static class AFKDetector
 
     public static void RecordPosition(PlayerControl pc)
     {
-        if (!EnableDetector.GetBool() || !GameStates.IsInTask || pc == null || ExemptedPlayers.Contains(pc.PlayerId) || Options.CurrentGameMode is CustomGameMode.FFA) return;
+        if (!EnableDetector.GetBool() || !GameStates.IsInTask || !pc || ExemptedPlayers.Contains(pc.PlayerId) || GameModeBase.GetGameMode() != CustomGameMode.Standard) return;
 
         var waitingTime = 10f;
         if (!pc.IsAlive()) waitingTime += 5f;
@@ -57,7 +57,7 @@ public static class AFKDetector
 
     public static void OnFixedUpdate(PlayerControl pc)
     {
-        if (!EnableDetector.GetBool() || !GameStates.IsInTask || ExileController.Instance || Main.AllAlivePlayerControls.Count < MinPlayersToActivate.GetInt() || pc == null || !PlayerData.TryGetValue(pc.PlayerId, out Data data)) return;
+        if (!EnableDetector.GetBool() || !GameStates.IsInTask || ExileController.Instance || Main.AllAlivePlayerControls.Count < MinPlayersToActivate.GetInt() || !pc || !PlayerData.TryGetValue(pc.PlayerId, out Data data)) return;
 
         if (Vector2.Distance(pc.GetCustomPosition(), data.LastPosition) > 0.1f && !TempIgnoredPlayers.Contains(pc.PlayerId))
         {

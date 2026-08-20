@@ -3,9 +3,9 @@ using Hazel;
 using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Impostor;
 using UnityEngine;
 using static TONE.Translator;
@@ -127,6 +127,7 @@ internal class Pelican : RoleBase
             3 => new Vector2(27f, 3.3f), // dlekS ehT
             4 => new Vector2(-16.8f, -6.2f), // Airship
             5 => new Vector2(9.6f, 23.2f), // The Fungle
+            7 => new(50f, 50f), // LIMap
             _ => throw new System.NotImplementedException(),
         };
     }
@@ -146,14 +147,15 @@ internal class Pelican : RoleBase
     private void EatPlayer(PlayerControl pc, PlayerControl target)
     {
         if (pc == null || target == null || !target.CanBeTeleported()) return;
-        if (Mini.Age < 18 && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)))
+        if (Mini.Age < 18 && target.Is(CustomRoles.Mini))
         {
-            pc.Notify(ColorString(GetRoleColor(CustomRoles.NiceMini), GetString("CantEat")));
+            pc.Notify(ColorString(GetRoleColor(CustomRoles.Mini), GetString("CantEat")));
             return;
         }
 
         eatenList[pc.PlayerId].Add(target.PlayerId);
         SyncEatenList();
+        AchievementManager.OnRoleAbility(CustomRoles.Pelican, AchievementBase.AchievementEventType.PelicanEat, pc);
 
         originalSpeed.Remove(target.PlayerId);
         originalSpeed.Add(target.PlayerId, Main.AllPlayerSpeed[target.PlayerId]);

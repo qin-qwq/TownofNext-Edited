@@ -257,7 +257,7 @@ public static class LobbyViewSettingsPanePatch
             yield return null;
 
             // Create button "Show Only Enabled Roles"
-            ShowOnlyEnabledRolesButton = UnityEngine.Object.Instantiate(__instance.rolesTabButton, __instance.rolesTabButton.transform.parent);
+            ShowOnlyEnabledRolesButton = Object.Instantiate(__instance.rolesTabButton, __instance.rolesTabButton.transform.parent);
             ShowOnlyEnabledRolesButton.buttonText.DestroyTranslator();
             ShowOnlyEnabledRolesButton.name = "ShowOnlyEnabledRolesButton";
             ShowOnlyEnabledRolesButton.buttonText.text = OnlyEnabledRoles
@@ -292,7 +292,7 @@ public static class LobbyViewSettingsPanePatch
             yield return null;
 
             // Create right arrow button
-            var rightButton = UnityEngine.Object.Instantiate(__instance.BackButton, __instance.BackButton.transform.parent).gameObject;
+            var rightButton = Object.Instantiate(__instance.BackButton, __instance.BackButton.transform.parent).gameObject;
             var rightButtonBoxCollider2D = rightButton.GetComponent<BoxCollider2D>();
             rightButtonBoxCollider2D.size = new Vector2(0.3f, 0.3f);
             rightButtonBoxCollider2D.offset = new Vector2(0f, 0f);
@@ -315,7 +315,7 @@ public static class LobbyViewSettingsPanePatch
             void OnRightPassiveClick()
             {
                 LastGameModeSelected++;
-                var enumGameModes = Enum.GetValues<CustomGameMode>().Without(CustomGameMode.All).Without(CustomGameMode.HidenSeekTONE).ToArray();
+                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^2];
                 if ((int)LastGameModeSelected > enumGameModes.Length)
                 {
                     LastGameModeSelected = CustomGameMode.Standard;
@@ -325,7 +325,7 @@ public static class LobbyViewSettingsPanePatch
             yield return null;
 
             // Create left arrow button
-            var leftButton = UnityEngine.Object.Instantiate(rightButton, __instance.BackButton.transform.parent).gameObject;
+            var leftButton = Object.Instantiate(rightButton, __instance.BackButton.transform.parent).gameObject;
             leftButton.transform.localPosition = new Vector3(-6.4f, 3.85f, -2f);
             leftButton.name = "LeftButtonArrow";
             // flip button
@@ -338,7 +338,7 @@ public static class LobbyViewSettingsPanePatch
             void OnLeftPassiveClick()
             {
                 LastGameModeSelected--;
-                var enumGameModes = Enum.GetValues<CustomGameMode>().Without(CustomGameMode.All).Without(CustomGameMode.HidenSeekTONE).ToArray();
+                var enumGameModes = Enum.GetValues<CustomGameMode>()[..^2];
                 if ((int)LastGameModeSelected < 0x01)
                 {
                     LastGameModeSelected = (CustomGameMode)enumGameModes.Length;
@@ -370,7 +370,7 @@ public static class LobbyViewSettingsPanePatch
                 {
                     case TabGroup.SystemSettings:
                     case TabGroup.ModSettings:
-                        var cloneSettingTabButton = UnityEngine.Object.Instantiate(__instance.taskTabButton, __instance.taskTabButton.transform.parent);
+                        var cloneSettingTabButton = Object.Instantiate(__instance.taskTabButton, __instance.taskTabButton.transform.parent);
                         cloneSettingTabButton.buttonText.DestroyTranslator();
                         cloneSettingTabButton.name = tabGroup.ToString();
                         cloneSettingTabButton.buttonText.text = GetString($"TabGroup.{tabGroup}");
@@ -401,7 +401,7 @@ public static class LobbyViewSettingsPanePatch
                     case TabGroup.NeutralRoles:
                     case TabGroup.CovenRoles:
                     case TabGroup.Addons:
-                        var cloneRoleTabButton = UnityEngine.Object.Instantiate(__instance.rolesTabButton, __instance.rolesTabButton.transform.parent);
+                        var cloneRoleTabButton = Object.Instantiate(__instance.rolesTabButton, __instance.rolesTabButton.transform.parent);
                         cloneRoleTabButton.buttonText.DestroyTranslator();
                         cloneRoleTabButton.name = tabGroup.ToString();
                         cloneRoleTabButton.buttonText.text = GetString($"TabGroup.{tabGroup}");
@@ -517,7 +517,7 @@ public static class LobbyViewSettingsPanePatch
         viewSettings.currentTab = tabName;
         for (int i = 0; i < viewSettings.settingsInfo.Count; i++)
         {
-            UnityEngine.Object.Destroy(viewSettings.settingsInfo[i].gameObject);
+            Object.Destroy(viewSettings.settingsInfo[i].gameObject);
         }
         viewSettings.settingsInfo.Clear();
         SetTabPatch_Postfix(viewSettings);
@@ -534,6 +534,7 @@ public static class LobbyViewSettingsPanePatch
             switch (currentGameMode)
             {
                 case CustomGameMode.Standard:
+                case CustomGameMode.RoundUp:
                     buttonTab.gameObject.SetActive(true);
                     break;
                 default:
@@ -629,7 +630,7 @@ public static class LobbyViewSettingsPanePatch
                         yPos -= 0.92f;
                     }
                     firstTitle = false;
-                    CategoryHeaderMasked categoryHeaderMasked = UnityEngine.Object.Instantiate(viewSettings.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, viewSettings.settingsContainer);
+                    CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(viewSettings.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, viewSettings.settingsContainer);
                     categoryHeaderMasked.SetHeader(StringNames.Name, 61);
                     categoryHeaderMasked.Background.color = categoryHeaderMasked.Divider.color = option.NameColor;
                     categoryHeaderMasked.Title.text = option.GetName(disableColor: true).Trim('★', ' ').RemoveHtmlTags();
@@ -668,7 +669,7 @@ public static class LobbyViewSettingsPanePatch
                 {
                     if (header != null) option.Header = header;
 
-                    ViewSettingsInfoPanel viewSettingsInfoPanel = UnityEngine.Object.Instantiate(viewSettings.infoPanelOrigin, Vector3.zero, Quaternion.identity, viewSettings.settingsContainer);
+                    ViewSettingsInfoPanel viewSettingsInfoPanel = Object.Instantiate(viewSettings.infoPanelOrigin, Vector3.zero, Quaternion.identity, viewSettings.settingsContainer);
                     viewSettingsInfoPanel.name = option.Name;
                     viewSettingsInfoPanel.transform.localScale = Vector3.one;
 
@@ -704,10 +705,10 @@ public static class LobbyViewSettingsPanePatch
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Float:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetFloat()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Int:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetInt()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         default:
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
@@ -753,7 +754,7 @@ public static class LobbyViewSettingsPanePatch
         Color roleColorHeaderRole = tabName.GetTabColor();
         TextOptionItem header = null;
 
-        CategoryHeaderMasked categoryHeaderMasked = UnityEngine.Object.Instantiate(viewSettings.categoryHeaderOrigin, viewSettings.settingsContainer);
+        CategoryHeaderMasked categoryHeaderMasked = Object.Instantiate(viewSettings.categoryHeaderOrigin, viewSettings.settingsContainer);
         categoryHeaderMasked.SetHeader(StringNames.RoleQuotaLabel, 61);
         categoryHeaderMasked.Title.text = GetString($"TabGroup.{tabName}").Trim('★', ' ').RemoveHtmlTags();
         categoryHeaderMasked.Title.fontWeight = FontWeight.Light;
@@ -785,7 +786,7 @@ public static class LobbyViewSettingsPanePatch
                 if (option.Tab != tabName) continue;
                 if (option.GameMode is not CustomGameMode.All && option.GameMode != LastGameModeSelected)
                 {
-                    if (!(option.GameMode == CustomGameMode.Standard))
+                    if (!(LastGameModeSelected == CustomGameMode.RoundUp && option.GameMode == CustomGameMode.Standard))
                         continue;
                 }
 
@@ -798,7 +799,7 @@ public static class LobbyViewSettingsPanePatch
                 // Title
                 if (data == null && option is TextOptionItem toi)
                 {
-                    CategoryHeaderRoleVariant categoryHeaderRoleVariant = UnityEngine.Object.Instantiate(viewSettings.categoryHeaderRoleOrigin, viewSettings.settingsContainer);
+                    CategoryHeaderRoleVariant categoryHeaderRoleVariant = Object.Instantiate(viewSettings.categoryHeaderRoleOrigin, viewSettings.settingsContainer);
                     categoryHeaderRoleVariant.SetHeader((tabName is TabGroup.ImpostorRoles) ? StringNames.ImpostorRolesHeader : StringNames.CrewmateRolesHeader, 61);
                     categoryHeaderRoleVariant.name = realName;
 
@@ -856,11 +857,11 @@ public static class LobbyViewSettingsPanePatch
                         {
                             if (OnlyEnabledRoles && roleDisabled) continue;
 
-                            ViewSettingsInfoPanelRoleVariant viewSettingsInfoPanelRoleVariant = UnityEngine.Object.Instantiate(viewSettings.infoPanelRoleOrigin, viewSettings.settingsContainer);
+                            ViewSettingsInfoPanelRoleVariant viewSettingsInfoPanelRoleVariant = Object.Instantiate(viewSettings.infoPanelRoleOrigin, viewSettings.settingsContainer);
                             viewSettingsInfoPanelRoleVariant.name = realName;
 
                             // Max count title
-                            var settingTitle = UnityEngine.Object.Instantiate(viewSettingsInfoPanelRoleVariant.chanceTitle, viewSettingsInfoPanelRoleVariant.transform);
+                            var settingTitle = Object.Instantiate(viewSettingsInfoPanelRoleVariant.chanceTitle, viewSettingsInfoPanelRoleVariant.transform);
                             settingTitle.name = "MaxCountTitle";
                             settingTitle.DestroyTranslator();
                             settingTitle.text = GetString("Maximum");
@@ -878,11 +879,14 @@ public static class LobbyViewSettingsPanePatch
 
                             if (role.OnlySpawnsWithPetsRole()) titleName += GetString("RequiresPet");
                             if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) titleName += GetString("SupportsPet");
+                            if (role.GetStaticRoleClass().IsBalance) titleName += GetString("SupportsBalance");
+                            if (role.NotAssignInVanillaServer() || (LastGameModeSelected == CustomGameMode.RoundUp && role.NotSpawnInRoundUp())) titleName += GetString("NotSupports");
 
                             var chanceAddOnPerGame = Options.CustomAdtRoleSpawnRate.TryGetValue(role, out var valueAddOnOpt) ? valueAddOnOpt.GetInt() : 0;
                             int numPerGame = Options.CustomRoleCounts.TryGetValue(role, out var valueInt) ? valueInt.GetInt() : 0;
+                            var roleIcon = GetRoleIcon(role);
 
-                            viewSettingsInfoPanelRoleVariant.SetInfo(titleName, numPerGame, chancePerGame, 61, option.NameColor, RoleManager.Instance.AllRoles[0].RoleIconSolid /*<- Role Icons sets here*/, tabName is not TabGroup.ImpostorRoles, roleDisabled);
+                            viewSettingsInfoPanelRoleVariant.SetInfo(titleName, numPerGame, chancePerGame, 61, option.NameColor, roleIcon /*<- Role Icons sets here*/, tabName is not TabGroup.ImpostorRoles, roleDisabled);
 
                             if (roleDisabled)
                             {
@@ -925,7 +929,7 @@ public static class LobbyViewSettingsPanePatch
                     if (option.Parent?.Parent != null && allCustomRoles.Any(x => x.ToString() == option.Parent?.Parent?.Name)) continue;
                     if (option.Parent?.Parent?.Parent != null && allCustomRoles.Any(x => x.ToString() == option.Parent?.Parent?.Parent.Name)) continue;
 
-                    ViewSettingsInfoPanel viewSettingsInfoPanel = UnityEngine.Object.Instantiate(viewSettings.infoPanelOrigin, Vector3.zero, Quaternion.identity, viewSettings.settingsContainer);
+                    ViewSettingsInfoPanel viewSettingsInfoPanel = Object.Instantiate(viewSettings.infoPanelOrigin, Vector3.zero, Quaternion.identity, viewSettings.settingsContainer);
                     viewSettingsInfoPanel.name = option.Name;
                     viewSettingsInfoPanel.transform.localScale = Vector3.one;
 
@@ -958,10 +962,10 @@ public static class LobbyViewSettingsPanePatch
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Float:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetFloat()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         case OptionTypes.Int:
-                            viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetInt()), 61);
+                            viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                             break;
                         default:
                             viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
@@ -990,7 +994,7 @@ public static class LobbyViewSettingsPanePatch
             IEnumerator CoShowRoleSettings()
             {
                 yPos -= 0.8f;
-                CategoryHeaderMasked categoryHeaderMasked2 = UnityEngine.Object.Instantiate(viewSettings.categoryHeaderOrigin, viewSettings.settingsContainer);
+                CategoryHeaderMasked categoryHeaderMasked2 = Object.Instantiate(viewSettings.categoryHeaderOrigin, viewSettings.settingsContainer);
                 categoryHeaderMasked2.SetHeader(StringNames.RoleSettingsLabel, 61);
                 categoryHeaderMasked2.transform.localScale = Vector3.one;
                 categoryHeaderMasked2.transform.localPosition = new Vector3(-9.77f, yPos, -2f);
@@ -1035,13 +1039,14 @@ public static class LobbyViewSettingsPanePatch
     private static float SetUpCustomRoleSettings(this LobbyViewSettingsPane viewSettings, CustomRoles role, OptionItem optionRole, TabGroup tabName, float spacingY, int maskLayer, float xPosRoleHeader, float startY)
     {
         float yPos = startY;
+        var roleIcon = GetRoleIcon(role);
         BaseGameSetting data;
 
-        AdvancedRoleViewPanel advancedRoleViewPanel = UnityEngine.Object.Instantiate(viewSettings.advancedRolePanelOrigin, viewSettings.settingsContainer);
+        AdvancedRoleViewPanel advancedRoleViewPanel = Object.Instantiate(viewSettings.advancedRolePanelOrigin, viewSettings.settingsContainer);
         advancedRoleViewPanel.name = role + "AdvancedPanel";
         advancedRoleViewPanel.transform.localScale = Vector3.one;
         advancedRoleViewPanel.transform.localPosition = new Vector3(xPosRoleHeader, yPos, -2f);
-        advancedRoleViewPanel.header.SetHeader((StringNames)(6000 + role), maskLayer, tabName is not TabGroup.ImpostorRoles /*<- Role Icons sets here*/);
+        advancedRoleViewPanel.header.SetHeader((StringNames)(6000 + role), maskLayer, tabName is not TabGroup.ImpostorRoles, roleIcon /*<- Role Icons sets here*/);
         advancedRoleViewPanel.divider.material.SetInt(PlayerMaterial.MaskLayer, maskLayer);
         advancedRoleViewPanel.header.Title.text = GetString(role.ToString());
         advancedRoleViewPanel.header.Title.color = Color.white;
@@ -1094,7 +1099,7 @@ public static class LobbyViewSettingsPanePatch
 
         void DrawSetting(OptionItem option, BaseGameSetting data)
         {
-            ViewSettingsInfoPanel viewSettingsInfoPanel = UnityEngine.Object.Instantiate(advancedRoleViewPanel.infoPanelOrigin, advancedRoleViewPanel.transform.parent, true);
+            ViewSettingsInfoPanel viewSettingsInfoPanel = Object.Instantiate(advancedRoleViewPanel.infoPanelOrigin, advancedRoleViewPanel.transform.parent, true);
             viewSettingsInfoPanel.name = option.Name;
             viewSettingsInfoPanel.transform.localScale = Vector3.one;
             viewSettingsInfoPanel.transform.localPosition = new Vector3(xPosRoleHeader - 3f, yPos, -2f);
@@ -1117,10 +1122,10 @@ public static class LobbyViewSettingsPanePatch
                     viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                     break;
                 case OptionTypes.Float:
-                    viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetFloat()), 61);
+                    viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                     break;
                 case OptionTypes.Int:
-                    viewSettingsInfoPanel.SetInfo(data.Title, data.GetValueString(option.GetInt()), 61);
+                    viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
                     break;
                 default:
                     viewSettingsInfoPanel.SetInfo(data.Title, option.GetString(), 61);
@@ -1145,5 +1150,9 @@ public static class LobbyViewSettingsPanePatch
             if (o.IsHiddenOn(Options.CurrentGameMode, true, checkCollapsedSection) || !o.GetBool()) return false;
             o = o.Parent;
         }
+    }
+    private static Sprite GetRoleIcon(CustomRoles role)
+    {
+        return RoleManager.Instance.GetRole(role.GetRoleTypes()).RoleIconSolid;
     }
 }
