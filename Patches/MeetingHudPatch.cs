@@ -954,6 +954,83 @@ class CastVotePatch
         }
     }
 }
+[HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.SetJudgeOverrule))]
+class SetJudgeOverrulePatch
+{
+    public static bool Prefix(MeetingHud __instance, PlayerId judgePlayerId, PlayerId targetPlayerId, ushort overruleNonce)
+    {
+        if (!AmongUsClient.Instance.AmHost) return true;
+        var srcPlayerId = judgePlayerId;
+        var suspectPlayerId = targetPlayerId;
+        var voter = GetPlayerById(srcPlayerId);
+        if (!voter || !voter.IsAlive()) return false;
+
+        var target = GetPlayerById(suspectPlayerId);
+        if (!target && suspectPlayerId < 253)
+        {
+            SendMessage(GetString("VoteDead"), srcPlayerId);
+            __instance.RpcClearVoteDelay(srcPlayerId);
+            return false;
+        } //Vote a disconnect player
+
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && voter.PlayerId == RoundUp.Deputy && suspectPlayerId < 254)
+        {
+            __instance.RpcClearVoteDelay(srcPlayerId);
+            return false;
+        }
+        if (Balancer.Choose && !(suspectPlayerId == Balancer.Target1 || suspectPlayerId == Balancer.Target2) && suspectPlayerId < 254)
+        {
+            __instance.RpcClearVoteDelay(srcPlayerId);
+            return false;
+        }
+
+        if (target && suspectPlayerId < 253)
+        {
+            if (!target.IsAlive() || target.Data.Disconnected)
+            {
+                SendMessage(GetString("VoteDead"), srcPlayerId);
+                __instance.RpcClearVoteDelay(srcPlayerId);
+                Swapper.CheckSwapperTarget(suspectPlayerId);
+                Balancer.CheckBalancerTarget(suspectPlayerId);
+                return false;
+            }
+
+            if (!(Options.UseMeetingShapeshift.GetBool() && voter.UsesMeetingShapeshift()))
+            {
+                if (voter.GetRoleClass().CheckVote(voter, target) == false)
+                {
+                    Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "SetJudgeOverrulePatch.RoleBase.CheckVote");
+                    __instance.RpcClearVoteDelay(srcPlayerId);
+                    return false;
+                }
+            }
+
+            switch (voter.GetCustomRole())
+            {
+                case CustomRoles.JudgeTONE:
+                    if (target.Is(CustomRoles.Solsticer))
+                    {
+                        SendMessage(GetString("ExpelSolsticer"), srcPlayerId);
+                        __instance.RpcClearVoteDelay(srcPlayerId);
+                        return false;
+                    }
+                    break;
+            }
+        }
+
+        return true;
+    }
+
+    public static void Postfix(MeetingHud __instance)
+    {
+        // Prevent double check end voting
+        if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
+        {
+            __instance.CheckForEndVoting();
+            //For stuffs in check for end voting to work
+        }
+    }
+}
 static class ExtendedMeetingHud
 {
     public static Dictionary<byte, int> CustomCalculateVotes(this MeetingHud __instance, bool CountInfluenced = false)

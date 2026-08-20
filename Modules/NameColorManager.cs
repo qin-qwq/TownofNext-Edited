@@ -84,7 +84,7 @@ public static class NameColorManager
         // Necroview
         if (seer.Is(CustomRoles.Necroview) && seer.IsAlive())
         {
-            if (target.Data.IsDead && !target.IsAlive())
+            if (target.Data.IsDead && !target.IsAlive() && isMeeting)
             {
                 color = Necroview.NameColorOptions(target);
             }
