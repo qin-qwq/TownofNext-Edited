@@ -3903,7 +3903,7 @@
   "OnPlayerJoinMsgTitle": "【 ★ Olá, {0}! ★ 】",
   "Pyrophoric": "Incendiário espontâneo",
   "PyrophoricInfo": "Queima a si mesmo para aumentar o campo de visão.",
-  "PyrophoricInfoLong": "(Tripulação): O Incendiário espontâneo pode se incendiar pelos dutos para aumentar a visão, mas morre após a reunião. Dependendo do anfitrião, ao se Incendiário espontâneo pode queimar o assassino se for morto normalmente, e ao ser expulso pode se vingar de um jogador aleatório.",
+  "PyrophoricInfoLong": "(船员阵营):\n自燃者可以通过进入通风管道来点燃自己，并提高视野，不过设定轮会议后就会因燃尽而亡\n根据房主设置，自燃者自燃时被非特殊击杀可以烧死凶手，被驱逐可以复仇一名随机玩家",
   "PyrophoricSkillCooldown": "Tempo de recarga da autocombustão",
   "PyrophoricVision": "Visão da autocombustão",
   "PyrophoricKilledMeetings": "Número de reuniões até morrer por exaustão",
