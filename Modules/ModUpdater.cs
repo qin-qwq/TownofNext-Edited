@@ -54,11 +54,11 @@ public class ModUpdater
         CheckCustomRegions();
         NewVersionCheck();
         DeleteOldFiles();
-        InfoPopup = UnityEngine.Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
+        InfoPopup = Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
         InfoPopup.name = "InfoPopup";
         InfoPopup.TextAreaTMP.GetComponent<RectTransform>().sizeDelta = new(2.5f, 2f);
 
-        InfoPopupV2 = UnityEngine.Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
+        InfoPopupV2 = Object.Instantiate(Twitch.TwitchManager.Instance.TwitchPopup);
         InfoPopupV2.name = "InfoPopupV2";
 
         if (!isChecked)
@@ -73,22 +73,19 @@ public class ModUpdater
         }
     }
 
-#if ANDROID
-    static string RegionConfigPath = Path.Combine(UnityEngine.Application.persistentDataPath, "BepInEx", "config", "at.duikbo.regioninstall.cfg");
-    static string MiniRegionInstallPath = Path.Combine(UnityEngine.Application.persistentDataPath, "BepInEx", "plugins", "Mini.RegionInstall.dll");
-#else
     const string RegionConfigPath = "./BepInEx/config/at.duikbo.regioninstall.cfg";
     const string MiniRegionInstallPath = "./BepInEx/plugins/Mini.RegionInstall.dll";
-#endif
 
     const string RegionConfigResource = "TONE.Resources.at.duikbo.regioninstall.cfg";
     const string MiniRegionInstallResource = "TONE.Resources.Mini.RegionInstall.dll";
+
     private static void CheckCustomRegions()
     {
-#if ANDROID
-        Logger.Info($"Skip check on Android platform", "CheckCustomRegions");
-        return;
-#endif
+        if (OperatingSystem.IsAndroid())
+        {
+            Logger.Info($"Skip check on Android platform", "CheckCustomRegions");
+            return;
+        }
         var regions = ServerManager.Instance.AvailableRegions;
         var hasCustomRegions = false;
         var forceUpdate = false;
@@ -104,7 +101,8 @@ public class ModUpdater
 
         foreach (var region in regions)
         {
-            if (region.Name.Contains("Niko233(NA_US)", StringComparison.OrdinalIgnoreCase) || region.Name.Contains("NikoCat233", StringComparison.OrdinalIgnoreCase))
+            if (region.Name.Contains("Niko233(NA_US)", StringComparison.OrdinalIgnoreCase) || region.Name.Contains("NikoCat233", StringComparison.OrdinalIgnoreCase) ||
+                region.Name.Contains("帆船服[广东广州]"))
             {
                 forceUpdate = true;
                 break;
@@ -235,9 +233,9 @@ public class ModUpdater
             string[] versionString = Main.PluginDisplayVersion?.ToString().Split(".");
             string[] tag = data["tag_name"]?.ToString()[1..].Split(".");
 
-            var pluginNum = int.Parse(versionString[0]) * 1000000 + int.Parse(versionString[1]) * 10000 + int.Parse($"{versionString[2][0]}") * 100
-                + (versionString[2].Length > 2 && versionString[2][2] == 'B' ? int.Parse($"{versionString[2][7]}") * 10 : versionString[2].Length > 2 && versionString[2][2] == 'A' ? int.Parse($"{versionString[2][8]}") : 99);
-            var versionNum = int.Parse(tag[0]) * 1000000 + int.Parse(tag[1]) * 10000 + int.Parse($"{tag[2][0]}") * 100 + (tag[2].Length > 2 && tag[2][1] == 'b' ? int.Parse(tag[2][2..]) * 10 : 99);
+            var pluginNum = int.Parse(versionString[0]) * 10000000 + int.Parse(versionString[1]) * 100000 + ParseVersion(versionString[2]);
+            pluginNum += Main.ExtraPluginVersion;
+            var versionNum = int.Parse(tag[0]) * 10000000 + int.Parse(tag[1]) * 100000 + ParseTag(tag[2]);
 
             Logger.Info($"Found local version: {pluginNum}; github version: {versionNum}", "CheckRelease");
 
@@ -280,17 +278,66 @@ public class ModUpdater
         isFail = false;
         yield break;
     }
+    public static int ParseVersion(string versionPart)
+    {
+        if (string.IsNullOrWhiteSpace(versionPart))
+            return 999; 
+
+        var tokens = versionPart.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (tokens.Length == 0)
+            return 999;
+
+        int patch = int.Parse(tokens[0]);
+        int preReleaseValue = 999;
+
+        if (tokens.Length >= 3)
+        {
+            string type = tokens[1];
+            if (type.Equals("Beta", StringComparison.OrdinalIgnoreCase))
+            {
+                int betaNum = int.Parse(tokens[2]);
+                preReleaseValue = betaNum * 100;
+
+                if (tokens.Length >= 5 && tokens[3].Equals("Hotfix", StringComparison.OrdinalIgnoreCase))
+                {
+                    int hotfixNum = int.Parse(tokens[4]);
+                    preReleaseValue += hotfixNum;
+                }
+            }
+            else if (type.Equals("Alpha", StringComparison.OrdinalIgnoreCase))
+            {
+                int alphaNum = int.Parse(tokens[2]);
+                preReleaseValue = alphaNum * 10;
+
+                if (tokens.Length >= 5 && tokens[3].Equals("Hotfix", StringComparison.OrdinalIgnoreCase))
+                {
+                    int hotfixNum = int.Parse(tokens[4]);
+                    preReleaseValue += hotfixNum;
+                }
+            }
+            // RC?
+        }
+
+        return patch * 1000 + preReleaseValue;
+    }
+    public static int ParseTag(string tagPart)
+    {
+        return ParseVersion(tagPart.Replace("a", " Alpha ").Replace("b", " Beta ").Replace("h", " Hotfix "));
+    }
     public static void StartUpdate(string url)
     {
-#if ANDROID
-        ShowPopup(GetString("AndroidUpdateNotSupported"), StringNames.Close, true, InfoPopup.Close);
-        Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
-        return;
-#else
-        ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
-        Task.Run(() => DownloadDLLAsync(url));
-        return;
-#endif
+        if (OperatingSystem.IsAndroid())
+        {
+            ShowPopup(GetString("AndroidUpdateNotSupported"), StringNames.Close, true, InfoPopup.Close);
+            Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
+            return;
+        }
+        else
+        {
+            ShowPopup(GetString("updatePleaseWait"), StringNames.Cancel, false);
+            Task.Run(() => DownloadDLLAsync(url));
+            return;
+        }
     }
     public static bool NewVersionCheck()
     {
@@ -471,8 +518,8 @@ public class ModUpdater
 
             InfoPopupV2.Show(message);
             templateExitGame.gameObject.SetActive(false);
-            var firstButton = UnityEngine.Object.Instantiate(templateExitGame, InfoPopupV2.transform);
-            var secondButton = UnityEngine.Object.Instantiate(templateExitGame, InfoPopupV2.transform);
+            var firstButton = Object.Instantiate(templateExitGame, InfoPopupV2.transform);
+            var secondButton = Object.Instantiate(templateExitGame, InfoPopupV2.transform);
             if (firstButton != null)
             {
                 firstButton.gameObject.SetActive(true);

@@ -1,4 +1,5 @@
 using Hazel;
+using InnerNet;
 using TONE.Modules.Rpc;
 using TONE.Roles.Neutral;
 using static TONE.Options;
@@ -10,14 +11,17 @@ public class Lovers : IAddon
     public CustomRoles Role => CustomRoles.Lovers;
     private const int Id = 23600;
     public AddonTypes Type => AddonTypes.Misc;
-    public static readonly List<(byte, byte)> loverPairs = [];
-    private static readonly Dictionary<(byte, byte), bool> hasHeartbreak = [];
-    public static byte loverless = byte.MaxValue;
-    public static bool IsEnable => loverPairs.Any();
 
     public static OptionItem LoverKnowRoles;
     public static OptionItem LoverSuicide;
     public static OptionItem PrivateChat;
+    public static OptionItem ImpCanBeInLove;
+    public static OptionItem CrewCanBeInLove;
+    public static OptionItem NeutralCanBeInLove;
+    public static OptionItem CovenCanBeInLove;
+
+    public static PlayerControl loverless = null;
+    public static readonly Dictionary<PlayerControl, PlayerControl> LoversPlayers = [];
 
     public void SetupCustomOption()
     {
@@ -27,6 +31,7 @@ public class Lovers : IAddon
 
         var countOption = IntegerOptionItem.Create(Id + 1, "NumberOfLovers", new(2, 2, 2), 2, TabGroup.Addons, false)
             .SetParent(spawnOption)
+            .SetHidden(true)
             .SetValueFormat(OptionFormat.Players)
             .SetGameMode(CustomGameMode.Standard);
 
@@ -44,31 +49,24 @@ public class Lovers : IAddon
             .SetGameMode(CustomGameMode.Standard);
 
         PrivateChat = BooleanOptionItem.Create(Id + 5, "PrivateChat", false, TabGroup.Addons, false)
-        .SetParent(spawnOption)
-        .SetGameMode(CustomGameMode.Standard);
-
-        var impOption = BooleanOptionItem.Create(Id + 7, "ImpCanBeInLove", true, TabGroup.Addons, false)
             .SetParent(spawnOption)
-            .SetGameMode(CustomGameMode.Standard)
-            .AddReplacement(("{role}", CustomRoles.Lovers.ToColoredString()));
+            .SetGameMode(CustomGameMode.Standard);
 
-        var neutralOption = BooleanOptionItem.Create(Id + 8, "NeutralCanBeInLove", true, TabGroup.Addons, false)
+        ImpCanBeInLove = BooleanOptionItem.Create(Id + 6, "ImpCanBeInLove", true, TabGroup.Addons, false)
             .SetParent(spawnOption)
-            .SetGameMode(CustomGameMode.Standard)
-            .AddReplacement(("{role}", CustomRoles.Lovers.ToColoredString()));
+            .SetGameMode(CustomGameMode.Standard);
 
-        var crewOption = BooleanOptionItem.Create(Id + 9, "CrewCanBeInLove", true, TabGroup.Addons, false)
+        CrewCanBeInLove = BooleanOptionItem.Create(Id + 7, "CrewCanBeInLove", true, TabGroup.Addons, false)
             .SetParent(spawnOption)
-            .SetGameMode(CustomGameMode.Standard)
-            .AddReplacement(("{role}", CustomRoles.Lovers.ToColoredString()));
+            .SetGameMode(CustomGameMode.Standard);
 
-        var covenOption = BooleanOptionItem.Create(Id + 10, "CovenCanBeInLove", true, TabGroup.Addons, false)
+        NeutralCanBeInLove = BooleanOptionItem.Create(Id + 8, "NeutralCanBeInLove", true, TabGroup.Addons, false)
             .SetParent(spawnOption)
-            .SetGameMode(CustomGameMode.Standard)
-            .AddReplacement(("{role}", CustomRoles.Lovers.ToColoredString()));
+            .SetGameMode(CustomGameMode.Standard);
 
-        AddonCanBeSettings.Add(CustomRoles.Lovers, (impOption, neutralOption, crewOption, covenOption));
-
+        CovenCanBeInLove = BooleanOptionItem.Create(Id + 9, "CovenCanBeInLove", true, TabGroup.Addons, false)
+            .SetParent(spawnOption)
+            .SetGameMode(CustomGameMode.Standard);
 
         CustomAdtRoleSpawnRate.Add(CustomRoles.Lovers, spawnRateOption);
         CustomRoleSpawnChances.Add(CustomRoles.Lovers, spawnOption);
@@ -76,151 +74,85 @@ public class Lovers : IAddon
     }
     public void Init()
     {
-        loverPairs.Clear();
-        loverless = byte.MaxValue;
+        loverless = null;
+        LoversPlayers.Clear();
     }
     public void Add(byte playerId, bool gameIsLoading = true)
     {
-        if (loverless == byte.MaxValue)
+        var player = Utils.GetPlayerById(playerId);
+        if (!loverless)
         {
-            loverless = playerId;
-            SendRPC();
-            return;
+            loverless = player;
         }
-
-        loverPairs.Add((loverless, playerId));
-        hasHeartbreak.Add((loverless, playerId), false);
-
-        loverless = byte.MaxValue;
-
-        SendRPC();
+        else
+        {
+            LoversPlayers[loverless] = player;
+            LoversPlayers[player] = loverless;
+            SendRPC(loverless, player);
+            loverless = null;
+        }
     }
     public void Remove(byte playerId)
     {
-        if (loverless == playerId)
+        var player = Utils.GetPlayerById(playerId);
+        if (LoversPlayers.TryGetValue(player, out var partner))
         {
-            loverless = byte.MaxValue;
-            return;
+            LoversPlayers.Remove(player);
+            LoversPlayers.Remove(partner);
+
+            Main.PlayerStates[partner.PlayerId].RemoveSubRole(CustomRoles.Lovers);
         }
-
-        var loverId = GetLoverId(playerId);
-        var pair = GetPair(playerId, loverId);
-
-        var hadHeartbreak = hasHeartbreak[pair];
-
-        loverPairs.Remove(pair);
-        hasHeartbreak.Remove(pair);
-
-        if (loverless == byte.MaxValue)
-        {
-            loverless = loverId;
-            SendRPC();
-            return;
-        }
-
-        // Two broken people will find each other, because lovers crave companionship
-        loverPairs.Add((loverless, playerId));
-        hasHeartbreak.Add((loverless, playerId), hadHeartbreak);
-
-        loverless = byte.MaxValue;
-
-        SendRPC();
     }
-    public static byte GetLoverId(PlayerControl player) => GetLoverId(player.PlayerId);
-    public static byte GetLoverId(byte playerId)
+
+    public static byte GetLoverId(PlayerControl player)
     {
-        //if (loverless == playerId) return byte.MaxValue;
+        if (!LoversPlayers.ContainsKey(player))
+            return byte.MaxValue;
 
-        foreach (var pair in loverPairs)
-        {
-            if (loverless == pair.Item1 || loverless == pair.Item2) Logger.Warn("Lover is also loverless?", "Lovers");
-            if (pair.Item1 == playerId) return pair.Item2;
-            if (pair.Item2 == playerId) return pair.Item1;
-        }
-
-        return byte.MaxValue;
+        return LoversPlayers[player].PlayerId;
     }
-    public static (byte PlayerId1, byte PlayerId2) GetPair(byte player, byte target) => loverPairs.FirstOrDefault(x => x.Item1 == player && x.Item2 == target || x.Item2 == player && x.Item1 == target);
-    public static bool AreLovers(PlayerControl player, PlayerControl target) => AreLovers(player.PlayerId, target.PlayerId);
-    public static bool AreLovers(byte player, byte target) => loverPairs.Any(x => (x.Item1 == player && x.Item2 == target) || (x.Item2 == player && x.Item1 == target));
-    public static bool LoverIsAlive(PlayerControl player) => LoverIsAlive(player.PlayerId);
-    public static bool LoverIsAlive(byte player)
+    public static bool AreLovers(PlayerControl player, PlayerControl target)
     {
-        var loverId = GetLoverId(player);
-        var pair = GetPair(player, loverId);
+        if (!LoversPlayers.ContainsKey(player) || !LoversPlayers.ContainsKey(target)) return false;
 
-        if (hasHeartbreak.TryGetValue(pair, out bool heartbreak)) return !heartbreak;
-
-        return false;
+        return true;
     }
 
-    public static void OnPlayerExiled(NetworkedPlayerInfo exiled)
-    {
-        if (!IsEnable) return;
-        if (!exiled) return;
-
-        List<byte> toKill = [];
-        foreach (var pair in loverPairs)
-        {
-            if (exiled.PlayerId == pair.Item1 && exiled.PlayerId != pair.Item2) toKill.Add(pair.Item2);
-            if (exiled.PlayerId == pair.Item2 && exiled.PlayerId != pair.Item1) toKill.Add(pair.Item1);
-        }
-
-        foreach (var playerId in toKill)
-        {
-            if (LoverIsAlive(playerId))
-                LoversSuicide(playerId, true);
-        }
-    }
-    public static void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
-    {
-        LoversSuicide();
-    }
     public static void LoversSuicide(byte deathId = 0x7f, bool isExiled = false)
     {
-        if (!LoverSuicide.GetBool() && CustomRoles.Lovers.IsEnable()) return;
-
-        foreach (var pair in loverPairs)
+        if (LoverSuicide.GetBool())
         {
-            PlayerControl p1 = pair.Item1.GetPlayer(), p2 = pair.Item2.GetPlayer();
+            var deadPlayer = Utils.GetPlayerById(deathId);
+            if (!deadPlayer) return;
 
-            if (p1.IsAlive() && pair.Item1 != deathId && p2.IsAlive() && pair.Item2 != deathId) continue;
+            if (!LoversPlayers.TryGetValue(deadPlayer, out var partnerPlayer)) return;
 
-            if (!p1.IsAlive() && !p2.IsAlive()) return;
+            if (!partnerPlayer || !partnerPlayer.IsAlive()) return;
 
-            if (Cupid.IsCupidLoverPair(p1, p2) && Cupid.LoversNotHeartbroken.GetBool()) continue;
-
-            if (hasHeartbreak[pair]) continue;
-
-            hasHeartbreak[pair] = true;
-
-            // Switch order so p1 is the dead one
-            var playerPair = (p1, p2);
-            if (p1.IsAlive() && pair.Item1 != deathId) playerPair = (p2, p1);
-            (p1, p2) = playerPair;
-
-            p2.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
-
-            if (isExiled)
+            if (partnerPlayer.Is(CustomRoles.Lovers))
             {
-                if (Main.PlayersDiedInMeeting.Contains(deathId))
+                partnerPlayer.SetDeathReason(PlayerState.DeathReason.FollowingSuicide);
+
+                if (isExiled)
                 {
-                    p2.RpcExileV3();
-                    if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                    //if (Main.PlayersDiedInMeeting.Contains(deathId))
+                    //{
+                    partnerPlayer.RpcExileV3();
+                    if (MeetingHud.Instance?.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                     {
                         MeetingHud.Instance?.CheckForEndVoting();
                     }
-                    MurderPlayerPatch.AfterPlayerDeathTasks(p2, p2, true);
                     _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
+                    //}
+                    //else
+                    //{
+                    //CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
+                    //}
                 }
                 else
                 {
-                    CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, p2.PlayerId);
+                    partnerPlayer.RpcMurderPlayer(partnerPlayer);
                 }
-            }
-            else
-            {
-                p2.RpcMurderPlayer(p2);
             }
         }
     }
@@ -241,62 +173,51 @@ public class Lovers : IAddon
         return "";
     }
 
-
-    public static void SendRPC()
+    public static void SendRPC(PlayerControl player, PlayerControl target)
     {
         if (!AmongUsClient.Instance.AmHost) return;
+        if (!player || !target) return;
 
-        Logger.Info($"loverless: {loverless.GetPlayerName()}", "Lovers.SendRPC");
-        foreach (var pair in loverPairs)
-        {
-            Logger.Info($"{pair.Item1.GetPlayerName()} loves {pair.Item2.GetPlayerName()}", "Lovers.SendRPC");
-        }
-        var msg = new RpcSetLoverPairs(PlayerControl.LocalPlayer.NetId, loverPairs.Count, loverPairs, loverless);
+        var msg = new RpcSetLoverPairs(PlayerControl.LocalPlayer.NetId, player, target);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }
+
     public static void ReceiveRPC(MessageReader reader)
     {
-        loverPairs.Clear();
-        int count = reader.ReadInt32();
-        Logger.Info($"Received {count} lover pairs.", "Lovers.ReceiveRPC");
+        LoversPlayers.Clear();
+        var player = reader.ReadNetObject<PlayerControl>();
+        var target = reader.ReadNetObject<PlayerControl>();
 
-        for (int i = 0; i < count; i++)
+        if (player && target)
         {
-            var pair = (reader.ReadByte(), reader.ReadByte());
-            loverPairs.Add(pair);
-            Logger.Info($"{pair.Item1.GetPlayer().GetRealName()} ♡ {pair.Item2.GetPlayer().GetRealName()}", "Lovers.ReceiveRPC");
+            LoversPlayers[player] = target;
+            LoversPlayers[target] = player;
         }
-
-        loverless = reader.ReadByte();
-
-        Logger.Info($"{loverless.GetPlayer().GetRealName()} has no lover, how sad.", "Lovers.ReceiveRPC");
     }
 
     public static void CheckWin()
     {
-        var alivePairs = loverPairs.Where(p => !((!p.Item1.GetPlayer().IsAlive() || !p.Item2.GetPlayer().IsAlive()) && LoverSuicide.GetBool()));
+        var eligiblePairs = LoversPlayers.Where(x => x.Key.PlayerId < x.Value.PlayerId && !Utils.IsSameTeammate(x.Key, x.Value, neu: false) && (!LoverSuicide.GetBool() || (x.Key.IsAlive() && x.Value.IsAlive()))).ToList();
 
-        if (!alivePairs.Any()) return;
-        if (loverPairs.All(p => Utils.IsSameTeammate(p.Item1.GetPlayer(), p.Item2.GetPlayer(), neu: false))) return;
+        if (!eligiblePairs.Any()) return;
         // if not (some lovers dead and lovers suicide)
         if (CustomWinnerHolder.WinnerTeam is CustomWinner.Crewmate or CustomWinner.Impostor or CustomWinner.Jackal or CustomWinner.Pelican or CustomWinner.Coven)
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Lovers);
-            foreach (var pair in loverPairs)
+            foreach (var pair in eligiblePairs)
             {
-                CustomWinnerHolder.WinnerIds.Add(pair.Item1);
-                CustomWinnerHolder.WinnerIds.Add(pair.Item2);
-
+                CustomWinnerHolder.WinnerIds.Add(pair.Key.PlayerId);
+                CustomWinnerHolder.WinnerIds.Add(pair.Value.PlayerId);
             }
         }
     }
     public static void CheckAdditionalWin()
     {
-        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers));
+        var loverWinners = CustomWinnerHolder.WinnerIds.Where(p => p.GetPlayer().Is(CustomRoles.Lovers) && p.GetPlayer().IsPlayerNeutralTeam());
 
         foreach (var lover in loverWinners)
         {
-            var loverId = GetLoverId(lover);
+            var loverId = GetLoverId(lover.GetPlayer());
             if (!CustomWinnerHolder.WinnerIds.Contains(loverId))
             {
                 CustomWinnerHolder.WinnerIds.Add(loverId);
@@ -305,20 +226,22 @@ public class Lovers : IAddon
         }
     }
 
-    public static void OnPartnerLeft(byte playerId)
+    public static void OnPartnerLeft(PlayerControl player)
     {
-        var loverId = GetLoverId(playerId);
+        if (LoversPlayers.TryGetValue(player, out var partner))
+        {
+            LoversPlayers.Remove(player);
+            LoversPlayers.Remove(partner);
 
-        var pair = loverPairs.First(x => x.Item1 == playerId || x.Item2 == loverId);
-        loverPairs.Remove(pair);
-
-        Main.PlayerStates[loverId].RemoveSubRole(CustomRoles.Lovers);
+            Main.PlayerStates[player.PlayerId].RemoveSubRole(CustomRoles.Lovers);
+            Main.PlayerStates[partner.PlayerId].RemoveSubRole(CustomRoles.Lovers);
+        }
     }
 
     public static bool LoversMsg(PlayerControl pc, string msg, bool check = true)
     {
-        if (!AmongUsClient.Instance.AmHost) return false;
-        if (!GameStates.IsMeeting || pc == null) return false;
+        //if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.Is(CustomRoles.Lovers)) return false;
         if (!PrivateChat.GetBool()) return false;
         if (!pc.IsAlive()) return false;
@@ -333,10 +256,24 @@ public class Lovers : IAddon
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId == player || x == pc)
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+        if (AmongUsClient.Instance.AmHost || !pc.IsModded())
+        {
+            SendLoversChannelMsg(pc, msg);
+        }
+        else
+        {
+            var message = new RpcSendChannelMsg(PlayerControl.LocalPlayer.NetId, msg, (int)SendTargetPatch.SendTargets.Lovers);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
 
         return true;
+    }
+
+    public static void SendLoversChannelMsg(PlayerControl pc, string msg)
+    {
+        var player = GetLoverId(pc);
+        Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId == player || x == pc)
+            .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Lovers), $"{Translator.GetString("MessageFromLovers")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 }
 

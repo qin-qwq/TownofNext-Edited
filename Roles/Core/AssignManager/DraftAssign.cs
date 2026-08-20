@@ -1,18 +1,18 @@
-using AmongUs.GameOptions;
 using System.Text;
-using TONE.Roles.Core.AssignManager;
+using TONE.Modules;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using static TONE.Translator;
 
-namespace TONE.Roles.Core.DraftAssign;
+namespace TONE.Roles.Core.AssignManager;
 
 public static class DraftAssign
 {
     public static List<CustomRoles> AllRoles = [];
     public static Dictionary<byte, List<CustomRoles>> DraftPools = [];
     public static Dictionary<byte, CustomRoles> DraftRoles = [];
+    public static readonly List<string> KillingFractions = [];
 
     public static void GetNeutralCounts(int NKmaxOpt, int NKminOpt, int NNKmaxOpt, int NNKminOpt, int NAmaxOpt, int NAminOpt, ref int ResultNKnum, ref int ResultNNKnum, ref int ResultNAnum)
     {
@@ -81,6 +81,8 @@ public static class DraftAssign
             DraftPools[pc.PlayerId] = [];
             DraftRoles[pc.PlayerId] = CustomRoles.NotAssigned;
         }
+        KillingFractions.Clear();
+        FactionOption.ChangeSettings();
     }
 
     public static void StartSelect()
@@ -100,7 +102,42 @@ public static class DraftAssign
         GetCovenCounts(Options.CovenRolesMaxPlayer.GetInt(), Options.CovenRolesMinPlayer.GetInt(), ref optCovenNum);
         GetImpCounts(Options.ImpRolesMaxPlayer.GetInt(), Options.ImpRolesMinPlayer.GetInt(), ref optImpNum);
 
-        List<CustomRoles> allRoles = EnumHelper.GetAllValues<CustomRoles>().Where(x => !NoAssignRoles(x) && (!Options.DraftAffectedByRoleSpawnChances.GetBool() || IRandom.Instance.Next(100) < x.GetMode())).Shuffle(rd).ToList();
+        if (optNeutralKillingNum > 0)
+        {
+            KillingFractions.Add("NK");
+        }
+        if (optNeutralApocalypseNum > 0)
+        {
+            KillingFractions.Add("NA");
+        }
+        if (optCovenNum > 0)
+        {
+            KillingFractions.Add("Coven");
+        }
+
+        if (Options.SpawnOneRandomKillingFraction.GetBool() && KillingFractions.Any())
+        {
+            var randomType = KillingFractions.RandomElement();
+            KillingFractions.Clear();
+            KillingFractions.Add(randomType);
+            switch (randomType)
+            {
+                case "NK":
+                    optNeutralApocalypseNum = 0;
+                    optCovenNum = 0;
+                    break;
+                case "NA":
+                    optNeutralKillingNum = 0;
+                    optCovenNum = 0;
+                    break;
+                case "Coven":
+                    optNeutralKillingNum = 0;
+                    optNeutralApocalypseNum = 0;
+                    break;
+            }
+        }
+
+        var allRoles = EnumHelper.GetAllValues<CustomRoles>().Where(x => !NoAssignRoles(x) && (!Options.DraftAffectedByRoleSpawnChances.GetBool() || IRandom.Instance.Next(100) < x.GetMode())).Shuffle(rd).ToList();
 
         if (allRoles.Count < playerCount * draftCount)
         {
@@ -145,14 +182,14 @@ public static class DraftAssign
         else if (AllRoles.Count + 1 < (playerCount - RoleAssign.SetRoles.Values.Count) * draftCount)
         {
             Logger.SendInGame(GetString("DraftNotEnoughRoles"));
-            return; 
+            return;
         }
 
         if (Sunnyboy.CheckSpawn() && AllRoles.Remove(CustomRoles.Jester)) AllRoles.Add(CustomRoles.Sunnyboy);
         if (Bard.CheckSpawn() && AllRoles.Remove(CustomRoles.Arrogance)) AllRoles.Add(CustomRoles.Bard);
         if (Requiter.CheckSpawn() && AllRoles.Remove(CustomRoles.Knight)) AllRoles.Add(CustomRoles.Requiter);
 
-        List<PlayerControl> AllPlayers = Main.EnumeratePlayerControls().Shuffle(rd).ToList();
+        var AllPlayers = Main.EnumeratePlayerControls().Shuffle(rd).ToList();
 
         foreach (var pc in AllPlayers)
         {
@@ -181,6 +218,14 @@ public static class DraftAssign
         {
             SendDraftPoolMsg(player);
         }
+
+        _ = new LateTask(() =>
+        {
+            foreach (var player in Main.EnumeratePlayerControls())
+            {
+                SendDraftPoolMsg(player);
+            }
+        }, 25f, "Re Send Draft Pool Msg");
     }
 
     public static List<CustomRoles> GetDraftPool(this PlayerControl player) => DraftPools[player.PlayerId];
@@ -286,6 +331,11 @@ public static class DraftAssign
         Utils.SendMessage(string.Format(GetString("DraftPoolMessage"), player.GetFormattedDraftPool()), player.PlayerId, noReplay: true);
     }
 
+    public static void RemoveReSendDraftPoolMsg()
+    {
+        LateTask.RemoveByName("Re Send Draft Pool Msg");
+    }
+
     public static bool IsSameTeamRoles(CustomRoles role, CustomRoles role2)
     {
         if ((role.IsCrewmate() && role2.IsCrewmate()) || (role.IsImpostor() && role2.IsImpostor()) || (role.IsCoven() && role2.IsCoven())
@@ -300,7 +350,7 @@ public static class DraftAssign
     {
         int chance = role.GetMode();
         if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) return true;
-        if (RoleAssign.SetRoles.ContainsValue(role)) return true;
+        if (RoleAssign.SetRoles.ContainsValue(role) || (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) || (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) return true;
         switch (role)
         {
             case CustomRoles.Stalker when GameStates.FungleIsActive:
@@ -311,11 +361,8 @@ public static class DraftAssign
             case CustomRoles.RuthlessRomantic:
             case CustomRoles.GM:
             case CustomRoles.NotAssigned:
-            case CustomRoles.NiceMini:
-            case CustomRoles.EvilMini:
             case CustomRoles.Runner:
             case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
-            case CustomRoles.Mini:
             case CustomRoles.NiceGuesser when Options.GuesserMode.GetBool() && Options.CrewmatesCanGuess.GetBool():
             case CustomRoles.EvilGuesser when Options.GuesserMode.GetBool() && Options.ImpostorsCanGuess.GetBool():
                 return true;

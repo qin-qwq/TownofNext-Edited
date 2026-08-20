@@ -11,7 +11,7 @@ using TONE.Modules.Rpc;
 using TONE.Patches;
 using TONE.Roles.Core;
 using TONE.Roles.Core.AssignManager;
-using TONE.Roles.Core.DraftAssign;
+using TONE.Roles.Vanilla;
 using UnityEngine;
 using static TONE.Translator;
 
@@ -46,6 +46,7 @@ internal class ChangeRoleSettings
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Tracker, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Detective, 0, 0);
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Viper, 0, 0);
+                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Judge, 0, 0);
                 }
             }
             else if (GameStates.IsHideNSeek)
@@ -58,6 +59,7 @@ internal class ChangeRoleSettings
             KillTimerManager.Initializate();
             AbilityUseManager.Initializate();
             AbilityTimeManager.Initializate();
+            AchievementManager.OnGameStart();
 
             Main.AllPlayerKillCooldown.Clear();
             Main.AllPlayerSpeed.Clear();
@@ -89,7 +91,7 @@ internal class ChangeRoleSettings
 
             Main.LastNotifyNames.Clear();
 
-            Main.FirstDiedPrevious = Options.CurrentGameMode is CustomGameMode.Standard && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
+            Main.FirstDiedPrevious = GameModeBase.GetGameMode() is CustomGameMode.Standard && Options.ShieldPersonDiedFirst.GetBool() ? Main.FirstDied : "";
 
             LobbyViewSettingsPanePatch.ClearReferences();
 
@@ -107,14 +109,16 @@ internal class ChangeRoleSettings
             OnPlayerLeftPatch.LeftPlayerId = byte.MaxValue;
             FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
             Main.Invisible.Clear();
-            CheckForEndVotingPatch.SomeoneExiled = false;
             ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();
+            ShipStatusFixedUpdatePatch.ClosestVent = [];
+            ShipStatusFixedUpdatePatch.CanUseClosestVent = [];
 
             ChatManager.ResetHistory();
             ReportDeadBodyPatch.CanReport.Clear();
+            ReportDeadBodyPatch.PreventEAC = false;
             Options.UsedButtonCount = 0;
 
             Main.RealOptionsData = new OptionBackupData(GameOptionsManager.Instance.CurrentGameOptions);
@@ -158,6 +162,8 @@ internal class ChangeRoleSettings
                     CriticalErrorManager.SetCriticalError("Player Have Invalid Color", true);
                     Logger.Error(msg, "CoStartGame");
                 }
+                DraftAssign.RemoveReSendDraftPoolMsg();
+                FactionOption.ChangeSettings();
             }
 
             foreach (var pc in Main.EnumeratePlayerControls())
@@ -190,16 +196,6 @@ internal class ChangeRoleSettings
                     Main.LastNotifyNames[pair] = currentName;
                 }
 
-                if (Options.UsePets.GetBool() && Options.CurrentGameMode is CustomGameMode.Standard && AmongUsClient.Instance.AmHost)
-                {
-                    foreach (var player in Main.EnumeratePlayerControls())
-                    {
-                        if (player.Is(CustomRoles.GM)) continue;
-
-                        _ = new LateTask(() => { player.RpcSetPet(PetsPatch.GetPetId()); }, 3f);
-                    }
-                }
-
                 Main.PlayerStates[pc.PlayerId] = new(pc.PlayerId)
                 {
                     NormalOutfit = new NetworkedPlayerInfo.PlayerOutfit().Set(currentName, pc.Data.Outfits[PlayerOutfitType.Default].ColorId, pc.Data.Outfits[PlayerOutfitType.Default].HatId, pc.Data.Outfits[PlayerOutfitType.Default].SkinId, pc.Data.Outfits[PlayerOutfitType.Default].VisorId, pc.Data.Outfits[PlayerOutfitType.Default].PetId, pc.Data.Outfits[PlayerOutfitType.Default].NamePlateId),
@@ -212,6 +208,8 @@ internal class ChangeRoleSettings
 
                 ReportDeadBodyPatch.CanReport[pc.PlayerId] = true;
                 ReportDeadBodyPatch.WaitReport[pc.PlayerId] = [];
+
+                Main.PlayerStates[pc.PlayerId].IsBlackOut = false;
 
                 VentSystemDeterioratePatch.LastClosestVent[pc.PlayerId] = 99;
                 VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime[pc.PlayerId] = false;
@@ -245,23 +243,20 @@ internal class ChangeRoleSettings
                 addOn?.Init();
             }
 
+            // Initialize all GameModes
+            foreach (var gm in CustomGameModeManager.GameModeClass.Values)
+            {
+                gm?.Init();
+            }
+
             TargetArrow.Init();
             LocateArrow.Init();
             DoubleTrigger.Init();
 
-            //FFA
-            FFAManager.Init();
-
-            //Speed Run
-            SpeedRun.Init();
-
-            //Tag Mode
-            TagMode.Init();
-
             try
             {
-                SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
-                MapRoomDoorsUpdatePatch.DoorTimerTexts.Values.DoIf(x => x != null, x => UnityEngine.Object.Destroy(x.gameObject));
+                SabotageMapPatch.TimerTexts.Values.DoIf(x => x != null, x => Object.Destroy(x.gameObject));
+                MapRoomDoorsUpdatePatch.DoorTimerTexts.Values.DoIf(x => x != null, x => Object.Destroy(x.gameObject));
             }
             catch (Exception e) { Utils.ThrowException(e); }
 
@@ -287,9 +282,6 @@ internal class ChangeRoleSettings
             SetEverythingUpPatch.LastWinsText = "";
             SetEverythingUpPatch.LastWinsReason = "";
 
-            GC.Collect();
-            Resources.UnloadUnusedAssets();
-
             Logger.Msg("End", "Initialization");
         }
         catch (Exception ex)
@@ -304,7 +296,7 @@ internal class StartGameHostPatch
 {
     private static AmongUsClient thiz;
 
-    private static RoleOptionsCollectionV10 RoleOpt => Main.NormalOptions.roleOptions;
+    private static RoleOptionsCollectionV11 RoleOpt => Main.NormalOptions.roleOptions;
     private static Dictionary<RoleTypes, int> RoleTypeNums = [];
     public static void UpdateRoleTypeNums()
     {
@@ -318,6 +310,7 @@ internal class StartGameHostPatch
             { RoleTypes.Tracker, RoleAssign.AddTrackerNum },
             { RoleTypes.Detective, RoleAssign.AddDetectiveNum },
             { RoleTypes.Viper, RoleAssign.AddViperNum },
+            { RoleTypes.Judge, RoleAssign.AddJudgeNum },
         };
     }
 
@@ -366,11 +359,20 @@ internal class StartGameHostPatch
             ShipStatus.Instance = result.GetComponent<ShipStatus>();
             thiz.Spawn(ShipStatus.Instance, -2, SpawnFlags.None);
         }
+        try
+        {
+            GC.Collect();
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
+        }
+        catch (Exception e) { Utils.ThrowException(e); }
         float timer = 0f;
+        var start = DateTime.Now;
         while (true)
         {
             bool stopWaiting = true;
             int maxTimer = 10;
+            var totalSeconds = (float)(DateTime.Now - start).TotalSeconds;
             if (GameOptionsManager.Instance.CurrentGameOptions.MapId is 4 or 5)
             {
                 maxTimer = 15;
@@ -396,6 +398,11 @@ internal class StartGameHostPatch
                     }
                 }
             }
+            if (totalSeconds < maxTimer)
+            {
+                LoadingBarManager.Instance.ToggleLoadingBar(true);
+                LoadingBarManager.Instance.SetLoadingPercent((float)(totalSeconds / maxTimer * 100.0), StringNames.LoadingBarGameStartWaitingPlayers);
+            }
             yield return null;
             if (stopWaiting)
             {
@@ -404,8 +411,11 @@ internal class StartGameHostPatch
             timer += Time.deltaTime;
         }
         thiz.SendClientReady();
-        yield return new WaitForSecondsRealtime(2f);
+        //yield return new WaitForSecondsRealtime(2f);
         yield return AssignRoles();
+
+        LoadingBarManager.Instance.ToggleLoadingBar(false);
+
         //ShipStatus.Instance.Begin(); // Tasks sets in IntroPatch
         yield break;
     }
@@ -465,15 +475,15 @@ internal class StartGameHostPatch
             yield break;
         }
 
-        if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
+        /*if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
         {
             yield return RpcSetRoleReplacer.ReleaseVanilla();
         }
         else
-        {
-            // Send all RPC for modded region
-            RpcSetRoleReplacer.Release();
-        }
+        {*/
+        // Send all RPC for modded region
+        RpcSetRoleReplacer.Release();
+        //}
 
         try
         {
@@ -493,13 +503,14 @@ internal class StartGameHostPatch
                     RoleTypes.Tracker => CustomRoles.Tracker,
                     RoleTypes.Detective => CustomRoles.Detective,
                     RoleTypes.Viper => CustomRoles.Viper,
+                    RoleTypes.Judge => CustomRoles.Judge,
                     _ => CustomRoles.NotAssigned
                 };
                 if (role == CustomRoles.NotAssigned) Logger.SendInGame(string.Format(GetString("Error.InvalidRoleAssignment"), pc?.Data?.PlayerName));
                 Main.PlayerStates[pc.PlayerId].SetMainRole(role, false);
             }
 
-            if (Options.CurrentGameMode is CustomGameMode.FFA)
+            if (GameModeBase.GetGameMode() is CustomGameMode.FFA)
             {
                 foreach (var pair in RoleAssign.RoleResult)
                 {
@@ -517,7 +528,7 @@ internal class StartGameHostPatch
 
             try
             {
-                if (Options.CurrentGameMode is CustomGameMode.Standard)
+                if (GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons)
                 {
                     AddonAssign.StartAssigningNarc();
                     AddonAssign.StartAssigningGuesser();
@@ -534,13 +545,13 @@ internal class StartGameHostPatch
             foreach (var pair in Main.PlayerStates)
             {
                 var message = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, pair.Value.MainRole);
-                RpcUtils.LateBroadcastReliableMessage(message);
+                RpcUtils.SendMessageImmediately(message);
 
                 // Set Add-ons
                 foreach (var subRole in pair.Value.SubRoles.ToArray())
                 {
                     var message2 = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, subRole);
-                    RpcUtils.LateBroadcastReliableMessage(message2);
+                    RpcUtils.SendMessageImmediately(message2);
                 }
             }
 
@@ -575,21 +586,7 @@ internal class StartGameHostPatch
                 RoleOpt.SetRoleRate(roleType.Key, roleNum, RoleOpt.GetChancePerGame(roleType.Key));
             }
 
-            switch (Options.CurrentGameMode)
-            {
-                case CustomGameMode.Standard:
-                    GameEndCheckerForNormal.SetPredicateToNormal();
-                    break;
-                case CustomGameMode.FFA:
-                    GameEndCheckerForNormal.SetPredicateToFFA();
-                    break;
-                case CustomGameMode.SpeedRun:
-                    GameEndCheckerForNormal.SetPredicateToSpeedRun();
-                    break;
-                case CustomGameMode.TagMode:
-                    GameEndCheckerForNormal.SetPredicateToTagMode();
-                    break;
-            }
+            GameModeBase.GetGameMode().GetGameModeClass().SetPredicate();
 
             EAC.LogAllRoles();
             //Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
@@ -635,7 +632,7 @@ internal class StartGameHostPatch
             }
 
             var message = new RpcSetRoleMessage(pc.NetId, roleType, true);
-            RpcUtils.LateSpecificSendMessage(message, pc.GetClientId());
+            RpcUtils.SendMessageImmediately(message, pc.GetClientId());
         }
     }
 
@@ -684,7 +681,11 @@ internal class SelectRolesPatch
             if (Main.HideNSeekOptions.ImpostorPlayerID != -1)
             {
                 var player = Utils.GetPlayerById(Main.HideNSeekOptions.ImpostorPlayerID);
-                if (player) Impostor.Add(player);
+                if (player)
+                {
+                    Impostor.Add(player);
+                    ImpostorNum--;
+                }
             }
 
             var Player = Main.EnumeratePlayerControls().Shuffle(IRandom.Instance).ToList();
@@ -710,7 +711,6 @@ internal class SelectRolesPatch
                 else if (Impostor.Contains(player))
                 {
                     player.RpcSetRole(RoleTypes.Impostor);
-                    ImpostorNum--;
                     continue;
                 }
                 else if (ImpostorNum > 0)
@@ -907,6 +907,7 @@ public static class RpcSetRoleReplacer
             else
             {
                 selfRoleTypes = RoleClass.ThisRoleBase.GetRoleTypesDirect();
+                if (JudgeTONE.playerIdList.Contains(target.PlayerId)) selfRoleTypes = RoleTypes.Crewmate;
             }
 
             foreach (var seer in Main.PlayerStates.Values)
@@ -918,6 +919,12 @@ public static class RpcSetRoleReplacer
                 }
 
                 if (selfRoleTypes is RoleTypes.Noisemaker)
+                {
+                    RoleMap[(seer.PlayerId, target.PlayerId)] = (selfRoleTypes, MainRole);
+                    continue;
+                }
+
+                if (target.PlayerId == PlayerControl.LocalPlayer.PlayerId && selfRoleTypes is RoleTypes.Detective)
                 {
                     RoleMap[(seer.PlayerId, target.PlayerId)] = (selfRoleTypes, MainRole);
                     continue;

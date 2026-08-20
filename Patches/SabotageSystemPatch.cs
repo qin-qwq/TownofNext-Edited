@@ -132,7 +132,7 @@ public class SabotageSystemPatch
                 if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                 {
                     // Need for hiding player names if player is desync Impostor
-                    Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: true, MushroomMixupIsActive: true);
+                    Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: false, MushroomMixupIsActive: true, SendOption: SendOption.None);
                 }
             }
 
@@ -200,7 +200,7 @@ public class SabotageSystemPatch
                         if ((!pc.Is(Custom_Team.Impostor) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && pc.HasDesyncRole())
                         {
                             // Need for display player names if player is desync Impostor
-                            Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: true);
+                            Utils.NotifyRoles(SpecifySeer: pc, ForceLoop: false, SendOption: SendOption.None);
                         }
                     }
                 }
@@ -283,7 +283,7 @@ public class SabotageSystemPatch
             {
                 foreach (var pc in Main.EnumerateAlivePlayerControls())
                     if (pc.Is(CustomRoles.Mare))
-                        Utils.NotifyRoles(SpecifyTarget: pc);
+                        Utils.NotifyRoles(SpecifyTarget: pc, SendOption: SendOption.None);
             }
 
             Logger.Info("Lights sabotage called", "ElectricTask");
@@ -306,7 +306,7 @@ public class SabotageSystemPatch
             {
                 foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
                     if (pc.Is(CustomRoles.Mare))
-                        Utils.NotifyRoles(SpecifyTarget: pc);
+                        Utils.NotifyRoles(SpecifyTarget: pc, SendOption: SendOption.None);
             }
 
             Logger.Info("Lights sabotage fixed", "ElectricTask");
@@ -355,15 +355,16 @@ public class SabotageSystemPatch
                     return false;
             }
 
-            if (Options.CurrentGameMode is CustomGameMode.SpeedRun or CustomGameMode.TagMode)
+            if (player.Is(CustomRoles.Runner))
             {
                 return false;
             }
 
-            if (TimeMaster.Rewinding)
+            if (TimeAssassin.TimeStop || TimeMaster.Rewinding)
             {
                 return false;
             }
+
             return player.CanUseSabotage();
         }
 

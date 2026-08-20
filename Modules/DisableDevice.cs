@@ -161,8 +161,8 @@ public class RemoveDisableDevicesPatch
             (Options.DisableDevicesIgnoreCoven.GetBool() && player.Is(Custom_Team.Coven)) ||
             (Options.DisableDevicesIgnoreAfterAnyoneDied.GetBool() && GameStates.AlreadyDied);
 
-        var admins = UnityEngine.Object.FindObjectsOfType<MapConsole>(true);
-        var consoles = UnityEngine.Object.FindObjectsOfType<SystemConsole>(true);
+        var admins = Object.FindObjectsOfType<MapConsole>(true);
+        var consoles = Object.FindObjectsOfType<SystemConsole>(true);
         if (admins == null || consoles == null) return;
 
         switch (GetActiveMapId())

@@ -135,10 +135,7 @@ internal class Logos : RoleBase
                 }
             }
 
-            target.GetRoleClass()?.OnRemove(target.PlayerId);
-            target.RpcChangeRoleBasis(role);
-            target.RpcSetCustomRole(role);
-            target.GetRoleClass()?.OnAdd(target.PlayerId);
+            target.RpcSetCustomRoleV2(role, true, true);
             target.RpcResetTasks();
 
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(role), GetString("GangsterSuccessfullyRecruited")));
@@ -151,7 +148,7 @@ internal class Logos : RoleBase
             Utils.NotifyRoles(target, killer, true);
 
             killer.ResetKillCooldown();
-            killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
+            killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
 
             return false;
         }
@@ -192,6 +189,7 @@ internal class Logos : RoleBase
     public override void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
         if (!exiled) return;
+        if (exiled.Object != player) return;
 
         foreach (var pc in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Philosopher)))
         {
@@ -208,10 +206,7 @@ internal class Logos : RoleBase
         if (candidates.Count > 0)
         {
             var player = candidates.RandomElement();
-            player.GetRoleClass()?.OnRemove(player.PlayerId);
-            player.RpcChangeRoleBasis(CustomRoles.Logos);
-            player.RpcSetCustomRole(CustomRoles.Logos);
-            player.GetRoleClass()?.OnAdd(player.PlayerId);
+            player.RpcSetCustomRoleV2(CustomRoles.Logos, true, true);
             player.SetAbilityUseLimit(0);
             Utils.NotifyRoles(SpecifyTarget: player);
         }
@@ -360,7 +355,7 @@ internal class Philosopher : RoleBase
             SendRPC();
             if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
             {
-                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());
             }
             else
             {

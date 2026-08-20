@@ -64,6 +64,7 @@ internal class Conjurer : CovenManager
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.ShapeshifterCooldown = ConjureCooldown.GetFloat();
+        base.ApplyGameOptions(opt, playerId);
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = KillCooldown.GetFloat();
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)

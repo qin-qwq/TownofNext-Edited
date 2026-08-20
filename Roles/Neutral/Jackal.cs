@@ -1,5 +1,6 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Crewmate;
 using UnityEngine;
@@ -218,10 +219,7 @@ internal class Jackal : RoleBase
                     }
                 }
 
-                target.GetRoleClass()?.OnRemove(target.PlayerId);
-                target.RpcChangeRoleBasis(role);
-                target.RpcSetCustomRole(role);
-                target.GetRoleClass()?.OnAdd(target.PlayerId);
+                target.RpcSetCustomRoleV2(role, true, true);
 
                 killer.Notify(Utils.ColorString(Utils.GetRoleColor(role), GetString("GangsterSuccessfullyRecruited")));
                 target.Notify(Utils.ColorString(Utils.GetRoleColor(role), GetString("BeRecruitedByJackal")));
@@ -235,7 +233,7 @@ internal class Jackal : RoleBase
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
 
                 ConvertedPlayerId[killer.PlayerId] = target.PlayerId;
                 break;
@@ -263,7 +261,7 @@ internal class Jackal : RoleBase
                 Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
 
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
 
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
@@ -282,10 +280,7 @@ internal class Jackal : RoleBase
                             Main.PlayerStates[target.PlayerId].SubRoles.Remove(CustomRoles.Rascal);
                         }
                     }
-                    target.GetRoleClass()?.OnRemove(target.PlayerId);
-                    target.RpcChangeRoleBasis(role);
-                    target.RpcSetCustomRole(role);
-                    target.GetRoleClass()?.OnAdd(target.PlayerId);
+                    target.RpcSetCustomRoleV2(role, true, true);
                     if (role is CustomRoles.Sidekick && killer.GetBetrayalAddon() != CustomRoles.NotAssigned)
                         target.RpcSetCustomRole(addon);
                 }
@@ -313,7 +308,7 @@ internal class Jackal : RoleBase
                 Utils.NotifyRoles(SpecifySeer: target, SpecifyTarget: killer, ForceLoop: true);
 
                 killer.ResetKillCooldown();
-                killer.SetKillCooldown(5f, forceAnime: !DisableShieldAnimations.GetBool());
+                killer.SetKillCooldown(forceAnime: !DisableShieldAnimations.GetBool());
 
                 target.ResetKillCooldown();
                 target.SetKillCooldown(forceAnime: true);
@@ -379,10 +374,7 @@ internal class Jackal : RoleBase
             {
                 Logger.Info($"Assigned new Jackal {newJackal.GetNameWithRole()}", "Jackal");
 
-                newJackal.GetRoleClass()?.OnRemove(newJackal.PlayerId);
-                newJackal.RpcChangeRoleBasis(CustomRoles.Jackal);
-                newJackal.RpcSetCustomRole(CustomRoles.Jackal);
-                newJackal.GetRoleClass()?.OnAdd(newJackal.PlayerId);
+                newJackal.RpcSetCustomRoleV2(CustomRoles.Jackal, true, true);
 
                 Main.PlayerStates[newJackal.PlayerId].RemoveSubRole(CustomRoles.Recruit);
                 newJackal.PlayerId.SetAbilityUseLimit(RestoreLimitOnNewJackal.GetBool() && CanRecruitSidekick.GetBool() ? SidekickRecruitLimitOpt.GetInt() : 0);
@@ -470,8 +462,8 @@ internal class Jackal : RoleBase
 
     public static bool JackalChannel(PlayerControl pc, string msg, bool check = true)
     {
-        if (!AmongUsClient.Instance.AmHost) return false;
-        if (!GameStates.IsMeeting || pc == null) return false;
+        //if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.Is(CustomRoles.Jackal) && !pc.Is(CustomRoles.Sidekick) && !pc.Is(CustomRoles.Recruit)) return false;
         if (!EnableJackalChannel.GetBool()) return false;
         if (!pc.IsAlive()) return false;
@@ -483,10 +475,23 @@ internal class Jackal : RoleBase
 
         if (string.IsNullOrEmpty(msg)) return false;
 
-        Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jackal) || x.Is(CustomRoles.Sidekick) || x.Is(CustomRoles.Recruit))
-            .Do(x => Utils.SendMessage(msg, title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), $"{GetString("MessageFromJackal")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+        if (AmongUsClient.Instance.AmHost || !pc.IsModded())
+        {
+            SendJackalChannelMsg(pc, msg);
+        }
+        else
+        {
+            var message = new RpcSendChannelMsg(PlayerControl.LocalPlayer.NetId, msg, (int)SendTargetPatch.SendTargets.Jackal);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
 
         return true;
+    }
+
+    public static void SendJackalChannelMsg(PlayerControl pc, string msg)
+    {
+        Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jackal) || x.Is(CustomRoles.Sidekick) || x.Is(CustomRoles.Recruit))
+            .Do(x => Utils.SendMessage(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), msg), title: Utils.ColorString(Utils.GetRoleColor(CustomRoles.Jackal), $"{GetString("MessageFromJackal")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
     }
 }
 

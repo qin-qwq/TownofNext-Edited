@@ -1,3 +1,4 @@
+using InnerNet;
 using System;
 using TONE.Modules;
 using TONE.Patches;
@@ -24,7 +25,16 @@ internal class ControllerManagerUpdatePatch
         */
         try
         {
-            if (OperatingSystem.IsAndroid()) return;
+            var clientControlGUI = ClientControlGUI.Instance;
+            var hudManagerExists = HudManager.InstanceExists;
+
+            if (clientControlGUI)
+            {
+                if ((!hudManagerExists || !HudManager.Instance.Chat || !HudManager.Instance.Chat.IsOpenOrOpening) && Input.GetKeyDown(KeyCode.Delete))
+                    clientControlGUI.TogglePanel();
+
+                if (clientControlGUI.IsOpen) return;
+            }
 
             if (!RehostManager.IsAutoRehostDone && GetKeysDown(KeyCode.LeftShift, KeyCode.C))
             {
@@ -45,7 +55,7 @@ internal class ControllerManagerUpdatePatch
             //}
 
             // Show Role info
-            if (GameStates.IsInGame && (GameStates.IsCanMove || GameStates.IsMeeting) && Options.CurrentGameMode is CustomGameMode.Standard)
+            if (GameStates.IsInGame && (GameStates.IsCanMove || GameStates.IsMeeting) && GameModeBase.GetGameMode() is CustomGameMode.Standard)
             {
                 if (Input.GetKey(KeyCode.F1))
                 {
@@ -87,7 +97,7 @@ internal class ControllerManagerUpdatePatch
                 if (MeetingStates.FirstMeeting && !CompletedRepairingPlayer.Contains(PlayerControl.LocalPlayer.PlayerId) && GameStates.IsInGame && !GameStates.IsMeeting)
                 {
                     Logger.Info("Attempted to fix Black Screen", "KeyCommand");
-                    PlayerControl.LocalPlayer.FixBlackScreen();
+                    ExileController.Instance?.ReEnableGameplay();
                     CompletedRepairingPlayer.Add(PlayerControl.LocalPlayer.PlayerId);
                 }
             }
@@ -157,11 +167,11 @@ internal class ControllerManagerUpdatePatch
                     {
                         if (pva == null) continue;
 
-                        if (pva.VotedFor < 253)
-                            MeetingHud.Instance.RpcClearVote(pva.TargetPlayerId);
+                        if (pva.VotedForId < 253)
+                            MeetingHud.Instance.RpcClearVote(pva.PlayerId);
                     }
                     List<MeetingHud.VoterState> statesList = [];
-                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true, false, 0);
                     MeetingHud.Instance.RpcClose();
                 }
                 else
@@ -258,7 +268,7 @@ internal class ControllerManagerUpdatePatch
             // Clear self vote only in local game
             if (GetKeysDown(KeyCode.Return, KeyCode.V, KeyCode.LeftShift) && GameStates.IsMeeting && !GameStates.IsOnlineGame)
             {
-                MeetingHud.Instance.RpcClearVote(AmongUsClient.Instance.ClientId);
+                MeetingHud.Instance.RpcClearVote(PlayerControl.LocalPlayer.PlayerId);
             }
 
             // Open all the doors in Airship map

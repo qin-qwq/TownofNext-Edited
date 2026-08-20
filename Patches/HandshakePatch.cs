@@ -1,7 +1,7 @@
-using System;
 using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
+using System;
 
 namespace TONE.Patches;
 
@@ -88,7 +88,7 @@ public static class HandshakePatch
             handshake.Write(__result);
 
             // Reactor Header
-            var version = (byte) ReactorProtocolVersion.Latest;
+            var version = (byte)ReactorProtocolVersion.Latest;
             var value = (MAGIC << 8) | version;
             handshake.Write(value);
 
@@ -96,7 +96,7 @@ public static class HandshakePatch
             handshake.WritePacked(1);
             handshake.Write(Main.PluginGuid);
             handshake.Write(Main.PluginDisplayVersion);
-            handshake.Write((ushort) (ModFlags.RequireOnHost | ModFlags.DisableServerAuthority));
+            handshake.Write((ushort)(ModFlags.RequireOnHost | ModFlags.DisableServerAuthority));
 
             __result = handshake.ToByteArray(true);
             handshake.Recycle();

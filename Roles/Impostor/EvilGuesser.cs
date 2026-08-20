@@ -1,6 +1,4 @@
-using Hazel;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using static TONE.Translator;
 
 namespace TONE.Roles.Impostor;
@@ -54,7 +52,7 @@ internal class EvilGuesser : RoleBase
     public static bool HideTabInGuesserUI(int TabId)
     {
         if (!EGCanGuessImp.GetBool() && TabId == 1) return true;
-        if (!EGCanGuessAdt.GetBool() && TabId == 3) return true;
+        if (!EGCanGuessAdt.GetBool() && TabId == 4) return true;
 
         return false;
     }
@@ -104,7 +102,6 @@ internal class EvilGuesser : RoleBase
             guesser.ShowInfoMessage(isUI, GetString("SafeGuessNotCorrectlyGuessRole"));
             guesser.RpcRemoveAbilityUse();
             if (guesser.IsHost()) Utils.FlashColor(Utils.GetRoleColor(CustomRoles.EvilGuesser));
-            //else SendRPC(guesser);
 
             if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
             {
@@ -120,17 +117,5 @@ internal class EvilGuesser : RoleBase
     public override void OnReportDeadBody(PlayerControl goku, NetworkedPlayerInfo solos)
     {
         CantGuess = false;
-    }
-
-    public void SendRPC(PlayerControl pc)
-    {
-        if (!pc.IsNonHostModdedClient()) return;
-        var writer = MessageWriter.Get(SendOption.Reliable);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
-    }
-
-    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
-    {
-        Utils.FlashColor(Utils.GetRoleColor(CustomRoles.EvilGuesser));
     }
 }

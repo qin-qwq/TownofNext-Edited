@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using TONE.Modules;
 using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.Translator;
@@ -10,7 +11,7 @@ internal class Blaster : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Blaster;
     private const int Id = 32300;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -67,11 +68,11 @@ internal class Blaster : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = BombCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = BombCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl pc)
+    public override void UnShapeShiftButton(PlayerControl pc)
     {
-        if (WaitBomb.Contains(pc.PlayerId)) return false;
+        if (WaitBomb.Contains(pc.PlayerId)) return;
         var BombPlace = pc.GetCustomPosition();
         BombPosition[pc.PlayerId].Add(pc.transform.position);
         pc.Notify(string.Format(GetString("BlasterMark"), BombDelayTime.GetFloat()));
@@ -96,11 +97,11 @@ internal class Blaster : RoleBase
                     }
                 }
             }
+            CustomSoundsManager.RPCPlayCustomSoundAll("Boom");
             pc.RpcResetAbilityCooldown();
             BombPosition[pc.PlayerId].Clear();
             WaitBomb.Remove(pc.PlayerId);
         }, BombDelayTime.GetFloat(), "Blaster Boom");
-        return false;
     }
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {

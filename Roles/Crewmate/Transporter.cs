@@ -66,7 +66,7 @@ internal class Transporter : RoleBase
     {
         float xLoc = reader.ReadSingle();
         float yLoc = reader.ReadSingle();
-        TransporterLocation.Add(new Vector2(xLoc, yLoc), new(pc.GetCustomPosition(), pc.PlayerId));
+        TransporterLocation.Add(new Vector2(xLoc, yLoc), new(pc.GetCustomPosition()));
     }
 
     public override void OnPet(PlayerControl player)
@@ -75,7 +75,7 @@ internal class Transporter : RoleBase
         if (totalMarked >= 2 || player.GetAbilityUseLimit() <= 0) return;
 
         player.RpcRemoveAbilityUse();
-        TransporterLocation.Add(player.GetCustomPosition(), new(player.GetCustomPosition(), player.PlayerId));
+        TransporterLocation.Add(player.GetCustomPosition(), new(player.GetCustomPosition()));
         player.Notify(GetString("TransporterCreated"));
 
         SendRPC();

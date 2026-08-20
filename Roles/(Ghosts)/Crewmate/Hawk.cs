@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
 using System;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;
@@ -112,6 +112,6 @@ internal class Hawk : RoleBase
             && rnd.Next(100) >= KillerChanceMiss[target.PlayerId]
             && !target.IsNeutralApocalypse()
             && !target.Is(CustomRoles.CursedWolf)
-            && (!target.Is(CustomRoles.NiceMini) || Mini.Age > 18);
+            && (!target.Is(CustomRoles.Mini) || Mini.Age > 18);
     }
 }

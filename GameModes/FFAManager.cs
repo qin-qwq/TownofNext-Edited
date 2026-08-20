@@ -2,13 +2,16 @@ using Hazel;
 using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
+using TONE.Roles.Core.AssignManager;
 using UnityEngine;
 using static TONE.Translator;
 
 namespace TONE;
 
-internal static class FFAManager
+internal class FFAManager : GameModeBase
 {
+    public override CustomGameMode GameMode => CustomGameMode.FFA;
+
     private static Dictionary<byte, long> FFAShieldedList = [];
     private static Dictionary<byte, long> FFAIncreasedSpeedList = [];
     private static Dictionary<byte, long> FFADecreasedSpeedList = [];
@@ -37,7 +40,7 @@ internal static class FFAManager
     public static OptionItem FFA_EnableRandomTwists;
     public static OptionItem FFA_ShieldIsOneTimeUse;
 
-    public static void SetupCustomOption()
+    public override void SetupCustomOption()
     {
         TextOptionItem.Create(10000030, "MenuTitle.FreeForAll", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.FFA)
@@ -92,9 +95,9 @@ internal static class FFAManager
             .SetColor(new Color32(0, 255, 165, byte.MaxValue));
     }
 
-    public static void Init()
+    public override void Init()
     {
-        if (Options.CurrentGameMode != CustomGameMode.FFA) return;
+        if (GetGameMode() != CustomGameMode.FFA) return;
 
         FFADecreasedSpeedList = [];
         FFAIncreasedSpeedList = [];
@@ -113,7 +116,7 @@ internal static class FFAManager
     }
     public static void SetData()
     {
-        if (Options.CurrentGameMode != CustomGameMode.FFA) return;
+        if (GetGameMode() != CustomGameMode.FFA) return;
 
         RoundTime = FFA_GameTime.GetInt() + 8;
         var now = Utils.GetTimeStamp() + 8;
@@ -152,7 +155,7 @@ internal static class FFAManager
     public static Dictionary<byte, (string TEXT, long TIMESTAMP)> NameNotify = [];
     public static void GetNameNotify(PlayerControl player, ref string name)
     {
-        if (Options.CurrentGameMode != CustomGameMode.FFA || player == null) return;
+        if (GetGameMode() != CustomGameMode.FFA || !player) return;
         if (NameNotify.ContainsKey(player.PlayerId))
         {
             name = NameNotify[player.PlayerId].TEXT;
@@ -187,7 +190,7 @@ internal static class FFAManager
     }
     public static void OnPlayerAttack(PlayerControl killer, PlayerControl target)
     {
-        if (killer == null || target == null || Options.CurrentGameMode != CustomGameMode.FFA) return;
+        if (killer == null || target == null || GetGameMode() != CustomGameMode.FFA) return;
         if (target.inVent)
         {
             Logger.Info("Target is in a vent, kill blocked", "FFA");
@@ -422,7 +425,32 @@ internal static class FFAManager
         return arrows;
     }
 
-    public static void AppendFFAKcount(StringBuilder builder)
+    public override void SelectRoles()
+    {
+        foreach (PlayerControl pc in Main.EnumeratePlayerControls())
+        {
+            if (Main.EnableGM.Value && pc.IsHost())
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                continue;
+            }
+            else if (TagManager.AssignGameMaster(pc.FriendCode))
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
+                continue;
+            }
+            else if (RoleAssign.SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                continue;
+            }
+            RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.Killer;
+        }
+    }
+
+    public override void AppendKcount(StringBuilder builder)
     {
         int AliveFFAKiller = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.Killer));
         int DeadFFASpectator = Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Killer) && !x.IsAlive());
@@ -431,13 +459,56 @@ internal static class FFAManager
         builder.Append(string.Format("\n\r" + GetString("Remaining.FFASpectator"), DeadFFASpectator));
     }
 
+    public override void SetPredicate() => GameEndCheckerForNormal.predicate = new FFAGameEndPredicate();
+
+    public override string GetGameState(string taskText = null, bool forGameEnd = false)
+    {
+        Dictionary<byte, string> SummaryText2 = [];
+        foreach (var id in Main.PlayerStates.Keys)
+        {
+            string name = Main.AllPlayerNames[id].RemoveHtmlTags().Replace("\r\n", string.Empty);
+            string summary = $"{Utils.GetProgressText(id)}  {Utils.ColorString(id.GetPlayerColor(), name)}";
+            if (Utils.GetProgressText(id).Trim() == string.Empty) continue;
+            SummaryText2[id] = summary;
+        }
+
+        List<(int, byte)> list2 = [];
+        foreach (var id in Main.PlayerStates.Keys) list2.Add((GetRankOfScore(id), id));
+        list2.Sort();
+        foreach (var id in list2.Where(x => SummaryText2.ContainsKey(x.Item2))) return "\r\n" + SummaryText2[id.Item2];
+        return string.Empty;
+    }
+
+    public override void SummaryText(StringBuilder sb, List<byte> cloneRoles, bool sendMessage = false)
+    {
+        List<(int, byte)> listFFA = [];
+        foreach (byte id in cloneRoles.ToArray())
+        {
+            listFFA.Add((GetRankOfScore(id), id));
+        }
+        listFFA.Sort();
+        if (!sendMessage)
+        {
+            foreach (var id in listFFA.Where(x => EndGamePatch.SummaryText.ContainsKey(x.Item2)))
+                sb.Append($"\n  ").Append(EndGamePatch.SummaryText[id.Item2]);
+        }
+        else
+        {
+            foreach ((int, byte) id in listFFA.ToArray())
+            {
+                if (EndGamePatch.SummaryText.TryGetValue(id.Item2, out string winner))
+                    sb.Append($"\n　 ").Append(winner);
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     class FixedUpdateInGameModeFFAPatch
     {
         private static long LastFixedUpdate;
         public static void Postfix()
         {
-            if (!GameStates.IsInTask || Options.CurrentGameMode != CustomGameMode.FFA) return;
+            if (!GameStates.IsInTask || GetGameMode() != CustomGameMode.FFA) return;
 
             var now = Utils.GetTimeStamp();
 

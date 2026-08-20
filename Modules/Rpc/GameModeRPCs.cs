@@ -35,29 +35,11 @@ namespace TONE.Modules.Rpc
 
         private readonly string name;
     }
-    class RpcSyncSpeedRunStates : BaseModdedRpc
+    class RpcSyncGameModeStates : BaseModdedRpc
     {
-        public override byte RpcType => (byte)CustomRPC.SyncSpeedRunStates;
+        public override byte RpcType => (byte)CustomRPC.SyncGameModeStates;
 
-        public RpcSyncSpeedRunStates(uint rpcObjectNetId, MessageWriter writer) : base(rpcObjectNetId)
-        {
-            this.writer = writer;
-        }
-
-        public override void SerializeRpcValues(MessageWriter msg)
-        {
-            msg.Write(writer, false);
-            writer.Recycle();
-            // There are chances that the writer can't be recycled. May cause memory leak.
-        }
-
-        private readonly MessageWriter writer;
-    }
-    class RpcSyncTagModeTaskStates : BaseModdedRpc
-    {
-        public override byte RpcType => (byte)CustomRPC.SyncTagModeTaskStates;
-
-        public RpcSyncTagModeTaskStates(uint rpcObjectNetId, MessageWriter writer) : base(rpcObjectNetId)
+        public RpcSyncGameModeStates(uint rpcObjectNetId, MessageWriter writer) : base(rpcObjectNetId)
         {
             this.writer = writer;
         }

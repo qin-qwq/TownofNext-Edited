@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using UnityEngine;
 
 namespace TONE.Roles.Vanilla;
 
@@ -11,7 +12,7 @@ internal class ViperTONE : RoleBase
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
     //==================================================================\\
 
-    private static OptionItem ViperDissolveTime;
+    public static OptionItem ViperDissolveTime;
 
     public override void SetupCustomOption()
     {
@@ -21,14 +22,10 @@ internal class ViperTONE : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
     }
 
-    public override void Add(byte playerId)
+    public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting)
     {
-        var player = Utils.GetPlayerById(playerId);
-        player.RpcChangeRoleBasis(CustomRoles.ViperTONE);
-    }
-
-    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
-    {
-        AURoleOptions.ViperDissolveTime = ViperDissolveTime.GetInt();
+        var ViperRole = RoleManager.Instance.GetRole(RoleTypes.Viper);
+        var NewSprite = ViperRole.TryCast<ViperRole>()!.killSprite;
+        return NewSprite;
     }
 }

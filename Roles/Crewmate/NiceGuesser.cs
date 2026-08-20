@@ -1,6 +1,4 @@
-using Hazel;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -52,7 +50,7 @@ internal class NiceGuesser : RoleBase
     public static bool HideTabInGuesserUI(int TabId)
     {
         if (!GGCanGuessCrew.GetBool() && TabId == 0) return true;
-        if (!GGCanGuessAdt.GetBool() && TabId == 3) return true;
+        if (!GGCanGuessAdt.GetBool() && TabId == 4) return true;
 
         return false;
     }
@@ -102,7 +100,6 @@ internal class NiceGuesser : RoleBase
             guesser.ShowInfoMessage(isUI, GetString("SafeGuessNotCorrectlyGuessRole"));
             guesser.RpcRemoveAbilityUse();
             if (guesser.IsHost()) Utils.FlashColor(Utils.GetRoleColor(CustomRoles.NiceGuesser));
-            //else SendRPC(guesser);
 
             if (MisguessRolePrevGuessRoleUntilNextMeeting.GetBool())
             {
@@ -118,17 +115,5 @@ internal class NiceGuesser : RoleBase
     public override void OnReportDeadBody(PlayerControl goku, NetworkedPlayerInfo solos)
     {
         CantGuess = false;
-    }
-
-    public void SendRPC(PlayerControl pc)
-    {
-        if (!pc.IsNonHostModdedClient()) return;
-        var writer = MessageWriter.Get(SendOption.Reliable);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
-    }
-
-    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
-    {
-        Utils.FlashColor(Utils.GetRoleColor(CustomRoles.NiceGuesser));
     }
 }

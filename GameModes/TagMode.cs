@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
 using System;
 using System.Text;
@@ -6,15 +7,18 @@ using TMPro;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
 using UnityEngine;
 using static TONE.Translator;
 using static TONE.Utils;
 
 namespace TONE;
 
-public static class TagMode
+internal class TagMode : GameModeBase
 {
+    public override CustomGameMode GameMode => CustomGameMode.TagMode;
     private const int Id = 67_226_001;
+    public override bool NormalTaskText => true;
 
     public static OptionItem ZombieMaximun;
     public static OptionItem ZombieVision;
@@ -45,7 +49,7 @@ public static class TagMode
     public static bool Zap;
     public static (int, int) TaskCount = (0, 0);
 
-    public static void SetupCustomOption()
+    public override void SetupCustomOption()
     {
         TextOptionItem.Create(10000037, "MenuTitle.TagMode", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.TagMode)
@@ -114,30 +118,69 @@ public static class TagMode
             .SetColor(new Color32(44, 204, 0, byte.MaxValue));
     }
 
-    public static void Init()
+    public override void Init()
     {
-        if (Options.CurrentGameMode != CustomGameMode.TagMode) return;
-
         Zap = false;
+    }
 
+    public override void Add()
+    {
         int TaskNum = 0;
         switch (CrewmateTasks.GetInt())
         {
             case 0:
-                TaskNum = Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt();
+                TaskNum = Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt();
                 break;
             case 1:
-                TaskNum = (Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt()) * 2;
+                TaskNum = (Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt()) * 2;
                 break;
             case 2:
-                TaskNum = (Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt()) * 3;
+                TaskNum = (Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt()) * 3;
                 break;
             case 3:
-                TaskNum = (Main.AllAlivePlayerControls.Count() - ZombieMaximun.GetInt()) * 4;
+                TaskNum = (Main.AllAlivePlayerControls.Count - ZombieMaximun.GetInt()) * 4;
                 break;
         }
         TaskCount = (0, TaskNum);
+        Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.TZombie)).Do(x => x.RpcTeleportRandomSpawn());
     }
+
+    public override void SelectRoles()
+    {
+        var random = IRandom.Instance;
+        List<PlayerControl> AllPlayers2 = Main.EnumeratePlayerControls().Shuffle(random).ToList();
+        var ZombieNum = ZombieMaximun.GetInt();
+        foreach (PlayerControl pc in AllPlayers2)
+        {
+            if (Main.EnableGM.Value && pc.IsHost())
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                continue;
+            }
+            else if (TagManager.AssignGameMaster(pc.FriendCode))
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "TagManager");
+                continue;
+            }
+            else if (RoleAssign.SetRoles.TryGetValue(pc.PlayerId, out var role) && role == CustomRoles.GM)
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.GM;
+                Logger.Info($"Assign Game Master due to tag for [{pc.PlayerId}]{pc.GetRealName()}", "SetRoles");
+                continue;
+            }
+            else if (ZombieNum > 0)
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.TZombie;
+                ZombieNum--;
+                Logger.Info($"将感染者分配给 [{pc.PlayerId}]{pc.GetRealName()}", "TagModeAssign");
+                continue;
+            }
+            RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.TCrewmate;
+        }
+    }
+
+    public override void SetPredicate() => GameEndCheckerForNormal.predicate = new TagModeGameEndPredicate();
 
     public static void SendTaskRPC(byte targetId = 255)
     {
@@ -145,11 +188,11 @@ public static class TagMode
         writer.Write(targetId);
         writer.Write(TaskCount.Item1);
         writer.Write(TaskCount.Item2);
-        var sender = new RpcSyncTagModeTaskStates(PlayerControl.LocalPlayer.NetId, writer);
+        var sender = new RpcSyncGameModeStates(PlayerControl.LocalPlayer.NetId, writer);
         RpcUtils.LateBroadcastReliableMessage(sender);
     }
 
-    public static void HandleSyncTagModeTaskStates(MessageReader reader)
+    public override void ReceiveRPC(MessageReader reader)
     {
         byte targetId = reader.ReadByte();
         TaskCount = (reader.ReadInt32(), reader.ReadInt32());
@@ -158,7 +201,7 @@ public static class TagMode
         {
             var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
 
-            var newPopUp = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
+            var newPopUp = Object.Instantiate(popup, HudManager.Instance.transform.parent);
 
             var target = targetId.GetPlayer();
 
@@ -168,7 +211,7 @@ public static class TagMode
         }
     }
 
-    public static void AppendTagModeKcount(StringBuilder builder)
+    public override void AppendKcount(StringBuilder builder)
     {
         int ZombieCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TZombie));
         int CrewmateCount = Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TCrewmate));
@@ -184,17 +227,17 @@ class TagModeGameEndPredicate : GameEndPredicate
     {
         reason = GameOverReason.ImpostorsByKill;
 
-        if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TZombie)) <= 0)
+        if (!Main.AllAlivePlayerControls.Any(x => x.Is(CustomRoles.TZombie)))
         {
             reason = GameOverReason.ImpostorDisconnect;
-            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TCrewmate);
+            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Crewmate);
             CustomWinnerHolder.WinnerIds.Clear();
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
 
-        if (Main.AllAlivePlayerControls.Count(x => x.Is(CustomRoles.TCrewmate)) < 1)
+        if (!Main.AllAlivePlayerControls.Any(x => x.Is(CustomRoles.TCrewmate)))
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TZombie);
             CustomWinnerHolder.WinnerIds.Clear();
@@ -206,7 +249,7 @@ class TagModeGameEndPredicate : GameEndPredicate
         if (TagMode.TaskCount.Item1 >= TagMode.TaskCount.Item2)
         {
             reason = GameOverReason.CrewmatesByTask;
-            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.TCrewmate);
+            CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Crewmate);
             CustomWinnerHolder.WinnerIds.Clear();
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TCrewmate)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
@@ -227,7 +270,10 @@ public class TZombie : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        if (AmongUsClient.Instance.AmHost) player.RpcSetColor(2);
+        player.SetColor(2);
+
+        var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 2);
+        RpcUtils.LateBroadcastReliableMessage(message);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -262,7 +308,7 @@ public class TZombie : RoleBase
     {
         var targetRoleClass = target.GetRoleClass();
 
-        if (targetRoleClass.Role != CustomRoles.TCrewmate)
+        if (targetRoleClass.Role != CustomRoles.TCrewmate || target.inVent || target.walkingToVent || target.MyPhysics.Animations.IsPlayingEnterVentAnimation())
         {
             return false;
         }
@@ -296,7 +342,7 @@ public class TZombie : RoleBase
 
         var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
 
-        var newPopUp = UnityEngine.Object.Instantiate(popup, HudManager.Instance.transform.parent);
+        var newPopUp = Object.Instantiate(popup, HudManager.Instance.transform.parent);
 
         newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
         newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("TagMode.BecomeZombie");
@@ -305,6 +351,11 @@ public class TZombie : RoleBase
         TagMode.SendTaskRPC(target.PlayerId);
 
         return false;
+    }
+
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (player.inVent) player?.MyPhysics?.RpcBootFromVent(player.GetPlayerVentId());
     }
 
     public override string GetProgressText(byte playerId, bool comms) => string.Empty;
@@ -338,9 +389,12 @@ public class TCrewmate : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2 && AmongUsClient.Instance.AmHost)
+        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2)
         {
-            player.RpcSetColor(13);
+            player.SetColor(13);
+
+            var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 13);
+            RpcUtils.LateBroadcastReliableMessage(message);
         }
         playerId.SetAbilityUseLimit(TagMode.CrewmateVentLimit.GetFloat());
         ProtectState = (false, 0f);
@@ -488,6 +542,10 @@ public class TCrewmate : RoleBase
             DetectState.Item2 -= Time.fixedDeltaTime;
             if (DetectState.Item2 <= 0)
             {
+                if (player.IsModded() && MapBehaviour.Instance)
+                {
+                    if (MapBehaviour.Instance.IsOpen) MapBehaviour.Instance.Close();
+                }
                 DetectState = (false, 0f);
                 foreach (var target in Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.TZombie)))
                     TargetArrow.Remove(player.PlayerId, target.PlayerId);

@@ -1,5 +1,5 @@
 using AmongUs.GameOptions;
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using static TONE.Options;
 
 namespace TONE.Roles.Neutral;
@@ -49,7 +49,7 @@ internal class Werewolf : RoleBase
                 if (player == target) continue;
 
                 if (player.IsTransformedNeutralApocalypse()) continue;
-                else if ((player.Is(CustomRoles.NiceMini) || player.Is(CustomRoles.EvilMini)) && Mini.Age < 18) continue;
+                else if (player.Is(CustomRoles.Mini) && Mini.Age < 18) continue;
 
                 if (Utils.GetDistance(killer.transform.position, player.transform.position) <= MaulRadius.GetFloat())
                 {

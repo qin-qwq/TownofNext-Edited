@@ -11,7 +11,7 @@ internal class Escapist : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Escapist;
     private const int Id = 4000;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\
 
@@ -42,10 +42,10 @@ internal class Escapist : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = EscapeLocation.ContainsKey(playerId) ? ShapeshiftCooldown.GetFloat() : 1f;
+        AURoleOptions.ShapeshifterCooldown = EscapeLocation.ContainsKey(playerId) ? ShapeshiftCooldown.GetFloat() : 1f;
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         if (EscapeLocation.TryGetValue(shapeshifter.PlayerId, out var position))
         {
@@ -60,6 +60,5 @@ internal class Escapist : RoleBase
             shapeshifter.SyncSettings();
             shapeshifter.Notify(GetString("EscapisMtarkedPosition"));
         }
-        return false;
     }
 }

@@ -13,7 +13,7 @@ internal class Pitfall : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Pitfall;
     private const int Id = 5600;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\
 
@@ -77,7 +77,7 @@ internal class Pitfall : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = ShapeshiftCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = ShapeshiftCooldown.GetFloat();
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte id)
@@ -87,7 +87,7 @@ internal class Pitfall : RoleBase
     }
     // public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Set Trap");
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         //if (!CheckUnshapeshift) return;
         Logger.Info($"Triggered Pitfall Ability!!!", "Pitfall");
@@ -118,7 +118,6 @@ internal class Pitfall : RoleBase
         }
 
         shapeshifter.Notify(GetString("RejectShapeshift.AbilityWasUsed"), time: 2f);
-        return false;
     }
 
     private void OnFixedUpdateOthers(PlayerControl player, bool lowLoad, long nowTime)

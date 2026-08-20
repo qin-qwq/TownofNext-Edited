@@ -68,6 +68,7 @@ internal class Jailer : RoleBase
     }
     public override void Remove(byte playerId)
     {
+        JailerTarget.Remove(playerId);
         JailerHasExe.Remove(playerId);
         JailerDidVote.Remove(playerId);
     }
@@ -208,8 +209,8 @@ internal class Jailer : RoleBase
 
     public static bool JailerChannel(PlayerControl pc, string msg, bool check = true)
     {
-        if (!AmongUsClient.Instance.AmHost) return false;
-        if (!GameStates.IsMeeting || pc == null) return false;
+        //if (!AmongUsClient.Instance.AmHost) return false;
+        if (!GameStates.IsMeeting || !pc) return false;
         if (!pc.Is(CustomRoles.Jailer) && !IsTarget(pc.PlayerId)) return false;
         if (!EnableJailerChannel.GetBool()) return false;
         if (!pc.IsAlive()) return false;
@@ -221,17 +222,30 @@ internal class Jailer : RoleBase
 
         if (string.IsNullOrEmpty(msg)) return false;
 
+        if (AmongUsClient.Instance.AmHost || !pc.IsModded())
+        {
+            SendJailerChannelMsg(pc, msg);
+        }
+        else
+        {
+            var message = new RpcSendChannelMsg(PlayerControl.LocalPlayer.NetId, msg, (int)SendTargetPatch.SendTargets.Jailer);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
+
+        return true;
+    }
+
+    public static void SendJailerChannelMsg(PlayerControl pc, string msg)
+    {
         if (pc.Is(CustomRoles.Jailer))
         {
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
-                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")}"), sendTo: x.PlayerId, noReplay: true));
+                .Do(x => SendMessage(ColorString(GetRoleColor(CustomRoles.Jailer), msg), title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")}"), sendTo: x.PlayerId, noReplay: true));
         }
         else
         {
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Jailer) || IsTarget(x.PlayerId))
-                .Do(x => SendMessage(msg, title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
+                .Do(x => SendMessage(ColorString(GetRoleColor(CustomRoles.Jailer), msg), title: ColorString(GetRoleColor(CustomRoles.Jailer), $"{GetString("MessageFromJailer")} ~ <size=1.25>{pc.GetRealName(clientData: true)}</size>"), sendTo: x.PlayerId, noReplay: true));
         }
-
-        return true;
     }
 }

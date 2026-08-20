@@ -1,8 +1,11 @@
 using Hazel;
 using System;
+using System.Diagnostics;
+using TONE.Modules;
 using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
 using TONE.Roles.Neutral;
 using UnityEngine;
@@ -90,7 +93,7 @@ class UpdateSystemPatch
         if (!AmongUsClient.Instance.AmHost) return true;
 
         // ###### Can Be Sabotage Started? ######
-        if ((Options.CurrentGameMode == CustomGameMode.FFA) && systemType == SystemTypes.Sabotage) return false;
+        if ((GameModeBase.GetGameMode() == CustomGameMode.FFA) && systemType == SystemTypes.Sabotage) return false;
 
         if (Options.DisableSabotage.GetBool() && systemType == SystemTypes.Sabotage) return false;
 
@@ -111,6 +114,9 @@ class UpdateSystemPatch
         }
 
         player.GetRoleClass()?.UpdateSystem(__instance, systemType, amount, player);
+
+        if (CustomRoles.Archaeologist.HasEnabled())
+            Archaeologist.OnSabotageCall(systemType);
 
         if (Quizmaster.HasEnabled)
             Quizmaster.OnSabotageCall(systemType);
@@ -162,9 +168,7 @@ class ShipStatusCloseDoorsPatch
         Logger.Info($"Trying to close the door in the room: {room}", "CloseDoorsOfType");
 
         bool allow;
-        if (Options.CurrentGameMode == CustomGameMode.FFA || Options.DisableCloseDoor.GetBool()
-                    || Options.CurrentGameMode == CustomGameMode.SpeedRun && !SpeedRun.SpeedRun_AllowCloseDoor.GetBool()
-                    || Options.CurrentGameMode == CustomGameMode.TagMode) allow = false;
+        if (Options.DisableCloseDoor.GetBool() || !GameModeBase.GetGameMode().GetGameModeClass().CanCloseDoors) allow = false;
         else allow = true;
 
         if (allow)
@@ -185,7 +189,7 @@ class StartPatch
 
         Utils.CountAlivePlayers(sendLog: true, checkGameEnd: false);
 
-        if (Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || Options.CurrentGameMode != CustomGameMode.Standard)
+        if (Options.SyncButtonMode.GetBool() && Options.SyncedButtonCount.GetFloat() == Options.UsedButtonCount || Options.DisableMeeting.GetBool() || !GameModeBase.GetGameMode().GetGameModeClass().CanReport)
         {
             __instance.BreakEmergencyButton();
         }
@@ -206,48 +210,37 @@ class StartPatch
 
         switch (Utils.GetActiveMapName())
         {
-            case MapNames.Skeld:
-                var halloweenDecorationIsActive = Options.HalloweenDecorationsSkeld.GetBool();
-                var birthdayDecorationIsActive = Options.EnableBirthdayDecorationSkeld.GetBool();
-                var halloweenDecorationObject = __instance.transform.FindChild("Helloween");
-                var birthdayDecorationObject = __instance.transform.FindChild("BirthdayDecorSkeld");
-
-                if (Options.RandomBirthdayAndHalloweenDecorationSkeld.GetBool() && halloweenDecorationIsActive && birthdayDecorationIsActive)
-                {
-                    var random = IRandom.Instance.Next(0, 100);
-                    if (random < 50)
-                        halloweenDecorationObject?.gameObject.SetActive(true);
-                    else
-                        birthdayDecorationObject?.gameObject.SetActive(true);
-                    break;
-                }
-                if (halloweenDecorationIsActive)
-                    __instance.transform.FindChild("Helloween")?.gameObject.SetActive(true);
-
-                if (birthdayDecorationIsActive)
-                    __instance.transform.FindChild("BirthdayDecorSkeld")?.gameObject.SetActive(true);
+            // Skeld in MapDecorPatch
+            case MapNames.MiraHQ when Options.EnableHalloweenDecorations.GetBool():
+                __instance.transform.FindChild("HalloweenDecorMira")?.gameObject.SetActive(true);
                 break;
-            case MapNames.MiraHQ when Options.HalloweenDecorationsMira.GetBool():
-                __instance.transform.FindChild("Halloween")?.gameObject.SetActive(true);
-                break;
-            case MapNames.Dleks when Options.HalloweenDecorationsDleks.GetBool():
+            case MapNames.Dleks when Options.EnableHalloweenDecorations.GetBool():
                 __instance.transform.FindChild("Helloween")?.gameObject.SetActive(true);
                 break;
-            case MapNames.Polus when Main.EnableCustomDecorations.Value:
-                /*var Dropship = GameObject.Find("Dropship/panel_fuel");
-                if (Dropship != null)
-                {
-                    var Decorations = UnityEngine.Object.Instantiate(Dropship, GameObject.Find("Dropship")?.transform);
-                    Decorations.name = "Dropship_Decorations";
-                    Decorations.transform.DestroyChildren();
-                    UnityEngine.Object.Destroy(Decorations.GetComponent<Console>());
-                    UnityEngine.Object.Destroy(Decorations.GetComponent<BoxCollider2D>());
-                    UnityEngine.Object.Destroy(Decorations.GetComponent<PassiveButton>());
-                    Decorations.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TONE.Resources.Images.Dropship-Decorations.png", 100f);
-                    Decorations.transform.SetSiblingIndex(1);
-                    Decorations.transform.localPosition = new(0.0709f, 0.73f);
-                }*/
+            case MapNames.Polus when Options.EnableHalloweenDecorations.GetBool():
+                __instance.transform.FindChild("HalloweenDecorPolus")?.gameObject.SetActive(true);
                 break;
+            case MapNames.Airship when Options.EnableHalloweenDecorations.GetBool():
+                __instance.transform.FindChild("HalloweenDecorAirship")?.gameObject.SetActive(true);
+                break;
+            case MapNames.Fungle when Options.EnableHalloweenDecorations.GetBool():
+                __instance.transform.FindChild("HalloweenDecorFungle")?.gameObject.SetActive(true);
+                break;
+                /*case MapNames.Polus when Main.EnableCustomDecorations.Value:
+                    var Dropship = GameObject.Find("Dropship/panel_fuel");
+                    if (Dropship != null)
+                    {
+                        var Decorations = Object.Instantiate(Dropship, GameObject.Find("Dropship")?.transform);
+                        Decorations.name = "Dropship_Decorations";
+                        Decorations.transform.DestroyChildren();
+                        Object.Destroy(Decorations.GetComponent<Console>());
+                        Object.Destroy(Decorations.GetComponent<BoxCollider2D>());
+                        Object.Destroy(Decorations.GetComponent<PassiveButton>());
+                        Decorations.GetComponent<SpriteRenderer>().sprite = Utils.LoadSprite("TONE.Resources.Images.Dropship-Decorations.png", 100f);
+                        Decorations.transform.SetSiblingIndex(1);
+                        Decorations.transform.localPosition = new(0.0709f, 0.73f);
+                    }
+                    break;*/
         }
     }
 }
@@ -260,7 +253,7 @@ class StartMeetingPatch
         if (GameStates.IsHideNSeek) return;
 
         MeetingStates.ReportTarget = target;
-        MeetingStates.DeadBodies = UnityEngine.Object.FindObjectsOfType<DeadBody>();
+        MeetingStates.DeadBodies = Object.FindObjectsOfType<DeadBody>();
     }
     public static void Postfix()
     {
@@ -279,6 +272,7 @@ class ShipStatusBeginPatch
     public static bool Prefix()
     {
         RpcSetTasksPatch.decidedCommonTasks.Clear();
+        if (GameStates.IsHideNSeek) return true;
         return hasBegun;
     }
 
@@ -411,26 +405,101 @@ class ShipStatusSerializePatch
                 else
                 {
                     // Logger.Info("vanilla update vents", "ShipStatusSerializePatch");
-                    var subwriter = MessageWriter.Get(SendOption.Reliable);
-                    subwriter.StartMessage(5);
+                    DataFlagRateLimiter.Enqueue(() =>
                     {
-                        subwriter.Write(AmongUsClient.Instance.GameId);
-                        subwriter.StartMessage(1);
+                        var subwriter = MessageWriter.Get(SendOption.Reliable);
+                        subwriter.StartMessage(5);
                         {
-                            subwriter.WritePacked(__instance.NetId);
-                            subwriter.StartMessage((byte)SystemTypes.Ventilation);
-                            ventilationSystem.Serialize(subwriter, false);
+                            subwriter.Write(AmongUsClient.Instance.GameId);
+                            subwriter.StartMessage(1);
+                            {
+                                subwriter.WritePacked(__instance.NetId);
+                                subwriter.StartMessage((byte)SystemTypes.Ventilation);
+                                ventilationSystem.Serialize(subwriter, false);
+                                subwriter.EndMessage();
+                            }
                             subwriter.EndMessage();
                         }
                         subwriter.EndMessage();
-                    }
-                    subwriter.EndMessage();
-                    AmongUsClient.Instance.SendOrDisconnect(subwriter);
-                    subwriter.Recycle();
+                        AmongUsClient.Instance.SendOrDisconnect(subwriter);
+                        subwriter.Recycle();
+                    });
                 }
                 ventilationSystem.IsDirty = false;
             }
         }
         return false;
+    }
+}
+// Credit: EHR
+internal static class ShipStatusFixedUpdatePatch
+{
+    public static Dictionary<byte, int> ClosestVent = [];
+    public static Dictionary<byte, bool> CanUseClosestVent = [];
+
+    private static Stopwatch Stopwatch;
+
+    public static System.Collections.IEnumerator Postfix()
+    {
+        Stopwatch = Stopwatch.StartNew();
+
+        while (ShipStatus.Instance)
+        {
+            if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks)
+            {
+                Stopwatch.Reset();
+                yield return new WaitForSecondsRealtime(AntiBlackout.SkipTasks ? 2f : 5f);
+                Stopwatch.Start();
+                continue;
+            }
+
+            var ventilationSystem = ShipStatus.Instance.Systems[SystemTypes.Ventilation].CastFast<VentilationSystem>();
+
+            if (ventilationSystem == null)
+            {
+                Stopwatch.Reset();
+                yield return new WaitForSecondsRealtime(0.1f);
+                Stopwatch.Start();
+                continue;
+            }
+
+            foreach (PlayerControl pc in Main.EnumerateAlivePlayerControls())
+            {
+                try
+                {
+                    Vent closestVent = pc.GetClosestVent();
+                    int ventId = closestVent.Id;
+                    bool canUseVent = !pc.CantUseVent(ventId);
+
+                    if (!ClosestVent.TryGetValue(pc.PlayerId, out int lastVentId) || !CanUseClosestVent.TryGetValue(pc.PlayerId, out bool lastCanUseVent))
+                    {
+                        ClosestVent[pc.PlayerId] = ventId;
+                        CanUseClosestVent[pc.PlayerId] = canUseVent;
+                        continue;
+                    }
+
+                    if (ventId != lastVentId || canUseVent != lastCanUseVent)
+                        VentSystemDeterioratePatch.SerializeV2(ventilationSystem, pc);
+
+                    ClosestVent[pc.PlayerId] = ventId;
+                    CanUseClosestVent[pc.PlayerId] = canUseVent;
+                }
+                catch (Exception e) { Utils.ThrowException(e); }
+
+                if (Stopwatch.ElapsedMilliseconds > 3)
+                {
+                    Stopwatch.Reset();
+                    yield return null;
+                    Stopwatch.Start();
+                }
+            }
+
+            Stopwatch.Reset();
+            yield return new WaitForSecondsRealtime(1f);
+            Stopwatch.Start();
+        }
+
+        if (ShipStatus.Instance)
+            Main.Instance.StartCoroutine(Postfix());
     }
 }

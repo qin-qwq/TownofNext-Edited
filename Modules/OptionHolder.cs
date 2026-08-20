@@ -7,19 +7,6 @@ using UnityEngine;
 
 namespace TONE;
 
-[Obfuscation(Exclude = true)]
-[Flags]
-public enum CustomGameMode
-{
-    Standard = 0x01,
-    FFA = 0x02,
-    SpeedRun = 0x03,
-    TagMode = 0x04,
-
-    HidenSeekTONE = 0x08, // HidenSeekTONE must be after other game modes
-    All = int.MaxValue
-}
-
 [HarmonyPatch]
 public static class Options
 {
@@ -27,6 +14,9 @@ public static class Options
     public static void OptionsLoadStart_Postfix()
     {
         Logger.Msg("Mod option loading start", "Load Options");
+        AchievementManager.Load();
+        ChatCommands.LoadCommands();
+        FactionOption.Load();
         try
         {
             Main.Instance.StartCoroutine(CoLoadOptions());
@@ -56,20 +46,13 @@ public static class Options
 
             2 => CustomGameMode.SpeedRun,
             3 => CustomGameMode.TagMode,
-            4 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
+            4 => CustomGameMode.RoundUp,
+            5 => CustomGameMode.CopsAndRobbers,
+            //5 => CustomGameMode.BonfireNight,
+            6 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
             _ => CustomGameMode.Standard
         };
     public static int prevGameMode = 0;
-    public static readonly string[] gameModes =
-    [
-        "Standard",
-        "FFA",
-
-        "SpeedRun",
-        "TagMode",
-
-        "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
-    ];
 
     public static OptionItem DraftHeader;
     public static OptionItem DraftMode;
@@ -151,6 +134,11 @@ public static class Options
         "pet_stardew_junimo",
         "pet_RANDOM_FOR_EVERYONE"
     ];
+    public static readonly string[] WinBySabotageMode =
+    [
+        "WinBySabotageMode.Impostor",
+        "WinBySabotageMode.Coven"
+    ];
     [Obfuscation(Exclude = true)]
     public enum QuickChatSpamMode
     {
@@ -197,6 +185,8 @@ public static class Options
     public static OptionItem BypassRateLimitAC;
     public static OptionItem MaxSpiltReliablePacketsPerTick;
     public static OptionItem MaxSpiltNonePacketsPerTick;
+    public static OptionItem MaxSpiltReliableDataFlagPerSecond;
+    public static OptionItem MaxSpiltNoneDataFlagPerSecond;
 
     public static OptionItem GradientTagsOpt;
     public static OptionItem EnableKillerLeftCommand;
@@ -258,7 +248,6 @@ public static class Options
     public static OptionItem AutoPlayAgainCountdown;
 
     public static OptionItem EnableVoteCommand;
-    public static OptionItem ShouldVoteCmdsSpamChat;
 
     public static OptionItem LowLoadMode;
     public static OptionItem LowLoadDelayUpdateNames;
@@ -345,9 +334,6 @@ public static class Options
     public static OptionItem DecontaminationTimeOnPolus;
 
     public static OptionItem EnableHalloweenDecorations;
-    public static OptionItem HalloweenDecorationsSkeld;
-    public static OptionItem HalloweenDecorationsMira;
-    public static OptionItem HalloweenDecorationsDleks;
     public static OptionItem EnableBirthdayDecorationSkeld;
     public static OptionItem RandomBirthdayAndHalloweenDecorationSkeld;
 
@@ -380,6 +366,8 @@ public static class Options
     public static OptionItem DisableAirshipViewingDeckLightsPanel;
     public static OptionItem DisableAirshipGapRoomLightsPanel;
     public static OptionItem DisableAirshipCargoLightsPanel;
+
+    public static OptionItem WinBySabotageTeam;
 
     // Disable
     public static OptionItem DisableShieldAnimations;
@@ -438,7 +426,6 @@ public static class Options
     public static OptionItem WhenSkipVoteIgnoreEmergency;
     public static OptionItem WhenNonVote;
     public static OptionItem WhenTie;
-    public static OptionItem ShowMeetingReason;
     public static OptionItem UseMeetingShapeshift;
 
     // Other
@@ -467,9 +454,10 @@ public static class Options
     public static OptionItem GhostCanSeeOtherVotes;
     public static OptionItem GhostCanSeeDeathReason;
     public static OptionItem ConvertedCanBecomeGhost;
-    public static OptionItem NeutralCanBecomeGhost;
     public static OptionItem MaxImpGhost;
     public static OptionItem MaxCrewGhost;
+    public static OptionItem MaxNeutralGhost;
+    public static OptionItem MaxCovenGhost;
     public static OptionItem DefaultAngelCooldown;
 
 
@@ -575,8 +563,8 @@ public static class Options
     public static OptionItem HideGuesserCommands;
     public static OptionItem ShowOnlyEnabledRolesInGuesserUI;
     public static OptionItem CanOnlyGuessEnabled;
-    public static OptionItem CantGuessDuringDiscussionTime;
     public static OptionItem CanGuessCrewInvestigative;
+    public static OptionItem InvestigativeRoleCantGuess;
     public static OptionItem UseQuickChatSpamCheat;
 
     // 技能相关设定
@@ -585,7 +573,11 @@ public static class Options
     public static OptionItem CancelPetAnimation;
     public static OptionItem CantUseAbilityDuringDiscussionTime;
     public static OptionItem EnableImpostorChannel;
+    public static OptionItem EnableCovenChannel;
     public static OptionItem ShowExileMsgAfterMeeting;
+    public static OptionItem BalanceRoleSetting;
+    public static OptionItem BalanceNeedPlayers;
+    public static OptionItem ChangeFactionSettings;
 
     // ------------ General Role Settings ------------
 
@@ -735,7 +727,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 34300 last id for roles/add-ons (Next use 34400)
+        // 34600 last id for roles/add-ons (Next use 34700)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -754,7 +746,7 @@ public static class Options
                 .SetHidden(true);
 
         // Game Mode
-        GameMode = StringOptionItem.Create(60000, "GameMode", gameModes, 0, TabGroup.ModSettings, false)
+        GameMode = StringOptionItem.Create(60000, "GameMode", CustomGameModeManager.gameModes, 0, TabGroup.ModSettings, false)
             .SetHeader(true);
 
 
@@ -968,7 +960,6 @@ public static class Options
             .SetColor(new Color32(140, 255, 255, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateVanilla).ForEach(r => r.SetupCustomOption());
-        CustomRoleManager.GetNormalOptions(Custom_RoleType.CrewmateVanillaGhosts).ForEach(r => r.SetupCustomOption());
 
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCrewmate()).Any(r => r.Value.IsExperimental))
         {
@@ -993,7 +984,7 @@ public static class Options
         /*
          * MINI 
          */
-        CustomRoles.Mini.GetStaticRoleClass().SetupCustomOption();
+        //CustomRoles.Mini.GetStaticRoleClass().SetupCustomOption();
 
         /*
          * SUPPORT ROLES
@@ -1095,6 +1086,12 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard);
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralApocalypse).ForEach(r => r.SetupCustomOption());
+
+        TextOptionItem.Create(10000116, "RoleType.NeutralGhost", TabGroup.NeutralRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(127, 140, 141, byte.MaxValue));
+
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.NeutralGhosts).ForEach(r => r.SetupCustomOption());
         #endregion
         Logger.Info("Neutral settings setup", "Load Options");
         yield return null;
@@ -1102,7 +1099,7 @@ public static class Options
         #region Coven Settings
         if (CustomRoleManager.RoleClass.Where(x => x.Key.IsCoven()).Any(r => r.Value.IsExperimental))
         {
-            TextOptionItem.Create(10000023, "Experimental.Roles", TabGroup.NeutralRoles)
+            TextOptionItem.Create(10000023, "Experimental.Roles", TabGroup.CovenRoles)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(141, 70, 49, byte.MaxValue));
 
@@ -1134,6 +1131,12 @@ public static class Options
             .SetColor(new Color32(172, 66, 242, byte.MaxValue));
 
         CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenUtility).ForEach(r => r.SetupCustomOption());
+
+        TextOptionItem.Create(10000117, "RoleType.CovenGhost", TabGroup.CovenRoles)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(172, 66, 242, byte.MaxValue));
+
+        CustomRoleManager.GetNormalOptions(Custom_RoleType.CovenGhosts).ForEach(r => r.SetupCustomOption());
         #endregion
         Logger.Info("Coven settings setup", "Load Options");
         yield return null;
@@ -1210,6 +1213,12 @@ public static class Options
             .SetValueFormat(OptionFormat.Pieces)
             .SetParent(BypassRateLimitAC);
         MaxSpiltNonePacketsPerTick = IntegerOptionItem.Create(60047, "MaxSpiltNonePacketsPerTick", new(1, 100, 1), 5, TabGroup.SystemSettings, false)
+            .SetValueFormat(OptionFormat.Pieces)
+            .SetParent(BypassRateLimitAC);
+        MaxSpiltReliableDataFlagPerSecond = IntegerOptionItem.Create(60046, "MaxSpiltReliableDataFlagPerSecond", new(20, 100, 1), 23, TabGroup.SystemSettings, false)
+            .SetValueFormat(OptionFormat.Pieces)
+            .SetParent(BypassRateLimitAC);
+        MaxSpiltNoneDataFlagPerSecond = IntegerOptionItem.Create(61003, "MaxSpiltNoneDataFlagPerSecond", new(20, 100, 1), 23, TabGroup.SystemSettings, false)
             .SetValueFormat(OptionFormat.Pieces)
             .SetParent(BypassRateLimitAC);
 
@@ -1378,14 +1387,8 @@ public static class Options
         yield return null;
 
         #region Game Settings
-        //FFA
-        FFAManager.SetupCustomOption();
 
-        //Speed Run
-        SpeedRun.SetupCustomOption();
-
-        //Tag Mode
-        TagMode.SetupCustomOption();
+        CustomGameModeManager.GameModeClass.Values.Do(x => x.SetupCustomOption());
 
         // Hide & Seek
         TextOptionItem.Create(10000055, "MenuTitle.Hide&Seek", TabGroup.ModSettings)
@@ -1513,17 +1516,14 @@ public static class Options
             .SetColor(Color.cyan);
 
         CanOnlyGuessEnabled = BooleanOptionItem.Create(60696, "CanOnlyGuessEnabled", true, TabGroup.ModSettings, false)
-            .SetHeader(true)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetColor(Color.cyan);
-
-        CantGuessDuringDiscussionTime = BooleanOptionItem.Create(60697, "CantGuessDuringDiscussionTime", true, TabGroup.ModSettings, false)
-            .SetHeader(true)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
 
         CanGuessCrewInvestigative = BooleanOptionItem.Create(60698, "CanGuessCrewInvestigative", true, TabGroup.ModSettings, false)
-            .SetHeader(true)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(Color.cyan);
+
+        InvestigativeRoleCantGuess = BooleanOptionItem.Create(60699, "InvestigativeRoleCantGuess", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(Color.cyan);
 
@@ -1619,15 +1619,6 @@ public static class Options
             .SetColor(new Color32(19, 188, 233, byte.MaxValue));
         // Vanilla Map Decorations
         EnableHalloweenDecorations = BooleanOptionItem.Create(60506, "EnableHalloweenDecorations", false, TabGroup.ModSettings, false)
-            .SetColor(new Color32(19, 188, 233, byte.MaxValue));
-        HalloweenDecorationsSkeld = BooleanOptionItem.Create(60507, "HalloweenDecorationsSkeld", false, TabGroup.ModSettings, false)
-            .SetParent(EnableHalloweenDecorations)
-            .SetColor(new Color32(19, 188, 233, byte.MaxValue));
-        HalloweenDecorationsMira = BooleanOptionItem.Create(60508, "HalloweenDecorationsMira", false, TabGroup.ModSettings, false)
-            .SetParent(EnableHalloweenDecorations)
-            .SetColor(new Color32(19, 188, 233, byte.MaxValue));
-        HalloweenDecorationsDleks = BooleanOptionItem.Create(60509, "HalloweenDecorationsDleks", false, TabGroup.ModSettings, false)
-            .SetParent(EnableHalloweenDecorations)
             .SetColor(new Color32(19, 188, 233, byte.MaxValue));
         EnableBirthdayDecorationSkeld = BooleanOptionItem.Create(60518, "EnableBirthdayDecorationSkeld", false, TabGroup.ModSettings, false)
             .SetColor(new Color32(19, 188, 233, byte.MaxValue));
@@ -1733,6 +1724,9 @@ public static class Options
         DisableAirshipCargoLightsPanel = BooleanOptionItem.Create(60554, "DisableAirshipCargoLightsPanel", false, TabGroup.ModSettings, false)
             .SetParent(LightsOutSpecialSettings)
             .SetGameMode(CustomGameMode.Standard);
+        WinBySabotageTeam = StringOptionItem.Create(60555, "WinBySabotageTeam", WinBySabotageMode, 0, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(243, 96, 96, byte.MaxValue));
 
 
         // Disable
@@ -2081,12 +2075,6 @@ public static class Options
         EnableVoteCommand = BooleanOptionItem.Create(60746, "EnableVote", true, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
-        ShouldVoteCmdsSpamChat = BooleanOptionItem.Create(60747, "ShouldVoteSpam", false, TabGroup.ModSettings, false)
-            .SetParent(EnableVoteCommand)
-            .SetGameMode(CustomGameMode.Standard);
-        ShowMeetingReason = BooleanOptionItem.Create(60748, "ShowMeetingReason", false, TabGroup.ModSettings, false)
-            .SetColor(new Color32(147, 241, 240, byte.MaxValue))
-            .SetGameMode(CustomGameMode.Standard);
         UseMeetingShapeshift = BooleanOptionItem.Create(60749, "UseMeetingShapeshift", true, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
@@ -2095,13 +2083,17 @@ public static class Options
             .HideInFFA()
             .HideInSpeedRun()
             .HideInTagMode()
+            .HideInBonfireNight()
+            .HideInCAR()
             .SetColor(new Color32(193, 255, 209, byte.MaxValue));
         // 梯子摔死
         LadderDeath = BooleanOptionItem.Create(60760, "LadderDeath", false, TabGroup.ModSettings, false)
             .SetColor(new Color32(193, 255, 209, byte.MaxValue))
             .HideInFFA()
             .HideInSpeedRun()
-            .HideInTagMode();
+            .HideInTagMode()
+            .HideInBonfireNight()
+            .HideInCAR();
         LadderDeathChance = StringOptionItem.Create(60761, "LadderDeathChance", EnumHelper.GetAllNames<SpawnChance>()[1..], 0, TabGroup.ModSettings, false)
             .SetParent(LadderDeath);
 
@@ -2180,18 +2172,22 @@ public static class Options
         ConvertedCanBecomeGhost = BooleanOptionItem.Create(60840, "ConvertedCanBeGhostRole", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(217, 218, 255, byte.MaxValue));
-        NeutralCanBecomeGhost = BooleanOptionItem.Create(60841, "NeutralCanBeGhostRole", false, TabGroup.ModSettings, false)
-            .SetParent(ConvertedCanBecomeGhost)
-            .SetGameMode(CustomGameMode.Standard)
-            .SetColor(new Color32(217, 218, 255, byte.MaxValue));
 
         MaxImpGhost = IntegerOptionItem.Create(60850, "MaxImpGhostRole", new(0, 15, 1), 15, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetValueFormat(OptionFormat.Times)
+            .SetValueFormat(OptionFormat.Players)
             .SetColor(new Color32(217, 218, 255, byte.MaxValue));
         MaxCrewGhost = IntegerOptionItem.Create(60860, "MaxCrewGhostRole", new(0, 15, 1), 15, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetValueFormat(OptionFormat.Times)
+            .SetValueFormat(OptionFormat.Players)
+            .SetColor(new Color32(217, 218, 255, byte.MaxValue));
+        MaxNeutralGhost = IntegerOptionItem.Create(60861, "MaxNeutralGhostRole", new(0, 15, 1), 15, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetValueFormat(OptionFormat.Players)
+            .SetColor(new Color32(217, 218, 255, byte.MaxValue));
+        MaxCovenGhost = IntegerOptionItem.Create(60862, "MaxCovenGhostRole", new(0, 15, 1), 15, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetValueFormat(OptionFormat.Players)
             .SetColor(new Color32(217, 218, 255, byte.MaxValue));
         DefaultAngelCooldown = FloatOptionItem.Create(60870, "DefaultAngelCooldown", new(2.5f, 120f, 2.5f), 35f, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
@@ -2222,7 +2218,21 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
-        ShowExileMsgAfterMeeting = BooleanOptionItem.Create(61105, "ShowExileMsgAfterMeeting", true, TabGroup.ModSettings, false)
+        EnableCovenChannel = BooleanOptionItem.Create(61105, "EnableCovenChannel", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        ShowExileMsgAfterMeeting = BooleanOptionItem.Create(61106, "ShowExileMsgAfterMeeting", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        BalanceRoleSetting = BooleanOptionItem.Create(61107, "BalanceRoleSetting", true, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        BalanceNeedPlayers = IntegerOptionItem.Create(61108, "BalanceNeedPlayers", (1, 15, 1), 12, TabGroup.ModSettings, false)
+            .SetParent(BalanceRoleSetting)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetValueFormat(OptionFormat.Players)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        ChangeFactionSettings = BooleanOptionItem.Create(61109, "ChangeFactionSettings", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion

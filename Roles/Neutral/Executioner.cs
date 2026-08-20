@@ -35,7 +35,6 @@ internal class Executioner : RoleBase
         CustomRoles.Amnesiac,
         CustomRoles.Maverick,
         CustomRoles.CrewmateTONE,
-        CustomRoles.Celebrity,
         CustomRoles.Bodyguard,
         CustomRoles.Dictator,
         CustomRoles.Mayor,
@@ -97,7 +96,8 @@ internal class Executioner : RoleBase
                 else if (!CanTargetNeutralEvil.GetBool() && target.GetCustomRole().IsNE()) continue;
                 else if (!CanTargetNeutralChaos.GetBool() && target.GetCustomRole().IsNC()) continue;
                 else if (!CanTargetCoven.GetBool() && target.Is(Custom_Team.Coven)) continue;
-                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.NiceMini or CustomRoles.EvilMini or CustomRoles.Solsticer or CustomRoles.Workaholic) continue;
+                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.Solsticer or CustomRoles.Workaholic) continue;
+                if (target.Is(CustomRoles.Mini)) continue;
                 if (Lovers.AreLovers(executioner, target)) continue;
 
                 targetList.Add(target);
@@ -180,9 +180,6 @@ internal class Executioner : RoleBase
             case CustomRoles.Amnesiac:
                 Main.PlayerStates[executionerId].RemoveSubRole(CustomRoles.Oblivious);
                 break;
-            case CustomRoles.Celebrity:
-                Main.PlayerStates[executionerId].RemoveSubRole(CustomRoles.Cyber);
-                break;
             case CustomRoles.Dictator:
                 new[] { CustomRoles.Tiebreaker, CustomRoles.Paranoia, CustomRoles.Knighted, CustomRoles.VoidBallot, CustomRoles.Silent, CustomRoles.Influenced }.Do(x => Main.PlayerStates[executionerId].RemoveSubRole(x));
                 break;
@@ -207,7 +204,7 @@ internal class Executioner : RoleBase
         Utils.NotifyRoles(SpecifySeer: executioner);
     }
 
-    public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
+    /*public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
         if (_Player != null && _Player.PlayerId == target.PlayerId)
         {
@@ -215,7 +212,7 @@ internal class Executioner : RoleBase
             TargetList.Remove(TargetId);
             TargetId = byte.MaxValue;
         }
-    }
+    }*/
     private void OnOthersDead(PlayerControl killer, PlayerControl target, bool inMeeting)
     {
         if (IsTarget(target.PlayerId))
@@ -238,7 +235,7 @@ internal class Executioner : RoleBase
 
     public override void CheckExileTarget(NetworkedPlayerInfo exiled, ref bool DecidedWinner, bool isMeetingHud, ref string name)
     {
-        if (!_Player.IsAlive() || !IsTarget(exiled.PlayerId)) return;
+        if (!_Player.IsAlive() || !IsTarget(exiled.PlayerId) || !exiled) return;
 
         if (isMeetingHud)
         {

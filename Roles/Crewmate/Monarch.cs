@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Core;
-using TONE.Roles.Double;
 using static TONE.Options;
 using static TONE.Translator;
 
@@ -49,7 +49,7 @@ internal class Monarch : RoleBase
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {
         if (killer.GetAbilityUseLimit() <= 0) return false;
-        if (Mini.Age < 18 && (target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)))
+        if (Mini.Age < 18 && target.Is(CustomRoles.Mini))
         {
             killer.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cultist), GetString("CantRecruit")));
             return false;

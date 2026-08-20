@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace TONE.Patches;
 
 // Thanks Galster (https://github.com/Galster-dev)

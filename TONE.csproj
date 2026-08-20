@@ -17,11 +17,11 @@
 		<CodePage>65001</CodePage>
 	</PropertyGroup>
 
-	<PropertyGroup Condition=" '$(Platform)' == 'Android' ">
-		<DefineConstants>TRACE;ANDROID</DefineConstants>
-	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Platform)' == 'Windows' ">
 		<DefineConstants>TRACE;PC</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Platform)' == 'Android' ">
+		<DefineConstants>TRACE;ANDROID</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -30,8 +30,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Condition="$(Platform)=='Windows'" Include="AmongUs.GameLibs.Steam" Version="2026.8.18" PrivateAssets="all" />
 		<PackageReference Condition="$(Platform)=='Android'" Include="AmongUs.GameLibs.Android" Version="2026.3.17" PrivateAssets="all" />
-		<PackageReference Condition="$(Platform)=='Windows'" Include="AmongUs.GameLibs.Steam" Version="2026.3.31" PrivateAssets="all" />
 
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1">
 			<PrivateAssets>all</PrivateAssets>

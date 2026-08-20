@@ -107,6 +107,7 @@ internal class Blackmailer : RoleBase
 
         ClearBlackmaile(true);
         ForBlackmailer.Add(target.PlayerId, _Player.PlayerId);
+        AchievementManager.OnRoleAbility(CustomRoles.Blackmailer, AchievementBase.AchievementEventType.BlackmailerBlackmailed, blackmailer);
         SendRPC(target.PlayerId);
     }
 

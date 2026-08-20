@@ -11,7 +11,7 @@ internal class Bomber : RoleBase
     public override CustomRoles Role => CustomRoles.Bomber;
     private const int Id = 700;
 
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -53,9 +53,9 @@ internal class Bomber : RoleBase
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = BombCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = BombCooldown.GetFloat();
     }
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         var playerRole = shapeshifter.GetCustomRole();
 
@@ -94,7 +94,6 @@ internal class Bomber : RoleBase
                 }
             }, 0.3f, $"{playerRole} was suicide");
         }
-        return false;
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)

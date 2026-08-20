@@ -3,18 +3,27 @@ using Hazel;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using InnerNet;
 using System;
+using System.Runtime.CompilerServices;
+using System.Text;
 using UnityEngine;
 
 namespace TONE;
 
 public class CustomRpcSender
 {
+    private int messages;
     public MessageWriter stream;
     public readonly string name;
     public readonly SendOption sendOption;
     public bool isUnsafe;
+    public bool shouldLog;
     public delegate void onSendDelegateType();
     public onSendDelegateType onSendDelegate;
+
+    private readonly List<string> LastRpcs = [];
+    private readonly List<object> LastWriten = [];
+
+    private readonly List<MessageWriter> doneStreams = [];
 
     public State CurrentState
     {
@@ -25,62 +34,91 @@ public class CustomRpcSender
             else Logger.Warn("CurrentStateはisUnsafeがtrueの時のみ上書きできます", "CustomRpcSender");
         }
     }
-    private State currentState = State.BeforeInit;
-    private int messages;
+    private State currentState/* = State.BeforeInit*/;
 
-    //0~: targetClientId (GameDataTo)
-    //-1: 全プレイヤー (GameData)
-    //-2: 未設定
+    // 0~: targetClientId (GameDataTo)
+    // -1: All players (GameData)
+    // -2: Not set
     private int currentRpcTarget;
 
-    private int rootMessageCount;
+    public bool checkLength;
+    public bool packed;
 
-    private CustomRpcSender() { }
-    public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe)
+    public CustomRpcSender(string name, SendOption sendOption, bool isUnsafe, bool log)
     {
         stream = MessageWriter.Get(sendOption);
 
         this.name = name;
         this.sendOption = sendOption;
         this.isUnsafe = isUnsafe;
+        this.shouldLog = log;
         this.currentRpcTarget = -2;
-        this.messages = 0;
-        onSendDelegate = () => Logger.Info($"{this.name}'s onSendDelegate =>", "CustomRpcSender");
+        this.packed = false;
+        this.checkLength = true;
+        onSendDelegate = () => { };
 
         currentState = State.Ready;
-        rootMessageCount = 0;
-        Logger.Info($"\"{name}\" is ready", "CustomRpcSender");
+        messages = 0;
+        if (this.shouldLog)
+            Logger.Info($"\"{name}\" is ready", "CustomRpcSender");
     }
-    public static CustomRpcSender Create(string name = "No Name Sender", SendOption sendOption = SendOption.None, bool isUnsafe = false)
+    public static CustomRpcSender Create(string name = "No Name Sender", SendOption sendOption = SendOption.None, bool isUnsafe = false, bool log = true)
     {
-        return new CustomRpcSender(name, sendOption, isUnsafe);
+        return new CustomRpcSender(name, sendOption, isUnsafe, log);
     }
 
     #region Start/End Message
+
     public CustomRpcSender StartMessage(int targetClientId = -1)
     {
-        if (currentState != State.Ready)
+        if (currentState is not State.Ready and not State.InRootPackedMessage)
         {
-            string errorMsg = $"Messageを開始しようとしましたが、StateがReadyではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to start Message but State is not Ready or InRootPackedMessage (in: \"{name}\")";
+
             if (isUnsafe)
-            {
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
+            else
+                throw new InvalidOperationException(errorMsg);
+        }
+
+        if (currentState == State.InRootPackedMessage && targetClientId < 0)
+        {
+            var errorMsg = $"Tried to start Message, but State is InRootPackedMessage and the requested targetClientId is negative. Only GameDataTo messages can be started in this state. (in: \"{name}\")";
+
+            if (isUnsafe)
+                Logger.Warn(errorMsg, "CustomRpcSender.Warn");
+            else
+                throw new InvalidOperationException(errorMsg);
+        }
+
+        if (checkLength && stream.Length > 500)
+        {
+            if (currentState == State.InRootPackedMessage)
+            {
+                stream.EndMessage();
+                doneStreams.Add(stream);
+                stream = MessageWriter.Get(sendOption);
+                messages = 0;
+                currentState = State.Ready;
+                StartPackedMessage();
             }
             else
             {
-                throw new InvalidOperationException(errorMsg);
+                doneStreams.Add(stream);
+                stream = MessageWriter.Get(sendOption);
+                messages = 0;
             }
         }
 
         if (targetClientId < 0)
         {
-            // 全員に対するRPC
+            // RPC for everyone
             stream.StartMessage(5);
             stream.Write(AmongUsClient.Instance.GameId);
         }
         else
         {
-            // 特定のクライアントに対するRPC (Desync)
+            // RPC (Desync) to a specific client
             stream.StartMessage(6);
             stream.Write(AmongUsClient.Instance.GameId);
             stream.WritePacked(targetClientId);
@@ -88,48 +126,99 @@ public class CustomRpcSender
 
         currentRpcTarget = targetClientId;
         currentState = State.InRootMessage;
-        rootMessageCount++;
-
-        if (rootMessageCount > 1)
-        {
-            Logger.Info($"\"{name}\" has {rootMessageCount} root messages.", "CustomRpcSender");
-        }
         return this;
     }
 
-    public CustomRpcSender EndMessage(bool startNew = false)
+    public CustomRpcSender StartPackedMessage()
     {
-        if (currentState != State.InRootMessage)
+        if (GameStates.IsLocalGame) return this;
+
+        if (currentState != State.Ready)
         {
-            string errorMsg = $"Messageを終了しようとしましたが、StateがInRootMessageではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to start Packed Message but State is not Ready (in: \"{name}\")";
+
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
             else
                 throw new InvalidOperationException(errorMsg);
         }
-        stream.EndMessage();
 
-        if (startNew)
+        if (checkLength && stream.Length > 500)
         {
+            doneStreams.Add(stream);
             stream = MessageWriter.Get(sendOption);
             messages = 0;
         }
 
+        stream.StartMessage(26);
+        stream.WritePacked(AmongUsClient.Instance.GameId);
+
         currentRpcTarget = -2;
-        currentState = State.Ready;
+        currentState = State.InRootPackedMessage;
+        packed = true;
         return this;
     }
+
+    public CustomRpcSender EndMessage(bool startNew = false)
+    {
+        if (currentState is not State.InRootMessage and not State.InRootPackedMessage)
+        {
+            var errorMsg = $"Tried to end Message but State is not InRootMessage or InRootPackedMessage (in: \"{name}\")";
+
+            if (isUnsafe)
+                Logger.Warn(errorMsg, "CustomRpcSender.Warn");
+            else
+                throw new InvalidOperationException(errorMsg);
+        }
+
+        bool wasPackedContext = packed;
+        bool closingPackedRoot = currentState == State.InRootPackedMessage;
+
+        stream.EndMessage();
+
+        if (closingPackedRoot)
+            packed = false;
+
+        if (startNew)
+        {
+            if (wasPackedContext && !closingPackedRoot)
+            {
+                // Close outer packed root too
+                stream.EndMessage();
+            }
+
+            doneStreams.Add(stream);
+            stream = MessageWriter.Get(sendOption);
+            messages = 0;
+
+            currentState = State.Ready;
+            currentRpcTarget = -2;
+
+            if (wasPackedContext)
+                StartPackedMessage();
+
+            return this;
+        }
+
+        currentRpcTarget = -2;
+        currentState = packed ? State.InRootPackedMessage : State.Ready;
+        return this;
+    }
+
     #endregion
     #region Start/End Rpc
     public CustomRpcSender StartRpc(uint targetNetId, RpcCalls rpcCall)
-        => StartRpc(targetNetId, (byte)rpcCall);
+    {
+        return StartRpc(targetNetId, (byte)rpcCall);
+    }
     public CustomRpcSender StartRpc(
         uint targetNetId,
         byte callId)
     {
         if (currentState != State.InRootMessage)
         {
-            string errorMsg = $"RPCを開始しようとしましたが、StateがInRootMessageではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to start RPC but State is not InRootMessage (in: \"{name}\")";
+
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
             else
@@ -138,8 +227,9 @@ public class CustomRpcSender
 
         if (messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
         {
+            int targetClientId = currentRpcTarget;
             EndMessage(startNew: true);
-            StartMessage(currentRpcTarget);
+            StartMessage(targetClientId);
         }
 
         messages++;
@@ -155,7 +245,8 @@ public class CustomRpcSender
     {
         if (currentState != State.InRpc)
         {
-            string errorMsg = $"RPCを終了しようとしましたが、StateがInRpcではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to end RPC but State is not InRpc (in: \"{name}\")";
+
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
             else
@@ -169,56 +260,137 @@ public class CustomRpcSender
     #endregion
     public CustomRpcSender AutoStartRpc(
         uint targetNetId,
-        RpcCalls callId,
-        int targetClientId = -1) => AutoStartRpc(targetNetId, (byte)callId, targetClientId);
+        RpcCalls rpcCall,
+        int targetClientId = -1,
+        [CallerFilePath] string callerPath = "",
+        [CallerLineNumber] int callerLine = 0)
+    {
+        // ReSharper disable ExplicitCallerInfoArgument
+        return AutoStartRpc(targetNetId, (byte)rpcCall, targetClientId, callerPath, callerLine);
+        // ReSharper restore ExplicitCallerInfoArgument
+    }
     public CustomRpcSender AutoStartRpc(
         uint targetNetId,
         byte callId,
-        int targetClientId = -1)
+        int targetClientId = -1,
+        [CallerFilePath] string callerPath = "",
+        [CallerLineNumber] int callerLine = 0)
     {
         if (targetClientId == -2) targetClientId = -1;
-        if (currentState is not State.Ready and not State.InRootMessage)
+
+        if (currentState is not State.Ready and not State.InRootPackedMessage and not State.InRootMessage)
         {
-            string errorMsg = $"RPCを自動で開始しようとしましたが、StateがReadyまたはInRootMessageではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to start RPC automatically, but State is not Ready or InRootPackedMessage or InRootMessage (in: \"{name}\", state: {currentState}) (called from {callerPath}:{callerLine})";
+
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
             else
                 throw new InvalidOperationException(errorMsg);
         }
+
+        if (currentState == State.InRootPackedMessage && targetClientId < 0)
+        {
+            var errorMsg = $"Tried to start RPC automatically, but State is InRootPackedMessage and the requested targetClientId is negative. Only GameDataTo messages can be started in this state. (in: \"{name}\", state: {currentState}) (called from {callerPath}:{callerLine})";
+
+            if (isUnsafe)
+                Logger.Warn(errorMsg, "CustomRpcSender.Warn");
+            else
+                throw new InvalidOperationException(errorMsg);
+        }
+
         if (currentRpcTarget != targetClientId)
         {
-            //StartMessage処理
-            if (currentState == State.InRootMessage) this.EndMessage(startNew: true);
-            else if (messages > 0) // state is Ready
+            // StartMessage processing
+            if (currentState == State.InRootMessage)
+                EndMessage(startNew: !packed && messages < AmongUsClient.Instance.GetMaxMessagePackingLimit());
+            else if (messages > 0) // state is Ready or InRootPackedMessage
             {
-                stream = MessageWriter.Get(sendOption);
-                messages = 0;
+                if (currentState == State.InRootPackedMessage)
+                {
+                    stream.EndMessage();
+                    currentState = State.Ready;
+                    doneStreams.Add(stream);
+                    stream = MessageWriter.Get(sendOption);
+                    messages = 0;
+                    StartPackedMessage(); // assume the next message should be in a PackedGameDataTo message as well
+                }
+                else // state is Ready
+                {
+                    doneStreams.Add(stream);
+                    stream = MessageWriter.Get(sendOption);
+                    messages = 0;
+                }
             }
-            this.StartMessage(targetClientId);
+
+            StartMessage(targetClientId);
         }
-        this.StartRpc(targetNetId, callId);
+
+        StartRpc(targetNetId, callId);
 
         return this;
     }
     public void SendMessage(bool dispose = false)
     {
-        if (currentState == State.InRootMessage) this.EndMessage();
-        if (currentState != State.Ready)
+        if (!dispose)
         {
-            string errorMsg = $"Attempted to send RPC, but State is not Ready  (in: \"{name}\")";
-            if (isUnsafe)
-                Logger.Warn(errorMsg, "CustomRpcSender.Warn");
-            else
-                throw new InvalidOperationException(errorMsg);
+            if (currentState == State.InRootMessage) EndMessage();
+
+            if (currentState == State.InRootPackedMessage)
+            {
+                if (stream.Length <= 11)
+                    dispose = true;
+                else
+                    EndMessage();
+            }
+
+            if (!dispose && currentState != State.Ready)
+            {
+                if (currentState == State.Finished)
+                {
+                    Logger.Warn($"Tried to send Message but \"{name}\" is already Finished", "CustomRpcSender.Warn");
+                    return;
+                }
+
+                var errorMsg = $"Tried to send Message but State is not Ready (in: \"{name}\", state: {currentState})";
+
+                if (isUnsafe)
+                    Logger.Warn(errorMsg, "CustomRpcSender.Warn");
+                else
+                    throw new InvalidOperationException(errorMsg);
+            }
         }
+
+        if (stream.Length > 1200 && !dispose) Logger.Msg($"Large packet \"{name}\" is sending ({stream.Length} bytes)", "CustomRpcSender");
+        else if (shouldLog || stream.Length > 3) Logger.Info($"\"{name}\" is finished (Length: {stream.Length}, dispose: {dispose}, sendOption: {sendOption})", "CustomRpcSender");
 
         if (!dispose)
         {
+            if (doneStreams.Count > 0)
+            {
+                var sb = new StringBuilder(" + Lengths: ");
+
+                doneStreams.ForEach(x =>
+                {
+                    if (x.Length > 1200) Logger.Msg($"Large reliable packet \"{name}\" is sending ({x.Length} bytes)", "CustomRpcSender");
+                    else if (shouldLog || x.Length > 3) sb.Append($" | {x.Length}");
+
+                    AmongUsClient.Instance.SendOrDisconnect(x);
+                    x.Recycle();
+                });
+
+                Logger.Info(sb.ToString(), "CustomRpcSender");
+
+                doneStreams.Clear();
+            }
+
             AmongUsClient.Instance.SendOrDisconnect(stream);
             onSendDelegate();
         }
+
+        packed = false;
+        currentRpcTarget = -2;
+        messages = 0;
         currentState = State.Finished;
-        Logger.Info($"\"{name}\" is " + (dispose ? "disposed" : "finished"), "CustomRpcSender");
         stream.Recycle();
     }
 
@@ -244,19 +416,20 @@ public class CustomRpcSender
     public CustomRpcSender WriteMessageType(byte val) => Write(w => w.StartMessage(val));
     public CustomRpcSender WriteEndMessage() => Write(w => w.EndMessage());
     public CustomRpcSender WriteVector2(Vector2 vector2) => Write(w => NetHelpers.WriteVector2(vector2, w));
-
     #endregion
 
     private CustomRpcSender Write(Action<MessageWriter> action)
     {
         if (currentState != State.InRpc)
         {
-            string errorMsg = $"RPCを書き込もうとしましたが、StateがWrite(書き込み中)ではありません (in: \"{name}\")";
+            var errorMsg = $"Tried to write into RPC, but State is not InRpc (in: \"{name}\")";
+
             if (isUnsafe)
                 Logger.Warn(errorMsg, "CustomRpcSender.Warn");
             else
                 throw new InvalidOperationException(errorMsg);
         }
+
         action(stream);
 
         return this;
@@ -264,11 +437,12 @@ public class CustomRpcSender
     [Obfuscation(Exclude = true)]
     public enum State
     {
-        BeforeInit = 0, //初期化前 何もできない
-        Ready, //送信準備完了 StartMessageとSendMessageを実行可能
-        InRootMessage, //StartMessage～EndMessageの間の状態 StartRpcとEndMessageを実行可能
-        InRpc, //StartRpc～EndRpcの間の状態 WriteとEndRpcを実行可能
-        Finished, //送信後 何もできない
+        BeforeInit = 0, // Cannot do anything before initialization
+        Ready, // Ready to send - StartMessage and SendMessage can be executed
+        InRootPackedMessage, // State where only GameDataTo submessages can be started
+        InRootMessage, // State between StartMessage and EndMessage - StartRpc and EndMessage can be executed
+        InRpc, // State between StartRpc and EndRpc - Write and EndRpc can be executed
+        Finished // Nothing can be done after sending
     }
 }
 public static class CustomRpcSenderExtensions
@@ -289,7 +463,7 @@ public static class CustomRpcSenderExtensions
             .EndRpc();
     }
 
-    public static void RpcSetName(this CustomRpcSender sender, PlayerControl player, string name, PlayerControl seer = null)
+    public static void RpcSetName(ref CustomRpcSender sender, PlayerControl player, PlayerControl seer, string name)
     {
         bool seerIsNull = !seer;
         int targetClientId = seerIsNull ? -1 : seer.OwnerId;
@@ -309,63 +483,60 @@ public static class CustomRpcSenderExtensions
                 break;
         }
 
-        sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetName, targetClientId)
+        sender.checkLength = false;
+
+        if (sender.stream.Length + GetSetNameRpcSize(player.NetId, name) > 1100)
+        {
+            bool packed = sender.packed;
+            sender.SendMessage();
+            sender = CustomRpcSender.Create(sender.name, sender.sendOption);
+            if (packed) sender.StartPackedMessage();
+        }
+
+        sender.AutoStartRpc(player.NetId, RpcCalls.SetName, targetClientId)
             .Write(player.Data.NetId)
             .Write(name)
             .Write(false)
             .EndRpc();
-    }
 
-    // Credit: EHR
-    public static void RpcDesyncRepairSystem(this CustomRpcSender sender, PlayerControl target, SystemTypes systemType, int amount)
-    {
-        sender.AutoStartRpc(ShipStatus.Instance.NetId, RpcCalls.UpdateSystem, target.OwnerId);
-        sender.Write((byte)systemType);
-        sender.WriteNetObject(target);
-        sender.Write((byte)amount);
-        sender.EndRpc();
-    }
+        return;
 
-    public static bool TP(this CustomRpcSender sender, PlayerControl pc, Vector2 location, bool noCheckState = false, bool log = true)
-    {
-        if (!AmongUsClient.Instance.AmHost) return false;
-
-        CustomNetworkTransform nt = pc.NetTransform;
-
-        if (!noCheckState)
+        static int GetSetNameRpcSize(uint netId, string playerName)
         {
-            // if (pc.Is(CustomRoles.AntiTP)) return false;
-
-            if (pc.inVent || pc.inMovingPlat || pc.onLadder || !pc.IsAlive() || pc.MyPhysics.Animations.IsPlayingAnyLadderAnimation() || pc.MyPhysics.Animations.IsPlayingEnterVentAnimation())
-            {
-                if (log) Logger.Warn($"Target ({pc.GetNameWithRole().RemoveHtmlTags()}) is in an un-teleportable state - Teleporting canceled", "TP");
-                return false;
-            }
-
-            if (Vector2.Distance(pc.GetCustomPosition(), location) < 0.5f)
-            {
-                if (log) Logger.Warn($"Target ({pc.GetNameWithRole().RemoveHtmlTags()}) is too close to the destination - Teleporting canceled", "TP");
-                return false;
-            }
+            int byteCount = System.Text.Encoding.UTF8.GetByteCount(playerName);
+            return 3 + PackedUIntSize(netId) + 1 + 4 + PackedUIntSize((uint)byteCount) + byteCount + 1;
         }
 
+        static int PackedUIntSize(uint value)
+        {
+            return value switch
+            {
+                < 0x80 => 1,
+                < 0x4000 => 2,
+                < 0x20_0000 => 3,
+                < 0x1000_0000 => 4,
+                _ => 5
+            };
+        }
+    }
+}
 
-        nt.SnapTo(location, (ushort)(nt.lastSequenceId + 328));
-        nt.SetDirtyBit(uint.MaxValue);
+// Rather not send the packet than get kicked immediately after sending it
+// Packet sizes: The maximum MessageReader messasge size allowed (header included) is 1200 bytes.
+// can be found here: https://github.com/innersloth-LLC/AmongUsModdingInformation
+[HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.SendOrDisconnect))]
+static class PreventLargePacketKickPatch
+{
+    public static bool Prefix([HarmonyArgument(0)] MessageWriter msg)
+    {
+        if (msg.Length <= 1200) return true;
 
-        var newSid = (ushort)(nt.lastSequenceId + 8);
+        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame)
+        {
+            Logger.Warn($"Blocked large packet from sending (size: {msg.Length})", nameof(PreventLargePacketKickPatch));
+            return false;
+        }
 
-        sender.AutoStartRpc(nt.NetId, RpcCalls.SnapTo);
-        sender.WriteVector2(location);
-        sender.Write(newSid);
-        sender.EndRpc();
-
-        if (log) Logger.Info($"{pc.GetNameWithRole().RemoveHtmlTags()} => {location}", "TP");
-
-        // CheckInvalidMovementPatch.LastPosition[pc.PlayerId] = location;
-        // CheckInvalidMovementPatch.ExemptedPlayers.Add(pc.PlayerId);
-
-        // if (sender.sendOption == SendOption.Reliable) Utils.NumSnapToCallsThisRound++;
         return true;
     }
 }

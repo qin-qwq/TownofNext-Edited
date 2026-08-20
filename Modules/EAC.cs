@@ -136,12 +136,9 @@ internal class EAC
                 // Some mods may add custom colors. Skip check color check
                 case RpcCalls.SetColor:
                     // Only sent by Host
-                    if (Options.CurrentGameMode != CustomGameMode.TagMode)
-                    {
-                        Report(pc, "Directly SetColor");
-                        HandleCheat(pc, "Directly SetColor");
-                        Logger.Fatal($"Directly SetColor【{pc.GetClientId()}:{pc.GetRealName()}】已驳回", "EAC");
-                    }
+                    Report(pc, "Directly SetColor");
+                    HandleCheat(pc, "Directly SetColor");
+                    Logger.Fatal($"Directly SetColor【{pc.GetClientId()}:{pc.GetRealName()}】已驳回", "EAC");
                     return true;
                 case RpcCalls.CheckMurder:
                     if (GameStates.IsLobby)
@@ -387,7 +384,7 @@ internal class EAC
     }
     public static bool RpcUpdateSystemCheck(PlayerControl player, SystemTypes systemType, byte amount)
     {
-        if (GameStates.IsLocalGame)
+        if (GameStates.IsLocalGame || Main.LIMap)
         {
             return false;
         }
@@ -460,10 +457,13 @@ internal class EAC
             //Normal clients will never directly send MushroomMixupSabotage
         }
 
-        if (GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.VoteStates.Animating || GameStates.IsExilling)
+        if ((GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.MeetingStates.Animating) || GameStates.IsExilling)
         {
-            WarnHost();
-            Report(player, "Bad Sabotage D : In Meeting");
+            if (!ReportDeadBodyPatch.PreventEAC)
+            {
+                WarnHost();
+                Report(player, "Bad Sabotage D : In Meeting");
+            }
             Logger.Fatal($"玩家【{player.GetClientId()}:{player.GetRealName()}】Bad Sabotage D，已驳回", "EAC");
             return true;
         }
@@ -694,7 +694,7 @@ internal class EAC
                 break;
             case 3:
                 foreach (var apc in Main.EnumeratePlayerControls().Where(x => x.PlayerId != pc?.Data?.PlayerId).ToArray())
-                    Utils.SendMessage(string.Format(GetString("Message.NoticeByEAC"), pc?.Data?.PlayerName, text), apc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Impostor), GetString("MessageFromEAC")));
+                    Utils.SendMessage(string.Format(GetString("Message.NoticeByEAC"), pc?.Data?.PlayerName, text), apc.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Impostor), GetString("MessageFromEAC")), sendOption: SendOption.None);
                 break;
             case 4:
                 if (!BanManager.TempBanWhiteList.Contains(pc.GetClient().GetHashedPuid()))

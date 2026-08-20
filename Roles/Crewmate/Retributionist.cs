@@ -1,7 +1,7 @@
 using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
-using TONE.Roles.Double;
+using TONE.Roles.AddOns.Common;
 using UnityEngine;
 using static TONE.MeetingHudStartPatch;
 using static TONE.Options;
@@ -66,7 +66,7 @@ internal class Retributionist : RoleBase
         return string.Empty;
     }
 
-    public static bool RetributionistMsgCheck(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsInGame || pc == null) return false;
@@ -144,7 +144,12 @@ internal class Retributionist : RoleBase
             pc.ShowInfoMessage(isUI, GetString("ApocalypseImmune"));
             return true;
         }
-        else if (target.Is(CustomRoles.NiceMini) && Mini.Age < 18)
+        else if (CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
+        {
+            pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
+            return true;
+        }
+        else if (target.Is(CustomRoles.Mini) && Mini.Age < 18)
         {
             pc.ShowInfoMessage(isUI, GetString("GuessMini"));
             return true;
@@ -198,56 +203,23 @@ internal class Retributionist : RoleBase
         return true;
     }
 
-    private static void SendRPC(byte playerId)
-    {
-        var msg = new RpcRetributionistRevenge(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
-    public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
-    {
-        int PlayerId = reader.ReadByte();
-        RetributionistMsgCheck(pc, $"/ret {PlayerId}", true);
-    }
-
-    private static void RetributionistOnClick(byte playerId /*, MeetingHud __instance*/)
-    {
-        Logger.Msg($"Click: ID {playerId}", "Retributionist UI");
-        var pc = GetPlayerById(playerId);
-        if (pc == null || !pc.IsAlive() || !GameStates.IsVoting) return;
-        if (AmongUsClient.Instance.AmHost) RetributionistMsgCheck(PlayerControl.LocalPlayer, $"/ret {playerId}", true);
-        else SendRPC(playerId);
-    }
     public override void OnMeetingHudStart(PlayerControl pc)
     {
         if (!pc.IsAlive())
             AddMsg(GetString("RetributionistDeadMsg"), pc.PlayerId);
     }
 
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.Retributionist) && !PlayerControl.LocalPlayer.IsAlive())
-                CreateJudgeButton(__instance);
-        }
-    }
-    public static void CreateJudgeButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates.ToArray())
-        {
-            var pc = GetPlayerById(pva.TargetPlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Retributionist) && !pc.IsAlive();
 
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
-            targetBox.name = "ShootButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("MeetingKillButton");
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => RetributionistOnClick(pva.TargetPlayerId/*, __instance*/)));
-        }
+    public override bool ShowAbilityButtonFor(PlayerControl target) => !target.IsAlive();
+
+    public override string AbilityButtonName => "MeetingKillButton";
+
+    public override void OnClickAbilityButton(byte playerId)
+    {
+        Logger.Msg($"Click: ID {playerId}", "Retributionist UI");
+        var pc = GetPlayerById(playerId);
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/ret {playerId}", true);
     }
 }

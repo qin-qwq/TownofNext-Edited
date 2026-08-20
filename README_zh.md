@@ -92,6 +92,7 @@
 > - 改进职业分配
 > - 改进文本框（TextBoxPatch.cs）
 > - 提高性能的一些想法
+> - 适配安卓的一些想法
 >
 ### :star: [TONEX （以前是 TOHEX）](https://github.com/XtremeWave/TownOfNewEpic_Xtreme)
 >
@@ -127,5 +128,13 @@
 ### :star: [MiraAPI](https://github.com/All-Of-Us-Mods/MiraAPI)
 >
 > - 下一个按钮图像
+>
+### :star: [UnityDoorstop](https://github.com/Pietrodjaowjao/UnityDoorstop)
+>
+> - 修改 doorstop_config.ini 和 winhttp.dll
+>
+### :star: [Kevin MacLeod](https://www.youtube.com/user/kmmusic)
+>
+> - 使用音乐
 >
 ---

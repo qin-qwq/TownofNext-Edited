@@ -60,7 +60,7 @@ internal class Ritualist : CovenManager
         }
         return true;
     }
-    public static bool RitualistMsgCheck(PlayerControl pc, string msg, bool isUI = false)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
@@ -97,7 +97,7 @@ internal class Ritualist : CovenManager
                 pc.ShowInfoMessage(isUI, error);
                 return true;
             }
-            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            if (GuessManager.CantUseAbilityDuringDiscussionTime())
             {
                 pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                 return true;
@@ -156,7 +156,7 @@ internal class Ritualist : CovenManager
             EnchantedPlayers[rit].Clear();
         }
     }
-    public void ConvertRole(PlayerControl killer, PlayerControl target)
+    public static void ConvertRole(PlayerControl killer, PlayerControl target)
     {
         var addon = killer.GetBetrayalAddon(true);
         if (target.CanBeRecruitedBy(killer))

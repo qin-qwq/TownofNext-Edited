@@ -57,7 +57,7 @@ internal class President : RoleBase
 
     public static bool CheckReveal(byte targetId) => CheckPresidentReveal.TryGetValue(targetId, out var canBeReveal) && canBeReveal;
 
-    public static bool EndMsg(PlayerControl pc, string msg)
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
@@ -71,7 +71,7 @@ internal class President : RoleBase
 
         if (!pc.IsAlive())
         {
-            Utils.SendMessage(GetString("PresidentDead"), pc.PlayerId);
+            Utils.SendMessage(GetString("PresidentDead"), pc.PlayerId, sendOption: SendOption.None);
             return false;
         }
 
@@ -82,7 +82,7 @@ internal class President : RoleBase
                 Utils.SendMessage(GetString("PresidentEndMax"), pc.PlayerId);
                 return true;
             }
-            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
+            if (GuessManager.CantUseAbilityDuringDiscussionTime())
             {
                 Utils.SendMessage(GetString("UseAbilityDuringDiscussion"), pc.PlayerId);
                 return true;
@@ -93,13 +93,11 @@ internal class President : RoleBase
             {
                 if (pva == null) continue;
 
-                if (pva.VotedFor < 253)
-                    MeetingHud.Instance.RpcClearVote(pva.TargetPlayerId);
+                if (pva.VotedForId < 253)
+                    MeetingHud.Instance.RpcClearVote(pva.PlayerId);
             }
             EndMeeting = true;
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
+            Utils.RpcVotingCompleteV2();
         }
         else if (operate == 2)
         {
@@ -119,7 +117,7 @@ internal class President : RoleBase
                 if (!CovenSeePresident.GetBool() && tar.GetCustomRole().IsCoven()) continue;
                 Utils.SendMessage(string.Format(GetString("PresidentRevealed"), pc.GetRealName()), tar.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.President), GetString("PresidentRevealTitle")));
             }
-            SendRPC(pc.PlayerId, isEnd: false);
+            SendRPC();
         }
         return true;
     }
@@ -147,36 +145,23 @@ internal class President : RoleBase
         }
         return false;
     }
-    public override bool OnCheckMurderAsTarget(PlayerControl killer, PlayerControl target)
+    public override void OnMurderPlayerAsTarget(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
     {
+        if (inMeeting || isSuicide || !killer || !target) return;
         if (CheckPresidentReveal[target.PlayerId])
             killer.SetKillCooldown(0.9f);
-        return true;
     }
 
-    private static void SendRPC(byte playerId, bool isEnd = true)
+    private void SendRPC()
     {
-
-        if (!isEnd)
-        {
-            var msg1 = new RpcPresidentReveal(PlayerControl.LocalPlayer.NetId, playerId, CheckPresidentReveal[playerId]);
-            RpcUtils.LateBroadcastReliableMessage(msg1);
-            return;
-        }
-        var msg2 = new RpcPresidentEnd(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg2);
-
+        var writer = MessageWriter.Get(SendOption.Reliable);
+        writer.Write(CheckPresidentReveal[_Player.PlayerId]);
+        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
     }
-    public static void ReceiveRPC(MessageReader reader, PlayerControl pc, bool isEnd = true)
+    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
-        byte PlayerId = reader.ReadByte();
-        if (!isEnd)
-        {
-            bool revealed = reader.ReadBoolean();
-            CheckPresidentReveal[PlayerId] = revealed;
-            return;
-        }
-        EndMsg(pc, $"/finish");
+        bool revealed = reader.ReadBoolean();
+        CheckPresidentReveal[pc.PlayerId] = revealed;
     }
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {

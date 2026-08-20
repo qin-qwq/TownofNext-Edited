@@ -104,7 +104,7 @@ internal class Sheriff : RoleBase
         KillTargetOptions[role].ReplacementDictionary = replacementDic;
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId) => opt.SetVision(false);
-    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = IsUseKillButton(Utils.GetPlayerById(id)) ? CurrentKillCooldown : CurrentKillCooldown;
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = CurrentKillCooldown;
 
     public override bool CanUseKillButton(PlayerControl pc) => IsUseKillButton(pc);
     public static bool IsUseKillButton(PlayerControl pc)
@@ -130,6 +130,7 @@ internal class Sheriff : RoleBase
         }
         killer.SetDeathReason(PlayerState.DeathReason.Misfire);
         killer.RpcMurderPlayer(killer);
+        AchievementManager.OnRoleAbility(CustomRoles.Sheriff, AchievementBase.AchievementEventType.SheriffMisfire, killer);
         return MisfireKillsTarget.GetBool();
     }
     public static bool CanBeKilledBySheriff(PlayerControl player)
@@ -197,6 +198,7 @@ internal class Sheriff : RoleBase
             target.GetRoleClass()?.OnAdd(target.PlayerId);
             target.ResetKillCooldown();
             target.SetKillCooldown(forceAnime: true);
+            Logger.Info($"Assigned new Sheriff {target.GetNameWithRole()}", "Sheriff");
         }
     }
 }

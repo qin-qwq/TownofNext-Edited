@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
+using TONE.Roles.AddOns.Common;
 using TONE.Roles.Crewmate;
-using TONE.Roles.Double;
 using TONE.Roles.Neutral;
 using UnityEngine;
 
@@ -64,7 +64,7 @@ internal class Warlock : RoleBase
     {
         if (!Main.CheckShapeshift[killer.PlayerId] && !IsCurseAndKill[killer.PlayerId])
         {
-            if (target.Is(CustomRoles.LazyGuy) || target.Is(CustomRoles.Lazy) || target.Is(CustomRoles.NiceMini) && Mini.Age < 18) return false;
+            if (target.Is(CustomRoles.LazyGuy) || target.Is(CustomRoles.Lazy) || target.Is(CustomRoles.Mini) && Mini.Age < 18) return false;
 
             IsCursed = true;
             killer.SetKillCooldown();

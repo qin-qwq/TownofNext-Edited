@@ -26,13 +26,13 @@ internal class Dictator : RoleBase
     }
 
     public static bool CheckVotingForTarget(PlayerControl pc, PlayerVoteArea pva)
-        => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedFor && pva.VotedFor < 253 && !pc.Data.IsDead;
-    public bool ExilePlayer(PlayerControl pc, string msg, bool isUI = false)
+        => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedForId && pva.VotedForId < 253 && !pc.Data.IsDead;
+    public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)
     {
         if (!ChangeCommandToExpel.GetBool()) return false;
         if (!AmongUsClient.Instance.AmHost) return false;
         if (!GameStates.IsMeeting || pc == null || GameStates.IsExilling) return false;
-        if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating) return false;
+        if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.Animating or MeetingHud.MeetingStates.Results) return false;
         if (!pc.IsAlive()) return false;
         if (!pc.Is(CustomRoles.Dictator)) return false;
         int operate = 0; // 1:ID 2:猜测
@@ -72,12 +72,6 @@ internal class Dictator : RoleBase
             if (target.Is(CustomRoles.Solsticer))
             {
                 pc.ShowInfoMessage(isUI, GetString("ExpelSolsticer"));
-                MeetingHud.Instance.RpcClearVoteDelay(pc.GetClientId());
-                return true;
-            }
-            if (CantUseAbilityDuringDiscussionTime.GetBool() && MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.Animating)
-            {
-                pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                 return true;
             }
             if (Balancer.Choose && !(targetid == Balancer.Target1 || targetid == Balancer.Target2))
@@ -101,20 +95,20 @@ internal class Dictator : RoleBase
             if (AntiBlackout.BlackOutIsActive)
             {
                 if (isBlackOut)
-                    MeetingHud.Instance.AntiBlackRpcVotingComplete(states, exiled, false);
+                    MeetingHud.Instance.AntiBlackRpcVotingComplete(states, exiled, false, false, 0);
                 else
-                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), exiled, false);
+                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), exiled, false, false, 0);
                 if (exiled != null)
                 {
                     AntiBlackout.ShowExiledInfo = isBlackOut;
                     CheckForEndVotingPatch.ConfirmEjections(exiled, isBlackOut);
-                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+                    MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true, false, 0);
                     MeetingHud.Instance.RpcClose();
                 }
             }
             else
             {
-                MeetingHud.Instance.RpcVotingComplete(states, exiled, false);
+                MeetingHud.Instance.RpcVotingComplete(states, exiled, false, false, 0);
 
                 if (exiled != null)
                 {
@@ -134,81 +128,17 @@ internal class Dictator : RoleBase
         return true;
     }
 
-    private void SendDictatorRPC(byte playerId)
-    {
-        var msg = new RpcDictator(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
-    }
+    public override bool CreateAbilityButton(PlayerControl pc) => pc.Is(CustomRoles.Dictator) && pc.IsAlive() && ChangeCommandToExpel.GetBool();
 
-    public static void OnReceiveDictatorRPC(MessageReader reader, PlayerControl pc)
-    {
-        byte pid = reader.ReadByte();
-        if (pc.Is(CustomRoles.Dictator) && pc.IsAlive() && GameStates.IsVoting)
-        {
-            if (pc.GetRoleClass() is Dictator dictator)
-                dictator.ExilePlayer(pc, $"/exp {pid}", true);
-        }
-    }
+    public override bool ShowAbilityButtonFor(PlayerControl target) => target.IsAlive();
 
-    private void DictatorOnClick(byte playerId, MeetingHud __instance)
+    public override string AbilityButtonName => "JusticeIcon";
+
+    public override void OnClickAbilityButton(byte playerId)
     {
         Logger.Msg($"Click: ID {playerId}", "Dictator UI");
         var pc = playerId.GetPlayer();
-        if (pc == null || !pc.IsAlive() || !GameStates.IsVoting) return;
-
-        if (AmongUsClient.Instance.AmHost) ExilePlayer(PlayerControl.LocalPlayer, $"/exp {playerId}");
-        else SendDictatorRPC(playerId);
-
-        CreateDictatorButton(__instance);
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.GetRoleClass() is Dictator dictator && PlayerControl.LocalPlayer.IsAlive())
-                if (ChangeCommandToExpel.GetBool())
-                    dictator.CreateDictatorButton(__instance);
-        }
-    }
-
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.OnDestroy))]
-    class OnDestroyPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            foreach (var pva in __instance.playerStates)
-            {
-                if (pva?.transform?.Find("DictatorButton") != null)
-                    UnityEngine.Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
-            }
-        }
-    }
-
-    private void CreateDictatorButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            if (pva.transform.Find("DictatorButton") != null) UnityEngine.Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
-
-            var pc = pva.TargetPlayerId.GetPlayer();
-            var local = PlayerControl.LocalPlayer;
-            if (pc == null || !pc.IsAlive()) continue;
-
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
-            targetBox.name = "DictatorButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            renderer.sprite = CustomButton.Get("JudgeIcon");
-
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
-            {
-                DictatorOnClick(pva.TargetPlayerId, __instance);
-            }));
-        }
+        if (!pc || !pc.IsAlive() || !GameStates.IsVoting) return;
+        RoleCommand(_Player, $"/exp {playerId}", true);
     }
 }

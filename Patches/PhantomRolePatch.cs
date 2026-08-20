@@ -101,7 +101,11 @@ public static class PhantomRolePatch
 
             if (phantom.AmOwner)
             {
-                DestroyableSingleton<HudManager>.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
+                try
+                {
+                    HudManager.Instance.AbilityButton.SetFromSettings(phantom.Data.Role.Ability);
+                }
+                catch { }
                 phantom.Data.Role.SetCooldown();
                 return false;
             }
@@ -124,8 +128,9 @@ public static class PhantomRolePatch
 
             _ = new LateTask(() =>
             {
-                if (phantom.GetCustomRole() is CustomRoles.Fury) return;
                 phantom.SetKillCooldown(Math.Max(killCooldown, 0.001f));
+                phantom.ResetKillCooldown();
+                phantom.SyncSettings();
             }, 0.2f, $"Phantom Check");
 
             return false;

@@ -51,12 +51,12 @@ internal class Cleanser : RoleBase
 
         if (target.PlayerId == voter.PlayerId)
         {
-            Utils.SendMessage(GetString("CleanserRemoveSelf"), voter.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()));
+            Utils.SendMessage(GetString("CleanserRemoveSelf"), voter.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()), sendOption: Hazel.SendOption.None);
             return true;
         }
         if (target.Is(CustomRoles.Stubborn))
         {
-            Utils.SendMessage(GetString("CleanserCantRemove"), voter.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()));
+            Utils.SendMessage(GetString("CleanserCantRemove"), voter.PlayerId, Utils.ColorString(Utils.GetRoleColor(CustomRoles.Cleanser), GetString("Cleanser").ToUpper()), sendOption: Hazel.SendOption.None);
             return true;
         }
         if (CleanserTarget[voter.PlayerId] != byte.MaxValue) return true;

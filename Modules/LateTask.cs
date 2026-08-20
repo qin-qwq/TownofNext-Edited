@@ -52,4 +52,13 @@ class LateTask
             }
         }
     }
+    public static void RemoveByName(string name)
+    {
+        var task = Tasks.FirstOrDefault(t => t.name == name);
+        if (task != null)
+        {
+            Tasks.Remove(task);
+            if (task.shouldLog) Logger.Info($"\"{task.name}\" is removed manually", "LateTask");
+        }
+    }
 }

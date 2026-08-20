@@ -404,7 +404,7 @@ class RandomSpawn
         {
             Teleport(player, false);
         }
-        public virtual Vector2 GetAllLocation()
+        public virtual Vector2 GetRandomLocation()
         {
             var locations = Positions.ToArray();
 
@@ -412,12 +412,16 @@ class RandomSpawn
 
             return location.Value;
         }
+        public virtual IEnumerable<Vector2> GetAllLocation()
+        {
+            return Positions.Values.ToArray();
+        }
 
         private void Teleport(PlayerControl player, bool isRadndom)
         {
             int selectRandomSpawn;
 
-            if (isRadndom && Options.CurrentGameMode != CustomGameMode.FFA)
+            if (isRadndom && GameModeBase.GetGameMode() != CustomGameMode.FFA)
             {
                 selectRandomSpawn = 1;
 
@@ -442,7 +446,7 @@ class RandomSpawn
         }
         public Vector2 GetLocation(bool first = false)
         {
-            if (Options.CurrentGameMode == CustomGameMode.TagMode)
+            if (GameModeBase.GetGameMode() == CustomGameMode.TagMode)
             {
                 var Locations = Positions.ToArray();
                 switch (Main.NormalOptions.MapId)

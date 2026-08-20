@@ -37,7 +37,7 @@ public class LastImpostor : IAddon
     public static void SetSubRole()
     {
         if (currentId != byte.MaxValue || !AmongUsClient.Instance.AmHost) return;
-        if (Options.CurrentGameMode != CustomGameMode.Standard || !CustomRoles.LastImpostor.IsEnable() || Main.AliveImpostorCount != 1) return;
+        if (!GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons || !CustomRoles.LastImpostor.IsEnable() || Main.AliveImpostorCount != 1) return;
 
         foreach (var pc in Main.EnumerateAlivePlayerControls())
         {

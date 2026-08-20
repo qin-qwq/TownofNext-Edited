@@ -24,7 +24,7 @@ internal class Fireworker : RoleBase
     [Obfuscation(Exclude = true)]
     private const int Id = 3200;
 
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //==================================================================\\
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => nowFireworkerCount[player.PlayerId] == 0 ? CustomButton.Get("FireworkD") : CustomButton.Get("FireworkP");
@@ -91,7 +91,7 @@ internal class Fireworker : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = PlaceCooldown.GetFloat();
+        AURoleOptions.ShapeshifterCooldown = PlaceCooldown.GetFloat();
     }
 
     public override bool CanUseKillButton(PlayerControl pc)
@@ -110,7 +110,7 @@ internal class Fireworker : RoleBase
         return canUse;
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
         Logger.Info($"Fireworker ShapeShift", "Fireworker");
 
@@ -122,7 +122,10 @@ internal class Fireworker : RoleBase
                 Logger.Info("One firework set up", "Fireworker");
 
                 FireworkerPosition[shapeshifterId].Add(shapeshifter.transform.position);
-                Fireworks.Add(new(shapeshifter.GetCustomPosition(), [.. Main.EnumeratePlayerControls().Where(x => x.GetCountTypes() == CountTypes.Impostor).Select(x => x.PlayerId)], _state.PlayerId));
+                foreach (var pc in Main.EnumeratePlayerControls().Where(x => x.GetCountTypes() == CountTypes.Impostor))
+                {
+                    Fireworks.Add(new(shapeshifter.GetCustomPosition(), pc));
+                }
                 nowFireworkerCount[shapeshifterId]--;
                 state[shapeshifterId] = nowFireworkerCount[shapeshifterId] == 0
                     ? Main.AliveImpostorCount <= 1 ? FireworkerState.ReadyFire : FireworkerState.WaitTime
@@ -171,7 +174,6 @@ internal class Fireworker : RoleBase
         }
         SendRPC(shapeshifterId);
         Utils.NotifyRoles(ForceLoop: true);
-        return false;
     }
 
     public override string GetLowerText(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false, bool isForHud = false)

@@ -3903,7 +3903,7 @@
   "OnPlayerJoinMsgTitle": "【 ★ {0} 您好！★ 】",
   "Pyrophoric": "自燃者",
   "PyrophoricInfo": "燃烧自己，提高视野",
-  "PyrophoricInfoLong": "(船员阵营):\n自燃者可以通过进入通风管道来点燃自己，并提高视野，不过设定轮会议后就会因燃尽而亡。\n根据房主设置，自燃者自燃时被非特殊击杀可以烧死凶手，被驱逐可以复仇一名随机玩家。",
+  "PyrophoricInfoLong": "(船员阵营):\n自燃者可以通过进入通风管道来点燃自己，并提高视野，不过设定轮会议后就会因燃尽而亡\n根据房主设置，自燃者自燃时被非特殊击杀可以烧死凶手，被驱逐可以复仇一名随机玩家",
   "PyrophoricSkillCooldown": "自燃冷却时间",
   "PyrophoricVision": "自燃视野",
   "PyrophoricKilledMeetings": "燃尽而亡需要的会议数",

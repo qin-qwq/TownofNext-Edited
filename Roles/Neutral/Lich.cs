@@ -206,7 +206,7 @@ internal class Lich : RoleBase
         if (NarcManager.KnowRoleOfTarget(seer, target)) return false;
 
         if (Main.GodMode.Value && seer.IsHost()) return false;
-        if (CurrentGameMode == CustomGameMode.FFA) return false;
+        if (GameModeBase.GetGameMode() == CustomGameMode.FFA) return false;
 
         if (target.GetRoleClass().OthersKnowTargetRoleColor(seer, target)) return false;
         if (Workaholic.OthersKnowWorka(target)) return false;

@@ -4,7 +4,6 @@ using UnityEngine;
 namespace TONE;
 
 // 来源：https://github.com/TownOfNext/TownOfNext/blob/main/src/Patches/MainMenuButtonHoverAnimation.cs
-#if !ANDROID
 [HarmonyPatch]
 public class MainMenuButtonHoverAnimation
 {
@@ -12,11 +11,13 @@ public class MainMenuButtonHoverAnimation
     [HarmonyPriority(Priority.Last)]
     private static void Start_Postfix(MainMenuManager __instance)
     {
+        if (OperatingSystem.IsAndroid()) return;
         var mainButtons = GameObject.Find("Main Buttons");
         mainButtons.ForEachChild((Il2CppSystem.Action<GameObject>)Init);
     }
     public static void RefreshButtons(GameObject obj)
     {
+        if (OperatingSystem.IsAndroid()) return;
         AllButtons = new();
         obj.ForEachChild((Il2CppSystem.Action<GameObject>)Init);
     }
@@ -24,6 +25,7 @@ public class MainMenuButtonHoverAnimation
     {
         if (obj.name is "BottomButtonBounds" or "Divider") return;
         if (AllButtons.ContainsKey(obj)) return;
+        if (OperatingSystem.IsAndroid()) return;
         SetButtonStatus(obj, false);
         var pb = obj.GetComponent<PassiveButton>();
         pb.OnMouseOver = new();
@@ -43,6 +45,7 @@ public class MainMenuButtonHoverAnimation
     private static void Update_Postfix(MainMenuManager __instance)
     {
         if (GameObject.Find("MainUI") == null) return;
+        if (OperatingSystem.IsAndroid()) return;
 
         foreach (var kvp in AllButtons.Where(x => x.Key != null && x.Key.active))
         {
@@ -56,4 +59,3 @@ public class MainMenuButtonHoverAnimation
         }
     }
 }
-#endif

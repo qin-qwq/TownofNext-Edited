@@ -41,7 +41,6 @@ internal class Lawyer : RoleBase
         CustomRoles.Amnesiac,
         CustomRoles.Jester,
         CustomRoles.Opportunist,
-        CustomRoles.Celebrity,
         CustomRoles.Bodyguard,
         CustomRoles.Dictator,
         CustomRoles.Mayor,
@@ -98,7 +97,8 @@ internal class Lawyer : RoleBase
                 else if (!CanTargetCrewmate.GetBool() && (target.Is(Custom_Team.Crewmate) || target.Is(CustomRoles.Narc))) continue;
                 else if (!CanTargetJester.GetBool() && target.Is(CustomRoles.Jester)) continue;
                 else if (target.Is(Custom_Team.Neutral) && !target.IsNeutralKiller() && !target.Is(CustomRoles.Jester) && !target.IsNeutralApocalypse()) continue;
-                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar or CustomRoles.NiceMini or CustomRoles.EvilMini) continue;
+                if (target.GetCustomRole() is CustomRoles.GM or CustomRoles.SuperStar) continue;
+                if (target.Is(CustomRoles.Mini)) continue;
                 if (Lovers.AreLovers(lawyer, target)) continue;
 
                 targetList.Add(target);
@@ -171,6 +171,12 @@ internal class Lawyer : RoleBase
         if (_Player == null || !IsTarget(target.PlayerId)) return;
         ChangeRole(inMeeting);
     }
+    public override void CheckExileTarget(NetworkedPlayerInfo exiled, ref bool DecidedWinner, bool isMeetingHud, ref string name)
+    {
+        if (_Player == null || !IsTarget(exiled.PlayerId) || !exiled) return;
+
+        ChangeRole(true);
+    }
     public static bool TargetKnowLawyer => TargetKnowsLawyer.GetBool();
     public override bool KnowRoleTarget(PlayerControl player, PlayerControl target)
     {
@@ -216,9 +222,6 @@ internal class Lawyer : RoleBase
         {
             case CustomRoles.Amnesiac:
                 Main.PlayerStates[lawyer.PlayerId].RemoveSubRole(CustomRoles.Oblivious);
-                break;
-            case CustomRoles.Celebrity:
-                Main.PlayerStates[lawyer.PlayerId].RemoveSubRole(CustomRoles.Cyber);
                 break;
             case CustomRoles.Dictator:
                 new[] { CustomRoles.Tiebreaker, CustomRoles.Paranoia, CustomRoles.Knighted, CustomRoles.VoidBallot, CustomRoles.Silent, CustomRoles.Influenced }.Do(x => Main.PlayerStates[lawyer.PlayerId].RemoveSubRole(x));

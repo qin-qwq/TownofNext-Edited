@@ -2,7 +2,6 @@ using System;
 using TMPro;
 using UnityEngine;
 using static TONE.Translator;
-using Object = UnityEngine.Object;
 
 namespace TONE;
 
@@ -20,6 +19,7 @@ public class GameSettingMenuPatch
 
     static Dictionary<TabGroup, PassiveButton> ModSettingsButtons = [];
     static Dictionary<TabGroup, GameOptionsMenu> ModSettingsTabs = [];
+    public static readonly TabGroup[] TabGroupValues = Enum.GetValues<TabGroup>();
     public static GameSettingMenu Instance;
 
     [HarmonyPatch(nameof(GameSettingMenu.Start)), HarmonyPrefix]
@@ -30,10 +30,12 @@ public class GameSettingMenuPatch
 
         TabGroup[] ExludeList = Options.CurrentGameMode switch
         {
-            CustomGameMode.HidenSeekTONE => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
-            CustomGameMode.FFA => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
-            CustomGameMode.SpeedRun => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
-            CustomGameMode.TagMode => Enum.GetValues<TabGroup>().Skip(2).ToArray(),
+            CustomGameMode.HidenSeekTONE => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.FFA => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.SpeedRun => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.TagMode => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.BonfireNight => TabGroupValues.Skip(2).ToArray(),
+            CustomGameMode.CopsAndRobbers => TabGroupValues.Skip(4).ToArray(),
             _ => []
         };
 
@@ -59,7 +61,7 @@ public class GameSettingMenuPatch
                 _ => "#ffffff",
             };
             label.fontStyle = FontStyles.UpperCase;
-            label.text = $"<color={htmlcolor}>{GetString("TabGroup." + tab)}</color>";
+            label.SetText($"<color={htmlcolor}>{GetString("TabGroup." + tab)}</color>");
 
             _ = ColorUtility.TryParseHtmlString(htmlcolor, out Color tabColor);
             button.inactiveSprites.GetComponent<SpriteRenderer>().color = tabColor;
@@ -111,7 +113,7 @@ public class GameSettingMenuPatch
         var textLabel = gameSettingButton.GetComponentInChildren<TextMeshPro>();
         textLabel.DestroyTranslator();
         textLabel.fontStyle = FontStyles.UpperCase;
-        textLabel.text = GetString("TabVanilla.GameSettings");
+        textLabel.SetText(GetString("TabVanilla.GameSettings"));
 
         var optionMenu = GameObject.Find("PlayerOptionsMenu(Clone)");
         var menuDescription = optionMenu?.transform.FindChild("What Is This?");
@@ -171,7 +173,7 @@ public class GameSettingMenuPatch
         Color clr = new(-1, -1, -1);
         var PLabel = preset.GetComponentInChildren<TextMeshPro>();
         PLabel.DestroyTranslator();
-        PLabel.text = GetString($"Preset_{OptionItem.CurrentPreset + 1}");
+        PLabel.SetText(GetString($"Preset_{OptionItem.CurrentPreset + 1}"));
         //PLabel.font = PLuLabel.font; 
         float size = DestroyableSingleton<TranslationController>.Instance.currentLanguage.languageID switch
         {
@@ -189,7 +191,7 @@ public class GameSettingMenuPatch
         var MLabel = GMinus.transform.Find("FontPlacer/Text_TMP").GetComponent<TextMeshPro>();
         MLabel.alignment = TextAlignmentOptions.Center;
         MLabel.DestroyTranslator();
-        MLabel.text = "-";
+        MLabel.SetText("-");
         MLabel.transform.localPosition = new Vector3(MLabel.transform.localPosition.x, MLabel.transform.localPosition.y + 0.26f, MLabel.transform.localPosition.z);
         MLabel.color = new Color(255f, 255f, 255f);
         MLabel.SetFaceColor(new Color(255f, 255f, 255f));
@@ -224,7 +226,7 @@ public class GameSettingMenuPatch
         var PLuLabel = PlusFab.transform.Find("FontPlacer/Text_TMP").GetComponent<TextMeshPro>();
         PLuLabel.alignment = TextAlignmentOptions.Center;
         PLuLabel.DestroyTranslator();
-        PLuLabel.text = "+";
+        PLuLabel.SetText("+");
         PLuLabel.color = new Color(255f, 255f, 255f);
         PLuLabel.transform.localPosition = new Vector3(PLuLabel.transform.localPosition.x, PLuLabel.transform.localPosition.y + 0.26f, PLuLabel.transform.localPosition.z);
         PLuLabel.transform.localScale = new Vector3(12f, 4f, 1f);
@@ -246,7 +248,7 @@ public class GameSettingMenuPatch
 
         var GameSettingsLabel = __instance.GameSettingsButton.transform.parent.parent.FindChild("GameSettingsLabel").GetComponent<TextMeshPro>();
         GameSettingsLabel.DestroyTranslator();
-        GameSettingsLabel.text = GetString($"{Options.CurrentGameMode}");
+        GameSettingsLabel.SetText(GetString($"{Options.CurrentGameMode}"));
 
         var FreeChatField = DestroyableSingleton<ChatController>.Instance.freeChatField;
         var TextField = Object.Instantiate(FreeChatField, ParentLeftPanel.parent);
@@ -377,14 +379,14 @@ public class GameSettingMenuPatch
                 {
                     case TabGroup.SystemSettings:
                     case TabGroup.ModSettings:
-                        __instance.MenuDescriptionText.text = GetString("TabMenuDescription_General");
+                        __instance.MenuDescriptionText.SetText(GetString("TabMenuDescription_General"));
                         break;
                     case TabGroup.ImpostorRoles:
                     case TabGroup.CrewmateRoles:
                     case TabGroup.NeutralRoles:
                     case TabGroup.CovenRoles:
                     case TabGroup.Addons:
-                        __instance.MenuDescriptionText.text = GetString("TabMenuDescription_Roles&AddOns");
+                        __instance.MenuDescriptionText.SetText(GetString("TabMenuDescription_Roles&AddOns"));
                         break;
                 }
             }

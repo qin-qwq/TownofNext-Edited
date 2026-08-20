@@ -11,7 +11,7 @@ public static class OutfitManager
 
         void Setoutfit()
         {
-            if (player == null || Outfit == null) return;
+            if (!player || Outfit == null) return;
 
             player.SetName(Outfit.PlayerName);
             Main.AllPlayerNames[player.PlayerId] = Outfit.PlayerName;
@@ -57,7 +57,7 @@ public static class OutfitManager
         }
     }
 
-    public static void SetNewOutfit(this PlayerControl player, NetworkedPlayerInfo.PlayerOutfit newOutfit, bool setName = true, bool setNamePlate = true, uint newLevel = 500)
+    public static void SetNewOutfit(this PlayerControl player, NetworkedPlayerInfo.PlayerOutfit newOutfit, bool setName = true, bool setNamePlate = true, uint newLevel = 500, bool setPetAbility = false)
     {
         if (setName)
         {
@@ -71,7 +71,16 @@ public static class OutfitManager
         player.SetHat(newOutfit.HatId, newOutfit.ColorId);
         player.SetSkin(newOutfit.SkinId, newOutfit.ColorId);
         player.SetVisor(newOutfit.VisorId, newOutfit.ColorId);
-        player.SetPet(newOutfit.PetId);
+        if (!setPetAbility)
+        {
+            player.SetPet(newOutfit.PetId);
+        }
+        else
+        {
+            var pet = PetsPatch.GetPetId();
+            player.SetPet(pet);
+            newOutfit.PetId = pet;
+        }
 
         if (setNamePlate)
         {
@@ -86,6 +95,7 @@ public static class OutfitManager
         }
 
         var setOutfit = new RpcSetOutfit(player.NetId, player.Data.NetId, newOutfit, setName, setNamePlate);
-        RpcUtils.LateBroadcastReliableMessage(setOutfit);
+        if (Main.MeetingIsStarted) RpcUtils.SendMessageImmediately(setOutfit);
+        else RpcUtils.LateBroadcastReliableMessage(setOutfit);
     }
 }

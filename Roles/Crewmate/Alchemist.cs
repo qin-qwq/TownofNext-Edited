@@ -191,7 +191,10 @@ internal class Alchemist : RoleBase
                 var min = targetDistance.OrderBy(c => c.Value).FirstOrDefault();
                 PlayerControl target = Utils.GetPlayerById(min.Key);
                 var KillRange = ExtendedPlayerControl.GetKillDistances();
-                if (min.Value <= KillRange && !player.inVent && !player.inMovingPlat && !target.inVent && !target.inMovingPlat)
+                var playerPos = player.GetCustomPosition();
+                var vector = target.GetCustomPosition() - playerPos;
+                var magnitude = vector.magnitude;
+                if (min.Value <= KillRange && !player.inVent && !player.inMovingPlat && !target.inVent && !target.inMovingPlat && !PhysicsHelpers.AnyNonTriggersBetween(playerPos, vector.normalized, magnitude, Constants.ShipAndObjectsMask))
                 {
                     if (player.RpcCheckAndMurder(target, true))
                     {
@@ -227,7 +230,7 @@ internal class Alchemist : RoleBase
 
                 ventedId.Remove(alchemistId);
 
-                alchemist.Notify(GetString("SwooperInvisStateOut"));
+                alchemist.Notify(GetString("SwooperInvisStateOut"), hasPriority: true, sendInLog: false);
 
                 needSync = true;
                 InvisTime.Remove(alchemistId);
@@ -235,7 +238,7 @@ internal class Alchemist : RoleBase
             else if (remainTime <= 10)
             {
                 if (!alchemist.IsModded())
-                    alchemist.Notify(string.Format(GetString("SwooperInvisStateCountdown"), remainTime), sendInLog: false);
+                    alchemist.Notify(string.Format(GetString("SwooperInvisStateCountdown"), remainTime), hasPriority: true, sendInLog: false);
             }
         }
 
@@ -370,7 +373,7 @@ internal class Alchemist : RoleBase
 
             InvisTime.Add(pc.PlayerId, Utils.GetTimeStamp());
             SendRPC(pc);
-            pc.Notify(GetString("ChameleonInvisState"), InvisDuration.GetFloat());
+            pc.Notify(GetString("ChameleonInvisState"), InvisDuration.GetFloat(), hasPriority: true, sendInLog: false);
 
         }, 0.8f, "Alchemist Invis");
     }

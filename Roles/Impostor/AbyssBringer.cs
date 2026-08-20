@@ -14,7 +14,7 @@ internal class AbyssBringer : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Abyssbringer;
     const int Id = 31300;
-    public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -60,7 +60,7 @@ internal class AbyssBringer : RoleBase
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        AURoleOptions.PhantomCooldown = BlackHolePlaceCooldown.GetInt();
+        AURoleOptions.ShapeshifterCooldown = BlackHolePlaceCooldown.GetInt();
     }
 
     public override void Init()
@@ -76,21 +76,20 @@ internal class AbyssBringer : RoleBase
         }
     }
 
-    public override bool OnCheckVanish(PlayerControl shapeshifter)
+    public override void UnShapeShiftButton(PlayerControl shapeshifter)
     {
-        if (!Main.EnumerateAlivePlayerControls().Where(x => x.PlayerId != shapeshifter.PlayerId).Any())
+        if (!Main.EnumerateAlivePlayerControls().Any(x => x.PlayerId != shapeshifter.PlayerId))
         {
-            return false;
+            return;
         }
         // When no player exists, Instantly spawm and despawn networked object will cause error spam
 
         if (BlackHoles.Count >= BlackHoleCountLimit.GetInt())
         {
-            return false;
+            return;
         }
 
         CreateBlackHole(shapeshifter);
-        return false;
     }
     private void CreateBlackHole(PlayerControl shapeshifter)
     {
@@ -275,8 +274,9 @@ internal class AbyssBringer : RoleBase
         internal BlackHole(Vector2 position)
         {
             if (!AmongUsClient.Instance.AmHost) return;
-            CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#000000>█<#19131c>█<#000000>█<#000000>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#412847>█<#000000>█<#19131c>█<#000000>█<#412847>█<#260f26>█<alpha=#00>█<br><#000000>█<#412847>█<#412847>█<#000000>█<#260f26>█<#1c0d1c>█<#19131c>█<#000000>█<br><#19131c>█<#000000>█<#412847>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#19131c>█<#000000>█<br><#000000>█<#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#000000>█<#000000>█<#260f26>█<br><#000000>█<#260f26>█<#1c0d1c>█<#1c0d1c>█<#19131c>█<#412847>█<#412847>█<#19131c>█<br><alpha=#00>█<#260f26>█<#412847>█<#412847>█<#19131c>█<#260f26>█<#19131c>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#412847>█<#260f26>█<#260f26>█<#000000>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
-            //CreateNetObject("<size=100%><font=\"VCR SDF\"><line-height=67%><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#8b07e4>█<#8b07e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><#ca07e4>█<#b407e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#a907e4>█<#b407e4>█<#ca07e4>█<br><alpha=#00>█<#ca07e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#b407e4>█<#ca07e4>█<alpha=#00>█<br><alpha=#00>█<alpha=#00>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<#ca07e4>█<alpha=#00>█<alpha=#00>█<br></line-height></size>", position);
+            CreateNetObject("<line-height=97%><cspace=0.16em><#0000>WW</color><mark=#000000>WWWW</mark><#0000>WW\nW</color><mark=#000000>WWWWWW</mark><#0000>W</color>\n<mark=#000000>WWWWWWWW\nWWWWWWWW\nWWWWWWWW\nWWWWWWWW</mark>\n<#0000>W</color><mark=#000000>WWWWWW</mark><#0000>W\nWW</color><mark=#000000>WWWW</mark><#0000>WW", position);
         }
+
+        protected override bool ConstantlyChangesPosition => BlackHoleMovesTowardsNearestPlayer.GetBool();
     }
 }

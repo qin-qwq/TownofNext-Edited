@@ -1,3 +1,4 @@
+using TONE.Roles.Impostor;
 using UnityEngine;
 using static TONE.Options;
 
@@ -9,7 +10,7 @@ internal class Tunny : RoleBase
     public override CustomRoles Role => CustomRoles.Tunny;
     private const int Id = 32800;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
-    public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;
+    public override Custom_RoleType ThisRoleType => CanSnatchesWin() ? Custom_RoleType.NeutralEvil : Custom_RoleType.NeutralBenign;
     //==================================================================\\
 
     private static OptionItem CanWaitTime;
@@ -46,7 +47,7 @@ internal class Tunny : RoleBase
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        if (Prevent || !player.CanMove || !player.IsAlive() || !GameStates.IsInTask) return;
+        if (Prevent || !player.CanMove || !player.IsAlive() || !GameStates.IsInTask || TimeAssassin.TimeStop) return;
 
         if (player.GetCustomPosition() != NowPosition[player.PlayerId])
         {
@@ -72,4 +73,6 @@ internal class Tunny : RoleBase
             MoveTime[_Player.PlayerId] = CanWaitTime.GetInt();
         }, CanWaitTimeAfterMeeting.GetInt(), "TunnyPreventOff");
     }
+
+    public static bool CanSnatchesWin() => SnatchesWin == null ? false : SnatchesWin.GetBool();
 }

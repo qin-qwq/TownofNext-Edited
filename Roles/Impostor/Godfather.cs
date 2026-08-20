@@ -37,9 +37,7 @@ internal class Godfather : RoleBase
         {
             voter.RpcRemoveAbilityUse();
             GodfatherEnd = true;
-            List<MeetingHud.VoterState> statesList = [];
-            MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
-            MeetingHud.Instance.RpcClose();
+            Utils.RpcVotingCompleteV2();
             return false;
         }
         return true;

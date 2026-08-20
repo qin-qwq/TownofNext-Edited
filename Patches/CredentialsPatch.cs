@@ -85,7 +85,7 @@ class PingTrackerUpdatePatch
     private static Vector3 GetPingPosition()
     {
         var settingButtonTransformPosition = DestroyableSingleton<HudManager>.Instance.SettingsButton.transform.localPosition;
-        var offset_x = settingButtonTransformPosition.x - 1.58f;
+        var offset_x = HudManager.Instance.MatchInfoButton.isActiveAndEnabled ? settingButtonTransformPosition.x - 2.45f : settingButtonTransformPosition.x - 1.58f;
         var offset_y = settingButtonTransformPosition.y + 3.2f;
         Vector3 position;
         if (!Main.ShowTextOverlay.Value)
@@ -94,7 +94,7 @@ class PingTrackerUpdatePatch
         }
         if (AmongUsClient.Instance.IsGameStarted)
         {
-            if (DestroyableSingleton<HudManager>.Instance && !HudManager.Instance.Chat.isActiveAndEnabled)
+            if (DestroyableSingleton<HudManager>.Instance && (!HudManager.Instance.Chat.isActiveAndEnabled || !MeetingHud.Instance))
             {
                 offset_x += 0.7f; // Additional offsets for chat button if present
             }
@@ -149,8 +149,8 @@ class VersionShowerStartPatch
 #endif
         Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TONE version");
 
-        if (Main.IsAprilFools2)
-            Main.credentialsText = $"<color=#00bfff>Town Of Host</color> - 11.45.14";
+        if (Main.IsAprilFools)
+            Main.credentialsText = $"<color=#a54aff>Town Of Next Roles</color> - 0.0.1";
 
         ErrorText.Create(__instance.text);
         if (Main.hasArgumentException && ErrorText.Instance != null)
@@ -182,6 +182,14 @@ class VersionShowerStartPatch
                 SpecialEventText.color = col;
             }
         }
+        if (Main.IsPlan17InitialRelease)
+        {
+            SpecialEventText.text = $"Happy Birthday to Plan17!";
+            if (ColorUtility.TryParseHtmlString(Main.ModColor, out var col))
+            {
+                SpecialEventText.color = col;
+            }
+        }
         if (Main.IsTONEInitialRelease)
         {
             SpecialEventText.text = $"Happy Birthday to TONE!";
@@ -196,7 +204,7 @@ class VersionShowerStartPatch
 [HarmonyPatch(typeof(AccountTab), nameof(AccountTab.Awake))]
 public static class UpdateFriendCodeUIPatch
 {
-    private static GameObject VersionShower;
+    public static GameObject VersionShower;
 
     public static void Prefix()
     {

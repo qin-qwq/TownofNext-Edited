@@ -157,8 +157,10 @@ internal class Witch : RoleBase
 
         return false;
     }
-    /*public override void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
+    public override void OnCheckForEndVoting(PlayerState.DeathReason deathReason, params byte[] exileIds)
     {
+        if (Balancer.Choose || President.EndMeeting) return;
+
         foreach (var id in exileIds)
         {
             if (SpelledPlayer.ContainsKey(id))
@@ -192,27 +194,6 @@ internal class Witch : RoleBase
     public override void OnPlayerExiled(PlayerControl player, NetworkedPlayerInfo exiled)
     {
         if (!Balancer.Choose) RemoveSpelledPlayer();
-    }*/
-    public override void AfterMeetingTasks()
-    {
-        if (!_Player.IsAlive() || President.EndMeeting)
-            RemoveSpelledPlayer();
-
-        foreach (var pc in Main.EnumerateAlivePlayerControls())
-        {
-            var dic = SpelledPlayer.Where(x => x.Value.Contains(pc.PlayerId));
-            if (!dic.Any()) continue;
-            if (pc.IsTransformedNeutralApocalypse() && !CanKillTNA.GetBool()) continue;
-            var whichId = dic.FirstOrDefault().Key;
-            var witch = Utils.GetPlayerById(whichId);
-            if (witch != null && witch.IsAlive())
-            {
-                pc.RpcExileV3();
-                pc.SetRealKiller(witch);
-                pc.SetDeathReason(PlayerState.DeathReason.Spell);
-            }
-        }
-        RemoveSpelledPlayer();
     }
     public override void OnEnterVent(PlayerControl pc, Vent vent)
     {

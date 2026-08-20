@@ -19,10 +19,13 @@ public static class CustomRoleManager
     public static readonly Dictionary<CustomRoles, IAddon> AddonClasses = [];
     public static RoleBase GetStaticRoleClass(this CustomRoles role)
     {
+        if (role is CustomRoles.RWoodCollector or CustomRoles.BWoodCollector) return new FireThief();
+
         var roleClass = RoleClass.FirstOrDefault(x => x.Key == role).Value;
 
         if (!role.IsVanilla() && !role.IsAdditionRole()
-            && role is not CustomRoles.Apocalypse and not CustomRoles.Mini and not CustomRoles.NotAssigned and not CustomRoles.SpeedBooster and not CustomRoles.Killer and not CustomRoles.GM)
+            && role is not CustomRoles.Apocalypse and not CustomRoles.NotAssigned and not CustomRoles.SpeedBooster and not CustomRoles.Killer and not
+            CustomRoles.GM and not CustomRoles.RDeputy)
         {
             if (RoleClass.Count(x => x.Value.Role == role) > 1)
                 Logger.Error($"RoleClass for {role} is not unique.", "GetStaticRoleClass");
@@ -350,6 +353,7 @@ public static class CustomRoleManager
         // Check Suicide
         var isSuicide = killer.PlayerId == target.PlayerId;
 
+        if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
         // Target was murdered by Killer
         targetRoleClass.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
 
@@ -425,7 +429,7 @@ public static class CustomRoleManager
         CheckDeadBody(killer, target, inMeeting);
 
         // Check Lovers Suicide, including edge cases for suicide and disconnection
-        if (killer.PlayerId != target.PlayerId || !target.IsDisconnected())
+        if (!(killer.PlayerId == target.PlayerId && target.IsDisconnected()))
         {
             Lovers.LoversSuicide(target.PlayerId, inMeeting);
         }

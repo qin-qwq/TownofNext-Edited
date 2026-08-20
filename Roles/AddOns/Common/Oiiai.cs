@@ -26,7 +26,7 @@ public class Oiiai : IAddon
     public static readonly CustomRoles[] NRoleChangeRoles =
     [
         CustomRoles.Amnesiac,
-        CustomRoles.Imitator,
+        //CustomRoles.Imitator,
     ];
 
     public void SetupCustomOption()
@@ -199,6 +199,7 @@ public class Oiiai : IAddon
                 RoleTypes.Phantom => CustomRoles.PhantomTONE,
                 RoleTypes.Detective => CustomRoles.DetectiveTONE,
                 RoleTypes.Viper => CustomRoles.ViperTONE,
+                RoleTypes.Judge => CustomRoles.JudgeTONE,
                 _ => role,
             };
     }
