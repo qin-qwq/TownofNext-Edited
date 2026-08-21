@@ -3903,7 +3903,7 @@
   "OnPlayerJoinMsgTitle": "【 ★ {0} Welcome！★ 】",
   "Pyrophoric": "Pyrophoric",
   "PyrophoricInfo": "Burn yourself and improve your vision",
-  "PyrophoricInfoLong": "(船员阵营):\n自燃者可以通过进入通风管道来点燃自己，并提高视野，不过设定轮会议后就会因燃尽而亡\n根据房主设置，自燃者自燃时被非特殊击杀可以烧死凶手，被驱逐可以复仇一名随机玩家",
+  "PyrophoricInfoLong": "(Crewmate):\nThe Pyrophoric can ignite themselves by entering a vent, gaining increased vision — but once a Host-configured number of meetings have passed, they'll burn out and die.\nDepending on the Host's settings: if killed by a standard kill while ignited, the Pyrophoric can burn their killer to death in retaliation; if ejected, they can instead take revenge on a random player.",
   "PyrophoricSkillCooldown": "Pyrophoric Cooldown",
   "PyrophoricVision": "Pyrophoric Vision",
   "PyrophoricKilledMeetings": "Burned out and died needed meetings",
