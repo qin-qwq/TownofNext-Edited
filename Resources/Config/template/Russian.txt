@@ -1,2 +1,2 @@
-welcome: <color=#fab6ea>❀ Добро пожаловать! В этом лобби установлен мод <color=#fc83d0><b>TONE v{{ModVersion}}</b></color></color>\n<color=#83e8fc>☞ <b>/help</b> → Показать <color=#17a1e6>все команды</color></color><b>\n\n<color=#fc83d0>Мод был переведён: Cruel (@N1_Cruel)</color></b>
+welcome: <color=#fab6ea>❀ Добро пожаловать! В этом лобби установлен мод <color=#fc83d0><b>TONE v{{ModVersion}}</b></color></color>\n<color=#83e8fc>☞ <b>/help</b> → Показать <color=#17a1e6>все команды</color></color><b>\n\n<color=#fab6ea>Мод был переведён: Cruel (@N1_Cruel)</color></b>
 OnMeeting: <color=#83e8fc>☞ Отправьте <b>/r</b> → Показать список ролей\n☞ Отправьте <b>/r</b> [роль] → Показать описание роли\n☞ Отправьте <b>/m</b> → Узнать свою роль</color>
