@@ -437,7 +437,7 @@ internal class ChatCommands
         {
             foreach (var rl in CustomRolesHelper.AllRoles)
             {
-                //if (rl.IsVanilla()) continue;
+                if (rl.IsVanilla()) continue;
                 var roleName = GetString(rl.ToString()).ToLower().Trim().Replace(" ", "");
                 if (nameWithoutId == roleName)
                 {
@@ -2495,6 +2495,8 @@ internal class ChatCommands
             Utils.SendMessage(GetString("Message.SetRoleHelp"), player.PlayerId);
             return;
         }
+
+        if (roleToSet.IsVanilla()) roleToSet = Oiiai.GetErasedRole(roleToSet.GetRoleTypesDirect(), CustomRoles.Logos);
 
         var targetPc = Utils.GetPlayerById(resultId);
         if (!targetPc) return;

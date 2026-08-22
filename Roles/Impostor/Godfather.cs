@@ -42,6 +42,10 @@ internal class Godfather : RoleBase
         }
         return true;
     }
+    public override void OnMeetingShapeshift(PlayerControl shapeshifter, PlayerControl target)
+    {
+        CheckVote(shapeshifter, shapeshifter);
+    }
     public override void AfterMeetingTasks()
     {
         if (GodfatherEnd)

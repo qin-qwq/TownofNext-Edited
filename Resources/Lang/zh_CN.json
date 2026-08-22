@@ -4975,10 +4975,14 @@
   "JudgeTONEInfo": "接管会议",
   "JudgeTONEInfoLong": "(船员阵营):\n法官拥有一项强大的会议能力，即“一票定罪”。如果法官认为某个船员是伪装者，则可给此人投出一张特殊票\n当法官使用该能力时，会议只计入其特殊票。如果法官判断正确，则驱逐伪装者；判断失误，则改为驱逐法官本人！",
   "JudgeBase_JudgeTaskRequirementPercentage": "任务解锁 %",
+  "FactionSetting.NonNeutralKilling": "无刀中立数",
+  "FactionSetting.NeutralKilling": "带刀中立数",
+  "FactionSetting.NeutralApocalypse": "灾厄中立数",
+  "FactionSetting.Coven": "巫师阵营数",
+
   "Achievement.Completed": "<#fad101>成就已解锁</color>",
   "Achievement.Incomplete": "<#ff0000>成就待解锁</color>",
   "Achievement.All": "通用",
-
   "Achievement.Title.BlackmailPerGame": "沉默是金",
   "Achievement.Desc.BlackmailPerGame": "作为勒索者勒索 1 名玩家",
   "Achievement.Title.BountyHunterStreak": "悬赏猎手",

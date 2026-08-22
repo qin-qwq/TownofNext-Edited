@@ -21,7 +21,7 @@ public static class CustomRolesHelper
     {
         return role is CustomRoles.Transporter;
     }
-    public static bool NotAssignInVanillaServer(this CustomRoles roles)
+    public static bool NotAssignInVanillaServer(this CustomRoles role)
     {
         return false;
     }

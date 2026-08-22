@@ -1,3 +1,4 @@
+using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using System;
 using System.Collections;
@@ -1151,8 +1152,35 @@ public static class LobbyViewSettingsPanePatch
             o = o.Parent;
         }
     }
-    private static Sprite GetRoleIcon(CustomRoles role)
+    public static Sprite GetRoleIcon(CustomRoles role, bool color = false)
     {
-        return RoleManager.Instance.GetRole(role.GetRoleTypes()).RoleIconSolid;
+        var roleTypes = role.GetRoleTypes();
+        if (roleTypes is RoleTypes.Crewmate or RoleTypes.Impostor)
+        {
+            roleTypes = role.GetStaticRoleClass().ThisRoleType switch
+            {
+                Custom_RoleType.ImpostorKilling => RoleTypes.Viper,
+                Custom_RoleType.ImpostorSupport => RoleTypes.Phantom,
+                Custom_RoleType.ImpostorConcealing => RoleTypes.Phantom,
+                Custom_RoleType.ImpostorHindering => RoleTypes.Shapeshifter,
+                Custom_RoleType.CrewmateBasic => RoleTypes.Noisemaker,
+                Custom_RoleType.CrewmateSupport => RoleTypes.Scientist,
+                Custom_RoleType.CrewmateInvestigative => RoleTypes.Detective,
+                Custom_RoleType.CrewmateKilling => RoleTypes.Judge,
+                Custom_RoleType.CrewmatePower => RoleTypes.Tracker,
+                Custom_RoleType.NeutralBenign => RoleTypes.Judge,
+                Custom_RoleType.NeutralChaos => RoleTypes.Engineer,
+                Custom_RoleType.NeutralEvil => RoleTypes.Viper,
+                Custom_RoleType.NeutralKilling => RoleTypes.Shapeshifter,
+                Custom_RoleType.NeutralApocalypse => RoleTypes.Phantom,
+                Custom_RoleType.CovenPower => RoleTypes.Judge,
+                Custom_RoleType.CovenKilling => RoleTypes.Viper,
+                Custom_RoleType.CovenTrickery => RoleTypes.Shapeshifter,
+                Custom_RoleType.CovenUtility => RoleTypes.Detective,
+                _ => roleTypes
+            };
+        }
+        if (color) return RoleManager.Instance.GetRole(roleTypes).RoleIconColor;
+        else return RoleManager.Instance.GetRole(roleTypes).RoleIconSolid;
     }
 }

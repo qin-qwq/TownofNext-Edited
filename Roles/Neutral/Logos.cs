@@ -69,6 +69,7 @@ internal class Logos : RoleBase
         Stage4Tasks = IntegerOptionItem.Create(Id + 20, "Logos.Stage4Tasks", new(0, 100, 5), 100, TabGroup.NeutralRoles, false)
             .SetParent(CanUnlockStage4)
             .SetValueFormat(OptionFormat.Percent);
+        OverrideTasksData.Create(Id + 21, TabGroup.NeutralRoles, CustomRoles.Philosopher, CustomRoles.Logos);
     }
 
     public override void Init()
@@ -317,8 +318,6 @@ internal class Philosopher : RoleBase
             .Do(x => x.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Logos), GetString("Logos.UnlockStage1Ability"))));
             Logos.AbilityStage++;
             SendRPC();
-            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Logos))
-            .Do(x => Utils.NotifyRoles(SpecifyTarget: x));
         }
 
         if (!Logos.Stage[1] && Logos.CanUnlockStage2.GetBool() && taskNum >= Logos.Stage2Tasks.GetInt())
@@ -331,8 +330,6 @@ internal class Philosopher : RoleBase
             .Do(x => x.SyncSettings());
             Logos.AbilityStage++;
             SendRPC();
-            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Logos))
-            .Do(x => Utils.NotifyRoles(SpecifyTarget: x));
         }
 
         if (!Logos.Stage[2] && Logos.CanUnlockStage3.GetBool() && taskNum >= Logos.Stage3Tasks.GetInt())
@@ -342,8 +339,6 @@ internal class Philosopher : RoleBase
             .Do(x => x.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Logos), GetString("Logos.UnlockStage3Ability"))));
             Logos.AbilityStage++;
             SendRPC();
-            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Logos))
-            .Do(x => Utils.NotifyRoles(SpecifyTarget: x));
         }
 
         if (!Logos.Stage[3] && Logos.CanUnlockStage4.GetBool() && taskNum >= Logos.Stage4Tasks.GetInt())
@@ -353,6 +348,15 @@ internal class Philosopher : RoleBase
             .Do(x => x.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Logos), GetString("Logos.UnlockStage4Ability"))));
             Logos.AbilityStage++;
             SendRPC();
+        }
+
+        if (!Logos.Stage[3])
+        {
+            Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Logos))
+            .Do(x => Utils.NotifyRoles(SpecifyTarget: x)); 
+        }
+        else
+        {
             if (Main.CurrentServerIsVanilla && BypassRateLimitAC.GetBool())
             {
                 Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync());

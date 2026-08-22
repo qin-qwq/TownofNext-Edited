@@ -191,7 +191,7 @@ class CheckMurderPatch
         // No value is stored in TimeSinceLastKill || Stored time is greater than or equal to minTime => Allow kill
 
         //↓ If not permitted
-        if (TimeSinceLastKill.TryGetValue(killer.PlayerId, out var time) && time < minTime)
+        if (TimeSinceLastKill.TryGetValue(killer.PlayerId, out var time) && time < minTime && GameModeBase.GetGameMode() != CustomGameMode.TagMode)
         {
             Logger.Info($"Last kill was too shortly before, canceled - Ping: {AmongUsClient.Instance.Ping}, Time: {time}, MinTime: {minTime}", "CheckMurder");
             return false;

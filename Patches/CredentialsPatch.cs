@@ -94,7 +94,7 @@ class PingTrackerUpdatePatch
         }
         if (AmongUsClient.Instance.IsGameStarted)
         {
-            if (DestroyableSingleton<HudManager>.Instance && (!HudManager.Instance.Chat.isActiveAndEnabled || !MeetingHud.Instance))
+            if (DestroyableSingleton<HudManager>.Instance && !HudManager.Instance.Chat.isActiveAndEnabled)
             {
                 offset_x += 0.7f; // Additional offsets for chat button if present
             }

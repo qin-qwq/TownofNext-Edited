@@ -488,7 +488,7 @@ class CheckForEndVotingPatch
                 overruleNonce = winningOverrule.OverruleNonce;
                 exiledPlayer = overruledInfo.Object.IsPlayerCrewmateTeam() || overruledInfo.Object.Is(CustomRoles.Trickster) ? judgeInfo : overruledInfo;
                 if (!judgeInfo.IsHost()) JudgeTONE.playerIdList.Add(judgeInfo.PlayerId);
-                Logger.Info($"Judge overrule applied! Exiled: {exiledPlayer?.PlayerName}", "Judge");
+                Logger.Info($"The Judge has spoken! Exiled: {exiledPlayer.PlayerId}", "Judge");
             }
             //RPC
             if (AntiBlackout.BlackOutIsActive)
