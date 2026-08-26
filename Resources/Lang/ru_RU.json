@@ -494,7 +494,7 @@
   "GuessMasterInfo": "Шёпоты услышали все угаданные слова.",
   "TransporterInfo": "Выполнив задание, два игрока поменяются местами",
   "TimeManagerInfo": "Выполняйте задания, увеличивая время встречи",
-  "VeteranInfo": "Не позволяй убийце просто так убить себя",
+  "VeteranInfo": "Убейте того, кто захотел убить вас",
   "BastionInfo": "Положите бомбу в вентиляцию",
   "YinYangerInfo": "Спонтанно убей двух игроков",
   "BodyguardInfo": "Предотвращайте убийства поблизости",
@@ -1868,7 +1868,7 @@
   "CountMode_None": "Ничего",
   "Cultist_CharmedCountMode_Cultist": "<color=#cf6acd>Суккуб</color>",
   "CountMode_Original": "Первоначальная команда",
-  "JackalCanWinBySabotageWhenNoImpAlive": "Когда все <color=#ff1919>Предатели</color> мертвы, <color=#00b4eb>Jackal</color> побеждает с помощью саботажа",
+  "JackalCanWinBySabotageWhenNoImpAlive": "Когда все <color=#ff1919>Предатели</color> мертвы, <color=#00b4eb>Шакал</color> побеждает с помощью саботажа",
   "JackalResetKillCooldownWhenPlayerGetKilled": "Сбросить откат убийства, когда кого-то убивают",
   "JackalResetKillCooldownOn": "Откат убийства при сбросе",
   "JackalCanRecruitSidekick": "Может нанять <color=#00b4eb>Союзника</color>",
@@ -4881,6 +4881,7 @@
   "CanKnowTargetRole": "Может узнать роль цели",
   "PreventSeeRolesDeath": "Отключает видимость роли после смерти",
   "Underdog.ReduceKillCooldown": "Откат после убийства сокращается за каждую смерть",
-  "Kill2Duration": "Длительность серии убийств"
+  "Kill2Duration": "Длительность серии убийств",
+  "CovenCanSabotage": "<color=#ac42f2> Фракция волшебников </color> Члены фракции могут устраивать саботаж"
 
 }
