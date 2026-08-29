@@ -437,7 +437,7 @@ public class Main : BasePlugin
 
             foreach (var role in EnumHelper.GetAllValues<CustomRoles>())
             {
-                if (role.IsAdditionRole() && role.IsImpOnlyAddon()) roleColors.TryAdd(role, "#ff1919");
+                if (role.IsImpOnlyAddon()) roleColors.TryAdd(role, "#ff1919");
                 switch (role.GetCustomRoleTeam())
                 {
                     case Custom_Team.Impostor:
