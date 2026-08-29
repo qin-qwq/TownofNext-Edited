@@ -140,6 +140,12 @@ public static class Options
         "WinBySabotageMode.Impostor",
         "WinBySabotageMode.Coven"
     ];
+    public static readonly string[] MeetingAbilityMode =
+    [
+        "MeetingAbilityMode.None",
+        "MeetingAbilityMode.Shapeshift",
+        "MeetingAbilityMode.Judge"
+    ];
     [Obfuscation(Exclude = true)]
     public enum QuickChatSpamMode
     {
@@ -428,7 +434,7 @@ public static class Options
     public static OptionItem WhenSkipVoteIgnoreEmergency;
     public static OptionItem WhenNonVote;
     public static OptionItem WhenTie;
-    public static OptionItem UseMeetingShapeshift;
+    public static OptionItem UseMeetingAbilityMethod;
 
     // Other
     public static OptionItem LadderDeath;
@@ -2087,7 +2093,7 @@ public static class Options
         EnableVoteCommand = BooleanOptionItem.Create(60746, "EnableVote", true, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
-        UseMeetingShapeshift = BooleanOptionItem.Create(60749, "UseMeetingShapeshift", true, TabGroup.ModSettings, false)
+        UseMeetingAbilityMethod = StringOptionItem.Create(60749, "UseMeetingAbilityMethod", MeetingAbilityMode, 0, TabGroup.ModSettings, false)
             .SetColor(new Color32(147, 241, 240, byte.MaxValue))
             .SetGameMode(CustomGameMode.Standard);
         // 其它设定

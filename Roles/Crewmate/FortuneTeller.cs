@@ -183,8 +183,9 @@ internal class FortuneTeller : RoleBase
                 };
                 if (targetRole.GetCustomRoleTeam() == team) num--;
                 if (num <= 0) return;
-                var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && role.GetCustomRoleTeam() == team && !role.IsGhostRole() && role != CustomRoles.FortuneTeller
-                && role != CustomRoles.GM).ToList();
+                var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole &&
+                role.GetCustomRoleTeam() == team && !role.IsGhostRole() && !role.OtherGameModesRole() && role is not CustomRoles.FortuneTeller and not
+                CustomRoles.GM).ToList();
                 var count = Math.Min(num, activeRoleList.Count);
                 for (var i = 0; i < count; i++)
                 {
@@ -196,8 +197,9 @@ internal class FortuneTeller : RoleBase
         }
         else
         {
-            List<CustomRoles[]> completeRoleList = EnumHelper.Achunk<CustomRoles>(chunkSize: 6, shuffle: true, exclude: (x) => !x.IsGhostRole() && !x.IsAdditionRole() && !x.IsVanilla() && x is not CustomRoles.NotAssigned and not CustomRoles.ChiefOfPolice and not
-            CustomRoles.Killer and not CustomRoles.GM and not CustomRoles.Apocalypse and not CustomRoles.Coven and not CustomRoles.RDeputy);
+            List<CustomRoles[]> completeRoleList = EnumHelper.Achunk<CustomRoles>(chunkSize: 6, shuffle: true, exclude: (x) => !x.IsGhostRole() && !x.IsAdditionRole() &&
+            !x.IsVanilla() && !x.OtherGameModesRole() && x is not CustomRoles.NotAssigned and not CustomRoles.ChiefOfPolice and not CustomRoles.Killer and not
+            CustomRoles.GM and not CustomRoles.Apocalypse and not CustomRoles.Coven and not CustomRoles.RDeputy);
 
             var targetRole = target.GetCustomRole();
             string text = string.Empty;

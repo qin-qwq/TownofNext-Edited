@@ -194,6 +194,11 @@ public static class CustomRoleManager
             AURoleOptions.TrackerCooldown = 10f;
             AURoleOptions.PhantomCooldown = 10f;
         }
+
+        if (player.UsesMeetingShapeshift() && Options.UseMeetingAbilityMethod.GetValue() == 2)
+        {
+            AURoleOptions.JudgeTaskRequirementPercentage = 0;
+        }
     }
 
     /// <summary>

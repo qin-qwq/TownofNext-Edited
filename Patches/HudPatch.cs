@@ -224,7 +224,7 @@ class SetHudActivePatch
         if (!isActive)
         {
             if (MeetingHud.Instance && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted &&
-                Options.UseMeetingShapeshift.GetBool() && player.UsesMeetingShapeshift())
+                Options.UseMeetingAbilityMethod.GetValue() == 1 && player.UsesMeetingShapeshift())
             {
                 __instance.AbilityButton.ToggleVisible(true);
             }

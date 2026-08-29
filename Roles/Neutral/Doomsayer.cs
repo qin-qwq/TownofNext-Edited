@@ -356,8 +356,9 @@ internal class Doomsayer : RoleBase
                     };
                     if (targetRole.GetCustomRoleTeam() == team) num--;
                     if (num <= 0) return;
-                    var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole && role.GetCustomRoleTeam() == team && !role.IsGhostRole() && role != CustomRoles.Doomsayer
-                    && role != CustomRoles.GM).ToList();
+                    var activeRoleList = CustomRolesHelper.AllRoles.Where(role => (role.IsEnable() || role.RoleExist(countDead: true)) && role != targetRole &&
+                    role.GetCustomRoleTeam() == team && !role.IsGhostRole() && !role.OtherGameModesRole() && role is not CustomRoles.Doomsayer and not
+                    CustomRoles.GM).ToList();
                     var count = Math.Min(num, activeRoleList.Count);
                     for (var i = 0; i < count; i++)
                     {

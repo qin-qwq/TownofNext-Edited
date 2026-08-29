@@ -944,7 +944,7 @@ public static class Utils
         foreach (var role in CustomRolesHelper.AllRoles)
         {
             string mode = GetChance(role.GetMode());
-            if (role.IsEnable())
+            if (role.IsEnable() && !role.OtherGameModesRole())
             {
                 // if (role is CustomRoles.Lovers) mode = GetChance(Options.LoverSpawnChances.GetInt());
                 if (role.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(role))

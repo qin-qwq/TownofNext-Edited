@@ -564,6 +564,7 @@ class BeginCrewmatePatch
             case CustomRoles.President:
             case CustomRoles.Councillor:
             case CustomRoles.Godfather:
+            case CustomRoles.Notary:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Judge);
                 break;
             case CustomRoles.SuperStar:

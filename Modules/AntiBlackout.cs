@@ -407,6 +407,11 @@ public static class AntiBlackout
                 }
             }
         }
+        if (!Utils.IsActive(SystemTypes.Comms) && ReportDeadBodyPatch.BypassComms)
+        {
+            ReportDeadBodyPatch.BypassComms = false;
+            ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Comms, 128);
+        }
     }
     public static void ResetAfterMeeting()
     {

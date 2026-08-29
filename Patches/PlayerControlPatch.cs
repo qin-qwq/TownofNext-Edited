@@ -191,7 +191,7 @@ class CheckMurderPatch
         // No value is stored in TimeSinceLastKill || Stored time is greater than or equal to minTime => Allow kill
 
         //↓ If not permitted
-        if (TimeSinceLastKill.TryGetValue(killer.PlayerId, out var time) && time < minTime && GameModeBase.GetGameMode() != CustomGameMode.TagMode)
+        if (TimeSinceLastKill.TryGetValue(killer.PlayerId, out var time) && time < minTime && GameModeBase.GetGameMode() == CustomGameMode.Standard)
         {
             Logger.Info($"Last kill was too shortly before, canceled - Ping: {AmongUsClient.Instance.Ping}, Time: {time}, MinTime: {minTime}", "CheckMurder");
             return false;
@@ -664,7 +664,7 @@ public static class CheckShapeshiftPatch
         }
 
         var shapeshifterRoleClass = __instance.GetRoleClass();
-        if (Options.UseMeetingShapeshift.GetBool() && GameStates.IsMeeting)
+        if (Options.UseMeetingAbilityMethod.GetValue() == 1 && GameStates.IsMeeting)
         {
             if (MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.Voted or MeetingHud.MeetingStates.NotVoted)
                 shapeshifterRoleClass?.OnMeetingShapeshift(__instance, target);
@@ -841,6 +841,7 @@ class ReportDeadBodyPatch
     public static Dictionary<byte, bool> CanReport = [];
     public static Dictionary<byte, List<NetworkedPlayerInfo>> WaitReport = [];
     public static bool PreventEAC = false;
+    public static bool BypassComms = false;
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo target)
     {
         if (GameStates.IsMeeting || GameStates.IsHideNSeek) return false;
@@ -1174,6 +1175,18 @@ class ReportDeadBodyPatch
 
         // Sync all settings on meeting start
         _ = new LateTask(Utils.SyncAllSettings, 3f, "Sync all settings after report");
+        // Fix comms to prevent judge from being unable to use ability
+        if (Options.UseMeetingAbilityMethod.GetValue() == 2 && Utils.IsActive(SystemTypes.Comms)) _ = new LateTask(FixComms, 3f, "Fix comms after report");
+    }
+
+    public static void FixComms()
+    {
+        BypassComms = true;
+        var mapId = Utils.GetActiveMapId();
+
+        ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Comms, 16);
+        if (mapId is 1 or 5) // Mira HQ or The Fungle
+            ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Comms, 17);
     }
 }
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]

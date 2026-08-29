@@ -913,7 +913,7 @@ class CastVotePatch
             }
 
 
-            if (!(Options.UseMeetingShapeshift.GetBool() && voter.UsesMeetingShapeshift()))
+            if (!(Options.UseMeetingAbilityMethod.GetValue() != 0 && voter.UsesMeetingShapeshift()))
             {
                 if (voter.GetRoleClass().CheckVote(voter, target) == false)
                 {
@@ -983,6 +983,18 @@ class SetJudgeOverrulePatch
             __instance.RpcClearVoteDelay(srcPlayerId);
             return false;
         }
+        if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && TasksRemaining(voter) != 0)
+        {
+            SendMessage(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.JudgeAbilityProgress, TasksRemaining(voter)), srcPlayerId, noReplay: true);
+            __instance.RpcClearVoteDelay(srcPlayerId);
+            return false;
+        }
+        if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && ReportDeadBodyPatch.BypassComms)
+        {
+            SendMessage(GetString("JudgeAffectedByComms"), srcPlayerId, noReplay: true);
+            __instance.RpcClearVoteDelay(srcPlayerId);
+            return false;
+        }
 
         if (target && suspectPlayerId < 253)
         {
@@ -995,11 +1007,13 @@ class SetJudgeOverrulePatch
                 return false;
             }
 
-            if (!(Options.UseMeetingShapeshift.GetBool() && voter.UsesMeetingShapeshift()))
+
+            if (Options.UseMeetingAbilityMethod.GetValue() != 0 && voter.UsesMeetingShapeshift())
             {
-                if (voter.GetRoleClass().CheckVote(voter, target) == false)
+                if (voter.GetRoleClass()?.IsMethodOverridden("OnMeetingShapeshift") == true)
                 {
                     Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "SetJudgeOverrulePatch.RoleBase.CheckVote");
+                    voter.GetRoleClass()?.OnMeetingShapeshift(voter, target);
                     __instance.RpcClearVoteDelay(srcPlayerId);
                     return false;
                 }
@@ -1029,6 +1043,14 @@ class SetJudgeOverrulePatch
             __instance.CheckForEndVoting();
             //For stuffs in check for end voting to work
         }
+    }
+
+    public static int TasksRemaining(PlayerControl voter)
+    {
+        var initialTaskCount = voter.GetPlayerTaskState().AllTasksCount;
+        var num = voter.GetPlayerTaskState().CompletedTasksCount;
+        var taskRequirementProportion = JudgeTONE.JudgeTaskRequirementPercentage.GetInt() / 100f;
+        return Mathf.Clamp(Mathf.CeilToInt(taskRequirementProportion * initialTaskCount) - num, 0, 999);
     }
 }
 static class ExtendedMeetingHud
@@ -1499,7 +1521,7 @@ class MeetingHudStartPatch
                 ChatUpdatePatch.DoBlockChat = false;
             }, 3f, "SetName To Chat");
 
-            if (Options.UseMeetingShapeshift.GetBool())
+            if (Options.UseMeetingAbilityMethod.GetValue() != 0)
             {
                 _ = new LateTask(() =>
                 {
@@ -1512,8 +1534,8 @@ class MeetingHudStartPatch
                             SendMessage(GetString("SupportMeetingShapeshift"), pc.PlayerId, pc.GetCustomRole().ToColoredString().ToUpper(), noReplay: true);
                             var aapc = Main.EnumerateAlivePlayerControls();
                             var sender = CustomRpcSender.Create($"RpcSetRoleDesync for meeting shapeshift ({Main.AllPlayerNames.GetValueOrDefault(pc.PlayerId, "Someone")})", SendOption.Reliable);
-                            sender.RpcSetRole(pc, RoleTypes.Shapeshifter, pc.OwnerId);
-                            if (!pc.GetCustomRole().IsImpostor()) aapc.DoIf(x => x.GetCustomRole().IsImpostor(), x => sender.RpcSetRole(x, RoleTypes.Crewmate, pc.OwnerId));
+                            sender.RpcSetRole(pc, Options.UseMeetingAbilityMethod.GetValue() == 1 ? RoleTypes.Shapeshifter : RoleTypes.Judge, pc.OwnerId);
+                            if (!pc.GetCustomRole().IsImpostor() && Options.UseMeetingAbilityMethod.GetValue() == 1) aapc.DoIf(x => x.GetCustomRole().IsImpostor(), x => sender.RpcSetRole(x, RoleTypes.Crewmate, pc.OwnerId));
                             sender.SendMessage();
                         }
                     }
@@ -1769,7 +1791,7 @@ class MeetingHudOnDestroyPatch
             AntiBlackout.SetIsDead();
 
             Main.LastVotedPlayerInfo = null;
-            if (Options.UseMeetingShapeshift.GetBool())
+            if (Options.UseMeetingAbilityMethod.GetValue() != 0)
             {
                 var pc = PlayerControl.LocalPlayer;
                 if (pc.UsesMeetingShapeshift()) pc.RpcSetRoleDesync(pc.GetCustomRole().GetRoleTypes(), pc.OwnerId);
