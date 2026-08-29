@@ -63,12 +63,14 @@ public static class Camouflage
     public static List<byte> ResetSkinAfterDeathPlayers = [];
     public static Dictionary<byte, NetworkedPlayerInfo.PlayerOutfit> PlayerSkins = [];
     public static bool IsActive;
+    public static readonly List<byte> WaitingChangeSkin = [];
 
     public static void Init()
     {
         IsCamouflage = false;
         PlayerSkins.Clear();
         ResetSkinAfterDeathPlayers.Clear();
+        WaitingChangeSkin.Clear();
 
         IsActive = Options.CommsCamouflage.GetBool() && !(Options.DisableOnSomeMaps.GetBool() &&
             (
@@ -153,6 +155,12 @@ public static class Camouflage
         {
             foreach (var pc in Main.EnumeratePlayerControls())
             {
+                if (pc.inVent || pc.walkingToVent)
+                {
+                    WaitingChangeSkin.Add(pc.PlayerId);
+                    continue;
+                }
+
                 RpcSetSkin(pc);
 
                 if (!IsCamouflage && !pc.IsAlive())

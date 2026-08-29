@@ -197,6 +197,8 @@ internal class BountyHunter : RoleBase
 
         if (player.Is(CustomRoles.Narc) && target.IsPolice()) return false;
 
+        if (target.Is(CustomRoles.Mini) && Mini.Age < 18) return false;
+
         return true;
     }
     private static byte ResetTarget(PlayerControl player)

@@ -28,7 +28,8 @@ public class Lazy : IAddon
     public static bool CheckConflicts(PlayerControl player)
     {
         if (player.Is(CustomRoles.Ghoul)
-            || player.Is(CustomRoles.LazyGuy))
+            || player.Is(CustomRoles.LazyGuy)
+            || player.Is(CustomRoles.JudgeTONE))
             return false;
 
         if (player.GetCustomRole().IsNeutral()

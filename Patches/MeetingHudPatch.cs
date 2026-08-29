@@ -1616,11 +1616,18 @@ class MeetingHudStartPatch
                 button.OnClick.RemoveAllListeners();
                 button.OnClick.AddListener((Action)(() =>
                 {
-                    if (AmongUsClient.Instance.AmHost) PlayerControl.LocalPlayer.GetRoleClass().OnClickAbilityButton(pva.PlayerId);
+                    if (PlayerControl.LocalPlayer.GetRoleClass().UseGuessPage)
+                    {
+                        GuessManager.GuesserOnClick(pva.PlayerId, __instance, true);
+                    }
                     else
                     {
-                        var msg = new RpcClickAbilityButton(PlayerControl.LocalPlayer.NetId, pva.PlayerId);
-                        RpcUtils.LateBroadcastReliableMessage(msg);
+                        if (AmongUsClient.Instance.AmHost) PlayerControl.LocalPlayer.GetRoleClass().OnClickAbilityButton(pva.PlayerId, CustomRoles.NotAssigned);
+                        else
+                        {
+                            var msg = new RpcClickAbilityButton(PlayerControl.LocalPlayer.NetId, pva.PlayerId, 500);
+                            RpcUtils.LateBroadcastReliableMessage(msg);
+                        }
                     }
                 }));
             }

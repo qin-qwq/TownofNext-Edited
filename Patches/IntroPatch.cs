@@ -995,7 +995,7 @@ internal static class IntroCutsceneDestroyPatch
                     }
                     else
                     {
-                        pc.SetKillTimer(10f);
+                        pc.SetKillTimer(CD: 10f);
                     }
                 }
             }
@@ -1061,6 +1061,10 @@ internal static class IntroCutsceneDestroyPatch
             }
 
             if (AFKDetector.ActivateOnStart.GetBool()) _ = new LateTask(() => Main.EnumerateAlivePlayerControls().Do(AFKDetector.RecordPosition), 1f);
+            if (AbilityTimeManager.ResetStartAbilityCooldown)
+            {
+                _ = new LateTask(Utils.SyncAllSettings, 1f, "Reset Start Ability Cooldown");
+            }
 
             if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
             {
@@ -1073,6 +1077,8 @@ internal static class IntroCutsceneDestroyPatch
 
             Main.Instance.StartCoroutine(ShipStatusFixedUpdatePatch.Postfix());
         }
+
+        AbilityTimeManager.ResetStartAbilityCooldown = false;
 
         try
         {

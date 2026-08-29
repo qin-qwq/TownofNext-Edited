@@ -269,9 +269,12 @@ public static class EnterCodeManagerPatch
         {
             return;
         }
-        foreach (var error in response.Errors.ToArray())
+        if (response.Errors != null)
         {
-            Logger.Error($"{error.Reason}", "FindGameResult");
+            foreach (var error in response.Errors.ToArray())
+            {
+                Logger.Error($"{error.Reason}", "FindGameResult");
+            }
         }
         if (ServerManager.InstanceExists)
         {

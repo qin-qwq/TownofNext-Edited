@@ -351,6 +351,7 @@ public static class DraftAssign
         int chance = role.GetMode();
         if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) return true;
         if (RoleAssign.SetRoles.ContainsValue(role) || (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) || (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) return true;
+        if (role.OtherGameModesRole()) return true;
         switch (role)
         {
             case CustomRoles.Stalker when GameStates.FungleIsActive:
@@ -363,8 +364,6 @@ public static class DraftAssign
             case CustomRoles.NotAssigned:
             case CustomRoles.Runner:
             case CustomRoles.PhantomTONE when NarcManager.IsNarcAssigned():
-            case CustomRoles.NiceGuesser when Options.GuesserMode.GetBool() && Options.CrewmatesCanGuess.GetBool():
-            case CustomRoles.EvilGuesser when Options.GuesserMode.GetBool() && Options.ImpostorsCanGuess.GetBool():
                 return true;
         }
         return false;

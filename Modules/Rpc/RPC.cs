@@ -610,14 +610,18 @@ internal class RPCHandlerPatch
                     GameModeBase.GetGameMode().GetGameModeClass().ReceiveRPC(reader);
                     break;
                 case CustomRPC.SyncAllPlayerNames:
-                    Main.AllPlayerNames.Clear();
-                    Main.AllClientRealNames.Clear();
-                    int num = reader.ReadPackedInt32();
-                    for (int i = 0; i < num; i++)
-                        Main.AllPlayerNames.TryAdd(reader.ReadByte(), reader.ReadString());
-                    int num2 = reader.ReadPackedInt32();
-                    for (int i = 0; i < num2; i++)
-                        Main.AllClientRealNames.TryAdd(reader.ReadInt32(), reader.ReadString());
+                    try
+                    {
+                        Main.AllPlayerNames.Clear();
+                        Main.AllClientRealNames.Clear();
+                        int num = reader.ReadPackedInt32();
+                        for (int i = 0; i < num; i++)
+                            Main.AllPlayerNames.TryAdd(reader.ReadByte(), reader.ReadString());
+                        int num2 = reader.ReadPackedInt32();
+                        for (int i = 0; i < num2; i++)
+                            Main.AllClientRealNames.TryAdd(reader.ReadInt32(), reader.ReadString());
+                    }
+                    catch (Exception e) { Utils.ThrowException(e); }
                     break;
                 case CustomRPC.SyncFFANameNotify:
                     FFAManager.ReceiveRPCSyncNameNotify(reader);
@@ -1037,8 +1041,9 @@ internal static class RPC
         try
         {
             var targetId = reader.ReadByte();
+            var role = (CustomRoles)reader.ReadInt32();
 
-            pc.GetRoleClass().OnClickAbilityButton(targetId);
+            pc.GetRoleClass().OnClickAbilityButton(targetId, role);
         }
         catch (Exception error)
         {

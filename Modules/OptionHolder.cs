@@ -175,6 +175,7 @@ public static class Options
     public static OptionItem VeteranAbilityUseGainWithEachTaskCompleted;
     public static OptionItem TimeMasterAbilityUseGainWithEachTaskCompleted;
     public static OptionItem NiceHackerAbilityUseGainWithEachTaskCompleted;
+    public static OptionItem NotaryAbilityUseGainWithEachTaskCompleted;
 
     //public static OptionItem EnableGM;
     public static float DefaultKillCooldown = Main.NormalOptions?.KillCooldown ?? 20;
@@ -579,6 +580,7 @@ public static class Options
     public static OptionItem BalanceRoleSetting;
     public static OptionItem BalanceNeedPlayers;
     public static OptionItem ChangeFactionSettings;
+    public static OptionItem ResetStartAbilityCooldown;
 
     // ------------ General Role Settings ------------
 
@@ -728,7 +730,7 @@ public static class Options
     private static System.Collections.IEnumerator CoLoadOptions()
     {
         //#######################################
-        // 34600 last id for roles/add-ons (Next use 34700)
+        // 34700 last id for roles/add-ons (Next use 34800)
         // Limit id for roles/add-ons --- "59999"
         //#######################################
 
@@ -895,6 +897,15 @@ public static class Options
 
 
         }
+
+        /*
+         * CONCEALING ROLES
+         */
+        TextOptionItem.Create(10000041, "RoleType.ImpConcealing", TabGroup.ImpostorRoles)
+            .SetGameMode(CustomGameMode.CopsAndRobbers)
+            .SetColor(new Color32(255, 140, 0, byte.MaxValue));
+
+        new Disguiser().SetupCustomOption();
 
         TextOptionItem.Create(10000001, "RoleType.ImpKilling", TabGroup.ImpostorRoles) // KILLING
             .SetGameMode(CustomGameMode.Standard)
@@ -2234,6 +2245,9 @@ public static class Options
             .SetValueFormat(OptionFormat.Players)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         ChangeFactionSettings = BooleanOptionItem.Create(61109, "ChangeFactionSettings", false, TabGroup.ModSettings, false)
+            .SetGameMode(CustomGameMode.Standard)
+            .SetColor(new Color32(255, 212, 248, byte.MaxValue));
+        ResetStartAbilityCooldown = BooleanOptionItem.Create(61110, "ResetStartAbilityCooldown", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 212, 248, byte.MaxValue));
         #endregion

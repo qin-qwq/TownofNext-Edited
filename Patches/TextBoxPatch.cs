@@ -51,6 +51,7 @@ public static class TextBoxPatch
         __instance.allowAllCharacters = true;
         __instance.AllowEmail = true;
         __instance.AllowSymbols = true;
+        __instance.AllowPaste = true;
     }
 
     [HarmonyPatch(typeof(TextBoxTMP), nameof(TextBoxTMP.SetText))]

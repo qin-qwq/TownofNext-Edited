@@ -278,6 +278,9 @@ internal class DoubleAgent : RoleBase
         CustomSoundsManager.RPCPlayCustomSoundAll("Boom");
         ClearBomb();
 
+        if (AmongUsClient.Instance.AmHost)
+            _ = new Explosion(5f, 0.5f, player.GetCustomPosition());
+
         _Player?.Notify(ColorString(GetRoleColor(CustomRoles.DoubleAgent), GetString("DoubleAgent_BombExploded")));
     }
 
@@ -327,7 +330,7 @@ internal class DoubleAgent : RoleBase
 
     public override string AbilityButtonName => "PocketBomb";
 
-    public override void OnClickAbilityButton(byte targetId)
+    public override void OnClickAbilityButton(byte targetId, CustomRoles role)
     {
         if (BombIsActive) return;
 

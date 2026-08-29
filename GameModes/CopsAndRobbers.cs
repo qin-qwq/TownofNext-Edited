@@ -17,7 +17,7 @@ namespace TONE;
 internal class CopsAndRobbers : GameModeBase
 {
     public override CustomGameMode GameMode => CustomGameMode.CopsAndRobbers;
-    private const int Id = 67_230_001;
+    public const int Id = 67_230_001;
     public override bool OpeningHours => Main.IsSummer;
 
     public static OptionItem GameTime;
@@ -200,7 +200,7 @@ internal class CopsAndRobbers : GameModeBase
                     RpcUtils.LateBroadcastReliableMessage(message);
                     if (GetActiveMapName() is not MapNames.Airship) pc.RpcTeleport(Prison.Position);
                 }
-                else if (pc.Is(CustomRoles.Robber))
+                else if (pc.Is(CustomRoles.Robber) || pc.Is(CustomRoles.Disguiser))
                 {
                     pc.SetColor(6);
 
@@ -241,12 +241,20 @@ internal class CopsAndRobbers : GameModeBase
             }
         }
         var cops = NumCops.GetInt();
+        var disguiser = random.Next(1, 101) <= CustomRoles.Disguiser.GetMode() ? CustomRoles.Disguiser.GetCount() : 0;
         foreach (var pc in AllPlayers)
         {
             if (cops > 0)
             {
                 RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.Cop;
                 cops--;
+                continue;
+            }
+            if (disguiser > 0)
+            {
+                RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.Disguiser;
+                RobberList.Add(pc.PlayerId);
+                disguiser--;
                 continue;
             }
             RoleAssign.RoleResult[pc.PlayerId] = CustomRoles.Robber;
@@ -299,7 +307,7 @@ internal class CopsAndRobbers : GameModeBase
     public override void AppendKcount(StringBuilder builder)
     {
         int CopCount = Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Cop));
-        int RobberCount = Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Robber));
+        int RobberCount = Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Robber) || x.Is(CustomRoles.Disguiser));
 
         builder.Append(string.Format(GetString("Remaining.C&R.Cop"), CopCount));
         builder.Append(string.Format("\n\r" + GetString("Remaining.C&R.Robber"), RobberCount));
@@ -371,8 +379,8 @@ class CopsAndRobbersGameEndPredicate : GameEndPredicate
     {
         reason = GameOverReason.ImpostorsByKill;
 
-        if (Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Robber)) == CopsAndRobbers.CaptureList.Count ||
-            !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.Robber)) ||
+        if (Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Robber) || x.Is(CustomRoles.Disguiser)) == CopsAndRobbers.CaptureList.Count ||
+            !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.Robber) || x.Is(CustomRoles.Disguiser)) ||
             CopsAndRobbers.StartedAt != 0 && GetTimeStamp() - CopsAndRobbers.StartedAt >= CopsAndRobbers.GameTime.GetInt())
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Cop);
@@ -386,7 +394,7 @@ class CopsAndRobbersGameEndPredicate : GameEndPredicate
         {
             reason = GameOverReason.CrewmatesByTask;
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Robber);
-            Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Robber)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
+            Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Robber) || x.Is(CustomRoles.Disguiser)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));
             Main.DoBlockNameChange = true;
             return true;
         }
@@ -613,8 +621,6 @@ public class Cop : RoleBase
         return string.Empty;
     }
 
-    public override string GetProgressText(byte playerId, bool comms) => string.Empty;
-
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.AbilityButton?.OverrideText(GetString("ChangeButtonText"));
@@ -622,7 +628,12 @@ public class Cop : RoleBase
         else hud.KillButton?.OverrideText($"{GetString("KillButtonText")}");
     }
 
-    public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];
+    public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target)
+    {
+        if (target.Is(CustomRoles.Cop) || target.GetRoleClass() is Disguiser d && d.AbilityTime.Item1) return Main.roleColors[CustomRoles.Cop];
+
+        return Main.roleColors[CustomRoles.Robber];
+    } 
 }
 
 public class Robber : RoleBase
@@ -718,7 +729,7 @@ public class Robber : RoleBase
             return;
         }
 
-        if (CopsAndRobbers.CaptureList.Any() && !CopsAndRobbers.CaptureList.Contains(player.PlayerId) && !player.HasAbilityCD() && GetDistance(player.GetCustomPosition(), CopsAndRobbers.Prison.Position) <= 1f)
+        if (player.Is(CustomRoles.Robber) && CopsAndRobbers.CaptureList.Any() && !CopsAndRobbers.CaptureList.Contains(player.PlayerId) && !player.HasAbilityCD() && GetDistance(player.GetCustomPosition(), CopsAndRobbers.Prison.Position) <= 1f)
         {
             var targetId = CopsAndRobbers.CaptureList.RandomElement();
             var target = targetId.GetPlayer();
@@ -749,7 +760,7 @@ public class Robber : RoleBase
         {
             if (c.ReviveTime + CopsAndRobbers.CopReviveCooldown.GetInt() + CopsAndRobbers.CopInvincibilityCooldownAfterRevive.GetInt() > TimeStamp) return false;
         }
-        if (target.Is(CustomRoles.Robber)) return false;
+        if (target.Is(CustomRoles.Robber) || target.Is(CustomRoles.Disguiser)) return false;
         if (CopsAndRobbers.RobberCanKillCop.GetBool()) return true;
         else return false;
     }
@@ -844,4 +855,160 @@ public class Robber : RoleBase
     }
 
     public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => Main.roleColors[target.GetCustomRole()];
+}
+
+public class Disguiser : Robber
+{
+    public override CustomRoles Role => CustomRoles.Disguiser;
+    private const int Id = CopsAndRobbers.Id + 40;
+
+    public static OptionItem AbilityCooldown;
+    public static OptionItem AbilityDuration;
+    public static OptionItem AbilityLimit;
+
+    public (bool, float) AbilityTime = (false, 0f);
+
+    public override void SetupCustomOption()
+    {
+        Options.SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Disguiser, CustomGameMode.CopsAndRobbers);
+        AbilityCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.ImpostorRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Disguiser])
+            .SetValueFormat(OptionFormat.Seconds);
+        AbilityDuration = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityDuration, new(0f, 180f, 2.5f), 15f, TabGroup.ImpostorRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Disguiser])
+            .SetValueFormat(OptionFormat.Seconds);
+        AbilityLimit = IntegerOptionItem.Create(Id + 12, GeneralOption.SkillLimitTimes, new(0, 15, 1), 3, TabGroup.ImpostorRoles, false)
+            .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Disguiser])
+            .SetValueFormat(OptionFormat.Times);
+    }
+
+    public override void Add(byte playerId)
+    {
+        ReviveTime = 0;
+        playerId.SetAbilityUseLimit(AbilityLimit.GetInt());
+        AbilityTime = (false, 0f);
+    }
+
+    public override void UnShapeShiftButton(PlayerControl player)
+    {
+        if (CopsAndRobbers.CaptureList.Contains(player.PlayerId)) return;
+
+        var index = CopsAndRobbers.Jewel.FindIndex(location => !CopsAndRobbers.JewelList.Contains(player.PlayerId) && GetDistance(player.GetCustomPosition(), location.Position) <= 1f);
+
+        if (index >= 0)
+        {
+            var location = CopsAndRobbers.Jewel[index];
+            CopsAndRobbers.JewelList.Add(player.PlayerId);
+            location.Jewel.Despawn();
+            player.Notify(GetString("C&R.FindJewel"));
+            SendRPC(player, 1);
+            NotifyRoles(SpecifyTarget: player);
+            CopsAndRobbers.Jewel.RemoveAt(index);
+            return;
+        }
+
+        if (CopsAndRobbers.JewelList.Contains(player.PlayerId) && GetDistance(player.GetCustomPosition(), CopsAndRobbers.Bag.Position) <= 1f)
+        {
+            CopsAndRobbers.JewelList.Remove(player.PlayerId);
+            CopsAndRobbers.NumJewels++;
+            player.Notify(GetString("C&R.StealJewel"));
+
+            var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
+
+            var newPopUp = Object.Instantiate(popup, HudManager.Instance.transform.parent);
+
+            newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
+            newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("C&R.PrefabStealJewel");
+            newPopUp.Show(player, 0);
+
+            SendRPC(player, 2);
+            NotifyRoles(SpecifyTarget: player);
+            return;
+        }
+
+        if (player.GetAbilityUseLimit() > 0 && !player.HasAbilityCD())
+        {
+            player.SetColor(1);
+
+            var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 1);
+            RpcUtils.LateBroadcastReliableMessage(message);
+            AbilityTime = (true, AbilityDuration.GetFloat());
+            SendRPC(player, 4);
+            NotifyRoles(SpecifyTarget: player);
+            player.RpcRemoveAbilityUse();
+            player.RpcAddAbilityCD();
+        }
+    }
+
+    public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (AbilityTime.Item1)
+        {
+            AbilityTime.Item2 -= Time.fixedDeltaTime;
+            if (AbilityTime.Item2 <= 0)
+            {
+                if (!CopsAndRobbers.CaptureList.Contains(player.PlayerId))
+                {
+                    player.SetColor(6);
+
+                    var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 6);
+                    RpcUtils.LateBroadcastReliableMessage(message);
+                }
+                AbilityTime = (false, 0f);
+                SendRPC(player, 4);
+                NotifyRoles(SpecifyTarget: player);
+            }
+        }
+        base.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
+    }
+
+    public new void SendRPC(PlayerControl player, int id = 0, byte targetId = 255)
+    {
+        var writer = MessageWriter.Get(SendOption.Reliable);
+        writer.Write(player.PlayerId);
+        writer.Write(id);
+        writer.Write(targetId);
+        writer.Write(AbilityTime.Item1);
+        writer.Write(AbilityTime.Item2);
+        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+    }
+
+    public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
+    {
+        var playerId = reader.ReadByte();
+        var id = reader.ReadInt32();
+        var targetId = reader.ReadByte();
+
+        var player = playerId.GetPlayer();
+        var target = targetId.GetPlayer();
+
+        var popup = GameManagerCreator.Instance.HideAndSeekManagerPrefab.DeathPopupPrefab;
+        var newPopUp = Object.Instantiate(popup, HudManager.Instance.transform.parent);
+
+        switch (id)
+        {
+            case 1:
+                CopsAndRobbers.JewelList.Add(player.PlayerId);
+                break;
+            case 2:
+                CopsAndRobbers.JewelList.Remove(player.PlayerId);
+                CopsAndRobbers.NumJewels++;
+                newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
+                newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("C&R.PrefabStealJewel");
+                newPopUp.Show(player, 0);
+                break;
+            case 3:
+                CopsAndRobbers.CaptureList.Remove(targetId);
+                if (targetId != 255)
+                {
+                    newPopUp.gameObject.transform.GetChild(0).GetComponent<TextTranslatorTMP>().enabled = false;
+                    newPopUp.gameObject.transform.GetChild(0).GetComponent<TextMeshPro>().text = GetString("C&R.PrefabJailbreak");
+                    newPopUp.Show(target, 0);
+                }
+                break;
+            case 4:
+                AbilityTime = (reader.ReadBoolean(), reader.ReadSingle());
+                break;
+        }
+    }
 }

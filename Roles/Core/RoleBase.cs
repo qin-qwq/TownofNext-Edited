@@ -481,6 +481,10 @@ public abstract class RoleBase
     /// </summary>
     public virtual bool CreateAbilityButton(PlayerControl pc) => false;
     /// <summary>
+    /// Conditions for Use Guess Page
+    /// </summary>
+    public virtual bool UseGuessPage => false;
+    /// <summary>
     /// Show the Ability button on that target
     /// </summary>
     public virtual bool ShowAbilityButtonFor(PlayerControl target) => false;
@@ -491,7 +495,7 @@ public abstract class RoleBase
     /// <summary>
     /// After clicking the ability button
     /// </summary>
-    public virtual void OnClickAbilityButton(byte targetId)
+    public virtual void OnClickAbilityButton(byte targetId, CustomRoles role)
     { }
 
     public virtual void ReceiveRPC(MessageReader reader, PlayerControl pc)

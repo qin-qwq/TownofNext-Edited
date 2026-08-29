@@ -215,7 +215,7 @@ internal class Retributionist : RoleBase
 
     public override string AbilityButtonName => "MeetingKillButton";
 
-    public override void OnClickAbilityButton(byte playerId)
+    public override void OnClickAbilityButton(byte playerId, CustomRoles role)
     {
         Logger.Msg($"Click: ID {playerId}", "Retributionist UI");
         var pc = GetPlayerById(playerId);

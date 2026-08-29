@@ -187,7 +187,7 @@ internal class President : RoleBase
         if (EndMeeting)
         {
             Main.EnumeratePlayerControls().Do(x => x.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.President), GetString("PresidentCloseMeeting"))));
-            _ = new LateTask(() => { EndMeeting = false; }, 1f);
+            _ = new LateTask(() => { EndMeeting = false; }, 1f, shoudLog: false);
         }
     }
 }

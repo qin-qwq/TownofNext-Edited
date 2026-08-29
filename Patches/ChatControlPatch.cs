@@ -29,9 +29,6 @@ public static class SendTargetPatch
     [HarmonyPatch(nameof(ChatController.Awake)), HarmonyPostfix]
     public static void Awake_Postfix(ChatController __instance)
     {
-        __instance.freeChatField.textArea.SetText("");
-        __instance.freeChatField.textArea.AllowPaste = true;
-        __instance.freeChatField.UpdateCharCount();
         if (SendTargetShower != null) return;
         SendTargetShower = Object.Instantiate(__instance.freeChatField.charCountText.gameObject, __instance.freeChatField.charCountText.transform.parent);
         SendTargetShower.name = "TONE Send Target Shower";
@@ -160,11 +157,12 @@ class ChatControllerUpdatePatch
     private static SpriteRenderer OpenBanMenuIcon;
     private static SpriteRenderer OpenKeyboardIcon;
 
-    public static void Prefix()
+    // Innersloth anti-cheat updates
+    /*public static void Prefix()
     {
         if (AmongUsClient.Instance.AmHost && DataManager.Settings.Multiplayer.ChatMode == InnerNet.QuickChatModes.QuickChatOnly)
             DataManager.Settings.Multiplayer.ChatMode = InnerNet.QuickChatModes.FreeChatOrQuickChat;
-    }
+    }*/
     public static void Postfix(ChatController __instance)
     {
         if (Main.DarkTheme.Value)
@@ -246,8 +244,8 @@ class ChatControllerUpdatePatch
         if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.C))
             ClipboardHelper.PutClipboardString(__instance.freeChatField.textArea.text);
 
-        if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
-            __instance.freeChatField.textArea.SetText(__instance.freeChatField.textArea.text + GUIUtility.systemCopyBuffer.Trim());
+        //if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
+            //__instance.freeChatField.textArea.SetText(__instance.freeChatField.textArea.text + GUIUtility.systemCopyBuffer);
 
         if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
         {

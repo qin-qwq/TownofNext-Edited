@@ -332,7 +332,7 @@ internal class Justice : RoleBase
 
     public override string AbilityButtonName => "JusticeIcon";
 
-    public override void OnClickAbilityButton(byte targetId)
+    public override void OnClickAbilityButton(byte targetId, CustomRoles role)
     {
         Logger.Msg($"Click: ID {targetId}", "Justice UI");
         var target = targetId.GetPlayer();

@@ -515,7 +515,7 @@ public static class GuessManager
                 playerVoteArea.UnsetVote();
                 var voteAreaPlayer = Utils.GetPlayerById(playerVoteArea.PlayerId);
                 if (!voteAreaPlayer.AmOwner) continue;
-                meetingHud.ClearVote(playerVoteArea.PlayerId, false);
+                meetingHud.ClearVote(playerVoteArea.PlayerId, voteAreaPlayer.AmOwner);
             }
             Swapper.CheckSwapperTarget(pc.PlayerId);
             Balancer.CheckBalancerTarget(pc.PlayerId);
@@ -571,7 +571,7 @@ public static class GuessManager
             playerVoteArea.UnsetVote();
             var voteAreaPlayer = Utils.GetPlayerById(playerVoteArea.PlayerId);
             if (!voteAreaPlayer.AmOwner) continue;
-            meetingHud.ClearVote(playerVoteArea.PlayerId, false);
+            meetingHud.ClearVote(playerVoteArea.PlayerId, voteAreaPlayer.AmOwner);
         }
         hudManager.SetHudActive(false);
         _ = new LateTask(() => hudManager.SetHudActive(false), 0.3f, "SetHudActive in ClientGuess", shoudLog: false);
@@ -723,7 +723,7 @@ public static class GuessManager
     }
 
     public static TextMeshPro textTemplate;
-    static void GuesserOnClick(byte playerId, MeetingHud __instance)
+    public static void GuesserOnClick(byte playerId, MeetingHud __instance, bool nonGuess = false)
     {
         var pc = Utils.GetPlayerById(playerId);
         if (pc == null || !pc.IsAlive() || guesserUI != null || !GameStates.IsVoting) return;
@@ -1101,8 +1101,20 @@ public static class GuessManager
 
                         Logger.Msg($"Click: {pc.GetNameWithRole().RemoveHtmlTags()} => {role}", "Guesser UI");
 
-                        if (AmongUsClient.Instance.AmHost) GuesserMsg(PlayerControl.LocalPlayer, $"/bt {playerId} {GetString(role.ToString())}", true);
-                        else SendRPC(playerId, role);
+                        if (nonGuess)
+                        {
+                            if (AmongUsClient.Instance.AmHost) PlayerControl.LocalPlayer.GetRoleClass().OnClickAbilityButton(playerId, role);
+                            else
+                            {
+                                var msg = new RpcClickAbilityButton(PlayerControl.LocalPlayer.NetId, playerId, (int)role);
+                                RpcUtils.LateBroadcastReliableMessage(msg);
+                            }
+                        }
+                        else
+                        {
+                            if (AmongUsClient.Instance.AmHost) GuesserMsg(PlayerControl.LocalPlayer, $"/bt {playerId} {GetString(role.ToString())}", true);
+                            else SendRPC(playerId, role);
+                        }
 
                         // Reset the GUI
                         __instance.playerStates.ToList().ForEach(x =>

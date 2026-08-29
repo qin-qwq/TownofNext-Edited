@@ -281,8 +281,8 @@ class EjectMainMenuEjectCrewmatePatch
     {
         try
         {
-            __instance.pressState.SetActive(false);
-            __instance.ejectButton.SetActive(true);
+            __instance.pressState?.SetActive(false);
+            __instance.ejectButton?.SetActive(true);
             __instance.onCooldown = false;
         }
         catch { }

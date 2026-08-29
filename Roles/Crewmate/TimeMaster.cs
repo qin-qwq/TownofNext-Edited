@@ -135,7 +135,13 @@ internal class TimeMaster : RoleBase
                 {
                     if (target.Is(CustomRoles.Madmate) && !ps.Player.IsPlayerImpostorTeam()) continue;
                     ps.Player.RpcRevive();
-                    ps.Player.RpcTeleport(deadBody.TruePosition);
+                    if (GetDistance(deadBody.TruePosition, ExtendedPlayerControl.GetBlackRoomPosition()) <= 1f)
+                    {
+                        Vector2 closestVentPosition = ShipStatus.Instance.AllVents.Where(x => x != null).MinBy(x => Vector2.Distance(deadBody.TruePosition, x.transform.position)).transform.position;
+                        closestVentPosition.y += 0.3636f;
+                        ps.Player.RpcTeleport(closestVentPosition);
+                    }
+                    else ps.Player.RpcTeleport(deadBody.TruePosition);
                     ps.Player.Notify(ColorString(Color.yellow, GetString("RevivedByTimeMaster")));
                 }
             }

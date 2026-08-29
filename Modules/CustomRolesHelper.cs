@@ -25,6 +25,10 @@ public static class CustomRolesHelper
     {
         return false;
     }
+    public static bool OtherGameModesRole(this CustomRoles role)
+    {
+        return role is CustomRoles.Disguiser;
+    }
     public static bool NotSpawnInRoundUp(this CustomRoles role)
     {
         return role is CustomRoles.Instigator or CustomRoles.Vindicator or CustomRoles.Mayor or
@@ -327,20 +331,8 @@ public static class CustomRolesHelper
             || (role is CustomRoles.President && President.CheckReveal(target.PlayerId))
             || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
             || (role is CustomRoles.Solsticer)
-            || (role is CustomRoles.Mini && Mini.EveryoneCanKnowMini.GetBool());
-    }
-    public static bool IsRevealingRole2(this CustomRoles role)
-    {
-        return (role is CustomRoles.Mayor && Mayor.MayorRevealWhenDoneTasks.GetBool())
-            || (role is CustomRoles.SuperStar && SuperStar.EveryOneKnowSuperStar.GetBool())
-            || (role is CustomRoles.Marshall)
-            || (role is CustomRoles.Workaholic && Workaholic.WorkaholicVisibleToEveryone.GetBool())
-            || (role is CustomRoles.Doctor && Doctor.VisibleToEveryoneOpt.GetBool())
-            || (role is CustomRoles.Bait && Bait.BaitNotification.GetBool() && Inspector.CheckBaitCountType)
-            || (role is CustomRoles.President)
-            || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
-            || (role is CustomRoles.Solsticer)
-            || (role is CustomRoles.Mini && Mini.EveryoneCanKnowMini.GetBool());
+            || (role is CustomRoles.Mini && Mini.EveryoneCanKnowMini.GetBool())
+            || Notary.NotarizeList.Contains(target.PlayerId);
     }
     public static bool IsBetrayalAddon(this CustomRoles role)
     {

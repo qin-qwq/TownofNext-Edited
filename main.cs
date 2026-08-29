@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.08.23";
+    public const string PluginVersion = "26.08.29";
     public const string PluginDisplayVersion = "2.0.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -981,6 +981,7 @@ public enum CustomRoles
     Mortician,
     NiceGuesser,
     NiceHacker,
+    Notary,
     Observer,
     Oracle,
     Overseer,
@@ -1136,6 +1137,7 @@ public enum CustomRoles
     // C&R
     Cop,
     Robber,
+    Disguiser,
 
     // Sub-role after 500
     NotAssigned = 500,

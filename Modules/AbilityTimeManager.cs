@@ -9,11 +9,13 @@ public static class AbilityTimeManager
 {
     public static readonly Dictionary<byte, long> AbilityCooldown = [];
     public static readonly Dictionary<byte, long> AbilityDuration = [];
+    public static bool ResetStartAbilityCooldown = false;
 
     public static void Initializate()
     {
         AbilityCooldown.Clear();
         AbilityDuration.Clear();
+        ResetStartAbilityCooldown = Options.ResetStartAbilityCooldown.GetBool();
     }
 
     public static bool HasAbilityCD(this PlayerControl pc) => AbilityCooldown.ContainsKey(pc.PlayerId);
@@ -29,17 +31,18 @@ public static class AbilityTimeManager
     public static void RpcAddAbilityCD(this PlayerControl pc, bool rpc = true, bool includeDuration = false)
     {
         if (!Options.UsePets.GetBool() && Utils.IsMethodOverridden(pc.GetRoleClass(), "OnPet")) return;
+        var time = ResetStartAbilityCooldown ? Utils.GetTimeStamp() - pc.DefaultAbilityCD() + 10 : Utils.GetTimeStamp();
         if (!pc.HasAbilityCD() && pc.DefaultAbilityCD() != -10)
         {
             if (pc.AbilityDruation() != -20 && includeDuration)
             {
-                AbilityCooldown.Add(pc.PlayerId, Utils.GetTimeStamp());
+                AbilityCooldown.Add(pc.PlayerId, time);
                 AbilityDuration.Add(pc.PlayerId, pc.AbilityDruation());
                 if (rpc) SendRPC(pc);
             }
             else
             {
-                AbilityCooldown.Add(pc.PlayerId, Utils.GetTimeStamp());
+                AbilityCooldown.Add(pc.PlayerId, time);
                 AbilityDuration.Add(pc.PlayerId, 0);
                 if (rpc) SendRPC(pc);
             }
@@ -79,6 +82,7 @@ public static class AbilityTimeManager
             CustomRoles.NiceHacker => (int)NiceHacker.HackerCooldown.GetFloat(),
             CustomRoles.Fury => (int)Fury.AngryCooldown.GetFloat(),
             CustomRoles.Robber => CopsAndRobbers.RobberJailbreakCooldown.GetInt(),
+            CustomRoles.Disguiser => (int)Disguiser.AbilityCooldown.GetFloat(),
             _ => -10
         };
 
@@ -99,6 +103,7 @@ public static class AbilityTimeManager
             CustomRoles.Dreamer => (int)Dreamer.FantasyDuration.GetFloat(),
             CustomRoles.NiceHacker => (int)NiceHacker.HackerDuration.GetFloat(),
             CustomRoles.Fury => (int)Fury.AngryDuration.GetFloat(),
+            CustomRoles.Disguiser => (int)Disguiser.AbilityDuration.GetFloat(),
             _ => -20
         };
 

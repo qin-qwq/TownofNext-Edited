@@ -221,7 +221,7 @@ internal class Nemesis : RoleBase
 
     public override string AbilityButtonName => "MeetingKillButton";
 
-    public override void OnClickAbilityButton(byte playerId)
+    public override void OnClickAbilityButton(byte playerId, CustomRoles role)
     {
         Logger.Msg($"Click: ID {playerId}", "Nemesis UI");
         var pc = Utils.GetPlayerById(playerId);

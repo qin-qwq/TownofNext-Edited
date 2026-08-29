@@ -24,7 +24,7 @@ class MatchInfoGuideCreateNormalModeSettingsPatch
         __instance.transform.FindChild("MatchInfoParent").FindChild("SettingsPanel").GetComponentInChildren<Scroller>().SetYBoundsMax(Mathf.Clamp(Mathf.Ceil(1.5f), 0.0f, 999f));
         foreach (var allRole in CustomRolesHelper.AllRoles)
         {
-            if (!allRole.IsVanilla() && allRole.IsEnable() && !allRole.IsAdditionRole())
+            if (!allRole.IsVanilla() && allRole.IsEnable() && !allRole.IsAdditionRole() && !allRole.OtherGameModesRole())
             {
                 CreateTONERoleEntry(__instance, allRole);
                 ++num;

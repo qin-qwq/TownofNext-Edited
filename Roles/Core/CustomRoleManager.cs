@@ -1,6 +1,7 @@
 using AmongUs.GameOptions;
 using System;
 using System.Text;
+using TONE.Modules;
 using TONE.Roles.AddOns;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
@@ -183,6 +184,15 @@ public static class CustomRoleManager
         {
             opt.SetFloat(FloatOptionNames.ImpostorLightMod, 0);
             opt.SetFloat(FloatOptionNames.CrewLightMod, 0);
+        }
+
+        if (AbilityTimeManager.ResetStartAbilityCooldown)
+        {
+            AURoleOptions.ScientistCooldown = 10f;
+            AURoleOptions.EngineerCooldown = 10f;
+            AURoleOptions.ShapeshifterCooldown = 10f;
+            AURoleOptions.TrackerCooldown = 10f;
+            AURoleOptions.PhantomCooldown = 10f;
         }
     }
 

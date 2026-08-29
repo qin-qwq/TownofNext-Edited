@@ -83,6 +83,7 @@ internal class Balancer : RoleBase
 
     public static void BalancerMsg(PlayerControl voter, PlayerControl target)
     {
+        if (!AmongUsClient.Instance.AmHost) return;
         if (Choose) return;
         if (voter.GetAbilityUseLimit() < 1) return;
         if (voter == null || target == null) return;
@@ -189,7 +190,7 @@ internal class Balancer : RoleBase
 
     public override string AbilityButtonName => "BalancerIcon";
 
-    public override void OnClickAbilityButton(byte targetId)
+    public override void OnClickAbilityButton(byte targetId, CustomRoles role)
     {
         Logger.Msg($"Click: ID {targetId}", "Balancer UI");
         var target = targetId.GetPlayer();

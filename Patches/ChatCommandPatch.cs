@@ -1,3 +1,4 @@
+using AmongUs.Data;
 using AmongUs.InnerNet.GameDataMessages;
 using Assets.CoreScripts;
 using Hazel;
@@ -219,12 +220,13 @@ internal class ChatCommands
             new("Revenge", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, (_, _, _) => { }, true, false, [GetString("CommandArgs.Revenge.Id")]),
             new("Retributionist", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, (_, _, _) => { }, true, false, [GetString("CommandArgs.Retributionist.Id")]),
             new("Exorcise", "", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false),
-            new("BloodRitual", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, (_, _, _) => { }, true, false, [GetString("CommandArgs.BloodRitual.Id"), GetString("CommandArgs.BloodRitual.Role")]),
+            new("BloodRitual", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.BloodRitual.Id"), GetString("CommandArgs.BloodRitual.Role")]),
             new("Medium", "{answer}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Medium.Answer")]),
             new("Summon", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Summon.Id")]),
             new("Swap", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Swap.Id")]),
             new("Expel", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Expel.Id")]),
             new("Imitate", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Imitate.Id")]),
+            new("Notarize", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Notarize.Id"), GetString("CommandArgs.Notarize.Role")]),
         ];
     }
 
@@ -527,7 +529,8 @@ internal class ChatCommands
 
         if (isUp)
         {
-            if (result.IsGhostRole() || !shouldDevAssign || result.IsAddonAssignedMidGame() || (result.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) || (result.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp))
+            if (result.IsGhostRole() || !shouldDevAssign || result.IsAddonAssignedMidGame() || (result.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) ||
+                (result.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp) || result.OtherGameModesRole())
             {
                 Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId, sendOption: SendOption.None);
                 return;
@@ -2503,7 +2506,7 @@ internal class ChatCommands
 
         var shouldDevAssign = true;
 
-        if (roleToSet is CustomRoles.GM or CustomRoles.Mini || roleToSet.GetCount() < 1 || roleToSet.GetMode() == 0)
+        if (roleToSet is CustomRoles.GM or CustomRoles.Mini || roleToSet.GetCount() < 1 || roleToSet.GetMode() == 0 || roleToSet.OtherGameModesRole())
         {
             shouldDevAssign = false;
         }
@@ -2764,6 +2767,7 @@ class ChatUpdatePatch
     {
         if (!AmongUsClient.Instance.AmHost || Main.MessagesToSend.Count == 0 || (Main.MessagesToSend[0].Item2 == byte.MaxValue && Main.MessageWait.Value > __instance.timeSinceLastMessage)) return;
         if (DoBlockChat) return;
+        if (DataManager.Settings.Multiplayer.ChatMode == InnerNet.QuickChatModes.QuickChatOnly) return;
 
         Instance ??= __instance;
 
@@ -3006,7 +3010,7 @@ class RpcSendChatPatch
 {
     public static bool Prefix(PlayerControl __instance, string chatText, ref bool __result)
     {
-        if (string.IsNullOrWhiteSpace(chatText))
+        if (string.IsNullOrWhiteSpace(chatText) || DataManager.Settings.Multiplayer.ChatMode == InnerNet.QuickChatModes.QuickChatOnly)
         {
             __result = false;
             return false;

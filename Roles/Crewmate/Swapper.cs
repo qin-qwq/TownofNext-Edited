@@ -344,7 +344,7 @@ internal class Swapper : RoleBase
 
     public override string AbilityButtonName => "SwapNo";
 
-    public override void OnClickAbilityButton(byte playerId)
+    public override void OnClickAbilityButton(byte playerId, CustomRoles role)
     {
         Logger.Msg($"Click: ID {playerId}", "Swapper UI");
         var pc = playerId.GetPlayer();

@@ -318,6 +318,7 @@ internal class Doomsayer : RoleBase
                 if (Illusionist.IsCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCrewmate()).ToList().RandomElement();
                 else if (Illusionist.IsNonCovIllusioned(target.PlayerId)) targetRole = CustomRolesHelper.AllRoles.Where(role => role.IsEnable() && !role.IsAdditionRole() && role.IsCoven()).ToList().RandomElement();
                 else if (target.Is(CustomRoles.Narc)) targetRole = CustomRoles.Sheriff;
+                else if (Lich.IsCursed(target)) targetRole = CustomRoles.Lich;
                 var rand = IRandom.Instance;
                 List<CustomRoles> roleList = [];
                 ChooseRole(Custom_Team.Impostor);

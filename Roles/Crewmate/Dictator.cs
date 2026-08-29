@@ -134,7 +134,7 @@ internal class Dictator : RoleBase
 
     public override string AbilityButtonName => "JusticeIcon";
 
-    public override void OnClickAbilityButton(byte playerId)
+    public override void OnClickAbilityButton(byte playerId, CustomRoles role)
     {
         Logger.Msg($"Click: ID {playerId}", "Dictator UI");
         var pc = playerId.GetPlayer();

@@ -538,6 +538,14 @@ public static class LobbyViewSettingsPanePatch
                 case CustomGameMode.RoundUp:
                     buttonTab.gameObject.SetActive(true);
                     break;
+                case CustomGameMode.CopsAndRobbers:
+                    if (tabName is TabGroup.NeutralRoles
+                        or TabGroup.CovenRoles
+                        or TabGroup.Addons)
+                    {
+                        buttonTab.gameObject.SetActive(false);
+                    }
+                    break;
                 default:
                     if (tabName is TabGroup.ImpostorRoles
                         or TabGroup.CrewmateRoles
@@ -878,10 +886,7 @@ public static class LobbyViewSettingsPanePatch
 
                             titleName = titleName.RemoveHtmlTags();
 
-                            if (role.OnlySpawnsWithPetsRole()) titleName += GetString("RequiresPet");
-                            if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) titleName += GetString("SupportsPet");
-                            if (role.GetStaticRoleClass().IsBalance) titleName += GetString("SupportsBalance");
-                            if (role.NotAssignInVanillaServer() || (LastGameModeSelected == CustomGameMode.RoundUp && role.NotSpawnInRoundUp())) titleName += GetString("NotSupports");
+                            titleName += AddSettingMark(role);
 
                             var chanceAddOnPerGame = Options.CustomAdtRoleSpawnRate.TryGetValue(role, out var valueAddOnOpt) ? valueAddOnOpt.GetInt() : 0;
                             int numPerGame = Options.CustomRoleCounts.TryGetValue(role, out var valueInt) ? valueInt.GetInt() : 0;
@@ -1182,5 +1187,14 @@ public static class LobbyViewSettingsPanePatch
         }
         if (color) return RoleManager.Instance.GetRole(roleTypes).RoleIconColor;
         else return RoleManager.Instance.GetRole(roleTypes).RoleIconSolid;
+    }
+    public static string AddSettingMark(CustomRoles role)
+    {
+        if (role.OnlySpawnsWithPetsRole()) return GetString("RequiresPet");
+        if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) return GetString("SupportsPet");
+        if (role.GetStaticRoleClass().IsBalance) return GetString("SupportsBalance");
+        if (role.NotAssignInVanillaServer() || (LastGameModeSelected == CustomGameMode.RoundUp && role.NotSpawnInRoundUp())) return GetString("NotSupports");
+
+        return string.Empty;
     }
 }

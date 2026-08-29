@@ -1128,6 +1128,12 @@ class ReportDeadBodyPatch
                     pc.RpcMakeVisible();
                 }
 
+                if (Camouflage.WaitingChangeSkin.Contains(pc.PlayerId))
+                {
+                    Camouflage.RpcSetSkin(player);
+                    Camouflage.WaitingChangeSkin.Remove(player.PlayerId);
+                }
+
                 if (!Main.OvverideOutfit.ContainsKey(pc.PlayerId))
                 {
                     // Update skins again, since players have different skins
@@ -1922,6 +1928,12 @@ class CoExitVentPatch
         }
 
         if (!AmongUsClient.Instance.AmHost) return;
+
+        if (Camouflage.WaitingChangeSkin.Contains(player.PlayerId))
+        {
+            Camouflage.RpcSetSkin(player);
+            Camouflage.WaitingChangeSkin.Remove(player.PlayerId);
+        }
 
         player.GetRoleClass()?.OnExitVent(player, id);
 

@@ -670,10 +670,7 @@ public static class StringOptionPatch
                     _ => 0.35f,
                 };
 
-                if (role.OnlySpawnsWithPetsRole()) name += GetString("RequiresPet");
-                if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) name += GetString("SupportsPet");
-                if (role.GetStaticRoleClass().IsBalance) name += GetString("SupportsBalance");
-                if (role.NotAssignInVanillaServer() || (Options.CurrentGameMode == CustomGameMode.RoundUp && role.NotSpawnInRoundUp())) name += GetString("NotSupports");
+                name += LobbyViewSettingsPanePatch.AddSettingMark(role);
 
                 SetupHelpIcon(role, __instance);
             }
