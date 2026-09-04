@@ -142,10 +142,11 @@ namespace TONE.Modules.Rpc
     class RpcSniperSync : BaseModdedRpc
     {
         public override byte RpcType => (byte)CustomRPC.SniperSync;
-        public RpcSniperSync(uint netId, byte playerId, List<byte> snList) : base(netId)
+        public RpcSniperSync(uint netId, byte playerId, List<byte> snList, int snAlert) : base(netId)
         {
             this.playerId = playerId;
             this.snList = snList;
+            this.snAlert = snAlert;
         }
 
         public override void SerializeRpcValues(MessageWriter msg)
@@ -156,10 +157,12 @@ namespace TONE.Modules.Rpc
             {
                 msg.Write(sn);
             }
+            msg.Write(snAlert);
         }
 
         private readonly byte playerId;
         private readonly List<byte> snList;
+        private readonly int snAlert;
     }
 
     /*class RpcSetLoversPlayers : BaseModdedRpc

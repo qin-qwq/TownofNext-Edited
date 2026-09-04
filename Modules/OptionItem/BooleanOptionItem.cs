@@ -15,6 +15,20 @@ public class BooleanOptionItem(int id, string name, bool defaultValue, TabGroup 
     {
         return new BooleanOptionItem(id, name.ToString(), defaultValue, tab, isSingleValue, vanillaText);
     }
+    public static BooleanOptionItem Create(CustomRoles role, int id, Enum name, bool defaultValue, bool isSingleValue, bool vanillaText = false)
+    {
+        var tab = role.IsAdditionRole() ? TabGroup.Addons : role switch
+        {
+            var r when r.IsImpostor() || r.IsMadmate() => TabGroup.ImpostorRoles,
+            var r when r.IsCrewmate() => TabGroup.CrewmateRoles,
+            var r when r.IsNeutral() => TabGroup.NeutralRoles,
+            var r when r.IsCoven() => TabGroup.CovenRoles,
+            _ => TabGroup.CrewmateRoles
+        };
+        var opt = new BooleanOptionItem(id, name.ToString(), defaultValue, tab, isSingleValue, vanillaText);
+        opt.SetParent(Options.CustomRoleSpawnChances[role]);
+        return opt;
+    }
 
     // Getter
     public override string GetString()

@@ -45,11 +45,11 @@ internal class Sniper : RoleBase
     private static bool AimAssist;
     private static bool AimAssistOneshot;
     private static bool SniperCanUseKillButton;
-    private static bool FinishSniper;
+    private static int SniperAlert;
 
     public override void SetupCustomOption()
     {
-        Options.SetupSingleRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Sniper, 1);
+        Options.SetupRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Sniper);
         SniperBulletCount = IntegerOptionItem.Create(Id + 10, "SniperBulletCount", new(1, 20, 1), 2, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sniper])
             .SetValueFormat(OptionFormat.Pieces);
         SniperPrecisionShooting = BooleanOptionItem.Create(Id + 11, "SniperPrecisionShooting", false, TabGroup.ImpostorRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Sniper]);
@@ -89,7 +89,7 @@ internal class Sniper : RoleBase
         AimAssist = SniperAimAssist.GetBool();
         AimAssistOneshot = SniperAimAssistOnshot.GetBool();
         SniperCanUseKillButton = CanKillWithBullets.GetBool();
-        FinishSniper = false;
+        SniperAlert = 0;
 
         snipeBasePosition[playerId] = new();
         LastPosition[playerId] = new();
@@ -108,7 +108,7 @@ internal class Sniper : RoleBase
     private static void SendRPC(byte playerId)
     {
         Logger.Info($"Player{playerId}:SendRPC", "Sniper");
-        var msg = new RpcSniperSync(PlayerControl.LocalPlayer.NetId, playerId, shotNotify[playerId]);
+        var msg = new RpcSniperSync(PlayerControl.LocalPlayer.NetId, playerId, shotNotify[playerId], SniperAlert);
         RpcUtils.LateBroadcastReliableMessage(msg);
     }
     public static void ReceiveRPC(MessageReader msg)
@@ -121,6 +121,7 @@ internal class Sniper : RoleBase
             shotNotify[playerId].Add(msg.ReadByte());
             count--;
         }
+        SniperAlert = msg.ReadInt32();
         Logger.Info($"Player{playerId}:ReceiveRPC", "Sniper");
     }
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -203,8 +204,9 @@ internal class Sniper : RoleBase
         {
             if (target.PlayerId == phantom.PlayerId) continue;
 
-            FinishSniper = true;
+            SniperAlert++;
             LocateArrow.Add(target.PlayerId, phantom.transform.position);
+            SendRPC(phantom.PlayerId);
 
             if (Medic.IsProtected(target.PlayerId) || (target.Is(Custom_Team.Impostor) && !phantom.Is(CustomRoles.Narc)) || target.inVent || target.IsTransformedNeutralApocalypse() || target.Is(CustomRoles.Solsticer)) continue;
             if (target.IsPolice() && phantom.Is(CustomRoles.Narc)) continue;
@@ -238,12 +240,20 @@ internal class Sniper : RoleBase
             Logger.Info($"无有效目标", "Sniper");
         }
 
-        _ = new LateTask(() => { FinishSniper = false; }, ArrowDuration.GetFloat(), "End Sniper Arrow");
+        _ = new LateTask(() =>
+        {
+            SniperAlert--;
+            foreach (var target in Main.EnumeratePlayerControls())
+            {
+                LocateArrow.Remove(target.PlayerId, phantom.transform.position);
+            }
+            SendRPC(phantom.PlayerId);
+        }, ArrowDuration.GetFloat(), "End Sniper Arrow");
         return false;
     }
     public override string GetSuffixOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
-        if (!FinishSniper || isForMeeting || seer.PlayerId != target.PlayerId || !seer.IsAlive()) return string.Empty;
+        if (SniperAlert <= 0 || isForMeeting || seer.PlayerId != target.PlayerId || !seer.IsAlive()) return string.Empty;
         if (!seer.Is(CustomRoles.Sniper))
         {
             return Utils.ColorString(Utils.GetRoleColor(CustomRoles.Sniper), GetString("Sniper")) + Utils.ColorString(Utils.GetRoleColor(CustomRoles.Sniper), LocateArrow.GetArrows(seer));
@@ -357,13 +367,14 @@ internal class Sniper : RoleBase
     public override void OnReportDeadBody(PlayerControl reporter, NetworkedPlayerInfo target)
     {
         meetingReset = true;
-        FinishSniper = false;
+        SniperAlert = 0;
         if (UsePhantomBasis.GetBool())
         {
             foreach (var pc in Main.EnumeratePlayerControls())
             {
                 LocateArrow.RemoveAllTarget(pc.PlayerId);
             }
+            if (_Player) SendRPC(_Player.PlayerId);
         }
     }
     public override string GetProgressText(byte playerId, bool comms)

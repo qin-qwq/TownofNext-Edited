@@ -1874,6 +1874,7 @@ class MeetingHudRpcClosePatch
         }
         else
         {
+            if (CheckForEndVotingPatch.TempExiledPlayer) CheckForEndVotingPatch.TempExiledPlayer.SendGameData();
             return true;
         }
     }

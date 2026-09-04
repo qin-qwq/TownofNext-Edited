@@ -288,3 +288,11 @@ class EjectMainMenuEjectCrewmatePatch
         catch { }
     }
 }
+[HarmonyPatch(typeof(EjectMainMenu), nameof(EjectMainMenu.StartEjectButton))]
+class EjectMainMenuStartEjectButtonPatch
+{
+    public static bool Prefix(EjectMainMenu __instance)
+    {
+        return !ModUpdater.hasUpdate;
+    }
+}

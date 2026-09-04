@@ -16,6 +16,20 @@ public class StringOptionItem(int id, string name, int defaultValue, TabGroup ta
     {
         return new StringOptionItem(id, name.ToString(), defaultIndex, tab, isSingleValue, selections, vanillaText, useGetString);
     }
+    public static StringOptionItem Create(CustomRoles role, int id, Enum name, string[] selections, int defaultIndex, bool isSingleValue, bool vanillaText = false, bool useGetString = true)
+    {
+        var tab = role.IsAdditionRole() ? TabGroup.Addons : role switch
+        {
+            var r when r.IsImpostor() || r.IsMadmate() => TabGroup.ImpostorRoles,
+            var r when r.IsCrewmate() => TabGroup.CrewmateRoles,
+            var r when r.IsNeutral() => TabGroup.NeutralRoles,
+            var r when r.IsCoven() => TabGroup.CovenRoles,
+            _ => TabGroup.CrewmateRoles
+        };
+        var opt = new StringOptionItem(id, name.ToString(), defaultIndex, tab, isSingleValue, selections, vanillaText, useGetString);
+        opt.SetParent(Options.CustomRoleSpawnChances[role]);
+        return opt;
+    }
 
     // Getter
     public override int GetInt() => Rule.GetValueByIndex(CurrentValue);

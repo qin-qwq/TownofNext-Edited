@@ -22,21 +22,22 @@ internal class Notary : RoleBase
 
     private static OptionItem NotarizeLimitPerGame;
     private static OptionItem NotarizeLimitPerMeeting;
-
+    enum OptionName
+    {
+        NotarizeLimitPerMeeting,
+        AbilityUseGainWithEachTaskCompleted
+    }
     public static readonly List<byte> NotarizeList = [];
     private static readonly Dictionary<byte, int> NotarizeLimitMeeting = [];
 
     public override void SetupCustomOption()
     {
-        SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Notary);
-        NotarizeLimitPerGame = IntegerOptionItem.Create(Id + 10, GeneralOption.SkillLimitTimes, new(1, 30, 1), 3, TabGroup.CrewmateRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Notary])
+        SetupRoleOptions(Id, TabGroup.CrewmateRoles, Role);
+        NotarizeLimitPerGame = IntegerOptionItem.Create(Role, Id + 10, GeneralOption.SkillLimitTimes, new(1, 30, 1), 3, false)
             .SetValueFormat(OptionFormat.Times);
-        NotarizeLimitPerMeeting = IntegerOptionItem.Create(Id + 11, "NotarizeLimitPerMeeting", new(1, 30, 1), 1, TabGroup.CrewmateRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Notary])
+        NotarizeLimitPerMeeting = IntegerOptionItem.Create(Role, Id + 11, OptionName.NotarizeLimitPerMeeting, new(1, 30, 1), 1, false)
             .SetValueFormat(OptionFormat.Times);
-        NotaryAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Id + 12, "AbilityUseGainWithEachTaskCompleted", new(0f, 5f, 0.1f), 1f, TabGroup.CrewmateRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Notary])
+        NotaryAbilityUseGainWithEachTaskCompleted = FloatOptionItem.Create(Role, Id + 12, OptionName.AbilityUseGainWithEachTaskCompleted, new(0f, 5f, 0.1f), 1f, false)
             .SetValueFormat(OptionFormat.Times);
     }
 

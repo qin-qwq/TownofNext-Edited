@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.08.29";
+    public const string PluginVersion = "26.09.04";
     public const string PluginDisplayVersion = "2.0.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -256,8 +256,8 @@ public class Main : BasePlugin
             if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
             {
                 DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 8, 19, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 8, 31, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 9, 11, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 9, 21, 7, 0, 0, 0, DateTimeKind.Utc);
                 return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
             }
             return false;
