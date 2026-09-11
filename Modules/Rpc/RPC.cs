@@ -145,6 +145,18 @@ class ShouldProcessRpcPatch
         return false;
     }
 }
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRoleRpc))]
+class HandleRoleRpcPatch
+{
+    public static bool Prefix(PlayerControl __instance, byte callId)
+    {
+        // Player data not initialized yet (early join) — skip to avoid vanilla NRE
+        if (__instance.Data == null || __instance.Data.Role == null) return false;
+        // Modded RPC ids must not reach vanilla role handlers
+        if (callId >= (byte)CustomRPC.VersionCheck) return false;
+        return true;
+    }
+}
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.HandleRpc))]
 internal class RPCHandlerPatch
 {

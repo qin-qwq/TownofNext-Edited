@@ -34,7 +34,21 @@ internal class Summoner : CovenManager
     public static OptionItem NoMeetingWhileSummoned;
     private static OptionItem HasAbilityUses;
     private static OptionItem MaxSummonsAllowed;
-
+    enum OptionName
+    {
+        SummonerSettings_ReviveDelay,
+        SummonerSettings_SummonDuration,
+        SummonerSettings_SummonedKillCooldown,
+        SummonerSettings_SummonerKillCooldown,
+        SummonerSettings_SummonedKnowsCoven,
+        SummonerSettings_RevealSummoned,
+        SummonerSettings_SummonedKillRequirement,
+        SummonerSettings_AllowResummon,
+        SummonerSettings_ResummonTakesUse,
+        SummonerSettings_SummonedKillsCountToSummoner,
+        SummonerSettings_NoMeetingWhileSummoned,
+        SummonerSettings_HasAbilityUses
+    }
     private readonly Dictionary<byte, RoleBase> SummonedOriginalRoles = new();
 
     private readonly List<byte> SummonedPlayerIds = new List<byte>();
@@ -51,49 +65,38 @@ internal class Summoner : CovenManager
         SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
 
         // Revive Delay
-        ReviveDelayOption = FloatOptionItem.Create(Id + 10, "SummonerSettings.ReviveDelay", new(1f, 30f, 1f), 5f, TabGroup.CovenRoles, false)
-        .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner])
+        ReviveDelayOption = FloatOptionItem.Create(Role, Id + 10, OptionName.SummonerSettings_ReviveDelay, new(1f, 30f, 1f), 5f, false)
         .SetValueFormat(OptionFormat.Seconds);
 
         // Death Timer
-        DeathTimerOption = FloatOptionItem.Create(Id + 11, "SummonerSettings.SummonDuration", new(5f, 120f, 5f), 30f, TabGroup.CovenRoles, false)
-        .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner])
+        DeathTimerOption = FloatOptionItem.Create(Role, Id + 11, OptionName.SummonerSettings_SummonDuration, new(5f, 120f, 5f), 30f, false)
         .SetValueFormat(OptionFormat.Seconds);
 
         // Kill Cooldown
-        KillCooldownOption = FloatOptionItem.Create(Id + 12, "SummonerSettings.SummonedKillCooldown", new(5f, 60f, 1f), 15f, TabGroup.CovenRoles, false)
-        .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner])
+        KillCooldownOption = FloatOptionItem.Create(Role, Id + 12, OptionName.SummonerSettings_SummonedKillCooldown, new(5f, 60f, 1f), 15f, false)
         .SetValueFormat(OptionFormat.Seconds);
 
-        NecroKillCooldownOption = FloatOptionItem.Create(Id + 19, "SummonerSettings.SummonerKillCooldown", new(5f, 60f, 1f), 15f, TabGroup.CovenRoles, false)
-        .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner])
+        NecroKillCooldownOption = FloatOptionItem.Create(Role, Id + 19, OptionName.SummonerSettings_SummonerKillCooldown, new(5f, 60f, 1f), 15f, false)
         .SetValueFormat(OptionFormat.Seconds);
 
-        KnowSummonedRoles = BooleanOptionItem.Create(Id + 13, "SummonerSettings.SummonedKnowsCoven", true, TabGroup.CovenRoles, false)
-        .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner]);
+        KnowSummonedRoles = BooleanOptionItem.Create(Role, Id + 13, OptionName.SummonerSettings_SummonedKnowsCoven, true, false);
 
-        RevealSummonedPlayer = BooleanOptionItem.Create(Id + 14, "SummonerSettings.RevealSummoned", true, TabGroup.CovenRoles, false)
-       .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner]);
+        RevealSummonedPlayer = BooleanOptionItem.Create(Role, Id + 14, OptionName.SummonerSettings_RevealSummoned, true, false);
 
-        SummonedKillRequirement = IntegerOptionItem.Create(Id + 15, "SummonerSettings.SummonedKillRequirement", new(0, 2, 1), 0, TabGroup.CovenRoles, false)
-       .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner])
+        SummonedKillRequirement = IntegerOptionItem.Create(Role, Id + 15, OptionName.SummonerSettings_SummonedKillRequirement, new(0, 2, 1), 0, false)
        .SetValueFormat(OptionFormat.Times);
 
-        AllowSummoningRevivedPlayers = BooleanOptionItem.Create(Id + 16, "SummonerSettings.AllowResummon", false, TabGroup.CovenRoles, false)
-       .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner]);
-        ResummonTakesUse = BooleanOptionItem.Create(Id + 22, "SummonerSettings.ResummonTakesUse", false, TabGroup.CovenRoles, false)
+        AllowSummoningRevivedPlayers = BooleanOptionItem.Create(Role, Id + 16, OptionName.SummonerSettings_AllowResummon, false, false);
+        ResummonTakesUse = BooleanOptionItem.Create(Role, Id + 22, OptionName.SummonerSettings_ResummonTakesUse, false, false)
        .SetParent(AllowSummoningRevivedPlayers);
 
-        SummonedKillsCountToSummoner = BooleanOptionItem.Create(Id + 20, "SummonerSettings.SummonedKillsCountToSummoner", false, TabGroup.CovenRoles, false)
-       .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner]);
+        SummonedKillsCountToSummoner = BooleanOptionItem.Create(Role, Id + 20, OptionName.SummonerSettings_SummonedKillsCountToSummoner, false, false);
 
-        NoMeetingWhileSummoned = BooleanOptionItem.Create(Id + 21, "SummonerSettings.NoMeetingWhileSummoned", false, TabGroup.CovenRoles, false)
-       .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner]);
+        NoMeetingWhileSummoned = BooleanOptionItem.Create(Role, Id + 21, OptionName.SummonerSettings_NoMeetingWhileSummoned, false, false);
 
-        HasAbilityUses = BooleanOptionItem.Create(Id + 17, "SummonerSettings.HasAbilityUses", true, TabGroup.CovenRoles, false)
-       .SetParent(CustomRoleSpawnChances[CustomRoles.Summoner]);
+        HasAbilityUses = BooleanOptionItem.Create(Role, Id + 17, OptionName.SummonerSettings_HasAbilityUses, true, false);
 
-        MaxSummonsAllowed = IntegerOptionItem.Create(Id + 18, GeneralOption.SkillLimitTimes, new(3, 15, 1), 5, TabGroup.CovenRoles, false)
+        MaxSummonsAllowed = IntegerOptionItem.Create(Role, Id + 18, GeneralOption.SkillLimitTimes, new(3, 15, 1), 5, false)
        .SetParent(HasAbilityUses).SetValueFormat(OptionFormat.Times);
     }
 

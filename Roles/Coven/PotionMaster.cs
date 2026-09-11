@@ -26,7 +26,13 @@ internal class PotionMaster : CovenManager
     private static OptionItem RevealsPersist;
     //private static OptionItem CanVent;
     //private static OptionItem HasImpostorVision;
-
+    enum OptionName
+    {
+        PotionMasterMaxReveals,
+        PotionMasterMaxBarriers,
+        PotionMasterCovenCanSeeReveals,
+        PotionMasterRevealsPersist
+    }
     private static readonly Dictionary<byte, HashSet<byte>> RevealList = [];
     private static readonly Dictionary<byte, HashSet<byte>> BarrierList = [];
     private static readonly Dictionary<byte, int> RevealLimit = [];
@@ -37,15 +43,15 @@ internal class PotionMaster : CovenManager
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.PotionMaster, 1, zeroOne: false);
-        KillCooldown = FloatOptionItem.Create(Id + 14, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        KillCooldown = FloatOptionItem.Create(Role, Id + 14, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        RevealMaxCount = IntegerOptionItem.Create(Id + 11, "PotionMasterMaxReveals", new(1, 15, 1), 5, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster])
+        RevealMaxCount = IntegerOptionItem.Create(Role, Id + 11, OptionName.PotionMasterMaxReveals, new(1, 15, 1), 5, false)
             .SetValueFormat(OptionFormat.Times);
-        BarrierMaxCount = IntegerOptionItem.Create(Id + 15, "PotionMasterMaxBarriers", new(1, 100, 1), 5, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster])
+        BarrierMaxCount = IntegerOptionItem.Create(Role, Id + 15, OptionName.PotionMasterMaxBarriers, new(1, 100, 1), 5, false)
             .SetValueFormat(OptionFormat.Times);
-        CovenCanSeeReveals = BooleanOptionItem.Create(Id + 12, "PotionMasterCovenCanSeeReveals", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);
-        RevealsPersist = BooleanOptionItem.Create(Id + 13, "PotionMasterRevealsPersist", true, TabGroup.CovenRoles, false)
+        CovenCanSeeReveals = BooleanOptionItem.Create(Role, Id + 12, OptionName.PotionMasterCovenCanSeeReveals, true, false);
+        RevealsPersist = BooleanOptionItem.Create(Role, Id + 13, OptionName.PotionMasterRevealsPersist, true, false)
             .SetParent(CovenCanSeeReveals);
         //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);
         //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.PotionMaster]);

@@ -11,7 +11,7 @@ public class MainMenuManagerStartPatch
 {
     public static GameObject amongUsLogo;
     public static GameObject Ambience;
-    public static SpriteRenderer ToheLogo { get; private set; }
+    public static SpriteRenderer ToneLogo { get; private set; }
 
     private static void Postfix(MainMenuManager __instance)
     {
@@ -21,7 +21,7 @@ public class MainMenuManagerStartPatch
         var logoObject = new GameObject("titleLogo_TONE");
         var logoTransform = logoObject.transform;
 
-        ToheLogo = logoObject.AddComponent<SpriteRenderer>();
+        ToneLogo = logoObject.AddComponent<SpriteRenderer>();
         logoTransform.parent = rightpanel;
         logoTransform.localPosition = new(-0.16f, 0f, 1f);
         logoTransform.localScale *= 1.2f;
@@ -195,7 +195,7 @@ public static class MainMenuManagerPatch
 
     public static PassiveButton CreateButton(string name, Vector3 localPosition, Color32 normalColor, Color32 hoverColor, UnityEngine.Events.UnityAction action, string label, Vector2? scale = null)
     {
-        var button = Object.Instantiate(template, MainMenuManagerStartPatch.ToheLogo.transform);
+        var button = Object.Instantiate(template, MainMenuManagerStartPatch.ToneLogo.transform);
         button.name = name;
         Object.Destroy(button.GetComponent<AspectPosition>());
         button.transform.localPosition = localPosition;
@@ -266,12 +266,12 @@ public static class MainMenuManagerPatch
     [HarmonyPostfix]
     public static void OpenMenu_Postfix()
     {
-        if (MainMenuManagerStartPatch.ToheLogo != null) MainMenuManagerStartPatch.ToheLogo.gameObject.SetActive(false);
+        if (MainMenuManagerStartPatch.ToneLogo != null) MainMenuManagerStartPatch.ToneLogo.gameObject.SetActive(false);
     }
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen)), HarmonyPostfix]
     public static void ResetScreen_Postfix()
     {
-        if (MainMenuManagerStartPatch.ToheLogo != null) MainMenuManagerStartPatch.ToheLogo.gameObject.SetActive(true);
+        if (MainMenuManagerStartPatch.ToneLogo != null) MainMenuManagerStartPatch.ToneLogo.gameObject.SetActive(true);
     }
 }
 [HarmonyPatch(typeof(EjectMainMenu), nameof(EjectMainMenu.EjectCrewmate))]

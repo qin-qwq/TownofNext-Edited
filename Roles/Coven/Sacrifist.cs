@@ -27,7 +27,17 @@ internal class Sacrifist : CovenManager
     private static OptionItem Speed;
     private static OptionItem SpeedDuration;
     private static OptionItem IncreasedCooldown;
-
+    enum OptionName
+    {
+        SacrifistDebuffCooldown,
+        SacrifistVision,
+        SacrifistVisionDuration,
+        SacrifistSpeed,
+        SacrifistSpeedDuration,
+        SacrifistIncreasedCooldown,
+        SacrifistDeathsAfterVote,
+        SacrifistNecroReducedCooldown
+    }
     private static byte DebuffID = 10;
     private static float debuffTimer;
     private static float maxDebuffTimer;
@@ -41,22 +51,22 @@ internal class Sacrifist : CovenManager
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Sacrifist, 1, zeroOne: false);
-        DebuffCooldown = FloatOptionItem.Create(Id + 10, "SacrifistDebuffCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        DebuffCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.SacrifistDebuffCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        Vision = FloatOptionItem.Create(Id + 13, "SacrifistVision", new(0f, 5f, 0.25f), 0.5f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        Vision = FloatOptionItem.Create(Role, Id + 13, OptionName.SacrifistVision, new(0f, 5f, 0.25f), 0.5f, false)
             .SetValueFormat(OptionFormat.Multiplier);
-        VisionDuration = FloatOptionItem.Create(Id + 17, "SacrifistVisionDuration", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        VisionDuration = FloatOptionItem.Create(Role, Id + 17, OptionName.SacrifistVisionDuration, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        Speed = FloatOptionItem.Create(Id + 14, "SacrifistSpeed", new(0f, 5f, 0.25f), 0.5f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        Speed = FloatOptionItem.Create(Role, Id + 14, OptionName.SacrifistSpeed, new(0f, 5f, 0.25f), 0.5f, false)
             .SetValueFormat(OptionFormat.Multiplier);
-        SpeedDuration = FloatOptionItem.Create(Id + 18, "SacrifistSpeedDuration", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        SpeedDuration = FloatOptionItem.Create(Role, Id + 18, OptionName.SacrifistSpeedDuration, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        IncreasedCooldown = FloatOptionItem.Create(Id + 15, "SacrifistIncreasedCooldown", new(0f, 100f, 2.5f), 50f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        IncreasedCooldown = FloatOptionItem.Create(Role, Id + 15, OptionName.SacrifistIncreasedCooldown, new(0f, 100f, 2.5f), 50f, false)
             .SetValueFormat(OptionFormat.Percent);
-        DeathsAfterVote = IntegerOptionItem.Create(Id + 11, "SacrifistDeathsAfterVote", new(0, 15, 1), 0, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        DeathsAfterVote = IntegerOptionItem.Create(Role, Id + 11, OptionName.SacrifistDeathsAfterVote, new(0, 15, 1), 0, false)
             .SetValueFormat(OptionFormat.Players);
-        NecroReducedCooldown = FloatOptionItem.Create(Id + 12, "SacrifistNecroReducedCooldown", new(0f, 100f, 2.5f), 50f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Sacrifist])
+        NecroReducedCooldown = FloatOptionItem.Create(Role, Id + 12, OptionName.SacrifistNecroReducedCooldown, new(0f, 100f, 2.5f), 50f, false)
             .SetValueFormat(OptionFormat.Percent);
     }
 

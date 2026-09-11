@@ -23,7 +23,12 @@ internal class Medusa : CovenManager
     //private static OptionItem KillCooldownAfterStoneGazing;
     //private static OptionItem CanVent;
     //private static OptionItem HasImpostorVision;
-
+    enum OptionName
+    {
+        MedusaStoneCooldown,
+        MedusaStoneDuration,
+        MedusaStoneVision
+    }
     private static readonly Dictionary<byte, List<byte>> StonedPlayers = [];
     private static readonly Dictionary<byte, float> originalSpeed = [];
     private static bool isStoning;
@@ -32,12 +37,12 @@ internal class Medusa : CovenManager
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Medusa, 1, zeroOne: false);
-        StoneCooldown = FloatOptionItem.Create(Id + 12, "MedusaStoneCooldown", new(0f, 180f, 2.5f), 20f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Medusa])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        StoneCooldown = FloatOptionItem.Create(Role, Id + 12, OptionName.MedusaStoneCooldown, new(0f, 180f, 2.5f), 20f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        StoneDuration = FloatOptionItem.Create(Id + 14, "MedusaStoneDuration", new(0f, 180f, 2.5f), 15f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Medusa])
+        StoneDuration = FloatOptionItem.Create(Role, Id + 14, OptionName.MedusaStoneDuration, new(0f, 180f, 2.5f), 15f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        StoneVision = FloatOptionItem.Create(Id + 16, "MedusaStoneVision", new(0f, 5f, 0.25f), 0.5f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Medusa])
+        StoneVision = FloatOptionItem.Create(Role, Id + 16, OptionName.MedusaStoneVision, new(0f, 5f, 0.25f), 0.5f, false)
             .SetValueFormat(OptionFormat.Multiplier);
         /*
         KillCooldownAfterStoneGazing = FloatOptionItem.Create(Id + 15, "KillCooldownAfterStoneGazing", new(0f, 180f, 2.5f), 40f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Medusa])

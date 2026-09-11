@@ -32,7 +32,11 @@ internal class Necromancer : CovenManager
     private static int Timer = 0;
     private static bool Success = false;
     private static float tempKillTimer = 0;
-
+    enum OptionName
+    {
+        NecromancerRevengeTime,
+        Necromancer_PreventKillerButtoning
+    }
     private static readonly Dictionary<byte, List<CustomRoles>> UsedRoles = [];
     private static readonly Dictionary<byte, List<CustomRoles>> OldAddons = [];
     private static float AbilityTimer;
@@ -40,17 +44,17 @@ internal class Necromancer : CovenManager
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Necromancer, 1, zeroOne: false);
-        KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        KillCooldown = FloatOptionItem.Create(Role, Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        RevengeTime = IntegerOptionItem.Create(Id + 11, "NecromancerRevengeTime", new(0, 60, 1), 30, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer])
+        RevengeTime = IntegerOptionItem.Create(Role, Id + 11, OptionName.NecromancerRevengeTime, new(0, 60, 1), 30, false)
             .SetValueFormat(OptionFormat.Seconds);
-        PreventKillerButtoning = BooleanOptionItem.Create(Id + 16, "Necromancer.PreventKillerButtoning", true, TabGroup.CovenRoles, false).SetParent(RevengeTime);
+        PreventKillerButtoning = BooleanOptionItem.Create(Role, Id + 16, OptionName.Necromancer_PreventKillerButtoning, true, false).SetParent(RevengeTime);
         //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer]);
         //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer]);
-        AbilityDuration = FloatOptionItem.Create(Id + 14, GeneralOption.AbilityDuration, new(0f, 300f, 2.5f), 60f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer])
+        AbilityDuration = FloatOptionItem.Create(Role, Id + 14, GeneralOption.AbilityDuration, new(0f, 300f, 2.5f), 60f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        AbilityCooldown = FloatOptionItem.Create(Id + 15, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Necromancer])
+        AbilityCooldown = FloatOptionItem.Create(Role, Id + 15, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
     }
     public override void Init()

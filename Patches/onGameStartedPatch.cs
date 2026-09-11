@@ -617,7 +617,7 @@ internal class StartGameHostPatch
         yield break;
     }
 
-    private static void SetRoleSelf()
+    public static void SetRoleSelf(bool overriden = true)
     {
         foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
         {
@@ -631,6 +631,14 @@ internal class StartGameHostPatch
             {
                 roleType = RoleTypes.CrewmateGhost;
             }
+
+            if (GameModeBase.GetGameMode() == CustomGameMode.Standard && overriden)
+            {
+                if (pc.HasDesyncRole() && pc.IsPlayerCrewmateTeam()) roleType = RoleTypes.Crewmate;
+                if (!pc.IsPlayerCrewmateTeam() && RpcSetRoleReplacer.IsImpostorRoleTypes(roleType)) roleType = RoleTypes.Impostor;
+            }
+
+            if (!overriden && pc.Is(CustomRoles.GM)) continue;
 
             var message = new RpcSetRoleMessage(pc.NetId, roleType, true);
             RpcUtils.SendMessageImmediately(message, pc.GetClientId());
@@ -802,7 +810,7 @@ public static class RpcSetRoleReplacer
             {
                 var roleType = role.GetRoleTypes();
 
-                if (roleType is not RoleTypes.Impostor and not RoleTypes.Shapeshifter and not RoleTypes.Phantom and not RoleTypes.Viper)
+                if (!IsImpostorRoleTypes(roleType))
                 {
                     foreach (var target in Main.EnumeratePlayerControls())
                     {
@@ -982,5 +990,13 @@ public static class RpcSetRoleReplacer
     public static void EndReplace()
     {
         Senders = null;
+    }
+
+    public static bool IsImpostorRoleTypes(RoleTypes roleTypes)
+    {
+        if (roleTypes is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper)
+            return true;
+
+        return false;
     }
 }

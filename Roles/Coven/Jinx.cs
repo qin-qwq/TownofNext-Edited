@@ -23,22 +23,24 @@ internal class Jinx : CovenManager
     private static OptionItem JinxSpellTimes;
     //private static OptionItem killAttacker;
     private static OptionItem CovenCanDieToJinx;
-
-
+    enum OptionName
+    {
+        JinxSpellTimes,
+        JinxCovenCanDieToJinx
+    }
     private static readonly Dictionary<byte, List<byte>> JinxedPlayers = [];
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Jinx, 1, zeroOne: false);
-        KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        KillCooldown = FloatOptionItem.Create(Role, Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 20f, false)
             .SetValueFormat(OptionFormat.Seconds);
         //CanVent = BooleanOptionItem.Create(Id + 11, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
         //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
-        JinxSpellTimes = IntegerOptionItem.Create(Id + 14, "JinxSpellTimes", new(1, 100, 1), 10, TabGroup.CovenRoles, false)
-        .SetParent(CustomRoleSpawnChances[CustomRoles.Jinx])
+        JinxSpellTimes = IntegerOptionItem.Create(Role, Id + 14, OptionName.JinxSpellTimes, new(1, 100, 1), 10, false)
         .SetValueFormat(OptionFormat.Times);
         //killAttacker = BooleanOptionItem.Create(Id + 15, GeneralOption.KillAttackerWhenAbilityRemaining, true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
-        CovenCanDieToJinx = BooleanOptionItem.Create(Id + 16, "JinxCovenCanDieToJinx", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Jinx]);
+        CovenCanDieToJinx = BooleanOptionItem.Create(Role, Id + 16, OptionName.JinxCovenCanDieToJinx, true, false);
 
     }
     public override void Init()

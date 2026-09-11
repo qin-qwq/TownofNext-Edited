@@ -25,22 +25,27 @@ internal class Illusionist : CovenManager
     public static OptionItem SnitchCanIllusioned;
     private static OptionItem ResetIllusionsPerRound;
     private static OptionItem ClearIllusionsWhenDead;
-
-
-
+    enum OptionName
+    {
+        IllusionCooldown,
+        IllusionistMaxIllusions,
+        IllusionistSnitchAffected,
+        IllusionistResetIllusionsPerRound,
+        IllusionistClearIllusionsWhenDead
+    }
     private static readonly Dictionary<byte, HashSet<byte>> IllusionedPlayers = [];
 
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Illusionist, 1, zeroOne: false);
-        IllusionCooldown = FloatOptionItem.Create(Id + 10, "IllusionCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Illusionist])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        IllusionCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.IllusionCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        MaxIllusions = IntegerOptionItem.Create(Id + 11, "IllusionistMaxIllusions", new(1, 100, 1), 5, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Illusionist])
+        MaxIllusions = IntegerOptionItem.Create(Role, Id + 11, OptionName.IllusionistMaxIllusions, new(1, 100, 1), 5, false)
             .SetValueFormat(OptionFormat.Times);
-        SnitchCanIllusioned = BooleanOptionItem.Create(Id + 12, "IllusionistSnitchAffected", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Illusionist]);
-        ResetIllusionsPerRound = BooleanOptionItem.Create(Id + 13, "IllusionistResetIllusionsPerRound", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Illusionist]);
-        ClearIllusionsWhenDead = BooleanOptionItem.Create(Id + 14, "IllusionistClearIllusionsWhenDead", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Illusionist]);
+        SnitchCanIllusioned = BooleanOptionItem.Create(Role, Id + 12, OptionName.IllusionistSnitchAffected, false, false);
+        ResetIllusionsPerRound = BooleanOptionItem.Create(Role, Id + 13, OptionName.IllusionistResetIllusionsPerRound, false, false);
+        ClearIllusionsWhenDead = BooleanOptionItem.Create(Role, Id + 14, OptionName.IllusionistClearIllusionsWhenDead, false, false);
     }
 
     public override void Init()

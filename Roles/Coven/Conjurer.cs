@@ -30,7 +30,14 @@ internal class Conjurer : CovenManager
     private static OptionItem CovenDiesInBlast;
     private static OptionItem KillCooldown;
     private static OptionItem ResetTargetAfterMeeting;
-
+    enum OptionName
+    {
+        ConjurerCooldown,
+        ConjurerRadius,
+        ConjurerNecroRadius,
+        ConjurerCovenDies,
+        ConjurerResetTarget
+    }
     public static byte NecroBombHolder = byte.MaxValue;
     private static readonly Dictionary<byte, List<Vector3>> ConjPosition = [];
     private static readonly Dictionary<byte, ConjState> state = [];
@@ -38,17 +45,17 @@ internal class Conjurer : CovenManager
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Conjurer, 1, zeroOne: false);
-        ConjureCooldown = FloatOptionItem.Create(Id + 10, "ConjurerCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Conjurer])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        ConjureCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.ConjurerCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        KillCooldown = FloatOptionItem.Create(Id + 14, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Conjurer])
+        KillCooldown = FloatOptionItem.Create(Role, Id + 14, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        ConjureRadius = FloatOptionItem.Create(Id + 11, "ConjurerRadius", new(0.5f, 100f, 0.5f), 2f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Conjurer])
+        ConjureRadius = FloatOptionItem.Create(Role, Id + 11, OptionName.ConjurerRadius, new(0.5f, 100f, 0.5f), 2f, false)
             .SetValueFormat(OptionFormat.Multiplier);
-        NecroRadius = FloatOptionItem.Create(Id + 12, "ConjurerNecroRadius", new(0.5f, 100f, 0.5f), 3f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Conjurer])
+        NecroRadius = FloatOptionItem.Create(Role, Id + 12, OptionName.ConjurerNecroRadius, new(0.5f, 100f, 0.5f), 3f, false)
             .SetValueFormat(OptionFormat.Multiplier);
-        CovenDiesInBlast = BooleanOptionItem.Create(Id + 13, "ConjurerCovenDies", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Conjurer]);
-        ResetTargetAfterMeeting = BooleanOptionItem.Create(Id + 15, "ConjurerResetTarget", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Conjurer]);
+        CovenDiesInBlast = BooleanOptionItem.Create(Role, Id + 13, OptionName.ConjurerCovenDies, false, false);
+        ResetTargetAfterMeeting = BooleanOptionItem.Create(Role, Id + 15, OptionName.ConjurerResetTarget, false, false);
     }
     public override void Init()
     {

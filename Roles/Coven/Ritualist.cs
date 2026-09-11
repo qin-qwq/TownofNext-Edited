@@ -20,17 +20,22 @@ internal class Ritualist : CovenManager
     private static OptionItem MaxRitsPerRound;
     public static OptionItem EnchantedKnowsCoven;
     public static OptionItem EnchantedKnowsEnchanted;
-
+    enum OptionName
+    {
+        RitualistMaxRitsPerRound,
+        RitualistEnchantedKnowsCoven,
+        RitualistEnchantedKnowsEnchanted
+    }
     private static readonly Dictionary<byte, int> RitualLimit = [];
     private static readonly Dictionary<byte, List<byte>> EnchantedPlayers = [];
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Ritualist, 1, zeroOne: false);
-        MaxRitsPerRound = IntegerOptionItem.Create(Id + 10, "RitualistMaxRitsPerRound", new(1, 15, 1), 2, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Ritualist])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        MaxRitsPerRound = IntegerOptionItem.Create(Role, Id + 10, OptionName.RitualistMaxRitsPerRound, new(1, 15, 1), 2, false)
             .SetValueFormat(OptionFormat.Times);
-        EnchantedKnowsCoven = BooleanOptionItem.Create(Id + 12, "RitualistEnchantedKnowsCoven", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Ritualist]);
-        EnchantedKnowsEnchanted = BooleanOptionItem.Create(Id + 13, "RitualistEnchantedKnowsEnchanted", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Ritualist]);
+        EnchantedKnowsCoven = BooleanOptionItem.Create(Role, Id + 12, OptionName.RitualistEnchantedKnowsCoven, true, false);
+        EnchantedKnowsEnchanted = BooleanOptionItem.Create(Role, Id + 13, OptionName.RitualistEnchantedKnowsEnchanted, true, false);
 
     }
     public override void Init()

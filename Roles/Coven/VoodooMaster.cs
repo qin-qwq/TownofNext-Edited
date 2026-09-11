@@ -21,18 +21,24 @@ internal class VoodooMaster : CovenManager
     private static OptionItem VoodoosPerRound;
     private static OptionItem CanDollCoven;
     private static OptionItem NecroAbilityCanKillCov;
-
+    enum OptionName
+    {
+        VoodooCooldown,
+        VoodooMasterPerRound,
+        VoodooMasterCanDollCoven,
+        VoodooMasterNecroCanKillCov
+    }
     public static readonly Dictionary<byte, List<byte>> Dolls = [];
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.VoodooMaster, 1, zeroOne: false);
-        VoodooCooldown = FloatOptionItem.Create(Id + 10, "VoodooCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.VoodooMaster])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        VoodooCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.VoodooCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        VoodoosPerRound = IntegerOptionItem.Create(Id + 11, "VoodooMasterPerRound", new(1, 15, 1), 1, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.VoodooMaster])
+        VoodoosPerRound = IntegerOptionItem.Create(Role, Id + 11, OptionName.VoodooMasterPerRound, new(1, 15, 1), 1, false)
             .SetValueFormat(OptionFormat.Players);
-        CanDollCoven = BooleanOptionItem.Create(Id + 12, "VoodooMasterCanDollCoven", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.VoodooMaster]);
-        NecroAbilityCanKillCov = BooleanOptionItem.Create(Id + 13, "VoodooMasterNecroCanKillCov", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.VoodooMaster]);
+        CanDollCoven = BooleanOptionItem.Create(Role, Id + 12, OptionName.VoodooMasterCanDollCoven, true, false);
+        NecroAbilityCanKillCov = BooleanOptionItem.Create(Role, Id + 13, OptionName.VoodooMasterNecroCanKillCov, true, false);
     }
     public override void Init()
     {

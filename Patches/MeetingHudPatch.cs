@@ -985,13 +985,13 @@ class SetJudgeOverrulePatch
         }
         if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && TasksRemaining(voter) != 0)
         {
-            SendMessage(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.JudgeAbilityProgress, TasksRemaining(voter)), srcPlayerId, noReplay: true);
+            SendMessage(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.JudgeAbilityProgress, TasksRemaining(voter)), srcPlayerId, ColorString(GetRoleColor(CustomRoles.JudgeTONE), GetString("JudgeTONE").ToUpper()), noReplay: true);
             __instance.RpcClearVoteDelay(srcPlayerId);
             return false;
         }
         if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && ReportDeadBodyPatch.BypassComms)
         {
-            SendMessage(GetString("JudgeAffectedByComms"), srcPlayerId, noReplay: true);
+            SendMessage(GetString("JudgeAffectedByComms"), srcPlayerId, ColorString(GetRoleColor(CustomRoles.JudgeTONE), GetString("JudgeTONE").ToUpper()), noReplay: true);
             __instance.RpcClearVoteDelay(srcPlayerId);
             return false;
         }

@@ -973,6 +973,8 @@ internal static class IntroCutsceneDestroyPatch
 
         if (AmongUsClient.Instance.AmHost)
         {
+            if (GameModeBase.GetGameMode() == CustomGameMode.Standard) StartGameHostPatch.SetRoleSelf(false);
+
             if (GameStates.IsNormalGame && !GameStates.AirshipIsActive)
             {
                 foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())

@@ -23,7 +23,11 @@ internal class Dreamweaver : CovenManager
     private static OptionItem AbilityCooldown;
     private static OptionItem NeutralsCanBeDreamwoven;
     private static OptionItem ImpostorsCanBeDreamwoven;
-
+    enum OptionName
+    {
+        DreamweaverSettings_CanDreamweaveNeutrals,
+        DreamweaverSettings_CanDreamweaveImpostors
+    }
     private static readonly Dictionary<byte, HashSet<byte>> DreamwovenList = [];
     private static readonly Dictionary<byte, HashSet<byte>> InsomniaList = [];
 
@@ -31,10 +35,10 @@ internal class Dreamweaver : CovenManager
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
-        AbilityCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[Role])
+        AbilityCooldown = FloatOptionItem.Create(Role, Id + 10, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, false)
                 .SetValueFormat(OptionFormat.Seconds);
-        NeutralsCanBeDreamwoven = BooleanOptionItem.Create(Id + 11, "DreamweaverSettings.CanDreamweaveNeutrals", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[Role]);
-        ImpostorsCanBeDreamwoven = BooleanOptionItem.Create(Id + 12, "DreamweaverSettings.CanDreamweaveImpostors", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[Role]);
+        NeutralsCanBeDreamwoven = BooleanOptionItem.Create(Role, Id + 11, OptionName.DreamweaverSettings_CanDreamweaveNeutrals, true, false);
+        ImpostorsCanBeDreamwoven = BooleanOptionItem.Create(Role, Id + 12, OptionName.DreamweaverSettings_CanDreamweaveImpostors, true, false);
     }
     public override void Init()
     {

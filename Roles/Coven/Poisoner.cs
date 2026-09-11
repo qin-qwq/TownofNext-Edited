@@ -25,7 +25,11 @@ internal class Poisoner : CovenManager
     //private static OptionItem CanVent;
     public static OptionItem KillCooldown;
     //private static OptionItem HasImpostorVision;
-
+    enum OptionName
+    {
+        PoisonCooldown,
+        PoisonerKillDelay
+    }
     private static readonly Dictionary<byte, PoisonedInfo> PoisonedPlayers = [];
     private static readonly Dictionary<byte, List<byte>> RoleblockedPlayers = [];
 
@@ -34,10 +38,10 @@ internal class Poisoner : CovenManager
 
     public override void SetupCustomOption()
     {
-        Options.SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.Poisoner, 1, zeroOne: false);
-        KillCooldown = FloatOptionItem.Create(Id + 10, "PoisonCooldown", new(0f, 180f, 2.5f), 20f, TabGroup.CovenRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Poisoner])
+        Options.SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        KillCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.PoisonCooldown, new(0f, 180f, 2.5f), 20f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        OptionKillDelay = FloatOptionItem.Create(Id + 11, "PoisonerKillDelay", new(1f, 60f, 1f), 10f, TabGroup.CovenRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Poisoner])
+        OptionKillDelay = FloatOptionItem.Create(Role, Id + 11, OptionName.PoisonerKillDelay, new(1f, 60f, 1f), 10f, false)
             .SetValueFormat(OptionFormat.Seconds);
         //CanVent = BooleanOptionItem.Create(Id + 12, GeneralOption.CanVent, true, TabGroup.CovenRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Poisoner]);
         //HasImpostorVision = BooleanOptionItem.Create(Id + 13, GeneralOption.ImpostorVision, true, TabGroup.CovenRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Poisoner]);

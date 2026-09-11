@@ -22,18 +22,23 @@ internal class CovenLeader : CovenManager
     private static OptionItem RetrainCooldown;
     public static OptionItem MaxRetrains;
     public static OptionItem RetrainConvertsHelpers;
-
+    enum OptionName
+    {
+        CovenLeaderMaxRetrains,
+        CovenLeaderRetrainCooldown,
+        CovenLeaderRetrainConvertsHelpers
+    }
     public static readonly HashSet<byte> List = [];
     public static readonly Dictionary<byte, CustomRoles> retrainPlayer = [];
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.CovenLeader, 1, zeroOne: false);
-        MaxRetrains = IntegerOptionItem.Create(Id + 10, "CovenLeaderMaxRetrains", new(1, 15, 1), 2, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CovenLeader])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        MaxRetrains = IntegerOptionItem.Create(Role, Id + 10, OptionName.CovenLeaderMaxRetrains, new(1, 15, 1), 2, false)
             .SetValueFormat(OptionFormat.Times);
-        RetrainCooldown = FloatOptionItem.Create(Id + 11, "CovenLeaderRetrainCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CovenLeader])
+        RetrainCooldown = FloatOptionItem.Create(Role, Id + 11, OptionName.CovenLeaderRetrainCooldown, new(0f, 180f, 2.5f), 30f, false)
                 .SetValueFormat(OptionFormat.Seconds);
-        RetrainConvertsHelpers = BooleanOptionItem.Create(Id + 12, "CovenLeaderRetrainConvertsHelpers", true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.CovenLeader]);
+        RetrainConvertsHelpers = BooleanOptionItem.Create(Role, Id + 12, OptionName.CovenLeaderRetrainConvertsHelpers, true, false);
     }
     public override void Init()
     {

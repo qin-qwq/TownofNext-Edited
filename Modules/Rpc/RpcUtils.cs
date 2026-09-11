@@ -49,7 +49,7 @@ public class RpcUtils
             writer.WritePacked(clientId);
         }
 
-        message.Serialize(writer);
+        message.CastFast<IGameDataMessage>().Serialize(writer);
 
         writer.EndMessage();
         AmongUsClient.Instance.SendOrDisconnect(writer);

@@ -24,11 +24,9 @@ internal class WitchDoctor : CovenManager
     public override void SetupCustomOption()
     {
         Options.SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
-        AbilityCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[Role])
+        AbilityCooldown = FloatOptionItem.Create(Role, Id + 10, GeneralOption.AbilityCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        AbilityLimit = IntegerOptionItem.Create(Id + 11, GeneralOption.SkillLimitTimes, new(0, 15, 1), 1, TabGroup.CovenRoles, false)
-            .SetParent(Options.CustomRoleSpawnChances[Role])
+        AbilityLimit = IntegerOptionItem.Create(Role, Id + 11, GeneralOption.SkillLimitTimes, new(0, 15, 1), 1, false)
             .SetValueFormat(OptionFormat.Times);
     }
 

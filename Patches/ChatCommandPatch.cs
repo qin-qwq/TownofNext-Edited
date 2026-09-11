@@ -600,6 +600,11 @@ internal class ChatCommands
             canceled = true;
             text = "/" + text[4..].TrimStart();
         }
+        else if (player.IsAlive() && !GameStates.IsLobby)
+        {
+            Utils.SendMessage(GetString("Warning.CommandFailed"), player.PlayerId, noReplay: true);
+            return;
+        }
         //if (!text.StartsWith("/")) return;
         string[] args = text.Split(' ');
 

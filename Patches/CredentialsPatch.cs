@@ -150,7 +150,7 @@ class VersionShowerStartPatch
         Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TONE version");
 
         if (Main.IsAprilFools)
-            Main.credentialsText = $"<color=#a54aff>Town Of Next Roles</color> - 0.0.1";
+            Main.credentialsText = $"<color={Main.ModColor}>{Main.ModName}</color> - 1.0.0";
 
         ErrorText.Create(__instance.text);
         if (Main.hasArgumentException && ErrorText.Instance != null)
@@ -160,9 +160,9 @@ class VersionShowerStartPatch
 
         VersionChecker.Check();
 
-        if (SpecialEventText == null && MainMenuManagerStartPatch.ToheLogo != null)
+        if (SpecialEventText == null && MainMenuManagerStartPatch.ToneLogo != null)
         {
-            SpecialEventText = Object.Instantiate(__instance.text, MainMenuManagerStartPatch.ToheLogo.transform);
+            SpecialEventText = Object.Instantiate(__instance.text, MainMenuManagerStartPatch.ToneLogo.transform);
             SpecialEventText.name = "SpecialEventText";
             SpecialEventText.text = "";
             SpecialEventText.color = Color.white;

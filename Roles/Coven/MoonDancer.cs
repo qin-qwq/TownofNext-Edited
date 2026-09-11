@@ -25,7 +25,12 @@ internal class MoonDancer : CovenManager
     private static OptionItem BatonPassCooldown;
     private static OptionItem BlastOffChance;
     private static OptionItem BatonPassEnabledAddons;
-
+    enum OptionName
+    {
+        MoonDancerBatonPassCooldown,
+        MoonDancerBlastOffChance,
+        MoonDancerPassEnabledAddons
+    }
     private static List<CustomRoles> addons = [];
     private static readonly Dictionary<byte, HashSet<byte>> BatonPassList = [];
     private static readonly Dictionary<byte, HashSet<byte>> BlastedOffList = [];
@@ -33,12 +38,12 @@ internal class MoonDancer : CovenManager
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.MoonDancer, 1, zeroOne: false);
-        BatonPassCooldown = FloatOptionItem.Create(Id + 10, "MoonDancerBatonPassCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.MoonDancer])
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
+        BatonPassCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.MoonDancerBatonPassCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        BlastOffChance = IntegerOptionItem.Create(Id + 11, "MoonDancerBlastOffChance", new(0, 100, 1), 50, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.MoonDancer])
+        BlastOffChance = IntegerOptionItem.Create(Role, Id + 11, OptionName.MoonDancerBlastOffChance, new(0, 100, 1), 50, false)
             .SetValueFormat(OptionFormat.Percent);
-        BatonPassEnabledAddons = BooleanOptionItem.Create(Id + 12, "MoonDancerPassEnabledAddons", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.MoonDancer]);
+        BatonPassEnabledAddons = BooleanOptionItem.Create(Role, Id + 12, OptionName.MoonDancerPassEnabledAddons, false, false);
     }
     public override void Init()
     {

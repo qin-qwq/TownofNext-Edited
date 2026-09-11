@@ -27,7 +27,14 @@ internal class HexMaster : CovenManager
     private static OptionItem CovenCanGetMovingHex;
     private static OptionItem MovingHexPassCooldown;
     private static OptionItem CanKillTNA;
-
+    enum OptionName
+    {
+        HexMasterHexCooldown,
+        HexMasterMovingHexCooldown,
+        HexMasterCovenCanGetMovingHex,
+        HexesLookLikeSpells,
+        CanKillTNA
+    }
     private static readonly Dictionary<byte, List<byte>> HexedPlayer = [];
     public static byte CurrentHexedPlayer = byte.MaxValue;
     public static byte LastHexedPlayer = byte.MaxValue;
@@ -35,8 +42,8 @@ internal class HexMaster : CovenManager
     public static long? CurrentHexedPlayerTime = new();
     public static long? HexedTime = new();
 
-    private static readonly Color RoleColorHex = Utils.GetRoleColor(CustomRoles.HexMaster);
-    private static readonly Color RoleColorSpell = Utils.GetRoleColor(CustomRoles.Impostor);
+    private static readonly Color RoleColorHex = GetRoleColor(CustomRoles.HexMaster);
+    private static readonly Color RoleColorSpell = GetRoleColor(CustomRoles.Impostor);
 
     /*
     private enum SwitchTriggerList
@@ -50,16 +57,16 @@ internal class HexMaster : CovenManager
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, CustomRoles.HexMaster, 1, zeroOne: false);
+        SetupSingleRoleOptions(Id, TabGroup.CovenRoles, Role, 1, zeroOne: false);
         //ModeSwitchAction = StringOptionItem.Create(Id + 10, GeneralOption.ModeSwitchAction, EnumHelper.GetAllNames<SwitchTriggerList>(), 2, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster]);
-        HexCooldown = FloatOptionItem.Create(Id + 13, "HexMasterHexCooldown", new(0f, 180f, 2.5f), 30f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster])
+        HexCooldown = FloatOptionItem.Create(Role, Id + 13, OptionName.HexMasterHexCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        MovingHexPassCooldown = FloatOptionItem.Create(Id + 15, "HexMasterMovingHexCooldown", new(0f, 5f, 0.25f), 1f, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster])
+        MovingHexPassCooldown = FloatOptionItem.Create(Role, Id + 15, OptionName.HexMasterMovingHexCooldown, new(0f, 5f, 0.25f), 1f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        CovenCanGetMovingHex = BooleanOptionItem.Create(Id + 14, "HexMasterCovenCanGetMovingHex", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster]);
-        HexesLookLikeSpells = BooleanOptionItem.Create(Id + 11, "HexesLookLikeSpells", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster]);
+        CovenCanGetMovingHex = BooleanOptionItem.Create(Role, Id + 14, OptionName.HexMasterCovenCanGetMovingHex, false, false);
+        HexesLookLikeSpells = BooleanOptionItem.Create(Role, Id + 11, OptionName.HexesLookLikeSpells, false, false);
         //HasImpostorVision = BooleanOptionItem.Create(Id + 12, GeneralOption.ImpostorVision,  true, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster]);
-        CanKillTNA = BooleanOptionItem.Create(Id + 16, "CanKillTNA", false, TabGroup.CovenRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.HexMaster]);
+        CanKillTNA = BooleanOptionItem.Create(Role, Id + 16, OptionName.CanKillTNA, false, false);
     }
     public override void Init()
     {
@@ -74,7 +81,7 @@ internal class HexMaster : CovenManager
         HexedPlayer.Add(playerId, []);
         // NowSwitchTrigger = (SwitchTriggerList)ModeSwitchAction.GetValue();
 
-        var pc = Utils.GetPlayerById(playerId);
+        var pc = GetPlayerById(playerId);
         pc.AddDoubleTrigger();
         CustomRoleManager.OnFixedUpdateOthers.Add(OnFixedUpdateOthers);
     }
@@ -88,8 +95,8 @@ internal class HexMaster : CovenManager
         }
         else
         {
-            var player = Utils.GetPlayerById(hexId);
-            if (player == null) return;
+            var player = GetPlayerById(hexId);
+            if (!player) return;
 
             var writer = MessageWriter.Get(SendOption.Reliable);
             writer.Write(newHex);
@@ -144,7 +151,7 @@ internal class HexMaster : CovenManager
         {
             HexMode[playerId] = !HexMode[playerId];
             SendRPC(false, playerId);
-            Utils.NotifyRoles(SpecifySeer: Utils.GetPlayerById(playerId));
+            NotifyRoles(SpecifySeer: GetPlayerById(playerId));
         }
     }
     */
