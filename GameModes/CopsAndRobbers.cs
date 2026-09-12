@@ -1,7 +1,7 @@
-using System.Text;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
+using System.Text;
 using TMPro;
 using TONE.Modules;
 using TONE.Modules.Rpc;
@@ -73,7 +73,7 @@ internal class CopsAndRobbers : GameModeBase
         TextOptionItem.Create(Id + 10, "MenuTitle.Cop", TabGroup.ModSettings)
             .SetGameMode(CustomGameMode.CopsAndRobbers)
             .SetColor(new Color32(0, 123, 255, byte.MaxValue));
-        
+
         NumCops = IntegerOptionItem.Create(Id + 11, "C&R_NumCops", new(1, 10, 1), 6, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.CopsAndRobbers)
             .SetColor(new Color32(0, 123, 255, byte.MaxValue))
@@ -186,7 +186,7 @@ internal class CopsAndRobbers : GameModeBase
             for (var i = 0; i < InitialJewels.GetInt(); i++)
             {
                 var location = AllLocation.RandomElement();
-                Jewel.Add(new JewelState { Position = location, Jewel = new(location)});
+                Jewel.Add(new JewelState { Position = location, Jewel = new(location) });
                 AllLocation.Remove(location);
             }
 
@@ -367,7 +367,7 @@ internal class CopsAndRobbers : GameModeBase
                 AllLocation.AddRange(available);
             }
             var location = AllLocation.RandomElement();
-            Jewel.Add( new JewelState { Position = location, Jewel = new (location) });
+            Jewel.Add(new JewelState { Position = location, Jewel = new(location) });
             AllLocation.Remove(location);
         }
     }
@@ -633,7 +633,7 @@ public class Cop : RoleBase
         if (target.Is(CustomRoles.Cop) || target.GetRoleClass() is Disguiser d && d.AbilityTime.Item1) return Main.roleColors[CustomRoles.Cop];
 
         return Main.roleColors[CustomRoles.Robber];
-    } 
+    }
 }
 
 public class Robber : RoleBase

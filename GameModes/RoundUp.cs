@@ -50,7 +50,7 @@ internal class RoundUp : Standard
     public static void OnReportDeadBody()
     {
         var pcList = Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerCrewmateTeam() || (x.IsPlayerImpostorTeam() && ImpostorCanBecomeDeputy.GetBool()) ||
-        (x.IsPlayerNeutralTeam() && NeutralCanBecomeDeputy.GetBool() && !x.Is(CustomRoles.Jester) && !x.Is(CustomRoles.Executioner) && !x.Is(CustomRoles.Pixie) && !x.Is(CustomRoles.Solsticer)) || 
+        (x.IsPlayerNeutralTeam() && NeutralCanBecomeDeputy.GetBool() && !x.Is(CustomRoles.Jester) && !x.Is(CustomRoles.Executioner) && !x.Is(CustomRoles.Pixie) && !x.Is(CustomRoles.Solsticer)) ||
         (x.IsPlayerCovenTeam() && CovenCanBecomeDeputy.GetBool())).ToList();
 
         if (pcList.Any())
@@ -71,7 +71,7 @@ internal class RoundUp : Standard
     {
         if (Deputy != byte.MaxValue)
         {
-            MeetingHudStartPatch.AddMsg(string.Format(GetString("RoundUp.SendDeputy"), ColorString(Main.PlayerColors[Deputy], Deputy.GetPlayer().GetRealName())), 
+            MeetingHudStartPatch.AddMsg(string.Format(GetString("RoundUp.SendDeputy"), ColorString(Main.PlayerColors[Deputy], Deputy.GetPlayer().GetRealName())),
             255, ColorString(new Color32(248, 216, 110, byte.MaxValue), GetString("RoundUp").ToUpper()));
             MeetingHudStartPatch.AddMsg(GetString("RoundUp.YouBecomeDeputy"), Deputy, ColorString(new Color32(248, 216, 110, byte.MaxValue), GetString("RoundUp").ToUpper()));
         }
@@ -155,7 +155,7 @@ internal class RoundUp : Standard
                 if (Keeper.IsTargetExiled(target.PlayerId))
                 {
                     pc.ShowInfoMessage(isUI, GetString("KeeperProtectTarget"));
-                    return true;                    
+                    return true;
                 }
 
                 List<MeetingHud.VoterState> statesList = [];

@@ -132,7 +132,7 @@ class GameEndCheckerForNormal
                         break;
                     case CustomWinner.Coven:
                         if ((((pc.Is(Custom_Team.Coven) || pc.Is(CustomRoles.Enchanted) || Main.PlayerStates[pc.PlayerId].IsNecromancer) && (countType == CountTypes.Coven || pc.Is(CustomRoles.Soulless)))
-                            || (pc.Is(CustomRoles.Enchanted) || (Summoner.CheckWinCondition(pc.PlayerId) && CustomRoles.Summoner.RoleExist(true))))
+                            || pc.Is(CustomRoles.Enchanted) || (Summoner.CheckWinCondition(pc.PlayerId) && CustomRoles.Summoner.RoleExist(true)))
                             && !pc.Is(CustomRoles.Lovers))
                         {
                             WinnerIds.Add(pc.PlayerId);
@@ -210,7 +210,7 @@ class GameEndCheckerForNormal
                 Romantic.BetPlayer.Do(x =>
                 {
                     if (Main.PlayerStates[x.Key].MainRole == CustomRoles.RuthlessRomantic
-                        && WinnerIds.Contains(x.Key) && !WinnerIds.Contains(x.Value))
+                        && !WinnerIds.Contains(x.Value))
                         WinnerIds.Add(x.Value);
                 });
             }

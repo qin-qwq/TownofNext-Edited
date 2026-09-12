@@ -967,9 +967,9 @@ public class RoleAssign
         if (Covs.Any()) Logger.Info(string.Join(", ", Covs.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "CovRoleResult");
         if (Crews.Any()) Logger.Info(string.Join(", ", Crews.Select(x => $"{x.Role} - {x.AssignedCount}/{x.MaxCount} ({x.SpawnChance}%)")), "CrewRoleResult");
 
-        if (Sunnyboy.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Jester)) FinalRolesList.Add(CustomRoles.Sunnyboy);
-        if (Bard.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Arrogance)) FinalRolesList.Add(CustomRoles.Bard);
-        if (Requiter.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Knight)) FinalRolesList.Add(CustomRoles.Requiter);
+        if (Sunnyboy.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Jester) && CheckMax(CustomRoles.Sunnyboy, CustomRoles.Jester)) FinalRolesList.Add(CustomRoles.Sunnyboy);
+        if (Bard.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Arrogance) && CheckMax(CustomRoles.Bard, CustomRoles.Arrogance)) FinalRolesList.Add(CustomRoles.Bard);
+        if (Requiter.CheckSpawn() && FinalRolesList.Remove(CustomRoles.Knight) && CheckMax(CustomRoles.Requiter, CustomRoles.Knight)) FinalRolesList.Add(CustomRoles.Requiter);
 
         // if roles are very few, add vanilla сrewmate roles
         if (AllPlayers.Count > FinalRolesList.Count)
@@ -1012,6 +1012,7 @@ public class RoleAssign
         return;
 
         RoleAssignInfo GetAssignInfo(CustomRoles role) => Roles.Values.FirstOrDefault(x => x.Any(y => y.Role == role))?.FirstOrDefault(x => x.Role == role);
+        bool CheckMax(CustomRoles role, CustomRoles role2) => SetRoles.Values.Count(r => r == role) < role2.GetCount();
     }
 
     public static int AddScientistNum;

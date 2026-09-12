@@ -1,8 +1,5 @@
-using Hazel;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using TONE.Roles.AddOns.Common;
-using UnityEngine;
 using static TONE.MeetingHudStartPatch;
 using static TONE.Options;
 using static TONE.Translator;

@@ -714,14 +714,14 @@ class InnerNetClientSpawnPatch
                 }
                 //if (PlayerControl.LocalPlayer.FriendCode.GetDevUser().IsUp && Options.EnableUpMode.GetBool())
                 //{
-                    _ = new LateTask(() =>
+                _ = new LateTask(() =>
+                {
+                    if (!AmongUsClient.Instance.IsGameStarted && client.Character?.IsHost() == true)
                     {
-                        if (!AmongUsClient.Instance.IsGameStarted && client.Character?.IsHost() == true)
-                        {
-                            Main.isChatCommand = true;
-                            AchievementManager.ShowCompletedThisGame();
-                        }
-                    }, 3.3f, "DisplayAchievementResult");
+                        Main.isChatCommand = true;
+                        AchievementManager.ShowCompletedThisGame();
+                    }
+                }, 3.3f, "DisplayAchievementResult");
                 //}
             }
         }

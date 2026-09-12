@@ -3,7 +3,6 @@ using Hazel;
 using System.Text;
 using TONE.Modules;
 using TONE.Modules.Rpc;
-using TONE.Roles.Core;
 using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
@@ -353,7 +352,7 @@ internal class Philosopher : RoleBase
         if (!Logos.Stage[3])
         {
             Main.EnumerateAlivePlayerControls().Where(x => x.Is(CustomRoles.Logos))
-            .Do(x => Utils.NotifyRoles(SpecifyTarget: x)); 
+            .Do(x => Utils.NotifyRoles(SpecifyTarget: x));
         }
         else
         {

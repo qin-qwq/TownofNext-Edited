@@ -27,22 +27,35 @@ internal class Admirer : RoleBase
     private static OptionItem CanAdmireNeutral;
     private static OptionItem CanAdmireCoven;
     private static OptionItem MisfireAdmireTarget;
-
+    public static OptionItem CanAdmireBeforeFirstMeeting;
+    enum OptionName
+    {
+        AdmireCooldown,
+        AdmirerKnowTargetRole,
+        AdmirerSkillLimit,
+        CanAdmireImp,
+        CanAdmireCrew,
+        CanAdmireNeutral,
+        CanAdmireCoven,
+        MisfireAdmireTarget,
+        CanAdmireBeforeFirstMeeting
+    }
     public static readonly Dictionary<byte, HashSet<byte>> AdmiredList = [];
 
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Admirer);
-        AdmireCooldown = FloatOptionItem.Create(Id + 10, "AdmireCooldown", new(1f, 180f, 1f), 25f, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer])
+        AdmireCooldown = FloatOptionItem.Create(Role, Id + 10, OptionName.AdmireCooldown, new(1f, 180f, 1f), 25f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        KnowTargetRole = BooleanOptionItem.Create(Id + 11, "AdmirerKnowTargetRole", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
-        SkillLimit = IntegerOptionItem.Create(Id + 12, "AdmirerSkillLimit", new(0, 100, 1), 1, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer])
+        KnowTargetRole = BooleanOptionItem.Create(Role, Id + 11, OptionName.AdmirerKnowTargetRole, true, false);
+        SkillLimit = IntegerOptionItem.Create(Role, Id + 12, OptionName.AdmirerSkillLimit, new(0, 100, 1), 1, false)
             .SetValueFormat(OptionFormat.Times);
-        CanAdmireImp = BooleanOptionItem.Create(Id + 13, "CanAdmireImp", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
-        CanAdmireCrew = BooleanOptionItem.Create(Id + 14, "CanAdmireCrew", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
-        CanAdmireNeutral = BooleanOptionItem.Create(Id + 15, "CanAdmireNeutral", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
-        CanAdmireCoven = BooleanOptionItem.Create(Id + 16, "CanAdmireCoven", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
-        MisfireAdmireTarget = BooleanOptionItem.Create(Id + 17, "MisfireAdmireTarget", true, TabGroup.CrewmateRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Admirer]);
+        CanAdmireImp = BooleanOptionItem.Create(Role, Id + 13, OptionName.CanAdmireImp, true, false);
+        CanAdmireCrew = BooleanOptionItem.Create(Role, Id + 14, OptionName.CanAdmireCrew, true, false);
+        CanAdmireNeutral = BooleanOptionItem.Create(Role, Id + 15, OptionName.CanAdmireNeutral, true, false);
+        CanAdmireCoven = BooleanOptionItem.Create(Role, Id + 16, OptionName.CanAdmireCoven, true, false);
+        MisfireAdmireTarget = BooleanOptionItem.Create(Role, Id + 17, OptionName.MisfireAdmireTarget, true, false);
+        CanAdmireBeforeFirstMeeting = BooleanOptionItem.Create(Role, Id + 18, OptionName.CanAdmireBeforeFirstMeeting, true, false);
     }
     public override void Init()
     {
@@ -74,7 +87,7 @@ internal class Admirer : RoleBase
     }
 
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = id.GetAbilityUseLimit() >= 1 ? AdmireCooldown.GetFloat() : 300f;
-    public override bool CanUseKillButton(PlayerControl player) => player.GetAbilityUseLimit() >= 1;
+    public override bool CanUseKillButton(PlayerControl player) => (CanAdmireBeforeFirstMeeting.GetBool() || !MeetingStates.FirstMeeting) && player.GetAbilityUseLimit() >= 1;
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {

@@ -915,39 +915,16 @@ public static class GuessManager
 
             if (Options.ShowOnlyEnabledRolesInGuesserUI.GetBool())
             {
-
                 List<CustomRoles> listOfRoles = CustomRolesHelper.AllRoles.Where(role => !role.IsGhostRole() && (role.IsEnable() || role.RoleExist(countDead: true))).ToList();
 
                 // Always show
-                if (!listOfRoles.Contains(CustomRoles.ImpostorTONE))
-                    listOfRoles.Add(CustomRoles.ImpostorTONE);
+                foreach (var role in CustomRolesHelper.AllRoles)
+                {
+                    if (role.GetStaticRoleClass().ThisRoleType != Custom_RoleType.ImpostorVanilla && role.GetStaticRoleClass().ThisRoleType != Custom_RoleType.CrewmateVanilla) continue;
 
-                if (!listOfRoles.Contains(CustomRoles.ShapeshifterTONE))
-                    listOfRoles.Add(CustomRoles.ShapeshifterTONE);
-
-                if (!listOfRoles.Contains(CustomRoles.CrewmateTONE))
-                    listOfRoles.Add(CustomRoles.CrewmateTONE);
-
-                if (!listOfRoles.Contains(CustomRoles.ScientistTONE))
-                    listOfRoles.Add(CustomRoles.ScientistTONE);
-
-                if (!listOfRoles.Contains(CustomRoles.EngineerTONE))
-                    listOfRoles.Add(CustomRoles.EngineerTONE);
-
-                if (!listOfRoles.Contains(CustomRoles.TrackerTONE))
-                    listOfRoles.Add(CustomRoles.TrackerTONE);
-
-                if (!listOfRoles.Contains(CustomRoles.PhantomTONE))
-                    listOfRoles.Add(CustomRoles.PhantomTONE);
-
-                if (!listOfRoles.Contains(CustomRoles.DetectiveTONE))
-                    listOfRoles.Add(CustomRoles.DetectiveTONE);
-
-                if (!listOfRoles.Contains(CustomRoles.ViperTONE))
-                    listOfRoles.Add(CustomRoles.ViperTONE);
-                
-                if (!listOfRoles.Contains(CustomRoles.JudgeTONE))
-                    listOfRoles.Add(CustomRoles.JudgeTONE);
+                    if (!listOfRoles.Contains(role))
+                        listOfRoles.Add(role);
+                }
 
                 if (!listOfRoles.Contains(CustomRoles.Amnesiac))
                     listOfRoles.Add(CustomRoles.Amnesiac);
@@ -956,6 +933,15 @@ public static class GuessManager
                 {
                     if (!listOfRoles.Contains(CustomRoles.Recruit))
                         listOfRoles.Add(CustomRoles.Recruit);
+
+                    if (!listOfRoles.Contains(CustomRoles.Sidekick))
+                        listOfRoles.Add(CustomRoles.Sidekick);
+                }
+
+                if (CustomRoles.Logos.IsEnable())
+                {
+                    if (!listOfRoles.Contains(CustomRoles.Philosopher))
+                        listOfRoles.Add(CustomRoles.Philosopher);
                 }
 
                 if (CustomRoles.Cultist.IsEnable())
@@ -988,13 +974,7 @@ public static class GuessManager
                         listOfRoles.Add(CustomRoles.Pestilence);
                 }
 
-                if (CustomRoles.SoulCollector.IsEnable())
-                {
-                    if (!listOfRoles.Contains(CustomRoles.Death))
-                        listOfRoles.Add(CustomRoles.Death);
-                }
-
-                if (CustomRoles.Lich.IsEnable())
+                if (CustomRoles.SoulCollector.IsEnable() || CustomRoles.Lich.IsEnable())
                 {
                     if (!listOfRoles.Contains(CustomRoles.Death))
                         listOfRoles.Add(CustomRoles.Death);

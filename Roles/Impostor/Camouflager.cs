@@ -43,7 +43,7 @@ internal class Camouflager : RoleBase
         DisableReportWhenCamouflageIsActiveOpt = BooleanOptionItem.Create(Id + 8, "DisableReportWhenCamouflageIsActive", false, TabGroup.ImpostorRoles, false)
             .SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
         //ShowShapeshiftAnimationsOpt = BooleanOptionItem.Create(Id + 9, GeneralOption.ShowShapeshiftAnimations, true, TabGroup.ImpostorRoles, false)
-            //.SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
+        //.SetParent(Options.CustomRoleSpawnChances[CustomRoles.Camouflager]);
 
     }
     public override void Init()
@@ -87,9 +87,9 @@ internal class Camouflager : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         //if (AbilityActivated)
-            //hud.AbilityButton.OverrideText(GetString("CamouflagerShapeshiftTextAfterDisguise"));
+        //hud.AbilityButton.OverrideText(GetString("CamouflagerShapeshiftTextAfterDisguise"));
         //else
-            hud.AbilityButton.OverrideText(GetString("CamouflagerShapeshiftTextBeforeDisguise"));
+        hud.AbilityButton.OverrideText(GetString("CamouflagerShapeshiftTextBeforeDisguise"));
     }
     /*public override bool OnCheckShapeshift(PlayerControl camouflager, PlayerControl target, ref bool resetCooldown, ref bool shouldAnimate)
     {

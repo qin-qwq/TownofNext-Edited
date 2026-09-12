@@ -1,6 +1,5 @@
 using AmongUs.GameOptions;
 using TONE.Modules;
-using TONE.Roles.Core;
 using UnityEngine;
 
 namespace TONE.Roles.Coven;

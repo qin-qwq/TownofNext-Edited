@@ -155,8 +155,8 @@ internal class Inspector : RoleBase
             bool target1IsVM = false;
             if (target1.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target1.PlayerId].Count > 0)
             {
-                target1 = Utils.GetPlayerById(VoodooMaster.Dolls[target1.PlayerId].Where(x => Utils.GetPlayerById(x).IsAlive()).ToList().RandomElement());
-                Utils.SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target1.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
+                target1 = GetPlayerById(VoodooMaster.Dolls[target1.PlayerId].Where(x => GetPlayerById(x).IsAlive()).ToList().RandomElement());
+                SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target1.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
                 target1IsVM = true;
             }
             var target1Name = target1.GetRealName();
@@ -167,8 +167,8 @@ internal class Inspector : RoleBase
             bool target2IsVM = false;
             if (target2.Is(CustomRoles.VoodooMaster) && VoodooMaster.Dolls[target1.PlayerId].Count > 0)
             {
-                target2 = Utils.GetPlayerById(VoodooMaster.Dolls[target2.PlayerId].Where(x => Utils.GetPlayerById(x).IsAlive()).ToList().RandomElement());
-                Utils.SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target2.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
+                target2 = GetPlayerById(VoodooMaster.Dolls[target2.PlayerId].Where(x => GetPlayerById(x).IsAlive()).ToList().RandomElement());
+                SendMessage(string.Format(GetString("VoodooMasterTargetInMeeting"), target2.GetRealName()), Utils.GetPlayerListByRole(CustomRoles.VoodooMaster).First().PlayerId);
                 target2IsVM = true;
             }
             var target2Name = target2.GetRealName();
@@ -219,7 +219,7 @@ internal class Inspector : RoleBase
                 }
                 else
                 {
-                    if ((Utils.IsSameTeammate(target1, target2) && !Lich.IsCursed(target1) && !Lich.IsCursed(target2) && !Illusionist.IsCovIllusioned(target1.PlayerId) && !Illusionist.IsCovIllusioned(target2.PlayerId) && !Illusionist.IsNonCovIllusioned(target1.PlayerId) && !Illusionist.IsNonCovIllusioned(target2.PlayerId))
+                    if ((Utils.IsSameTeammate(target1, target2, trick: true) && !Lich.IsCursed(target1) && !Lich.IsCursed(target2) && !Illusionist.IsCovIllusioned(target1.PlayerId) && !Illusionist.IsCovIllusioned(target2.PlayerId) && !Illusionist.IsNonCovIllusioned(target1.PlayerId) && !Illusionist.IsNonCovIllusioned(target2.PlayerId))
                     || (Lich.IsCursed(target1) && Lich.IsCursed(target2))
                     || (Illusionist.IsCovIllusioned(target1.PlayerId) && Illusionist.IsCovIllusioned(target2.PlayerId))
                     || (Illusionist.IsNonCovIllusioned(target1.PlayerId) && Illusionist.IsNonCovIllusioned(target2.PlayerId))

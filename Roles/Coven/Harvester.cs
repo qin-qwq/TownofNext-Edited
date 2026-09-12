@@ -41,14 +41,14 @@ internal class Harvester : CovenManager
             .SetValueFormat(OptionFormat.Seconds);
         SwapCooldown = FloatOptionItem.Create(Role, Id + 11, OptionName.HarvesterSettings_SwapCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        AmountStolen = IntegerOptionItem.Create(Role, Id + 12,  OptionName.HarvesterSettings_AmountStolen, new(1, 100, 1), 1, false)
+        AmountStolen = IntegerOptionItem.Create(Role, Id + 12, OptionName.HarvesterSettings_AmountStolen, new(1, 100, 1), 1, false)
             .SetValueFormat(OptionFormat.Times);
-        MaxAddonsCoven = IntegerOptionItem.Create(Role, Id + 13,  OptionName.HarvesterSettings_MaxAddonsCoven, new(1, 100, 1), 5, false)
+        MaxAddonsCoven = IntegerOptionItem.Create(Role, Id + 13, OptionName.HarvesterSettings_MaxAddonsCoven, new(1, 100, 1), 5, false)
             .SetValueFormat(OptionFormat.Times);
-        MaxAddonsSelf = IntegerOptionItem.Create(Role, Id + 14,  OptionName.HarvesterSettings_MaxAddonsSelf, new(1, 100, 1), 5, false)
+        MaxAddonsSelf = IntegerOptionItem.Create(Role, Id + 14, OptionName.HarvesterSettings_MaxAddonsSelf, new(1, 100, 1), 5, false)
             .SetValueFormat(OptionFormat.Times);
-        CanSwapRecruiting = BooleanOptionItem.Create(Role, Id + 15,  OptionName.HarvesterSettings_CanSwapRecruiting, false, false);
-        CanStealRecruiting = BooleanOptionItem.Create(Role, Id + 16,  OptionName.HarvesterSettings_CanStealRecruiting, false, false);
+        CanSwapRecruiting = BooleanOptionItem.Create(Role, Id + 15, OptionName.HarvesterSettings_CanSwapRecruiting, false, false);
+        CanStealRecruiting = BooleanOptionItem.Create(Role, Id + 16, OptionName.HarvesterSettings_CanStealRecruiting, false, false);
     }
     public override void Init()
     {

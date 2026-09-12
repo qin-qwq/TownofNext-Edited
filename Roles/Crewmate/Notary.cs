@@ -1,6 +1,6 @@
+using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using Hazel;
 using TONE.Modules;
 using TONE.Modules.Rpc;
 using UnityEngine;

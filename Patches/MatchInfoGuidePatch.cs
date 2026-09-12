@@ -30,7 +30,7 @@ class MatchInfoGuideCreateNormalModeSettingsPatch
                 ++num;
             }
         }
-        if (num == 0) 
+        if (num == 0)
             __instance.rolesEnabledMessage.SetActive(true);
         __instance.MatchInfoRoleScroller.SetYBoundsMax(Mathf.Clamp(Mathf.Ceil(num / 2f) + __instance.RoleEntryBoundsModifier, 0.0f, 999f));
         __instance.MatchInfoRoleMaskArea.material.SetInt(PlayerMaterial.MaskLayer, 50);

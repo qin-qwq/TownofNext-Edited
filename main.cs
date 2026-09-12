@@ -256,8 +256,8 @@ public class Main : BasePlugin
             if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
             {
                 DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 9, 11, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 9, 21, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 9, 19, 7, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 9, 28, 7, 0, 0, 0, DateTimeKind.Utc);
                 return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
             }
             return false;

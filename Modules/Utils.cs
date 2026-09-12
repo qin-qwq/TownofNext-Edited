@@ -758,6 +758,10 @@ public static class Utils
         try
         {
             float limit = playerId.GetAbilityUseLimit();
+            if ((Main.PlayerStates[playerId].MainRole == CustomRoles.Sheriff && !Sheriff.CanKillBeforeFirstMeeting.GetBool() ||
+                Main.PlayerStates[playerId].MainRole == CustomRoles.Knight && !Knight.CanKillBeforeFirstMeeting.GetBool() ||
+                Main.PlayerStates[playerId].MainRole == CustomRoles.Admirer && !Admirer.CanAdmireBeforeFirstMeeting.GetBool())
+                && MeetingStates.FirstMeeting) limit = 0;
             if (float.IsNaN(limit)) return string.Empty;
             Color TextColor;
             if (limit < 1) TextColor = displayOnlyUseAbility ? Color.gray : Color.red;
@@ -1331,7 +1335,7 @@ public static class Utils
     {
         // Always splits it, this is incase you want to very heavily modify msg and use the splitmsg functionality.
         bool isfirst = true;
-        if (text.Length > 720 && !GetPlayerById(sendTo).IsModded())
+        if (text.Length > 1200 && !GetPlayerById(sendTo).IsModded())
         {
             foreach (var txt in text.SplitMessage())
             {
@@ -1686,10 +1690,13 @@ public static class Utils
     }
     public static List<PlayerControl> GetPlayerListByRole(this CustomRoles role)
         => GetPlayerListByIds(Main.PlayerStates.Values.Where(x => x.MainRole == role).Select(r => r.PlayerId));
-    public static bool IsSameTeammate(this PlayerControl player, PlayerControl target, bool crew = true, bool imp = true, bool neu = true, bool coven = true)
+    public static bool IsSameTeammate(this PlayerControl player, PlayerControl target, bool crew = true, bool imp = true, bool neu = true, bool coven = true, bool trick = false)
     {
-        if ((player.IsPlayerCrewmateTeam() && target.IsPlayerCrewmateTeam() && crew) || (player.IsPlayerImpostorTeam() && target.IsPlayerImpostorTeam() && imp)
-            || (player.IsPlayerNeutralTeam() && target.IsPlayerNeutralTeam() && neu) || (player.IsPlayerCovenTeam() && target.IsPlayerCovenTeam() && coven))
+        var allCrew = (player.IsPlayerCrewmateTeam() || player.Is(CustomRoles.Trickster) && trick) && (target.IsPlayerCrewmateTeam() || target.Is(CustomRoles.Trickster) && trick);
+        var allImp = player.IsPlayerImpostorTeam() && (!player.Is(CustomRoles.Trickster) || !trick) && target.IsPlayerImpostorTeam() && (!target.Is(CustomRoles.Trickster) || !trick);
+        var allNeu = player.IsPlayerNeutralTeam() && target.IsPlayerNeutralTeam();
+        var allCoven = player.IsPlayerCovenTeam() && target.IsPlayerCovenTeam();
+        if ((allCrew && crew) || (allImp && imp) || (allNeu && neu) || (allCoven && coven))
         {
             return true;
         }
@@ -2313,7 +2320,7 @@ public static class Utils
                 SelfSuffix.Append(Radar.GetPlayerArrow(seer, seer, isForMeeting: isForMeeting));
                 SelfSuffix.Append(Spurt.GetSuffix(seer, isformeeting: isForMeeting));
 
-                if (!isForMeeting && Main.Invisible.Contains(seer.PlayerId) && !seer.Is(CustomRoles.Chameleon) && !seer.Is(CustomRoles.Swooper)) 
+                if (!isForMeeting && Main.Invisible.Contains(seer.PlayerId) && !seer.Is(CustomRoles.Chameleon) && !seer.Is(CustomRoles.Swooper))
                     SelfSuffix.Append(ColorString(GetRoleColor(seer.GetCustomRole()), GetString("IsInvisible")));
 
                 switch (GameModeBase.GetGameMode())

@@ -1,7 +1,6 @@
 using AmongUs.Data;
 using AmongUs.Data.Player;
 using Assets.InnerNet;
-using BepInEx.Unity.IL2CPP.Utils.Collections;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using System;
 using System.Collections;

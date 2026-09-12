@@ -1,4 +1,3 @@
-using InnerNet;
 using System;
 using TONE.Modules;
 using TONE.Patches;

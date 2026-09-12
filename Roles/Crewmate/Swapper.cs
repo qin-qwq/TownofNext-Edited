@@ -1,11 +1,8 @@
-using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TONE.Modules;
-using TONE.Modules.Rpc;
 using TONE.Roles.Core;
 using TONE.Roles.Coven;
-using UnityEngine;
 using static TONE.CheckForEndVotingPatch;
 using static TONE.Translator;
 using static TONE.Utils;
@@ -332,9 +329,9 @@ internal class Swapper : RoleBase
             Vote.Item1 = 253;
             Vote.Item2 = 253;
 
-            MeetingHudStartPatch.msgToSend.Add((GetString("SwapHelp"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper())));
+            MeetingHudStartPatch.AddMsg(GetString("SwapHelp"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
 
-            ResultSent.Clear(); 
+            ResultSent.Clear();
         }
     }
 

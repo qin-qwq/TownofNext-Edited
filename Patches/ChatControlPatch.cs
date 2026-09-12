@@ -1,4 +1,3 @@
-using AmongUs.Data;
 using System;
 using TMPro;
 using TONE.Patches;
@@ -110,7 +109,7 @@ public static class SendTargetPatch
                 return localPlayer.GetCustomRole().IsImpostor() && Options.EnableImpostorChannel.GetBool();
 
             case SendTargets.Coven:
-               return localPlayer.GetCustomRole().IsCoven() && Options.EnableCovenChannel.GetBool(); 
+                return localPlayer.GetCustomRole().IsCoven() && Options.EnableCovenChannel.GetBool();
 
             case SendTargets.Jackal:
                 return (localPlayer.Is(CustomRoles.Jackal) || localPlayer.Is(CustomRoles.Sidekick) || localPlayer.Is(CustomRoles.Recruit)) && Jackal.EnableJackalChannel.GetBool();
@@ -245,7 +244,7 @@ class ChatControllerUpdatePatch
             ClipboardHelper.PutClipboardString(__instance.freeChatField.textArea.text);
 
         //if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.V))
-            //__instance.freeChatField.textArea.SetText(__instance.freeChatField.textArea.text + GUIUtility.systemCopyBuffer);
+        //__instance.freeChatField.textArea.SetText(__instance.freeChatField.textArea.text + GUIUtility.systemCopyBuffer);
 
         if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(KeyCode.X))
         {

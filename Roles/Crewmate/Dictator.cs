@@ -1,9 +1,5 @@
-using Hazel;
 using System;
 using TONE.Modules.ChatManager;
-using TONE.Modules.Rpc;
-using TONE.Roles.Core;
-using UnityEngine;
 using static TONE.Options;
 using static TONE.Translator;
 using static TONE.Utils;

@@ -281,7 +281,7 @@ public class ModUpdater
     public static int ParseVersion(string versionPart)
     {
         if (string.IsNullOrWhiteSpace(versionPart))
-            return 999; 
+            return 999;
 
         var tokens = versionPart.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (tokens.Length == 0)

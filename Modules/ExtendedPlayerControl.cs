@@ -2138,7 +2138,7 @@ static class ExtendedPlayerControl
     public static void RpcSetCustomRoleV2(this PlayerControl player, CustomRoles role, bool remove = false, bool add = false)
     {
         if (!AmongUsClient.Instance.AmHost || !GameStates.IsInGame || !player || player.GetCustomRole() == role) return;
-        
+
         if (remove) player.GetRoleClass()?.OnRemove(player.PlayerId);
         player.RpcSetCustomRole(role);
         player.RpcChangeRoleBasis(role);
