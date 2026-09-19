@@ -29,28 +29,32 @@ internal class Huntsman : RoleBase
     private static OptionItem NumOfTargets;
     private static OptionItem MinKCD;
     private static OptionItem MaxKCD;
-
+    enum OptionName
+    {
+        HHSuccessKCDDecrease,
+        HHFailureKCDIncrease,
+        HHNumOfTargets
+    }
     private bool IsDead = false;
     private readonly HashSet<byte> Targets = [];
     private float KCD = 25;
 
     public override void SetupCustomOption()
     {
-        SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Huntsman, 1, zeroOne: false);
-        KillCooldown = FloatOptionItem.Create(Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman])
+        SetupSingleRoleOptions(Id, TabGroup.NeutralRoles, Role, 1, zeroOne: false);
+        KillCooldown = FloatOptionItem.Create(Role, Id + 10, GeneralOption.KillCooldown, new(0f, 180f, 2.5f), 30f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        SuccessKillCooldown = FloatOptionItem.Create(Id + 11, "HHSuccessKCDDecrease", new(0f, 180f, 0.5f), 5f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman])
+        SuccessKillCooldown = FloatOptionItem.Create(Role, Id + 11, OptionName.HHSuccessKCDDecrease, new(0f, 180f, 0.5f), 5f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        FailureKillCooldown = FloatOptionItem.Create(Id + 12, "HHFailureKCDIncrease", new(0f, 180f, 0.5f), 10f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman])
+        FailureKillCooldown = FloatOptionItem.Create(Role, Id + 12, OptionName.HHFailureKCDIncrease, new(0f, 180f, 0.5f), 10f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        CanVent = BooleanOptionItem.Create(Id + 13, GeneralOption.CanVent, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman]);
-        HasImpostorVision = BooleanOptionItem.Create(Id + 14, GeneralOption.ImpostorVision, true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman]);
-        NumOfTargets = IntegerOptionItem.Create(Id + 15, "HHNumOfTargets", new(0, 10, 1), 3, TabGroup.NeutralRoles, false)
-            .SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman])
+        CanVent = BooleanOptionItem.Create(Role, Id + 13, GeneralOption.CanVent, true, false);
+        HasImpostorVision = BooleanOptionItem.Create(Role, Id + 14, GeneralOption.ImpostorVision, true, false);
+        NumOfTargets = IntegerOptionItem.Create(Role, Id + 15, OptionName.HHNumOfTargets, new(0, 10, 1), 3, false)
             .SetValueFormat(OptionFormat.Times);
-        MaxKCD = FloatOptionItem.Create(Id + 16, "HHMaxKCD", new(0f, 180f, 2.5f), 60f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman])
+        MaxKCD = FloatOptionItem.Create(Role, Id + 16, GeneralOption.MaxKillCooldown, new(0f, 180f, 2.5f), 60f, false)
             .SetValueFormat(OptionFormat.Seconds);
-        MinKCD = FloatOptionItem.Create(Id + 17, "HHMinKCD", new(0f, 180f, 2.5f), 10f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Huntsman])
+        MinKCD = FloatOptionItem.Create(Role, Id + 17, GeneralOption.MinKillCooldown, new(0f, 180f, 2.5f), 10f, false)
             .SetValueFormat(OptionFormat.Seconds);
     }
     public override void Add(byte playerId)

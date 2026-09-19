@@ -689,6 +689,8 @@ namespace TONE.Modules
     {
         public ShapeshiftMenuElement(PlayerControl guesser)
         {
+            if (!AmongUsClient.Instance.AmHost) return;
+            if (Options.UseMeetingAbilityMethod.GetValue() != 1) return;
             CreateNetObject(string.Empty, new Vector2(0f, 0f), onlyVisibleTo: guesser);
         }
     }

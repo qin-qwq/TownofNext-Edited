@@ -331,7 +331,6 @@ public static class CustomRolesHelper
             || (role is CustomRoles.President && President.CheckReveal(target.PlayerId))
             || (role is CustomRoles.Captain && Captain.CrewCanFindCaptain())
             || (role is CustomRoles.Solsticer)
-            || (role is CustomRoles.Mini && Mini.EveryoneCanKnowMini.GetBool())
             || Notary.NotarizeList.Contains(target.PlayerId);
     }
     public static bool IsBetrayalAddon(this CustomRoles role)
@@ -1364,7 +1363,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Archaeologist)
                     || pc.Is(CustomRoles.Lovers)
                     || pc.Is(CustomRoles.Balancer)
-                    || pc.Is(CustomRoles.Admirer))
+                    || pc.Is(CustomRoles.Admirer)
+                    || pc.Is(CustomRoles.JudgeTONE))
                     return false;
                 break;
         }

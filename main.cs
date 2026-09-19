@@ -55,7 +55,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.09.04";
+    public const string PluginVersion = "26.09.20";
     public const string PluginDisplayVersion = "2.0.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -64,7 +64,7 @@ public class Main : BasePlugin
         ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.BETA;
+    public static readonly Release RELEASE = Release.RELEASE;
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: V2.0.0 Alpha 6 Hotfix 1

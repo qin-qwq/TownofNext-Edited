@@ -1171,7 +1171,6 @@ class MeetingHudStartPatch
                 var Des = pc.GetRoleInfo(true);
                 var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
                 var Conf = new StringBuilder();
-                var Sub = new StringBuilder();
                 var rlHex = GetRoleColorCode(role);
                 var SubTitle = $"<color={rlHex}>" + GetString("YourAddon") + "</color>\n";
                 if (Options.CustomRoleSpawnChances.TryGetValue(role, out var opt))
@@ -1180,20 +1179,45 @@ class MeetingHudStartPatch
                 var Setting = $"<color={rlHex}>{GetString(role.ToString())} {GetString("Settings:")}</color>\n";
                 Conf.Clear().Append($"<color=#ffffff>" + $"<size={ChatCommands.Csize}>" + Setting + cleared + "</size>" + "</color>");
 
-                foreach (var subRole in Main.PlayerStates[pc.PlayerId].SubRoles.ToArray())
-                    Sub.Append($"\n\n" + $"<size={ChatCommands.Asize}>" + subRole.GetRoleTitle() + subRole.GetInfoLong() + "</size>");
-
-                if (Sub.ToString() != string.Empty)
-                {
-                    var ACleared = Sub.ToString().Remove(0, 2);
-                    ACleared = ACleared.Length > 1200 ? $"<size={ChatCommands.Asize}>" + ACleared.RemoveHtmlTags() + "</size>" : ACleared;
-                    Sub.Clear().Append(ACleared);
-                }
-
                 AddMsg(Des, pc.PlayerId, title);
                 AddMsg("", pc.PlayerId, Conf.ToString());
-                if (Sub.ToString() != string.Empty) AddMsg(Sub.ToString(), pc.PlayerId, SubTitle);
 
+                var subRoles = Main.PlayerStates[pc.PlayerId].SubRoles.ToArray();
+                if (subRoles.Length == 0) continue;
+
+                if (!Main.CurrentServerIsVanilla)
+                {
+                    var Sub = new StringBuilder();
+                    foreach (var subRole in subRoles)
+                        Sub.Append("\n\n" + $"<size={ChatCommands.Asize}>" + Utils.GetRoleTitle(subRole) + Utils.GetInfoLong(subRole) + "</size>");
+
+                    var ACleared = Sub.ToString().Remove(0, 2);
+                    if (ACleared.Length > 1200)
+                        ACleared = $"<size={ChatCommands.Asize}>" + ACleared.RemoveHtmlTags() + "</size>";
+
+                    AddMsg(ACleared, pc.PlayerId, SubTitle);
+                }
+                else
+                {
+                    var SubRolesPerMessage = 2;
+                    for (var i = 0; i < subRoles.Length; i += SubRolesPerMessage)
+                    {
+                        var Sub = new StringBuilder();
+                        var count = Math.Min(SubRolesPerMessage, subRoles.Length - i);
+
+                        for (var j = 0; j < count; j++)
+                        {
+                            var subRole = subRoles[i + j];
+                            Sub.Append((j == 0 ? "" : "\n\n") + $"<size={ChatCommands.Asize}>" + Utils.GetRoleTitle(subRole) + Utils.GetInfoLong(subRole) + "</size>");
+                        }
+
+                        var body = Sub.ToString();
+                        if (body.Length > 1200)
+                            body = $"<size={ChatCommands.Asize}>" + body.RemoveHtmlTags() + "</size>";
+
+                        AddMsg(body, pc.PlayerId, SubTitle);
+                    }
+                }
             }
 
         if (msgToSend.Count >= 1)
@@ -1514,10 +1538,24 @@ class MeetingHudStartPatch
         {
             _ = new LateTask(() =>
             {
-                foreach (var pc in Main.EnumeratePlayerControls())
+                foreach (var seer in Main.EnumeratePlayerControls())
+                {
+                    if (seer.IsModded()) continue;
+                    var sender = CustomRpcSender.Create("SetNameToChat", SendOption.Reliable);
+                    sender.StartMessage(seer.GetClientId());
+
+                    foreach (var seen in Main.EnumeratePlayerControls())
+                    {
+                        var seenName = seen.GetRealName(isMeeting: true);
+                        var coloredName = ColorString(seen.GetRoleColor(), seenName);
+                        CustomRpcSenderExtensions.RpcSetName(ref sender, seen, seer, seer == seen ? coloredName : seenName);
+                    }
+                    sender.SendMessage();
+                }
+                /*foreach (var pc in Main.EnumeratePlayerControls())
                 {
                     pc.RpcSetNameEx(pc.GetRealName(isMeeting: true));
-                }
+                }*/
                 ChatUpdatePatch.DoBlockChat = false;
             }, 3f, "SetName To Chat");
 
@@ -1717,7 +1755,8 @@ class MeetingHudUpdatePatch
 
         if (!GameStates.IsVoting && __instance.lastSecond < 1)
         {
-            if (GameObject.Find("ShootButton") != null) ClearShootButton(__instance, true);
+            if (GameObject.Find("ShootButton")) ClearShootButton(__instance, true);
+            if (GameObject.Find("GuessButton")) ClearGuessButton(__instance, true);
             return;
         }
 

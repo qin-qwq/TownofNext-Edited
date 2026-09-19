@@ -33,7 +33,7 @@ internal class Notary : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, Role);
-        NotarizeLimitPerGame = IntegerOptionItem.Create(Role, Id + 10, GeneralOption.SkillLimitTimes, new(1, 30, 1), 3, false)
+        NotarizeLimitPerGame = IntegerOptionItem.Create(Role, Id + 10, GeneralOption.SkillLimitTimes, new(0, 30, 1), 3, false)
             .SetValueFormat(OptionFormat.Times);
         NotarizeLimitPerMeeting = IntegerOptionItem.Create(Role, Id + 11, OptionName.NotarizeLimitPerMeeting, new(1, 30, 1), 1, false)
             .SetValueFormat(OptionFormat.Times);
@@ -240,4 +240,14 @@ internal class Notary : RoleBase
     }
 
     public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => NotarizeList.Contains(target.PlayerId);
+
+    public override string GetMarkOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
+    {
+        if (NotarizeList.Contains(seen.PlayerId))
+        {
+            return ColorString(GetRoleColor(CustomRoles.Notary), "☆");
+        }
+
+        return string.Empty;
+    }
 }

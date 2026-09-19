@@ -394,13 +394,9 @@ public static class AntiBlackout
             pc.RpcAddAbilityCD();
             if (pc.GetRoleClass() is not DefaultSetup)
             {
-                if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Phantom or RoleTypes.Shapeshifter or RoleTypes.Viper)
+                if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper)
                 {
-                    if (pc.Is(CustomRoles.Saboteur) && Utils.AnySabotageIsActive())
-                    {
-                        pc.SetKillCooldown(Saboteur.SaboteurMinCD.GetFloat());
-                    }
-                    else if (Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var killTimer) && killTimer > 0f)
+                    if (Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var killTimer) && killTimer > 0f)
                     {
                         pc.SetKillCooldown(killTimer);
                     }

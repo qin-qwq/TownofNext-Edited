@@ -321,7 +321,7 @@ internal class MoonDancer : CovenManager
     {
         if (HasNecronomicon(playerId))
         {
-            hud.KillButton.OverrideText(GetString("MoonDancerNecroKillButton"));
+            hud.KillButton.OverrideText(GetString("MoonDancerNecroKillButtonText"));
         }
         else
         {

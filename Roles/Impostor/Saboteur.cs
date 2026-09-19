@@ -25,15 +25,7 @@ internal class Saboteur : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
     }
 
-    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = SaboteurCD.GetFloat();
-
-    public override void OnMurderPlayerAsKiller(PlayerControl killer, PlayerControl target, bool inMeeting, bool isSuicide)
-    {
-        if (AnySabotageIsActive())
-        {
-            killer.SetKillCooldown(SaboteurMinCD.GetFloat());
-        }
-    }
+    public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = AnySabotageIsActive() ? SaboteurMinCD.GetFloat() : SaboteurCD.GetFloat();
 
     public override bool CanUseKillButton(PlayerControl pc) => true;
 

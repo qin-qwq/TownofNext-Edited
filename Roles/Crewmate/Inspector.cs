@@ -219,16 +219,9 @@ internal class Inspector : RoleBase
                 }
                 else
                 {
-                    if ((Utils.IsSameTeammate(target1, target2, trick: true) && !Lich.IsCursed(target1) && !Lich.IsCursed(target2) && !Illusionist.IsCovIllusioned(target1.PlayerId) && !Illusionist.IsCovIllusioned(target2.PlayerId) && !Illusionist.IsNonCovIllusioned(target1.PlayerId) && !Illusionist.IsNonCovIllusioned(target2.PlayerId))
-                    || (Lich.IsCursed(target1) && Lich.IsCursed(target2))
-                    || (Illusionist.IsCovIllusioned(target1.PlayerId) && Illusionist.IsCovIllusioned(target2.PlayerId))
-                    || (Illusionist.IsNonCovIllusioned(target1.PlayerId) && Illusionist.IsNonCovIllusioned(target2.PlayerId))
-                    || (target1.IsPlayerNeutralTeam() && Lich.IsCursed(target2))
-                    || (Lich.IsCursed(target1) && target2.IsPlayerNeutralTeam())
-                    || (target1.IsPlayerCrewmateTeam() && Illusionist.IsCovIllusioned(target2.PlayerId))
-                    || (Illusionist.IsCovIllusioned(target1.PlayerId) && target2.IsPlayerCrewmateTeam())
-                    || (target1.IsPlayerCovenTeam() && Illusionist.IsNonCovIllusioned(target2.PlayerId))
-                    || (Illusionist.IsNonCovIllusioned(target1.PlayerId) && target2.IsPlayerCovenTeam()))
+                    var team1 = GetTargetTeam(target1);
+                    var team2 = GetTargetTeam(target2);
+                    if (team1 == team2)
                     {
                         _ = new LateTask(() =>
                         {
@@ -277,7 +270,7 @@ internal class Inspector : RoleBase
                             else if (target2.Is(CustomRoles.Admired)) roleT2 = "Crewmate";
                             else if (target2.GetCustomRole().IsImpostorTeamV2() || target2.IsAnySubRole(role => role.IsImpostorTeamV2())) roleT2 = "Impostor";
                             else if (target2.GetCustomRole().IsNeutralTeamV2() || target2.IsAnySubRole(role => role.IsNeutralTeamV2())) roleT2 = "Neutral";
-                            else if ((target2.GetCustomRole().IsCrewmateTeamV2() && (target2.GetCustomSubRoles().Any(role => role.IsCrewmateTeamV2()) || target2.GetCustomSubRoles().Count == 0))) roleT2 = "Crewmate";
+                            else if (target2.GetCustomRole().IsCrewmateTeamV2() && (target2.GetCustomSubRoles().Any(role => role.IsCrewmateTeamV2()) || target2.GetCustomSubRoles().Count == 0)) roleT2 = "Crewmate";
 
                             _ = new LateTask(() =>
                             {
@@ -305,6 +298,23 @@ internal class Inspector : RoleBase
             }
         }
         return true;
+    }
+
+    public static Custom_Team GetTargetTeam(PlayerControl target)
+    {
+        if ((target.IsPlayerCoven() || target.Is(CustomRoles.Enchanted) || Illusionist.IsNonCovIllusioned(target.PlayerId)) && !Lich.IsCursed(target))
+            return Custom_Team.Coven;
+
+        if ((Illusionist.IsCovIllusioned(target.PlayerId) || (target.GetCustomRole().IsCrewmateTeamV2() && (target.GetCustomSubRoles().All(role => role.IsCrewmateTeamV2()) || target.GetCustomSubRoles().Count == 0)) || target.Is(CustomRoles.Admired)) && !Lich.IsCursed(target))
+            return Custom_Team.Crewmate;
+
+        if ((target.GetCustomRole().IsImpostorTeamV2() || target.IsAnySubRole(role => role.IsImpostorTeamV2())) && !target.Is(CustomRoles.Admired) && !Lich.IsCursed(target))
+            return Custom_Team.Impostor;
+
+        if ((target.GetCustomRole().IsNeutralTeamV2() || target.IsAnySubRole(role => role.IsNeutralTeamV2()) || Lich.IsCursed(target)) && !target.Is(CustomRoles.Admired))
+            return Custom_Team.Neutral;
+
+        return Custom_Team.Crewmate;
     }
 
     private static bool MsgToPlayerAndRole(string msg, out byte id1, out byte id2, out string error)

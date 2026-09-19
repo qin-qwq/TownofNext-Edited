@@ -1690,13 +1690,10 @@ public static class Utils
     }
     public static List<PlayerControl> GetPlayerListByRole(this CustomRoles role)
         => GetPlayerListByIds(Main.PlayerStates.Values.Where(x => x.MainRole == role).Select(r => r.PlayerId));
-    public static bool IsSameTeammate(this PlayerControl player, PlayerControl target, bool crew = true, bool imp = true, bool neu = true, bool coven = true, bool trick = false)
+    public static bool IsSameTeammate(this PlayerControl player, PlayerControl target, bool crew = true, bool imp = true, bool neu = true, bool coven = true)
     {
-        var allCrew = (player.IsPlayerCrewmateTeam() || player.Is(CustomRoles.Trickster) && trick) && (target.IsPlayerCrewmateTeam() || target.Is(CustomRoles.Trickster) && trick);
-        var allImp = player.IsPlayerImpostorTeam() && (!player.Is(CustomRoles.Trickster) || !trick) && target.IsPlayerImpostorTeam() && (!target.Is(CustomRoles.Trickster) || !trick);
-        var allNeu = player.IsPlayerNeutralTeam() && target.IsPlayerNeutralTeam();
-        var allCoven = player.IsPlayerCovenTeam() && target.IsPlayerCovenTeam();
-        if ((allCrew && crew) || (allImp && imp) || (allNeu && neu) || (allCoven && coven))
+        if ((player.IsPlayerCrewmateTeam() && target.IsPlayerCrewmateTeam() && crew) || (player.IsPlayerImpostorTeam() && target.IsPlayerImpostorTeam() && imp)
+            || (player.IsPlayerNeutralTeam() && target.IsPlayerNeutralTeam() && neu) || (player.IsPlayerCovenTeam() && target.IsPlayerCovenTeam() && coven))
         {
             return true;
         }
@@ -1877,7 +1874,7 @@ public static class Utils
             if (seers.Length == 0) seers = "\u2205";
             if (targets.Length == 0) targets = "\u2205";
 
-            Logger.Info($" Seers: {seers} ---- Targets: {targets}", "NR");
+            Logger.Info($" Seers: {seers} ---- Targets: {targets}", "NotifyRoles");
         }
         catch (Exception e) { ThrowException(e); }
     }
@@ -2603,12 +2600,12 @@ public static class Utils
                     {
                         if (LastNotifyRolesErrorTS != now)
                         {
-                            Logger.Error($"Error - seer = {seer.GetNameWithRole()}, target = {realTarget.GetNameWithRole()}:", "NR");
+                            Logger.Error($"Error - seer = {seer.GetNameWithRole()}, target = {realTarget.GetNameWithRole()}:", "WriteSetNameRpcsToSender");
                             ThrowException(ex);
                             LastNotifyRolesErrorTS = now;
                         }
                         else
-                            Logger.Error($"Error - seer = {seer.GetNameWithRole()}, target = {realTarget.GetNameWithRole()}: {ex}", "NR");
+                            Logger.Error($"Error - seer = {seer.GetNameWithRole()}, target = {realTarget.GetNameWithRole()}: {ex}", "WriteSetNameRpcsToSender");
                     }
                 }
             }
@@ -2617,12 +2614,12 @@ public static class Utils
         {
             if (LastNotifyRolesErrorTS != now)
             {
-                Logger.Error($"Error for {seer.GetNameWithRole()}:", "NR");
+                Logger.Error($"Error for {seer.GetNameWithRole()}:", "WriteSetNameRpcsToSender");
                 ThrowException(ex);
                 LastNotifyRolesErrorTS = now;
             }
             else
-                Logger.Error($"Error for {seer.GetNameWithRole()}: {ex}", "NR");
+                Logger.Error($"Error for {seer.GetNameWithRole()}: {ex}", "WriteSetNameRpcsToSender");
         }
 
         return hasValue;
@@ -3463,7 +3460,8 @@ public static class Utils
 
         //Crewmates
         if (seer.Is(CustomRoles.Justice) || seer.Is(CustomRoles.Inspector) || seer.Is(CustomRoles.Lookout) || seer.Is(CustomRoles.Swapper) ||
-            (seer.Is(CustomRoles.Dictator) && Dictator.ChangeCommandToExpel.GetBool()) || seer.Is(CustomRoles.NiceGuesser)) return true;
+            (seer.Is(CustomRoles.Dictator) && Dictator.ChangeCommandToExpel.GetBool()) || seer.Is(CustomRoles.NiceGuesser) ||
+            seer.Is(CustomRoles.Notary)) return true;
 
         //Impostors
         if (seer.Is(CustomRoles.Councillor) || seer.Is(CustomRoles.Nemesis) || seer.Is(CustomRoles.EvilGuesser)) return true;

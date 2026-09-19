@@ -99,11 +99,14 @@ internal class Iceologer : RoleBase
         return false;
     }
 
-    public override string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target)
+    public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {
-        string color = string.Empty;
-        if (seer.Is(CustomRoles.Iceologer) && FreezePlayer.Contains(target.PlayerId) && FreezeFatal.GetBool()) color = "#ADD8E6";
-        return color;
+        if (FreezePlayer.Contains(seen.PlayerId))
+        {
+            return Utils.ColorString(Utils.HexToColor("add8e6"), " ☃");
+        }
+
+        return string.Empty;
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte id)

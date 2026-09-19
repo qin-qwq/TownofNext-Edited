@@ -87,7 +87,7 @@ internal class Balancer : RoleBase
         if (voter == null || target == null) return;
         if (!voter.IsAlive())
         {
-            SendMessage(GetString("BalancerDead"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()), sendOption: SendOption.None);
+            voter.ShowInfoMessage(true, GetString("BalancerDead"), ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
             return;
         }
         if (Target1 != 253)
@@ -95,7 +95,7 @@ internal class Balancer : RoleBase
             Target2 = target.PlayerId;
             if (Target1 == Target2)
             {
-                SendMessage(GetString("Choose1=2"), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()), sendOption: SendOption.None);
+                voter.ShowInfoMessage(true, GetString("Choose1=2"), ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
                 Target1 = 253;
                 Target2 = 253;
                 return;
@@ -105,7 +105,7 @@ internal class Balancer : RoleBase
             {
                 Target1 = 253;
                 Target2 = 253;
-                SendMessage(string.Format(GetString("Choose1IsDead"), target.GetRealName()), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()), sendOption: SendOption.None);
+                voter.ShowInfoMessage(true, string.Format(GetString("Choose1IsDead"), target.GetRealName()), ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
                 return;
             }
             voter.RpcRemoveAbilityUse();
@@ -115,7 +115,7 @@ internal class Balancer : RoleBase
             return;
         }
         Target1 = target.PlayerId;
-        SendMessage(string.Format(GetString("Choose1"), target.GetRealName()), voter.PlayerId, ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
+        voter.ShowInfoMessage(true, string.Format(GetString("Choose1"), target.GetRealName()), ColorString(GetRoleColor(CustomRoles.Balancer), GetString("Balancer").ToUpper()));
     }
 
     public override void OnMeetingHudStart(PlayerControl pc)

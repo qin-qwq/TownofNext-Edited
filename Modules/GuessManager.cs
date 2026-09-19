@@ -136,7 +136,6 @@ public static class GuessManager
                 return true;
             }
             var target = Utils.GetPlayerById(targetId, obfuscated: true);
-            if (role.IsVanilla()) role = Oiiai.GetErasedRole(role.GetRoleTypesDirect(), CustomRoles.Logos);
 
             Logger.Msg($" {pc.PlayerId}", "Guesser - pc.PlayerId");
             Logger.Msg($" {target.PlayerId}", "Guesser - target.PlayerId");
@@ -247,6 +246,11 @@ public static class GuessManager
                         pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
                         return true;
                     }
+                }
+                if (target.GetCustomRole().IsRevealingRole(target))
+                {
+                    pc.ShowInfoMessage(isUI, GetString("GuessRevealingRole"));
+                    return true;
                 }
                 if (Balancer.Choose && !(target.PlayerId == Balancer.Target1 || target.PlayerId == Balancer.Target2))
                 {

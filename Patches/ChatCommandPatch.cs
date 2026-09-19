@@ -421,6 +421,7 @@ internal class ChatCommands
         {
             foreach (var rl in CustomRolesHelper.AllRoles)
             {
+                if (rl.IsVanilla()) continue;
                 if (!CrossLangRoleNames.ContainsKey(rl))
                     continue;
                 else
@@ -595,30 +596,29 @@ internal class ChatCommands
         if (!Blackmailer.CheckBlackmaile(player)) ChatManager.SendMessage(player, text);
 
         if (text.StartsWith("\n")) text = text[1..];
-        if (text.StartsWith("/cmd"))
+        var cmd = text.StartsWith("/cmd");
+        if (cmd)
         {
             canceled = true;
             text = "/" + text[4..].TrimStart();
-        }
-        else if (player.IsAlive() && !GameStates.IsLobby)
-        {
-            Utils.SendMessage(GetString("Warning.CommandFailed"), player.PlayerId, noReplay: true);
-            return;
         }
         //if (!text.StartsWith("/")) return;
         string[] args = text.Split(' ');
 
         //if (text.Length >= 3) if (text[..2] == "/r" && text[..3] != "/rn") args[0] = "/r";
         //   if (SpamManager.CheckSpam(player, text)) return;
-        if (GuessManager.GuesserMsg(player, text)) { canceled = true; Logger.Info($"Is Guesser command", "OnReceiveChat"); return; }
-        if (player.GetRoleClass().RoleCommand(player, text)) { canceled = true; Logger.Info($"Is {player.GetCustomRole()} command", "OnReceiveChat"); return; }
-        if (Medium.MsMsg(player, text)) { Logger.Info($"Is Medium command", "OnReceiveChat"); return; }
-        if (Lovers.LoversMsg(player, text)) { canceled = true; Logger.Info($"Is Lovers Private Chat", "OnReceiveChat"); return; }
-        if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
-        if (CovenChannel(player, text)) { canceled = true; Logger.Info($"Is Coven Channel", "OnReceiveChat"); return; }
-        if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
-        if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
-        if (RoundUp.DeputyCommand(player, text)) { canceled = true; Logger.Info($"Is RoundUp Command", "OnReceiveChat"); return; }
+        if (cmd || !player.IsAlive())
+        {
+            if (GuessManager.GuesserMsg(player, text)) { canceled = true; Logger.Info($"Is Guesser command", "OnReceiveChat"); return; }
+            if (player.GetRoleClass().RoleCommand(player, text)) { canceled = true; Logger.Info($"Is {player.GetCustomRole()} command", "OnReceiveChat"); return; }
+            if (Medium.MsMsg(player, text)) { Logger.Info($"Is Medium command", "OnReceiveChat"); return; }
+            if (Lovers.LoversMsg(player, text)) { canceled = true; Logger.Info($"Is Lovers Private Chat", "OnReceiveChat"); return; }
+            if (ImpostorChannel(player, text)) { canceled = true; Logger.Info($"Is Impostor Channel", "OnReceiveChat"); return; }
+            if (CovenChannel(player, text)) { canceled = true; Logger.Info($"Is Coven Channel", "OnReceiveChat"); return; }
+            if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
+            if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
+            if (RoundUp.DeputyCommand(player, text)) { canceled = true; Logger.Info($"Is RoundUp Command", "OnReceiveChat"); return; }
+        }
 
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
@@ -656,7 +656,7 @@ internal class ChatCommands
                 }
 
                 command.Action(player, text, args);
-                if (command.IsCanceled) canceled |= command.AlwaysHidden;
+                if (command.IsCanceled) canceled |= command.AlwaysHidden || !cmd;
                 break;
             }
         }
@@ -1012,14 +1012,13 @@ internal class ChatCommands
         }
     }
 
-    private static void MyRoleCommand(PlayerControl player, string text, string[] args)
+    public static void MyRoleCommand(PlayerControl player, string text, string[] args)
     {
         var role = player.GetCustomRole();
         var lp = player;
         var Des = lp.GetRoleInfo(true);
         var title = $"<color=#ffffff>" + role.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
-        var Sub = new StringBuilder();
         var rlHex = Utils.GetRoleColorCode(role);
         var SubTitle = $"<color={rlHex}>" + GetString("YourAddon") + "</color>\n";
 
@@ -1029,19 +1028,45 @@ internal class ChatCommands
         var Setting = $"<color={rlHex}>{GetString(role.ToString())} {GetString("Settings:")}</color>\n";
         Conf.Clear().Append($"<color=#ffffff>" + $"<size={Csize}>" + Setting + cleared + "</size>" + "</color>");
 
-        foreach (var subRole in Main.PlayerStates[lp.PlayerId].SubRoles.ToArray())
-            Sub.Append($"\n\n" + $"<size={Asize}>" + Utils.GetRoleTitle(subRole) + Utils.GetInfoLong(subRole) + "</size>");
-
-        if (Sub.ToString() != string.Empty)
-        {
-            var ACleared = Sub.ToString().Remove(0, 2);
-            ACleared = ACleared.Length > 1200 ? $"<size={Asize}>" + ACleared.RemoveHtmlTags() + "</size>" : ACleared;
-            Sub.Clear().Append(ACleared);
-        }
-
         Utils.SendMessage(Des, lp.PlayerId, title, noReplay: true);
         Utils.SendMessage("", lp.PlayerId, Conf.ToString(), noReplay: true);
-        if (Sub.ToString() != string.Empty) Utils.SendMessage(Sub.ToString(), lp.PlayerId, SubTitle, noReplay: true);
+
+        var subRoles = Main.PlayerStates[lp.PlayerId].SubRoles.ToArray();
+        if (subRoles.Length == 0) return;
+
+        if (lp.IsHost() || !Main.CurrentServerIsVanilla)
+        {
+            var Sub = new StringBuilder();
+            foreach (var subRole in subRoles)
+                Sub.Append("\n\n" + $"<size={Asize}>" + Utils.GetRoleTitle(subRole) + Utils.GetInfoLong(subRole) + "</size>");
+
+            var ACleared = Sub.ToString().Remove(0, 2);
+            if (ACleared.Length > 1200)
+                ACleared = $"<size={Asize}>" + ACleared.RemoveHtmlTags() + "</size>";
+
+            Utils.SendMessage(ACleared, lp.PlayerId, SubTitle, noReplay: true);
+        }
+        else
+        {
+            var SubRolesPerMessage = 2;
+            for (var i = 0; i < subRoles.Length; i += SubRolesPerMessage)
+            {
+                var Sub = new StringBuilder();
+                var count = Math.Min(SubRolesPerMessage, subRoles.Length - i);
+
+                for (var j = 0; j < count; j++)
+                {
+                    var subRole = subRoles[i + j];
+                    Sub.Append((j == 0 ? "" : "\n\n") + $"<size={Asize}>" + Utils.GetRoleTitle(subRole) + Utils.GetInfoLong(subRole) + "</size>");
+                }
+
+                var body = Sub.ToString();
+                if (body.Length > 1200)
+                    body = $"<size={Asize}>" + body.RemoveHtmlTags() + "</size>";
+
+                Utils.SendMessage(body, lp.PlayerId, SubTitle, noReplay: true);
+            }
+        }
     }
 
     private static void MeCommand(PlayerControl player, string text, string[] args)
@@ -2503,8 +2528,6 @@ internal class ChatCommands
             Utils.SendMessage(GetString("Message.SetRoleHelp"), player.PlayerId);
             return;
         }
-
-        if (roleToSet.IsVanilla()) roleToSet = Oiiai.GetErasedRole(roleToSet.GetRoleTypesDirect(), CustomRoles.Logos);
 
         var targetPc = Utils.GetPlayerById(resultId);
         if (!targetPc) return;

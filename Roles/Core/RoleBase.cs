@@ -62,6 +62,11 @@ public abstract class RoleBase
         IsEnable = false;
 
         Main.UnShapeShifter.Remove(playerId);
+
+        if (IsDesyncRole)
+        {
+            Main.DesyncPlayerList.Remove(playerId);
+        }
     }
 
     /// <summary>
@@ -531,6 +536,7 @@ public abstract class RoleBase
         // Others custom roles settings
         DefaultKillCooldown,
         ReduceKillCooldown,
+        MaxKillCooldown,
         MinKillCooldown,
         KillAttackerWhenAbilityRemaining,
         SnatchesWin,

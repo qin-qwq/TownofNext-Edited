@@ -179,6 +179,8 @@ class EndGamePatch
             GameOptionsSender.AllSenders.Clear();
             GameOptionsSender.AllSenders.Add(new NormalGameOptionsSender());
             /* Send SyncSettings RPC */
+
+            Main.Instance.StartCoroutine(dbConnect.Init());
         }
     }
 }
