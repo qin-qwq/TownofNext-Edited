@@ -2863,7 +2863,7 @@
   "ExiledInnocentTargetAddBelow": "\nОглянувшись назад <color=#8f815e>Обвинитель</color> пересчитывает деньги в своих руках",
   "ExiledInnocentTargetInOneLine": "Изгнание {0} вызывает у вас дурное предчувствие \nЭто {1}, и оглянувшись назад <color=#8f815e>Обвинитель</color> пересчитывает деньги в своих руках",
   "ExiledDeath": "{0} был {1}!\nЧлены Экипажа спасены от <color=#ff174f>Армагеддона</color>!",
-  "ExiledNotDeath": "{0} был {1}.\nНо это не <color=#644661>Смерть</color>...\n<b><color=#ff174f>Смерть забрала души экипажа!</color></b>!",
+  "ExiledNotDeath": "{0} 是 {1}\n但它们不是<color=#644661>亡魂</color>...\n<b><color=#ff174f>亡魂夺走了船员的灵魂！</color></b>",
   "IsGood": "{0} был <color=#8cffff>Членом Экипажа</color>",
   "BelongTo": "{0} принадлежит {1}",
   "PlayerIsRole": "{0} был {1}",
