@@ -2863,7 +2863,7 @@
   "ExiledInnocentTargetAddBelow": "\nOlhando bem, o <color=#8f815e>Innocent</color> estava planejando isso",
   "ExiledInnocentTargetInOneLine": "{0} era o {1}.\nMas olhando bem, o <color=#8f815e>Innocent</color> estava planejando isso....\nGG!",
   "ExiledDeath": "{0} foi {1}! \nA Tripulação foi salva do <color=#ff174f>Armageddon</color>!",
-  "ExiledNotDeath": "{0} was the {1}.\nBut they were not <color=#644661>Death</color>...\n<b><color=#ff174f>Death has claimed the Souls of the Crew!</color></b>\nGG!",
+  "ExiledNotDeath": "{0} 是 {1}\n但它们不是<color=#644661>亡魂</color>...\n<b><color=#ff174f>亡魂夺走了船员的灵魂！</color></b>",
   "IsGood": "{0} was a <color=#8cffff>Crewmate</color>",
   "BelongTo": "{0} faz parte de {1}",
   "PlayerIsRole": "{0} era o {1}",
