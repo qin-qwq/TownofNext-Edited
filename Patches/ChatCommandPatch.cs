@@ -117,6 +117,7 @@ internal class ChatCommands
     private static readonly Dictionary<char, string> PollQuestions = [];
     private static readonly List<byte> PollVoted = [];
     private static Dictionary<int, int> TempCurrentOptions = [];
+    public static readonly Dictionary<byte, string> NotesContent = [];
     private static float Polltimer = 60f;
     private static string PollMSG = "";
     private static bool MapPoll;
@@ -154,7 +155,7 @@ internal class ChatCommands
             new("Up", "{role}", Command.UsageLevels.Up, Command.UsageTimes.InLobby, UpCommand, true, false, [GetString("CommandArgs.Up.Role")]),
             new("SetPlayers", "{number}", Command.UsageLevels.Host, Command.UsageTimes.InLobby, SetPlayersCommand, true, false, [GetString("CommandArgs.SetPlayers.Number")]),
             new("Help", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, HelpCommand, true, false),
-            new("Icons", "", Command.UsageLevels.Everyone, Command.UsageTimes.Always, IconsCommand, true, false),
+            new("Icons", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, IconsCommand, true, false, [GetString("CommandArgs.Icons.Id")]),
             new("SettingIcons", "", Command.UsageLevels.Host, Command.UsageTimes.Always, SettingIconsCommand, true, false),
             new("KCount", "", Command.UsageLevels.Everyone, Command.UsageTimes.InGame, KCountCommand, true, false),
             new("Vote", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InGame, VoteCommand, true, false, [GetString("CommandArgs.Vote.Id")]),
@@ -210,6 +211,7 @@ internal class ChatCommands
             new("SetRole", "{id} [role]", Command.UsageLevels.Up, Command.UsageTimes.InLobby, SetRoleCommand, true, false, [GetString("CommandArgs.SetRole.Id"), GetString("CommandArgs.SetRole.Role")]),
             new("MapPoll", "", Command.UsageLevels.Host, Command.UsageTimes.InLobby, MapPollCommand, true, false),
             new("Achievements", "[role]", Command.UsageLevels.Host, Command.UsageTimes.Always, AchievementsCommand, true, false, [GetString("CommandArgs.Achievements.Role")]),
+            new("Note", "", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, NoteCommand, true, false),
 
             new("Guess", "{id} {role}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]),
             new("Trial", "{id}", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, (_, _, _) => { }, true, false, [GetString("CommandArgs.Trial.Id")]),
@@ -919,6 +921,19 @@ internal class ChatCommands
 
     private static void IconsCommand(PlayerControl player, string text, string[] args)
     {
+        if (args.Length > 1 && byte.TryParse(args[1], out byte targetId))
+        {
+            var target = Utils.GetPlayerById(targetId);
+            if (!target)
+            {
+                Utils.SendMessage(GetString("Message.MeCommandInvalidID"), player.PlayerId, sendOption: SendOption.None);
+                return;
+            }
+
+            Utils.SendMessage(IconManager.GetIconInfoFor(player, target), player.PlayerId, GetString("IconsTitle"), ShouldSplit: true);
+            return;
+        }
+
         Utils.SendMessage(GetString("Command.icons"), player.PlayerId, GetString("IconsTitle"), ShouldSplit: true);
     }
 
@@ -2573,6 +2588,42 @@ internal class ChatCommands
     private static void AchievementsCommand(PlayerControl player, string text, string[] args)
     {
         AchievementManager.ShowAchievements(player.PlayerId, args.Length > 1 ? args[1] : null);
+    }
+
+    private static void NoteCommand(PlayerControl player, string text, string[] args)
+    {
+        if (NotesContent.TryGetValue(player.PlayerId, out var content))
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                Utils.SendMessage(GetString("Message.NotesContentEmpty"), player.PlayerId);
+            }
+            else
+            {
+                Utils.SendMessage(content, player.PlayerId, Utils.ColorString(Utils.GetRoleColor(player.GetCustomRole()), GetString("NotesContentTitle")));
+            }
+        }
+        else
+        {
+            Utils.SendMessage(GetString("Message.NotesContentEmpty"), player.PlayerId);
+        }
+    }
+
+    public static void AddNotesContent(PlayerControl player, string text)
+    {
+        if (!player) return;
+
+        if (NotesContent.TryGetValue(player.PlayerId, out var content))
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                NotesContent[player.PlayerId] = text;
+            }
+            else
+            {
+                NotesContent[player.PlayerId] = content + "\n" + text;
+            }
+        }
     }
 
     private static IEnumerator UploadCurrentPreset(PlayerControl player)

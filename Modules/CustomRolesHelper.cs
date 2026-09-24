@@ -70,7 +70,7 @@ public static class CustomRolesHelper
         if (role.IsImpostor() && NarcManager.IsNarcAssigned()) // When Narc is in a game,make all Impostor roles desync roles so imps will be able to kill each other
             return role.GetStaticRoleClass().ThisRoleBase.GetRoleTypes();
 
-        return (role.HasImpBasis(ForDesyncRole: false)) && !role.IsImpostor()
+        return role.HasImpBasis(ForDesyncRole: false) && !role.IsImpostor()
             ? role.GetStaticRoleClass().ThisRoleBase.GetRoleTypes()
             : RoleTypes.GuardianAngel;
     }

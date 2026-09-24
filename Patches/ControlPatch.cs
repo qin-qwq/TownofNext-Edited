@@ -160,6 +160,8 @@ internal class ControllerManagerUpdatePatch
             {
                 if (GameStates.IsHideNSeek) return;
 
+                if (!Main.IntroDestroyed) return;
+
                 if (GameStates.IsMeeting)
                 {
                     foreach (var pva in MeetingHud.Instance.playerStates)

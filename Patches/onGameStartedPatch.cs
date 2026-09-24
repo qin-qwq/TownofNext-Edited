@@ -117,6 +117,7 @@ internal class ChangeRoleSettings
             ShipStatusFixedUpdatePatch.CanUseClosestVent = [];
 
             ChatManager.ResetHistory();
+            ChatCommands.NotesContent.Clear();
             ReportDeadBodyPatch.CanReport.Clear();
             ReportDeadBodyPatch.PreventEAC = false;
             ReportDeadBodyPatch.BypassComms = false;
@@ -211,6 +212,7 @@ internal class ChangeRoleSettings
                 ReportDeadBodyPatch.WaitReport[pc.PlayerId] = [];
 
                 Main.PlayerStates[pc.PlayerId].IsBlackOut = false;
+                ChatCommands.NotesContent[pc.PlayerId] = string.Empty;
 
                 VentSystemDeterioratePatch.LastClosestVent[pc.PlayerId] = 99;
                 VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime[pc.PlayerId] = false;
@@ -542,19 +544,22 @@ internal class StartGameHostPatch
                 Logger.Warn($"Error after addons assign - error: {error}", "AddonAssign");
             }
 
+            var setCustomRoleSender = CustomRpcSender.Create("SetCustomRole Release Sender", SendOption.Reliable);
+
             // Sync for non-host modded clients by RPC
             foreach (var pair in Main.PlayerStates)
             {
-                var message = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, pair.Value.MainRole);
-                RpcUtils.SendMessageImmediately(message);
+                // Set roles
+                setCustomRoleSender.RpcSetCustomRole(pair.Key, pair.Value.MainRole);
 
                 // Set Add-ons
                 foreach (var subRole in pair.Value.SubRoles.ToArray())
                 {
-                    var message2 = new RpcSetCustomRole(PlayerControl.LocalPlayer.NetId, pair.Key, subRole);
-                    RpcUtils.SendMessageImmediately(message2);
+                    setCustomRoleSender.RpcSetCustomRole(pair.Key, subRole);
                 }
             }
+
+            setCustomRoleSender.SendMessage();
 
             GhostRoleAssign.Add();
 
@@ -640,8 +645,10 @@ internal class StartGameHostPatch
 
             if (!overriden && pc.Is(CustomRoles.GM)) continue;
 
-            var message = new RpcSetRoleMessage(pc.NetId, roleType, true);
-            RpcUtils.SendMessageImmediately(message, pc.GetClientId());
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(pc.NetId, (byte)RpcCalls.SetRole, SendOption.Reliable, pc.OwnerId);
+            writer.Write((ushort)roleType);
+            writer.Write(true);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
     }
 

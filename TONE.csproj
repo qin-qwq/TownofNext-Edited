@@ -24,6 +24,11 @@
 		<DefineConstants>TRACE;ANDROID</DefineConstants>
 	</PropertyGroup>
 
+	<PropertyGroup>
+	    <Deterministic>true</Deterministic>
+	    <PathMap>$(MSBuildProjectDirectory)=/</PathMap>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<EmbeddedResource Include=".\Resources\**" />
 		<EmbeddedResource Include="token.env" />

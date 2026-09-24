@@ -727,7 +727,7 @@ public static class GuessManager
     }
 
     public static TextMeshPro textTemplate;
-    public static void GuesserOnClick(byte playerId, MeetingHud __instance, bool nonGuess = false)
+    public static void GuesserOnClick(byte playerId, MeetingHud __instance, bool guess = true)
     {
         var pc = Utils.GetPlayerById(playerId);
         if (pc == null || !pc.IsAlive() || guesserUI != null || !GameStates.IsVoting) return;
@@ -791,34 +791,41 @@ public static class GuessManager
             int tabCount = 0;
             for (int TabId = 0; TabId < 5; TabId++)
             {
-                if (PlayerControl.LocalPlayer.Is(CustomRoles.EvilGuesser))
+                if (guess)
                 {
-                    if (EvilGuesser.HideTabInGuesserUI(TabId)) continue;
+                    if (PlayerControl.LocalPlayer.Is(CustomRoles.EvilGuesser))
+                    {
+                        if (EvilGuesser.HideTabInGuesserUI(TabId)) continue;
+                    }
+                    else if (PlayerControl.LocalPlayer.Is(CustomRoles.NiceGuesser))
+                    {
+                        if (NiceGuesser.HideTabInGuesserUI(TabId)) continue;
+                    }
+                    else if (PlayerControl.LocalPlayer.Is(CustomRoles.Doomsayer))
+                    {
+                        if (Doomsayer.HideTabInGuesserUI(TabId)) continue;
+                    }
+                    else if (PlayerControl.LocalPlayer.Is(CustomRoles.Guesser))
+                    {
+                        //if (!Options.GCanGuessCrew.GetBool() && TabId == 0) continue;
+                        //if (!Options.GCanGuessImp.GetBool() && TabId == 1) continue;
+                        if (!Guesser.GCanGuessAdt.GetBool() && TabId == 4) continue;
+                    }
+                    else if (Options.GuesserMode.GetBool() &&
+                        !(PlayerControl.LocalPlayer.Is(CustomRoles.EvilGuesser) ||
+                        PlayerControl.LocalPlayer.Is(CustomRoles.NiceGuesser) ||
+                        PlayerControl.LocalPlayer.Is(CustomRoles.Doomsayer) ||
+                        PlayerControl.LocalPlayer.Is(CustomRoles.Guesser)))
+                    {
+                        if (!Options.CrewCanGuessCrew.GetBool() && PlayerControl.LocalPlayer.Is(Custom_Team.Crewmate) && TabId == 0) continue;
+                        if (!Options.ImpCanGuessImp.GetBool() && PlayerControl.LocalPlayer.Is(Custom_Team.Impostor) && TabId == 1) continue;
+                        if (!Options.CovenCanGuessCoven.GetBool() && PlayerControl.LocalPlayer.Is(Custom_Team.Coven) && TabId == 3) continue;
+                        if (!Options.CanGuessAddons.GetBool() && TabId == 4) continue;
+                    }
                 }
-                else if (PlayerControl.LocalPlayer.Is(CustomRoles.NiceGuesser))
+                else
                 {
-                    if (NiceGuesser.HideTabInGuesserUI(TabId)) continue;
-                }
-                else if (PlayerControl.LocalPlayer.Is(CustomRoles.Doomsayer))
-                {
-                    if (Doomsayer.HideTabInGuesserUI(TabId)) continue;
-                }
-                else if (PlayerControl.LocalPlayer.Is(CustomRoles.Guesser))
-                {
-                    //if (!Options.GCanGuessCrew.GetBool() && TabId == 0) continue;
-                    //if (!Options.GCanGuessImp.GetBool() && TabId == 1) continue;
-                    if (!Guesser.GCanGuessAdt.GetBool() && TabId == 4) continue;
-                }
-                else if (Options.GuesserMode.GetBool() &&
-                    !(PlayerControl.LocalPlayer.Is(CustomRoles.EvilGuesser) ||
-                      PlayerControl.LocalPlayer.Is(CustomRoles.NiceGuesser) ||
-                      PlayerControl.LocalPlayer.Is(CustomRoles.Doomsayer) ||
-                      PlayerControl.LocalPlayer.Is(CustomRoles.Guesser)))
-                {
-                    if (!Options.CrewCanGuessCrew.GetBool() && PlayerControl.LocalPlayer.Is(Custom_Team.Crewmate) && TabId == 0) continue;
-                    if (!Options.ImpCanGuessImp.GetBool() && PlayerControl.LocalPlayer.Is(Custom_Team.Impostor) && TabId == 1) continue;
-                    if (!Options.CovenCanGuessCoven.GetBool() && PlayerControl.LocalPlayer.Is(Custom_Team.Coven) && TabId == 3) continue;
-                    if (!Options.CanGuessAddons.GetBool() && TabId == 4) continue;
+                    if (TabId == 4) continue;
                 }
 
                 Transform TeambuttonParent = new GameObject().transform;
@@ -1085,7 +1092,12 @@ public static class GuessManager
 
                         Logger.Msg($"Click: {pc.GetNameWithRole().RemoveHtmlTags()} => {role}", "Guesser UI");
 
-                        if (nonGuess)
+                        if (guess)
+                        {
+                            if (AmongUsClient.Instance.AmHost) GuesserMsg(PlayerControl.LocalPlayer, $"/bt {playerId} {GetString(role.ToString())}", true);
+                            else SendRPC(playerId, role);
+                        }
+                        else
                         {
                             if (AmongUsClient.Instance.AmHost) PlayerControl.LocalPlayer.GetRoleClass().OnClickAbilityButton(playerId, role);
                             else
@@ -1093,11 +1105,6 @@ public static class GuessManager
                                 var msg = new RpcClickAbilityButton(PlayerControl.LocalPlayer.NetId, playerId, (int)role);
                                 RpcUtils.LateBroadcastReliableMessage(msg);
                             }
-                        }
-                        else
-                        {
-                            if (AmongUsClient.Instance.AmHost) GuesserMsg(PlayerControl.LocalPlayer, $"/bt {playerId} {GetString(role.ToString())}", true);
-                            else SendRPC(playerId, role);
                         }
 
                         // Reset the GUI

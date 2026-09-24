@@ -2333,8 +2333,11 @@
   "Command.qq": "→ 让车队姬在群里发房号",
   "Command.dump": "→ 将游戏运行日志输出到桌面",
   "Command.death": "→ 显示你的死亡信息",
-  "Command.icons": "<size=60%><br><color=#ff1919>╳ </color>- 玩家被<color=#ff1919>勒索者</color>标记，会议期间无法发言。\n<color=#4682b4>☆</color> - 被<color=#4682b4>舰长</color>用来标记他们自己。只有船员阵营能看到<color=#4682b4>舰长</color>的星星。\n<color=#ff00ff>乂</color> - 该玩家被<color=#ff00ff>巫师</color>施邪咒，如果<color=#ff00ff>巫师</color>在会议结束前没有被击杀或驱逐，该玩家将死亡。\n♦ - 由<color=#008080>律师</color>、<color=#c0c0c0>刽子手</color>或<color=#ff9409>赌徒</color>使用。\n<color=#ff9ace>♡</color> - 由<color=#ff9ace>恋人</color>或<color=#ff1493>浪漫者</color>使用。\n<color=#00ff97>✚</color> - <color=#00ff97>医生</color>用来标记他们的目标。\\n<br><color=#edc240>⦿</color> - 该玩家与<color=#edc240>决斗者</color>正在进行决斗。\n<color=#8666bd>!?</color> - 该玩家被<color=#8666bd>测验长</color>标记，必须正确回答问题才能活下去。\n<color=#404040>☜</color> - 由<color=#404040>薛定谔的猫</color>用来标记他们的队友。\n<color=#6697ff>◈</color> - 该玩家被<color=#6697ff>裹尸布</color>标记，如果<color=#6697ff>裹尸布</color>在会议结束前没有被击杀或驱逐，该玩家将死亡。\n<color=#b8fb4f>⚠</color> - 该玩家是已完成任务的<color=#b8fb4f>告密者</color>或<color=#dee13d>至日者</color>。\n★ - 由<color=#f6f657>大明星</color>、<color=#f46f4e>网络员</color>或<color=#5573aa>展现者</color>使用。\n<color=#ff1919>†</color> - 该玩家被女巫咒杀，如果<color=#ff1919>女巫</color>在会议结束前没有被杀死，该玩家将死亡。\n<color=#ff1919>∇</color> - 由<color=#ff1919>神风特攻队</color>用来标记他们的目标。\n<color=#ff1919>■</color> - 由<color=#ff1919>球形闪电</color>用来量子轰炸。\n<color=#aa900d>⊠</color> - 由<color=#aa900d>狱卒</color>使用来标记被监禁的玩家。\n<color=#bf9f7a>●</color> - 由<color=#bf9f7a>面包师</color>使用来标记谁有面包。\n<color=#A675A1>♠</color> - 由<color=#A675A1>灵魂收集者</color>使用来标记他们正在预测谁的死亡。\n<color=#e5f6b4>⦿</color> - 由<color=#e5f6b4>瘟疫使者</color>使用来标记他们已经使谁染上了瘟疫。\n<color=#ac42f2>♣</color> - 标记持有死灵之书的<color=#ac42f2>巫术阵营</color>玩家。 仅展示给<color=#ac42f2>巫师阵营</color>玩家。\n<color=#ac42f2>⌘</color> - 玩家被扫把星诅咒了，与其交击杀互会暴毙。 仅展示给<color=#ac42f2>巫师阵营</color>玩家。\n<color=#ac42f2>ø</color> - 玩家被幻术师标记，若其为预言家等揭示类职业，其预言结果会逆转。 仅展示给<color=#ac42f2>巫师阵营</color>玩家。\n<color=#ac42f2>♻</color> - 玩家被美杜莎石化诅咒了。 仅展示给<color=#ac42f2>巫师阵营</color>玩家。\n<color=#ac42f2>✂</color> - 玩家被巫毒大师转化为巫毒娃娃。 仅展示给<color=#ac42f2>巫师阵营</color>玩家。\n<color=#677052>§</color> - 玩家被巫妖诅咒",
+  "Command.icons": "<size=60%>\n<color=#ff1919>╳ </color>- 玩家被<color=#ff1919>勒索者</color>标记，会议期间无法发言\n<color=#4682b4>☆</color> - 被<color=#4682b4>舰长</color>用来标记他们自己。只有船员阵营能看到<color=#4682b4>舰长</color>的星星\n<color=#ff00ff>乂</color> - 该玩家被<color=#ff00ff>巫师</color>施邪咒，如果<color=#ff00ff>巫师</color>在会议结束前没有被击杀或驱逐，该玩家将死亡\n♦ - 由<color=#008080>律师</color>、<color=#c0c0c0>刽子手</color>或<color=#ff9409>赌徒</color>使用\n<color=#ff9ace>♡</color> - 由<color=#ff9ace>恋人</color>或<color=#ff1493>浪漫者</color>使用\n<color=#00ff97>✚</color> - <color=#00ff97>医生</color>用来标记他们的目标\n<color=#edc240>⦿</color> - 该玩家与<color=#edc240>决斗者</color>正在进行决斗\n<color=#8666bd>!?</color> - 该玩家被<color=#8666bd>测验长</color>标记，必须正确回答问题才能活下去\n<color=#404040>☜</color> - 由<color=#404040>薛定谔的猫</color>用来标记他们的队友\n<color=#6697ff>◈</color> - 该玩家被<color=#6697ff>裹尸布</color>标记，如果<color=#6697ff>裹尸布</color>在会议结束前没有被击杀或驱逐，该玩家将死亡\n<color=#b8fb4f>⚠</color> - 该玩家是已完成任务的<color=#b8fb4f>告密者</color>或<color=#dee13d>至日者</color>\n★ - 由<color=#f6f657>大明星</color>、<color=#f46f4e>网络员</color>或<color=#5573aa>展现者</color>使用\n<color=#ff1919>†</color> - 该玩家被女巫咒杀，如果<color=#ff1919>女巫</color>在会议结束前没有被杀死，该玩家将死亡\n<color=#ff1919>∇</color> - 由<color=#ff1919>神风特攻队</color>用来标记他们的目标\n<color=#ff1919>■</color> - 由<color=#ff1919>球形闪电</color>用来量子轰炸\n<color=#aa900d>⊠</color> - 由<color=#aa900d>狱卒</color>使用来标记被监禁的玩家\n<color=#bf9f7a>●</color> - 由<color=#bf9f7a>面包师</color>使用来标记谁有面包\n<color=#A675A1>♠</color> - 由<color=#A675A1>灵魂收集者</color>使用来标记他们正在预测谁的死亡\n<color=#e5f6b4>⦿</color> - 由<color=#e5f6b4>瘟疫使者</color>使用来标记他们已经使谁染上了瘟疫\n<color=#ac42f2>♣</color> - 标记持有死灵之书的<color=#ac42f2>巫师阵营</color>玩家。 仅展示给<color=#ac42f2>巫师阵营</color>玩家\n<color=#ac42f2>⌘</color> - 玩家被扫把星诅咒了，与其交击杀互会暴毙。 仅展示给<color=#ac42f2>巫师阵营</color>玩家\n<color=#ac42f2>ø</color> - 玩家被幻术师标记，若其为预言家等揭示类职业，其预言结果会逆转。 仅展示给<color=#ac42f2>巫师阵营</color>玩家\n<color=#ac42f2>♻</color> - 玩家被美杜莎石化诅咒了。 仅展示给<color=#ac42f2>巫师阵营</color>玩家\n<color=#ac42f2>✂</color> - 玩家被巫毒大师转化为巫毒娃娃。 仅展示给<color=#ac42f2>巫师阵营</color>玩家\n<color=#677052>§</color> - 玩家被巫妖诅咒\n<color=#add8e6>☃</color> - 玩家被冰术师冰冻\n<color=#e5ff35>☆</color> - 玩家被公证人公证",
   "Command.start": "[Seconds] → 开始游戏",
+  "Command.iconsPlayer": "以下是你在<b>{0}</b>身上看到的图标",
+  "Command.iconsPlayerNone": "你未从该玩家身上看到任何图标",
+  "Command.iconsPlayerUnknown": "未知图标：{0}",
   "Command.iconinfo": "→ 显示会议中图标的信息",
   "Command.iconhelp": "→ 向每个人显示会议中图标的信息",
   "Command.Poll": "→ 发起投票，最多5个选项",
@@ -4625,6 +4628,7 @@
 
   "CommandForms.Icons": "icon,icons,iconhelp,符号,标志,符号帮助,标志帮助",
   "CommandDescription.Icons": "查看图标含义",
+  "CommandArgs.Icons.Id": "被指定玩家的编号（留空显示所有图标含义）",
 
   "CommandForms.SettingIcons": "sicon,sicons,settingicons,settingsicons,设置符号,设置标志",
   "CommandDescription.SettingIcons": "查看设置图标含义",
@@ -4840,6 +4844,9 @@
   "CommandDescription.Achievements": "查询成就",
   "CommandArgs.Achievements.Role": "查询的职业（留空为所有）",
 
+  "CommandForms.Note": "note",
+  "CommandDescription.Note": "查看笔记",
+
   "CommandForms.Guess": "bt,shoot,guess,bet,st,gs,猜,赌,賭",
   "CommandDescription.Guess": "猜测指定玩家的职业",
   "CommandArgs.Guess.Id": "被猜测玩家的编号",
@@ -5007,7 +5014,8 @@
   "NotarizeRevealingRole": "很抱歉，你不能公证一名职业很明显的玩家",
   "NotarizeFail": "你的公证失败了，这轮会议不能再进行公证了…",
   "NotarizeTarget": "公证人公证了<b>{0}</b>(<b>{1}</b>)！",
-  "GuessNotarize": "被公证的玩家才不会和你赌博，选个别的目标吧？",
+  "Message.NotesContentEmpty": "当前笔记内容为空！",
+  "NotesContentTitle": "笔记内容",
 
   "Achievement.Completed": "<#fad101>成就已解锁</color>",
   "Achievement.Incomplete": "<#ff0000>成就待解锁</color>",
