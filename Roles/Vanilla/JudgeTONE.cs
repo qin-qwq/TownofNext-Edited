@@ -1,4 +1,5 @@
 using AmongUs.GameOptions;
+using TONE.Modules;
 
 namespace TONE.Roles.Vanilla;
 
@@ -25,6 +26,11 @@ internal class JudgeTONE : RoleBase
     public override void Init()
     {
         playerIdList.Clear();
+    }
+
+    public override void Add(byte playerId)
+    {
+        playerId.SetAbilityUseLimit(1);
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)

@@ -28,7 +28,7 @@ internal class Executioner : RoleBase
     private static OptionItem RevealExeTargetUponEjection;
 
     public static HashSet<byte> TargetList = [];
-    private byte TargetId;
+    private byte TargetId = byte.MaxValue;
 
     public static readonly CustomRoles[] CRoleChangeRoles =
     [

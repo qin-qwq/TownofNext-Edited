@@ -111,6 +111,8 @@ internal class CopyCat : RoleBase
 
     private static bool BlackList(CustomRoles role)
     {
+        if (role.IsGhostRole()) return true;
+
         return role is CustomRoles.CopyCat or
             CustomRoles.Doomsayer or // CopyCat cannot guessed roles because he can be know others roles players
             CustomRoles.EvilGuesser or

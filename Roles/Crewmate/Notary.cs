@@ -58,6 +58,7 @@ internal class Notary : RoleBase
         if (!_Player) return;
 
         NotarizeLimitMeeting[_Player.PlayerId] = NotarizeLimitPerMeeting.GetInt();
+        SendRPC(byte.MaxValue);
     }
 
     public override bool RoleCommand(PlayerControl pc, string msg, bool isUI = false)

@@ -487,6 +487,7 @@ class CheckForEndVotingPatch
                 tie = false;
                 overruleNonce = winningOverrule.OverruleNonce;
                 exiledPlayer = overruledInfo.Object.IsPlayerCrewmateTeam() || overruledInfo.Object.Is(CustomRoles.Trickster) ? judgeInfo : overruledInfo;
+                if (judgeInfo.Object) judgeInfo.Object.RpcRemoveAbilityUse();
                 if (!judgeInfo.IsHost()) JudgeTONE.playerIdList.Add(judgeInfo.PlayerId);
                 Logger.Info($"The Judge has spoken! Exiled: {exiledPlayer.PlayerId}", "Judge");
             }
@@ -983,12 +984,6 @@ class SetJudgeOverrulePatch
             __instance.RpcClearVoteDelay(srcPlayerId);
             return false;
         }
-        if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && TasksRemaining(voter) != 0)
-        {
-            SendMessage(DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.JudgeAbilityProgress, TasksRemaining(voter)), srcPlayerId, ColorString(GetRoleColor(CustomRoles.JudgeTONE), GetString("JudgeTONE").ToUpper()), noReplay: true);
-            __instance.RpcClearVoteDelay(srcPlayerId);
-            return false;
-        }
         if (Options.UseMeetingAbilityMethod.GetValue() == 2 && voter.Is(CustomRoles.JudgeTONE) && ReportDeadBodyPatch.BypassComms)
         {
             SendMessage(GetString("JudgeAffectedByComms"), srcPlayerId, ColorString(GetRoleColor(CustomRoles.JudgeTONE), GetString("JudgeTONE").ToUpper()), noReplay: true);
@@ -1043,14 +1038,6 @@ class SetJudgeOverrulePatch
             __instance.CheckForEndVoting();
             //For stuffs in check for end voting to work
         }
-    }
-
-    public static int TasksRemaining(PlayerControl voter)
-    {
-        var initialTaskCount = voter.GetPlayerTaskState().AllTasksCount;
-        var num = voter.GetPlayerTaskState().CompletedTasksCount;
-        var taskRequirementProportion = JudgeTONE.JudgeTaskRequirementPercentage.GetInt() / 100f;
-        return Mathf.Clamp(Mathf.CeilToInt(taskRequirementProportion * initialTaskCount) - num, 0, 999);
     }
 }
 static class ExtendedMeetingHud

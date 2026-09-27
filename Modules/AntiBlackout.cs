@@ -326,7 +326,7 @@ public static class AntiBlackout
             var seer = seerId.GetPlayer();
             var target = targetId.GetPlayer();
 
-            if (seer == null || target == null) continue;
+            if (!seer || !target) continue;
 
             var isSelf = seerId == targetId;
             var isDead = target.Data.IsDead;
@@ -396,6 +396,7 @@ public static class AntiBlackout
             {
                 if (pc.GetRoleClass().ThisRoleBase.GetRoleTypesDirect() is RoleTypes.Impostor or RoleTypes.Shapeshifter or RoleTypes.Phantom or RoleTypes.Viper)
                 {
+                    pc.ResetKillCooldown();
                     if (Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var killTimer) && killTimer > 0f)
                     {
                         pc.SetKillCooldown(killTimer);

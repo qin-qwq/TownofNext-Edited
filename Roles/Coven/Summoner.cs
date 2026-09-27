@@ -683,7 +683,7 @@ internal class Summoned : RoleBase
             var player = Main.EnumeratePlayerControls().FirstOrDefault(p => p.PlayerId == playerId);
             if (player != null)
             {
-                player.Notify(ColorString(GetRoleColor(CustomRoles.Summoned), $"Time Remaining: {timeRemaining}s"));
+                player.Notify(ColorString(GetRoleColor(CustomRoles.Summoned), $"Time Remaining: {timeRemaining}s"), 5, false, true);
             }
         }
     }

@@ -270,10 +270,13 @@ public class TZombie : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        player.SetColor(2);
+        if (AmongUsClient.Instance.AmHost)
+        {
+            player.SetColor(2);
 
-        var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 2);
-        RpcUtils.LateBroadcastReliableMessage(message);
+            var message = new RpcSetColorMessage(player.NetId, player.Data.NetId, 2);
+            RpcUtils.LateBroadcastReliableMessage(message);
+        }
     }
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
@@ -389,7 +392,7 @@ public class TCrewmate : RoleBase
     public override void Add(byte playerId)
     {
         var player = GetPlayerById(playerId);
-        if (player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2)
+        if (AmongUsClient.Instance.AmHost && player.Data.Outfits[PlayerOutfitType.Default].ColorId == 2)
         {
             player.SetColor(13);
 

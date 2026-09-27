@@ -32,7 +32,7 @@ internal class Lawyer : RoleBase
     private static OptionItem HasImpostorVision;
 
     public static HashSet<byte> TargetList = [];
-    private byte TargetId;
+    private byte TargetId = byte.MaxValue;
 
     public static readonly List<string> ChangeRoles = new List<string>();
     public static readonly CustomRoles[] CRoleChangeRoles =

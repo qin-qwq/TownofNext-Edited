@@ -864,7 +864,7 @@ public static class Utils
             sb.Clear().Append(text.RemoveHtmlTags());
         }
 
-        SendMessage(sb.ToString(), PlayerId);
+        SendMessage(sb.ToString(), PlayerId, ShouldSplit: true);
     }
 
     public static void ShowAllActiveSettings(byte PlayerId = byte.MaxValue)
@@ -2823,6 +2823,7 @@ public static class Utils
             {
                 if (!playerState.Player) continue;
                 if (playerState.RoleClass == null) continue;
+                if (!playerState.RoleClass._Player) continue;
                 if (Balancer.Choose2)
                 {
                     Balancer.BalancerAfterMeetingTasks();

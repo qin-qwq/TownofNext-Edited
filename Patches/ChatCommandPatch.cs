@@ -405,7 +405,7 @@ internal class ChatCommands
 
         if ((TranslationController.InstanceExists ? TranslationController.Instance.currentLanguage.languageID : SupportedLangs.SChinese) == SupportedLangs.SChinese)
         {
-            Regex r = new("[\u4e00-\u9fa5]+$");
+            Regex r = new(@"[\u4e00-\u9fa5A-Za-z0-9]+$");
             MatchCollection mc = r.Matches(name);
             string result = string.Empty;
             for (int i = 0; i < mc.Count; i++)
