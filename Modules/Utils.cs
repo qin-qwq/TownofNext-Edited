@@ -264,6 +264,7 @@ public static class Utils
 
         _ = new LateTask(() =>
         {
+            if (TimeAssassin.TimeStop) return;
             Main.PlayerStates[player.PlayerId].IsBlackOut = false; //Remove black out for player
             player.MarkDirtySettings();
         }, Options.KillFlashDuration.GetFloat(), "Remove Kill Flash");

@@ -18,7 +18,7 @@ internal class CopsAndRobbers : GameModeBase
 {
     public override CustomGameMode GameMode => CustomGameMode.CopsAndRobbers;
     public const int Id = 67_230_001;
-    public override bool OpeningHours => Main.IsSummer;
+    public override bool OpeningHours => false;
 
     public static OptionItem GameTime;
     public static OptionItem ShowChatInGame;

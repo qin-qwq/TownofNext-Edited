@@ -48,9 +48,9 @@ public static class Options
             2 => CustomGameMode.SpeedRun,
             3 => CustomGameMode.TagMode,
             4 => CustomGameMode.RoundUp,
-            5 => CustomGameMode.CopsAndRobbers,
+            //5 => CustomGameMode.CopsAndRobbers,
             //5 => CustomGameMode.BonfireNight,
-            6 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
+            5 => CustomGameMode.HidenSeekTONE, // HidenSeekTONE must be after other game modes
             _ => CustomGameMode.Standard
         };
     public static int prevGameMode = 0;
