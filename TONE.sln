@@ -7,26 +7,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TONE", "TONE.csproj", "{566
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Beta|Android = Beta|Android
 		Beta|Windows = Beta|Windows
-		Debug|Android = Debug|Android
+		Beta|Android = Beta|Android
 		Debug|Windows = Debug|Windows
-		Release|Android = Release|Android
+		Debug|Android = Debug|Android
 		Release|Windows = Release|Windows
+		Release|Android = Release|Android
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Android.ActiveCfg = Beta|Android
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Android.Build.0 = Beta|Android
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Windows.ActiveCfg = Beta|Windows
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Windows.Build.0 = Beta|Windows
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Android.ActiveCfg = Debug|Android
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Android.Build.0 = Debug|Android
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Android.ActiveCfg = Beta|Android
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Beta|Android.Build.0 = Beta|Android
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Windows.ActiveCfg = Debug|Windows
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Windows.Build.0 = Debug|Windows
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Release|Android.ActiveCfg = Release|Android
-		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Release|Android.Build.0 = Release|Android
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Android.ActiveCfg = Debug|Android
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Debug|Android.Build.0 = Debug|Android
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Release|Windows.ActiveCfg = Release|Windows
 		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Release|Windows.Build.0 = Release|Windows
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Release|Android.ActiveCfg = Release|Android
+		{5662C988-912C-3D07-8454-0C0AC7960BFC}.Release|Android.Build.0 = Release|Android
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

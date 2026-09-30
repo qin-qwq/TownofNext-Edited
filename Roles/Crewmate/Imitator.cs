@@ -111,13 +111,15 @@ internal class Imitator : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("Imitator.AlreadyImitate"), ColorString(GetRoleColor(CustomRoles.Imitator), GetString("Imitator").ToUpper()));
                     return true;
                 }
-                if (!target.GetCustomRole().IsCrewmate() || target.Is(CustomRoles.GM))
+                var role = target.GetCustomRole();
+                if (role.IsGhostRole()) role = target.GetRoleMap().CustomRole;
+                if (!role.IsCrewmate() || role == CustomRoles.GM)
                 {
                     pc.ShowInfoMessage(isUI, GetString("Imitator.CantImitateNonCrewmate"), ColorString(GetRoleColor(CustomRoles.Imitator), GetString("Imitator").ToUpper()));
                     return true;
                 }
 
-                ImitateRole[pc.PlayerId] = target.GetCustomRole();
+                ImitateRole[pc.PlayerId] = role;
                 pc.ShowInfoMessage(isUI, string.Format(GetString("Imitator.ImitateTarget"), ColorString(targetId.GetPlayerColor(), target.GetRealName())), ColorString(GetRoleColor(CustomRoles.Imitator), GetString("Imitator").ToUpper()));
 
                 Logger.Info($"{pc.GetNameWithRole()} Imitate {target.GetNameWithRole()}", "Imitator");

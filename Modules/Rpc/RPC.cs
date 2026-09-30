@@ -22,7 +22,7 @@ namespace TONE;
 public enum CustomRPC : byte // 177/255 USED
 {
     // RpcCalls can increase with each AU version
-    // On version 2026.8.18 the last id in RpcCalls: 66
+    // On version 2026.9.29 the last id in RpcCalls: 67
 
     // Adding Role rpcs that overrides TONE section and changing BetterCheck will be rejected
     // Sync Role Skill can be used under most cases so you should not make a new rpc unless it's necessary

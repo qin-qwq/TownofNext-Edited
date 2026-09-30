@@ -1746,23 +1746,15 @@ class FixedUpdateInNormalGamePatch
         }
     }
 }
-[HarmonyPatch]
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Start))]
 class PlayerStartPatch
 {
-    public static MethodBase TargetMethod()
+    public static void Postfix(PlayerControl __instance)
     {
-        return Utils.GetStateMachineMoveNext<PlayerControl>(nameof(PlayerControl._Start_d__82));
-    }
-
-    public static void Postfix(PlayerControl._Start_d__82 __instance, ref bool __result)
-    {
-        if (__result) return;
-        var instance = __instance.__4__this;
-
         if (GameStates.IsHideNSeek) return;
 
-        var roleText = Object.Instantiate(instance.cosmetics.nameText);
-        roleText.transform.SetParent(instance.cosmetics.nameText.transform);
+        var roleText = Object.Instantiate(__instance.cosmetics.nameText);
+        roleText.transform.SetParent(__instance.cosmetics.nameText.transform);
         roleText.fontMaterial.SetFloat("_StencilComp", 7f);
         roleText.fontMaterial.SetFloat("_Stencil", 2f);
         roleText.transform.localPosition = new Vector3(0f, 0.2f, 0f);
@@ -2341,7 +2333,7 @@ class PlayerControlSetRolePatch
 
                 if (target.HasGhostRole())
                 {
-                    GhostRoles[seer] = RoleTypes.GuardianAngel;
+                    GhostRoles[seer] = target.GetCustomRole().GetRoleTypes();
                 }
                 else if ((self && targetIsKiller) || (!seerIsKiller && target.Is(Custom_Team.Impostor)))
                 {
@@ -2351,6 +2343,19 @@ class PlayerControlSetRolePatch
                 {
                     GhostRoles[seer] = RoleTypes.CrewmateGhost;
                 }
+            }
+            // If all players see player as Influencer
+            if (GhostRoles.All(kvp => kvp.Value == RoleTypes.SpiritGuide))
+            {
+                roleType = RoleTypes.SpiritGuide;
+                __instance.RpcSetRoleDesync(RoleTypes.SpiritGuide, __instance.GetClientId());
+                foreach (var seer in Main.EnumeratePlayerControls())
+                {
+                    if (seer.PlayerId == __instance.PlayerId) continue;
+                    __instance.RpcSetRoleDesync(RoleTypes.CrewmateGhost, seer.GetClientId());
+                }
+                GhostRoleAssign.CreateGAMessage(__instance);
+                return false;
             }
             // If all players see player as Guardian Angel
             if (GhostRoles.All(kvp => kvp.Value == RoleTypes.GuardianAngel))
@@ -2431,6 +2436,7 @@ class PlayerControlLocalSetRolePatch
                 RoleTypes.Detective => CustomRoles.DetectiveTONE,
                 RoleTypes.Viper => CustomRoles.ViperTONE,
                 RoleTypes.Judge => CustomRoles.JudgeTONE,
+                RoleTypes.SpiritGuide => CustomRoles.InfluencerTONE,
                 _ => CustomRoles.NotAssigned,
             };
             if (modRole != CustomRoles.NotAssigned)

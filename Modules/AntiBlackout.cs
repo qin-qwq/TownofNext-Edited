@@ -338,7 +338,7 @@ public static class AntiBlackout
                 {
                     selfExiled.Add(seer);
 
-                    if (target.HasGhostRole()) changedRoleType = RoleTypes.GuardianAngel;
+                    if (target.HasGhostRole()) changedRoleType = target.GetCustomRole().GetRoleTypes();
                     else if (target.Is(Custom_Team.Impostor) || target.HasDesyncRole()) changedRoleType = RoleTypes.ImpostorGhost;
                     else changedRoleType = RoleTypes.CrewmateGhost;
                 }

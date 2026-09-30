@@ -55,12 +55,12 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.09.27";
+    public const string PluginVersion = "26.09.30";
     public const string PluginDisplayVersion = "2.1.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
         [
-            (2026, 8, 18, 0) // 2026.8.18 & 18.0.0
+            (2026, 9, 29, 0) // 2026.9.29 & 19
         ];
 
     // Change this to change alpha/beta/full release
@@ -105,8 +105,8 @@ public class Main : BasePlugin
     public static string credentialsText;
     public Coroutines coroutines;
     public Dispatcher dispatcher;
-    public static NormalGameOptionsV11 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-    public static HideNSeekGameOptionsV11 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+    public static NormalGameOptionsV12 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+    public static HideNSeekGameOptionsV12 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
     //Client Options
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
@@ -778,9 +778,9 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalGameOptionsV11.RecommendedImpostors = NormalGameOptionsV11.MaxImpostors = Enumerable.Repeat(1, 128).ToArray();
-        NormalGameOptionsV11.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
-        HideNSeekGameOptionsV11.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        NormalGameOptionsV12.RecommendedImpostors = NormalGameOptionsV12.MaxImpostors = Enumerable.Repeat(1, 128).ToArray();
+        NormalGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        HideNSeekGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -814,6 +814,7 @@ public enum CustomRoles
     Tracker,
     Detective,
     Judge,
+    Influencer,
 
     // Impostor(Vanilla)
     Impostor,
@@ -830,6 +831,7 @@ public enum CustomRoles
     TrackerTONE,
     DetectiveTONE,
     JudgeTONE,
+    InfluencerTONE,
 
     // Impostor Vanilla Remakes
     ImpostorTONE,

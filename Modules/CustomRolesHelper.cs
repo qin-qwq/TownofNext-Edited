@@ -60,6 +60,7 @@ public static class CustomRolesHelper
             CustomRoles.DetectiveTONE => CustomRoles.Detective,
             CustomRoles.ViperTONE => CustomRoles.Viper,
             CustomRoles.JudgeTONE => CustomRoles.Judge,
+            CustomRoles.InfluencerTONE => CustomRoles.Influencer,
             _ => role.IsImpostor() ? CustomRoles.Impostor : CustomRoles.Crewmate,
         };
     }
@@ -1386,6 +1387,7 @@ public static class CustomRolesHelper
             CustomRoles.Detective => RoleTypes.Detective,
             CustomRoles.Viper => RoleTypes.Viper,
             CustomRoles.Judge => RoleTypes.Judge,
+            CustomRoles.Influencer => RoleTypes.SpiritGuide,
             _ => role.IsImpostor() ? RoleTypes.Impostor : RoleTypes.Crewmate,
         };
 
@@ -1405,6 +1407,7 @@ public static class CustomRolesHelper
             CustomRoles.Detective => RoleTypes.Detective,
             CustomRoles.Viper => RoleTypes.Viper,
             CustomRoles.Judge => RoleTypes.Judge,
+            CustomRoles.Influencer => RoleTypes.SpiritGuide,
             _ => role.IsImpostor() ? RoleTypes.Impostor : RoleTypes.Crewmate,
         };
     }
@@ -1451,7 +1454,8 @@ public static class CustomRolesHelper
             CustomRoles.Tracker or
             CustomRoles.Detective or
             CustomRoles.Viper or
-            CustomRoles.Judge;
+            CustomRoles.Judge or
+            CustomRoles.Influencer;
     }
     public static Custom_Team GetCustomRoleTeam(this CustomRoles role)
     {
@@ -1486,6 +1490,7 @@ public static class CustomRolesHelper
                 CustomRoles.Detective => roleOpt.GetNumPerGame(RoleTypes.Detective),
                 CustomRoles.Viper => roleOpt.GetNumPerGame(RoleTypes.Viper),
                 CustomRoles.Judge => roleOpt.GetNumPerGame(RoleTypes.Judge),
+                CustomRoles.Influencer => roleOpt.GetNumPerGame(RoleTypes.SpiritGuide),
                 _ => 0
             };
         }
@@ -1513,6 +1518,7 @@ public static class CustomRolesHelper
                 CustomRoles.Detective => roleOpt.GetChancePerGame(RoleTypes.Detective),
                 CustomRoles.Viper => roleOpt.GetChancePerGame(RoleTypes.Viper),
                 CustomRoles.Judge => roleOpt.GetChancePerGame(RoleTypes.Judge),
+                CustomRoles.Influencer => roleOpt.GetChancePerGame(RoleTypes.SpiritGuide),
                 _ => 0
             } / 100f;
         }
