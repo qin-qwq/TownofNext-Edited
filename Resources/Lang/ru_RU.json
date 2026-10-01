@@ -4768,7 +4768,7 @@
   "CommandForms.Achievements": "ach,achievement,achievements,ачивки",
   "CommandDescription.Achievements": "Просмотреть достижения",
   "CommandArgs.Achievements.Role": "Поиск ролей (оставьте пустым для поиска всех)",
-  "CommandForms.Note": "заметка",
+  "CommandForms.Note": "note",
   "CommandDescription.Note": "Просмотреть заметки",
   "CommandForms.Guess": "bt,shoot,guess,bet,st,gs,猜,赌,賭,бт",
   "CommandDescription.Guess": "Угадать роль указанного игрока",
