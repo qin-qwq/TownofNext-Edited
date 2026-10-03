@@ -69,7 +69,7 @@ public static class Options
     public static Dictionary<CustomRoles, StringOptionItem> CustomRoleSpawnChances;
     public static Dictionary<CustomRoles, IntegerOptionItem> CustomAdtRoleSpawnRate;
 
-    public static readonly Dictionary<CustomRoles, (OptionItem Imp, OptionItem Neutral, OptionItem Crew, OptionItem Coven)> AddonCanBeSettings = [];
+    public static readonly Dictionary<CustomRoles, (OptionItem Imp, OptionItem Neutral, OptionItem Crew, OptionItem Coven)> AddonTeamMaximumSettings = [];
     [Obfuscation(Exclude = true)]
     public enum SpawnChance
     {
@@ -380,7 +380,7 @@ public static class Options
     // Disable
     public static OptionItem DisableShieldAnimations;
     public static OptionItem DisableKillAnimationOnGuess;
-    public static OptionItem DisableVanillaRoles;
+    //public static OptionItem DisableVanillaRoles;
     public static OptionItem DisableTaskWin;
     public static OptionItem DisableTaskWinIfAllCrewsAreDead;
     public static OptionItem DisableTaskWinIfAllCrewsAreConverted;
@@ -1759,9 +1759,9 @@ public static class Options
         DisableKillAnimationOnGuess = BooleanOptionItem.Create(60561, "DisableKillAnimationOnGuess", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 153, 153, byte.MaxValue));
-        DisableVanillaRoles = BooleanOptionItem.Create(60562, "DisableVanillaRoles", true, TabGroup.ModSettings, false)
+        /*DisableVanillaRoles = BooleanOptionItem.Create(60562, "DisableVanillaRoles", true, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
-            .SetColor(new Color32(255, 153, 153, byte.MaxValue));
+            .SetColor(new Color32(255, 153, 153, byte.MaxValue));*/
         DisableTaskWin = BooleanOptionItem.Create(60563, "DisableTaskWin", false, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetColor(new Color32(255, 153, 153, byte.MaxValue));
@@ -2309,27 +2309,31 @@ public static class Options
 
         if (teamSpawnOptions)
         {
-            var impOption = BooleanOptionItem.Create(id + 3, "ImpCanBeRole", true, tab, false)
+            var impOption = IntegerOptionItem.Create(id + 3, "ImpMaximumRole", new(0, 15, 1), 3, tab, false)
                 .SetParent(spawnOption)
+                .SetValueFormat(OptionFormat.Players)
                 .SetGameMode(customGameMode)
                 .AddReplacement(("{role}", role.ToColoredString()));
 
-            var neutralOption = BooleanOptionItem.Create(id + 4, "NeutralCanBeRole", true, tab, false)
+            var neutralOption = IntegerOptionItem.Create(id + 4, "NeutralMaximumRole", new(0, 15, 1), 15, tab, false)
                 .SetParent(spawnOption)
+                .SetValueFormat(OptionFormat.Players)
                 .SetGameMode(customGameMode)
                 .AddReplacement(("{role}", role.ToColoredString()));
 
-            var crewOption = BooleanOptionItem.Create(id + 5, "CrewCanBeRole", true, tab, false)
+            var crewOption = IntegerOptionItem.Create(id + 5, "CrewMaximumRole", new(0, 15, 1), 15, tab, false)
                 .SetParent(spawnOption)
+                .SetValueFormat(OptionFormat.Players)
                 .SetGameMode(customGameMode)
                 .AddReplacement(("{role}", role.ToColoredString()));
 
-            var covenOption = BooleanOptionItem.Create(id + 6, "CovenCanBeRole", true, tab, false)
+            var covenOption = IntegerOptionItem.Create(id + 6, "CovenMaximumRole", new(0, 15, 1), 15, tab, false)
                 .SetParent(spawnOption)
+                .SetValueFormat(OptionFormat.Players)
                 .SetGameMode(customGameMode)
                 .AddReplacement(("{role}", role.ToColoredString()));
 
-            AddonCanBeSettings.Add(role, (impOption, neutralOption, crewOption, covenOption));
+            AddonTeamMaximumSettings.Add(role, (impOption, neutralOption, crewOption, covenOption));
         }
 
 

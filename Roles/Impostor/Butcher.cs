@@ -1,5 +1,6 @@
 using TONE.Modules;
 using TONE.Roles.Core;
+using TONE.Roles.Crewmate;
 using UnityEngine;
 using static TONE.Options;
 
@@ -73,6 +74,7 @@ internal class Butcher : RoleBase
             for (int i = 0; i <= 19; i++)
             {
                 if (GameStates.IsMeeting) break;
+                if (TimeMaster.Rewinding) break;
                 if (!target.IsHost())
                 {
                     target.MurderPlayer(target, ExtendedPlayerControl.ResultFlags);

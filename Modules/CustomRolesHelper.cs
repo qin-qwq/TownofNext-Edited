@@ -511,7 +511,7 @@ public static class CustomRolesHelper
 
         if (checkConditions)
         {
-            if (Options.AddonCanBeSettings.TryGetValue(role, out var o) && ((!o.Imp.GetBool() && pc.GetCustomRole().IsImpostor()) || (!o.Neutral.GetBool() && pc.GetCustomRole().IsNeutral()) || (!o.Crew.GetBool() && pc.GetCustomRole().IsCrewmate()) || (!o.Coven.GetBool() && pc.GetCustomRole().IsCoven())))
+            if (Options.AddonTeamMaximumSettings.TryGetValue(role, out var o) && ((o.Imp.GetInt() == 0 && pc.GetCustomRole().IsImpostor()) || (o.Neutral.GetInt() == 0 && pc.GetCustomRole().IsNeutral()) || (o.Crew.GetInt() == 0 && pc.GetCustomRole().IsCrewmate()) || (o.Coven.GetInt() == 0 && pc.GetCustomRole().IsCoven())))
                 return false;
 
             // if player already has this addon
@@ -592,8 +592,6 @@ public static class CustomRolesHelper
                     || (pc.Is(CustomRoles.Solsticer) && !Solsticer.SolsticerCanGuess.GetBool())
                     || (pc.Is(CustomRoles.God) && !God.CanGuess.GetBool()))
                     return false; //Based on guess manager
-                if ((pc.GetCustomRole().IsCrewmate() && !Guesser.CrewCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsNeutral() && !Guesser.NeutralCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsImpostor() && !Guesser.ImpCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsCoven() && !Guesser.CovenCanBeGuesser.GetBool()))
-                    return false;
                 if (pc.GetCustomRole().IsInvestigativeRole() && Options.InvestigativeRoleCantGuess.GetBool())
                     return false;
                 break;
@@ -676,17 +674,15 @@ public static class CustomRolesHelper
                     return false;
                 if (Options.GuesserMode.GetBool())
                 {
-                    if (DoubleShot.ImpCanBeDoubleShot.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.EvilGuesser) && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !Options.ImpostorsCanGuess.GetBool())
+                    if (!pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.EvilGuesser) && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !Options.ImpostorsCanGuess.GetBool())
                         return false;
-                    if (DoubleShot.CrewCanBeDoubleShot.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.NiceGuesser) && (pc.Is(Custom_Team.Crewmate) && !Options.CrewmatesCanGuess.GetBool()))
+                    if (!pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.NiceGuesser) && (pc.Is(Custom_Team.Crewmate) && !Options.CrewmatesCanGuess.GetBool()))
                         return false;
-                    if (DoubleShot.NeutralCanBeDoubleShot.GetBool() && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Doomsayer) && ((pc.GetCustomRole().IsNonNK() && !Options.PassiveNeutralsCanGuess.GetBool()) || (pc.GetCustomRole().IsNK() && !Options.NeutralKillersCanGuess.GetBool()) || (pc.GetCustomRole().IsNA() && !Options.NeutralApocalypseCanGuess.GetBool())))
+                    if (!pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Doomsayer) && ((pc.GetCustomRole().IsNonNK() && !Options.PassiveNeutralsCanGuess.GetBool()) || (pc.GetCustomRole().IsNK() && !Options.NeutralKillersCanGuess.GetBool()) || (pc.GetCustomRole().IsNA() && !Options.NeutralApocalypseCanGuess.GetBool())))
                         return false;
-                    if (DoubleShot.CovenCanBeDoubleShot.GetBool() && !pc.Is(CustomRoles.Guesser) && (pc.Is(Custom_Team.Coven) && !Options.CovenCanGuess.GetBool()))
+                    if (!pc.Is(CustomRoles.Guesser) && (pc.Is(Custom_Team.Coven) && !Options.CovenCanGuess.GetBool()))
                         return false;
                 }
-                if ((pc.Is(Custom_Team.Impostor) && !DoubleShot.ImpCanBeDoubleShot.GetBool()) || (pc.Is(Custom_Team.Crewmate) && !DoubleShot.CrewCanBeDoubleShot.GetBool()) || (pc.Is(Custom_Team.Neutral) && !DoubleShot.NeutralCanBeDoubleShot.GetBool()) || (pc.Is(Custom_Team.Coven) && !DoubleShot.CovenCanBeDoubleShot.GetBool()))
-                    return false;
                 break;
 
             case CustomRoles.Cyber:
@@ -1280,6 +1276,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.CopyCat)
                 )
                     return false;
+                if ((pc.Is(Custom_Team.Impostor) && !Lovers.ImpCanBeInLove.GetBool()) || (pc.Is(Custom_Team.Crewmate) && !Lovers.CrewCanBeInLove.GetBool()) || (pc.Is(Custom_Team.Neutral) && !Lovers.NeutralCanBeInLove.GetBool()) || (pc.Is(Custom_Team.Coven) && !Lovers.CovenCanBeInLove.GetBool()))
+                    return false;
                 break;
 
             case CustomRoles.Rat:
@@ -1365,7 +1363,9 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Lovers)
                     || pc.Is(CustomRoles.Balancer)
                     || pc.Is(CustomRoles.Admirer)
-                    || pc.Is(CustomRoles.JudgeTONE))
+                    || pc.Is(CustomRoles.JudgeTONE)
+                    || pc.Is(CustomRoles.Mercenary)
+                    || pc.Is(CustomRoles.Mayor))
                     return false;
                 break;
         }
@@ -1473,31 +1473,7 @@ public static class CustomRolesHelper
     public static bool RoleExist(this CustomRoles role, bool countDead = false) => Main.EnumeratePlayerControls().Any(x => x.Is(role) && (x.IsAlive() || countDead));
     public static int GetCount(this CustomRoles role)
     {
-        if (role.IsVanilla())
-        {
-            if (Options.DisableVanillaRoles.GetBool()) return 0;
-            var roleOpt = Main.NormalOptions.RoleOptions;
-            return role switch
-            {
-                CustomRoles.Crewmate => roleOpt.GetNumPerGame(RoleTypes.Crewmate),
-                CustomRoles.Scientist => roleOpt.GetNumPerGame(RoleTypes.Scientist),
-                CustomRoles.Engineer => roleOpt.GetNumPerGame(RoleTypes.Engineer),
-                CustomRoles.GuardianAngel => roleOpt.GetNumPerGame(RoleTypes.GuardianAngel),
-                CustomRoles.Shapeshifter => roleOpt.GetNumPerGame(RoleTypes.Shapeshifter),
-                CustomRoles.Noisemaker => roleOpt.GetNumPerGame(RoleTypes.Noisemaker),
-                CustomRoles.Phantom => roleOpt.GetNumPerGame(RoleTypes.Phantom),
-                CustomRoles.Tracker => roleOpt.GetNumPerGame(RoleTypes.Tracker),
-                CustomRoles.Detective => roleOpt.GetNumPerGame(RoleTypes.Detective),
-                CustomRoles.Viper => roleOpt.GetNumPerGame(RoleTypes.Viper),
-                CustomRoles.Judge => roleOpt.GetNumPerGame(RoleTypes.Judge),
-                CustomRoles.Influencer => roleOpt.GetNumPerGame(RoleTypes.SpiritGuide),
-                _ => 0
-            };
-        }
-        else
-        {
-            return Options.GetRoleCount(role);
-        }
+        return role.IsVanilla() ? 0 : Options.GetRoleCount(role);
     }
     public static int GetMode(this CustomRoles role) => Options.GetRoleSpawnMode(role);
     public static float GetChance(this CustomRoles role)

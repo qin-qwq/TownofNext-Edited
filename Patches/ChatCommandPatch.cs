@@ -658,7 +658,7 @@ internal class ChatCommands
                 }
 
                 command.Action(player, text, args);
-                if (command.IsCanceled) canceled |= command.AlwaysHidden || !cmd;
+                if (command.IsCanceled) canceled |= command.AlwaysHidden || cmd;
                 break;
             }
         }

@@ -26,7 +26,6 @@ public static class AddonAssign
             case CustomRoles.Autopsy when Options.EveryoneCanSeeDeathReason.GetBool():
             case CustomRoles.Madmate when Madmate.MadmateSpawnMode.GetInt() != 0:
             case CustomRoles.Glow or CustomRoles.Mare or CustomRoles.Torch when GameStates.FungleIsActive:
-            case CustomRoles.Guesser when Guesser.AdvancedSettings.GetBool():
                 return true;
         }
 
@@ -178,18 +177,7 @@ public static class AddonAssign
     {
         try
         {
-            var allAlivePlayers = Main.EnumerateAlivePlayerControls().ToList();
-            if (!allAlivePlayers.Any()) return;
-
-            var eligiblePlayers = new List<PlayerControl>();
-
-            foreach (var pc in allAlivePlayers)
-            {
-                if (CustomRolesHelper.CheckAddonConfilct(role, pc))
-                {
-                    eligiblePlayers.Add(pc);
-                }
-            }
+            var eligiblePlayers = AssignTargetList(role);
 
             if (!eligiblePlayers.Any()) return;
 
@@ -225,6 +213,77 @@ public static class AddonAssign
         {
             Logger.Warn($"Add-On {role} get error after check addon confilct for: {error}", "AssignSubRoles");
         }
+    }
+
+    ///<summary>
+    ///要分配的玩家列表
+    ///</summary>
+    private static List<PlayerControl> AssignTargetList(CustomRoles role)
+    {
+        var rnd = IRandom.Instance;
+        var candidates = new List<PlayerControl>();
+        var validPlayers = Main.EnumerateAlivePlayerControls().Where(pc => CustomRolesHelper.CheckAddonConfilct(role, pc));
+
+        if (Options.AddonTeamMaximumSettings.TryGetValue(role, out var data))
+        {
+            var crewmateMaximum = data.Crew.GetInt();
+            if (crewmateMaximum > 0)
+            {
+                var crewmates = validPlayers.Where(pc
+                    => pc.GetCustomRole().IsCrewmate()).ToList();
+                for (var i = 0; i < crewmateMaximum; i++)
+                {
+                    if (crewmates.Count == 0) break;
+                    var selectedCrewmate = crewmates[rnd.Next(crewmates.Count)];
+                    candidates.Add(selectedCrewmate);
+                    crewmates.Remove(selectedCrewmate);
+                }
+            }
+
+            var impostorMaximum = data.Imp.GetInt();
+            if (impostorMaximum > 0)
+            {
+                var impostors = validPlayers.Where(pc
+                    => pc.GetCustomRole().IsImpostor()).ToList();
+                for (var i = 0; i < impostorMaximum; i++)
+                {
+                    if (impostors.Count == 0) break;
+                    var selectedImpostor = impostors[rnd.Next(impostors.Count)];
+                    candidates.Add(selectedImpostor);
+                    impostors.Remove(selectedImpostor);
+                }
+            }
+
+            var neutralMaximum = data.Neutral.GetInt();
+            if (neutralMaximum > 0)
+            {
+                var neutrals = validPlayers.Where(pc
+                    => pc.GetCustomRole().IsNeutral()).ToList();
+                for (var i = 0; i < neutralMaximum; i++)
+                {
+                    if (neutrals.Count == 0) break;
+                    var selectedNeutral = neutrals[rnd.Next(neutrals.Count)];
+                    candidates.Add(selectedNeutral);
+                    neutrals.Remove(selectedNeutral);
+                }
+            }
+
+            var covenMaximum = data.Coven.GetInt();
+            if (covenMaximum > 0)
+            {
+                var covens = validPlayers.Where(pc
+                    => pc.GetCustomRole().IsCoven()).ToList();
+                for (var i = 0; i < covenMaximum; i++)
+                {
+                    if (covens.Count == 0) break;
+                    var selectedCoven = covens[rnd.Next(covens.Count)];
+                    candidates.Add(selectedCoven);
+                    covens.Remove(selectedCoven);
+                }
+            }
+        }
+
+        return candidates;
     }
 
     /*public static void InitAndStartAssignLovers()
@@ -302,77 +361,9 @@ public static class AddonAssign
 
         // logs the assigning
         var pc = ps.PlayerId.GetPlayer();
-        if (pc != null)
+        if (pc)
         {
             Logger.Info($"将警局特工分配给 {pc?.Data?.PlayerName}({pc.PlayerId})。 {pc?.Data?.PlayerName}的职业是： {pc.GetCustomRole()} + 警局特工", "Assign Narc");
-        }
-    }
-
-    public static void StartAssigningGuesser()
-    {
-        if (!Guesser.AdvancedSettings.GetBool() || !CustomRoles.Guesser.IsEnable()) return;
-        if (Options.NoLimitAddonsNumMax.GetInt() == 0) return;
-        var random = IRandom.Instance;
-        if (random.Next(1, 101) > (Options.CustomAdtRoleSpawnRate.TryGetValue(CustomRoles.Guesser, out var sc) ? sc.GetFloat() : 0)) return;
-        List<PlayerControl> AllPlayers = Main.EnumeratePlayerControls().Shuffle(random).ToList();
-        var ImpNum = Guesser.GImpMax.GetInt();
-        var CrewNum = Guesser.GCrewMax.GetInt();
-        var NeuNum = Guesser.GNeuMax.GetInt();
-        var CovenNum = Guesser.GCovenMax.GetInt();
-        var role = CustomRoles.Guesser;
-        foreach (PlayerControl pc in AllPlayers)
-        {
-            if (pc == null) continue;
-            if (Options.GuesserMode.GetBool() && ((pc.GetCustomRole().IsCrewmate() && Options.CrewmatesCanGuess.GetBool())
-            || (pc.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool())
-            || (pc.GetCustomRole().IsImpostor() && Options.ImpostorsCanGuess.GetBool())
-            || (pc.GetCustomRole().IsCoven() && Options.CovenCanGuess.GetBool())
-            || (pc.GetCustomRole().IsNA() && Options.NeutralApocalypseCanGuess.GetBool())
-            || (pc.GetCustomRole().IsNonNK() && Options.PassiveNeutralsCanGuess.GetBool())))
-                continue;
-            if (pc.Is(CustomRoles.EvilGuesser)
-                    || pc.Is(CustomRoles.NiceGuesser)
-                    || pc.Is(CustomRoles.Justice)
-                    || pc.Is(CustomRoles.CopyCat)
-                    || pc.Is(CustomRoles.Doomsayer)
-                    || pc.Is(CustomRoles.Nemesis)
-                    || pc.Is(CustomRoles.Councillor)
-                    || pc.Is(CustomRoles.GuardianAngelTONE)
-                    || pc.Is(CustomRoles.GM)
-                    || pc.Is(CustomRoles.Retributionist)
-                    || (pc.HasSubRole() && pc.GetCustomSubRoles().Count >= Options.NoLimitAddonsNumMax.GetInt())
-                    || pc.Is(CustomRoles.PunchingBag))
-                continue;
-            if ((pc.Is(CustomRoles.Specter) && !Specter.CanGuess.GetBool())
-                    || (pc.Is(CustomRoles.Terrorist) && (!Terrorist.TerroristCanGuess.GetBool() || Terrorist.CanTerroristSuicideWin.GetBool()))
-                    || (pc.Is(CustomRoles.Workaholic) && !Workaholic.WorkaholicCanGuess.GetBool())
-                    || (pc.Is(CustomRoles.Solsticer) && !Solsticer.SolsticerCanGuess.GetBool())
-                    || (pc.Is(CustomRoles.God) && !God.CanGuess.GetBool()))
-                continue;
-            if ((pc.GetCustomRole().IsCrewmate() && !Guesser.CrewCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsNeutral() && !Guesser.NeutralCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsImpostor() && !Guesser.ImpCanBeGuesser.GetBool()) || (pc.GetCustomRole().IsCoven() && !Guesser.CovenCanBeGuesser.GetBool()))
-                continue;
-            if (pc.GetCustomRole().IsInvestigativeRole() && Options.InvestigativeRoleCantGuess.GetBool())
-                continue;
-            if (ImpNum > 0 && pc.IsPlayerImpostorTeam() && Guesser.ImpCanBeGuesser.GetBool())
-            {
-                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
-                ImpNum--;
-            }
-            else if (CrewNum > 0 && pc.IsPlayerCrewmateTeam() && Guesser.CrewCanBeGuesser.GetBool())
-            {
-                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
-                CrewNum--;
-            }
-            else if (NeuNum > 0 && pc.IsPlayerNeutralTeam() && Guesser.NeutralCanBeGuesser.GetBool())
-            {
-                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
-                NeuNum--;
-            }
-            else if (CovenNum > 0 && pc.IsPlayerCovenTeam() && Guesser.CovenCanBeGuesser.GetBool())
-            {
-                Main.PlayerStates[pc.PlayerId].SetSubRole(role);
-                CovenNum--;
-            }
         }
     }
 }

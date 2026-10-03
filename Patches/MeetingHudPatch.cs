@@ -487,6 +487,7 @@ class CheckForEndVotingPatch
                 tie = false;
                 overruleNonce = winningOverrule.OverruleNonce;
                 exiledPlayer = overruledInfo.Object.IsPlayerCrewmateTeam() || overruledInfo.Object.Is(CustomRoles.Trickster) ? judgeInfo : overruledInfo;
+                exileId = exiledPlayer.PlayerId;
                 if (judgeInfo.Object) judgeInfo.Object.RpcRemoveAbilityUse();
                 if (!judgeInfo.IsHost()) JudgeTONE.playerIdList.Add(judgeInfo.PlayerId);
                 Logger.Info($"The Judge has spoken! Exiled: {exiledPlayer.PlayerId}", "Judge");

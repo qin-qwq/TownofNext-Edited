@@ -93,7 +93,10 @@ internal class Medium : RoleBase
             return true;
         }
 
-        SendMessage(GetString("Medium" + (ans ? "Yes" : "No")), ContactPlayer[pc.PlayerId], ColorString(GetRoleColor(CustomRoles.Medium), GetString("Medium").ToUpper()));
+        if (ContactPlayer[pc.PlayerId].GetPlayer())
+        {
+            SendMessage(GetString("Medium" + (ans ? "Yes" : "No")), ContactPlayer[pc.PlayerId], ColorString(GetRoleColor(CustomRoles.Medium), GetString("Medium").ToUpper()));
+        }
         SendMessage(GetString("MediumDone"), pc.PlayerId, ColorString(GetRoleColor(CustomRoles.Medium), GetString("Medium").ToUpper()));
 
         ContactPlayer.Remove(pc.PlayerId);

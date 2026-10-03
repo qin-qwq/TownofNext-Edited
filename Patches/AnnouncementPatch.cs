@@ -78,6 +78,7 @@ public class ModNews
             _ => "en_US.json", //English and any other unsupported language
         };
         var request = UnityWebRequest.Get(ModNewsURL);
+        request.timeout = 10;
         yield return request.SendWebRequest();
         if (request.isNetworkError || request.isHttpError)
         {

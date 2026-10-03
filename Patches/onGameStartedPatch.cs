@@ -36,19 +36,16 @@ internal class ChangeRoleSettings
             if (GameStates.IsNormalGame)
             {
                 Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
-                if (Options.DisableVanillaRoles.GetBool())
-                {
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Engineer, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Noisemaker, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Phantom, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Tracker, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Detective, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Viper, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Judge, 0, 0);
-                    Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.SpiritGuide, 0, 0);
-                }
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Engineer, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Shapeshifter, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Noisemaker, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Phantom, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Tracker, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Detective, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Viper, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Judge, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.SpiritGuide, 0, 0);
             }
             else if (GameStates.IsHideNSeek)
             {
@@ -415,7 +412,7 @@ internal class StartGameHostPatch
             timer += Time.deltaTime;
         }
         thiz.SendClientReady();
-        //yield return new WaitForSecondsRealtime(2f);
+        yield return new WaitForSecondsRealtime(2f);
         yield return AssignRoles();
 
         LoadingBarManager.Instance.ToggleLoadingBar(false);
@@ -459,7 +456,7 @@ internal class StartGameHostPatch
             // Set rate for Vanilla Roles
             foreach (var roleType in RoleTypeNums)
             {
-                int roleNum = Options.DisableVanillaRoles.GetBool() ? 0 : RoleOpt.GetNumPerGame(roleType.Key);
+                int roleNum = 0;
                 roleNum += roleType.Value;
                 RoleOpt.SetRoleRate(roleType.Key, roleNum, roleType.Value > 0 ? 100 : RoleOpt.GetChancePerGame(roleType.Key));
             }
@@ -536,7 +533,6 @@ internal class StartGameHostPatch
                 if (GameModeBase.GetGameMode().GetGameModeClass().NormalSelectAddons)
                 {
                     AddonAssign.StartAssigningNarc();
-                    AddonAssign.StartAssigningGuesser();
                     //AddonAssign.InitAndStartAssignLovers();
                     AddonAssign.StartSortAndAssign();
                 }
@@ -586,7 +582,7 @@ internal class StartGameHostPatch
             // Role types
             foreach (var roleType in RoleTypeNums)
             {
-                int roleNum = Options.DisableVanillaRoles.GetBool() ? 0 : RoleOpt.GetNumPerGame(roleType.Key);
+                int roleNum = 0;
                 roleNum -= roleType.Value;
                 RoleOpt.SetRoleRate(roleType.Key, roleNum, RoleOpt.GetChancePerGame(roleType.Key));
             }
@@ -634,6 +630,7 @@ internal class StartGameHostPatch
             else
             {
                 roleType = RoleTypes.CrewmateGhost;
+                Logger.Error($"Failed to find {pc.PlayerId} in RoleMap", "AssignRoleTypes");
             }
 
             if (GameModeBase.GetGameMode() == CustomGameMode.Standard && overriden)
@@ -786,7 +783,7 @@ public static class RpcSetRoleReplacer
         {
             var player = Utils.GetPlayerById(playerId);
 
-            if (player == null) continue;
+            if (!player) continue;
 
             Main.PlayerStates[playerId].SetMainRole(role, false);
 
