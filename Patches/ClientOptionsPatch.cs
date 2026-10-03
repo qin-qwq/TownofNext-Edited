@@ -46,13 +46,13 @@ public static class OptionsMenuBehaviourStartPatch
             Main.AutoRehost.Value = false;
         }
 
-        if (OperatingSystem.IsAndroid())
+        if (!OperatingSystem.IsWindows())
         {
             Main.UnlockFPS.Value = false;
             Main.EnableCustomSoundEffect.Value = false;
         }
 
-        if ((UnlockFPS == null || UnlockFPS.ToggleButton == null) && !OperatingSystem.IsAndroid())
+        if ((UnlockFPS == null || UnlockFPS.ToggleButton == null) && OperatingSystem.IsWindows())
         {
             UnlockFPS = ClientOptionItem.Create("UnlockFPS", Main.UnlockFPS, __instance, UnlockFPSButtonToggle);
             static void UnlockFPSButtonToggle()
@@ -165,7 +165,7 @@ public static class OptionsMenuBehaviourStartPatch
         {
             EnableCustomButton = ClientOptionItem.Create("EnableCustomButton", Main.EnableCustomButton, __instance);
         }
-        if ((EnableCustomSoundEffect == null || EnableCustomSoundEffect.ToggleButton == null) && !OperatingSystem.IsAndroid())
+        if ((EnableCustomSoundEffect == null || EnableCustomSoundEffect.ToggleButton == null) && OperatingSystem.IsWindows())
         {
             EnableCustomSoundEffect = ClientOptionItem.Create("EnableCustomSoundEffect", Main.EnableCustomSoundEffect, __instance);
         }
@@ -200,7 +200,7 @@ public static class OptionsMenuBehaviourStartPatch
             }
         }
 
-        if ((SwitchVanilla == null || SwitchVanilla.ToggleButton == null) && !OperatingSystem.IsAndroid())
+        if ((SwitchVanilla == null || SwitchVanilla.ToggleButton == null) && OperatingSystem.IsWindows())
         {
             SwitchVanilla = ClientOptionItem.Create("SwitchVanilla", Main.SwitchVanilla, __instance, SwitchVanillaButtonToggle);
             static void SwitchVanillaButtonToggle()

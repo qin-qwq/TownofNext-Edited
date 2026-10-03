@@ -34,13 +34,13 @@ public static class CustomSoundsManager
 
     public static void ReceiveRPC(MessageReader reader) => Play(reader.ReadString(), reader.ReadSingle(), reader.ReadSingle());
 
-    private static readonly string SOUNDS_PATH = OperatingSystem.IsAndroid() ? @$"{Main.Path}/TONE-DATA/resources/" : @$"{Environment.CurrentDirectory.Replace(@"\", "/")}/BepInEx/resources/";
+    private static readonly string SOUNDS_PATH = !OperatingSystem.IsWindows() ? @$"{Main.Path}/TONE-DATA/resources/" : @$"{Environment.CurrentDirectory.Replace(@"\", "/")}/BepInEx/resources/";
 
     public static long LastSoundRPCTS;
 
     public static void Play(string sound, float volume = 1f, float pitch = 1f, bool loop = false)
     {
-        if (!Constants.ShouldPlaySfx() || !Main.EnableCustomSoundEffect.Value || OperatingSystem.IsAndroid()) return;
+        if (!Constants.ShouldPlaySfx() || !Main.EnableCustomSoundEffect.Value || !OperatingSystem.IsWindows()) return;
 
         var path = Path.Combine(SOUNDS_PATH, sound + ".wav");
 

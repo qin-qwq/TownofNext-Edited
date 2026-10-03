@@ -44,7 +44,7 @@ public static class SendTargetPatch
         string text = Translator.GetString($"SendTargets.{Enum.GetName(SendTarget)}");
         if (GameStates.IsInGame && __instance.IsOpenOrOpening)
         {
-            var notice = OperatingSystem.IsAndroid() ? Translator.GetString("SendTargetSwitchNoticeAndroid") : Translator.GetString("SendTargetSwitchNotice");
+            var notice = OperatingSystem.IsWindows() ? Translator.GetString("SendTargetSwitchNotice") : Translator.GetString("SendTargetSwitchNoticeAndroid");
             text += "<size=75%>" + notice + "</size>";
 
             var shouldSwitch = false;

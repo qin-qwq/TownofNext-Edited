@@ -2115,7 +2115,7 @@ static class ExtendedPlayerControl
     public static Color32 GetPlayerColor(this byte playerId)
     {
         var player = Utils.GetPlayerById(playerId);
-        if (OperatingSystem.IsAndroid() && !player) return Color.white;
+        if (!OperatingSystem.IsWindows() && !player) return Color.white;
         if (Main.PlayerColors.TryGetValue(playerId, out var color)) return color;
         return Palette.PlayerColors[player.Data.DefaultOutfit.ColorId];
     }

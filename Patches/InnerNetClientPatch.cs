@@ -26,7 +26,7 @@ internal class GameDataHandlerPatch
 {
     public static bool Prefix(InnerNetClient __instance, MessageReader reader, int msgNum)
     {
-        if (OperatingSystem.IsAndroid()) return true;
+        if (!OperatingSystem.IsWindows()) return true;
 
         MessageReader subReader = MessageReader.Get(reader);
         var tag = (GameDataTag)reader.Tag;

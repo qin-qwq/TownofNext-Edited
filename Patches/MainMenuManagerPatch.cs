@@ -81,7 +81,7 @@ public static class MainMenuManagerPatch
             template = __instance.creditsButton;
         }
 
-        if (OperatingSystem.IsAndroid())
+        if (!OperatingSystem.IsWindows())
         {
             // In Starlight there is a official patch for this.
             Main.UnlockFPS.Value = false;
@@ -127,7 +127,7 @@ public static class MainMenuManagerPatch
         string[] fileNames = assembly.GetManifestResourceNames().Where(resourceName => resourceName.StartsWith(folder) && resourceName.EndsWith(".png")).ToArray();
         int choice = rand.Next(0, fileNames.Length);
 
-        spriteRenderer.sprite = Utils.LoadSprite(fileNames[choice], OperatingSystem.IsAndroid() ? 119f : 150f);
+        spriteRenderer.sprite = Utils.LoadSprite(fileNames[choice], OperatingSystem.IsWindows() ? 150f : 119f);
 
         if (template == null) return;
 

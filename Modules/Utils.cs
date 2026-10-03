@@ -2975,7 +2975,7 @@ public static class Utils
     }
     public static void DumpLog(bool open = true)
     {
-        string f = OperatingSystem.IsAndroid() ? $"{Main.Path}/TONE-logs/" : $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/TONE-logs/";
+        string f = !OperatingSystem.IsWindows() ? $"{Main.Path}/TONE-logs/" : $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/TONE-logs/";
         string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
         string filename = $"{f}TONE-v{Main.PluginVersion}-{t}.log";
         if (!Directory.Exists(f)) Directory.CreateDirectory(f);
@@ -2989,7 +2989,7 @@ public static class Utils
 
         SendMessage(string.Format(GetString("Message.DumpcmdUsed"), PlayerControl.LocalPlayer.GetNameWithRole()));
 
-        if (!OperatingSystem.IsAndroid())
+        if (OperatingSystem.IsWindows())
         {
             ProcessStartInfo psi = new("Explorer.exe") { Arguments = "/e,/select," + @filename.Replace("/", "\\") };
             Process.Start(psi);

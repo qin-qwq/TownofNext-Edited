@@ -8,7 +8,7 @@ public static class JoystickBlockPatch
 {
     private static bool ShouldBlockJoystickInput()
     {
-        if (!OperatingSystem.IsAndroid()) return false;
+        if (OperatingSystem.IsWindows()) return false;
         if (!ClientControlGUI.Instance || !ClientControlGUI.Instance.IsOpen) return false;
 
         foreach (Touch touch in Input.touches)

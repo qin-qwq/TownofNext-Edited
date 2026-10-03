@@ -183,7 +183,7 @@ public class Main : BasePlugin
     };
 
     public static string Star_Path = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
-    public static readonly string Path = OperatingSystem.IsAndroid() ? Star_Path : ".";
+    public static readonly string Path = !OperatingSystem.IsWindows() ? Star_Path : ".";
     public const string LANGUAGE_FOLDER_NAME = "TONE-DATA/Language";
 
     public static readonly MapNames[] MapNamesValues = Enum.GetValues<MapNames>();
@@ -785,7 +785,7 @@ public class Main : BasePlugin
 
         Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-        if (!OperatingSystem.IsAndroid())
+        if (OperatingSystem.IsWindows())
         {
             // there are some issues with TextBoxPatch and DiscordRPC on Android
             Harmony.PatchAll(typeof(TextBoxPatch));
@@ -795,7 +795,7 @@ public class Main : BasePlugin
         TextBoxPatch.AddChars();
 
         // ConsoleManager.DetachConsole();
-        if (DebugModeManager.AmDebugger && !OperatingSystem.IsAndroid()) ConsoleManager.CreateConsole();
+        if (DebugModeManager.AmDebugger && OperatingSystem.IsWindows()) ConsoleManager.CreateConsole();
 
         // InitializeFileHash();
         FileHash = "Support_2026_08_18";

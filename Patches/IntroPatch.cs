@@ -913,7 +913,7 @@ internal static class IntroCutsceneDestroyPatch
     {
         if (AmongUsClient.Instance.AmHost && !AmongUsClient.Instance.IsGameOver)
         {
-            if (OperatingSystem.IsAndroid()) Logger.Info("IntroCutscene destroyed for Starlight", "IntroCutscene");
+            if (!OperatingSystem.IsWindows()) Logger.Info("IntroCutscene destroyed for Starlight", "IntroCutscene");
 
             // Host is desync role
             if (PlayerControl.LocalPlayer.HasDesyncRole())

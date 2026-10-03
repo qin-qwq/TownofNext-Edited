@@ -320,12 +320,12 @@ class TaskPanelBehaviourPatch
                 if (sb.Length > 1)
                 {
                     var text = sb.ToString().TrimEnd('\n').TrimEnd('\r');
-                    if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && !OperatingSystem.IsAndroid())
+                    if (!Utils.HasTasks(player.Data, false) && sb.ToString().Count(s => (s == '\n')) >= 1 && OperatingSystem.IsWindows())
                         text = $"{Utils.ColorString(new Color32(255, 20, 147, byte.MaxValue), GetString("FakeTask"))}\r\n{text}";
                     AllText += $"\r\n\r\n<size=85%>{text}</size>";
                 }
 
-                if (MeetingStates.FirstMeeting && GameModeBase.GetGameMode() is CustomGameMode.Standard && !OperatingSystem.IsAndroid())
+                if (MeetingStates.FirstMeeting && GameModeBase.GetGameMode() is CustomGameMode.Standard && OperatingSystem.IsWindows())
                 {
                     AllText += $"\r\n\r\n</color><size=70%>{GetString("PressF1ShowMainRoleDes")}";
                     AllText += "</size>";

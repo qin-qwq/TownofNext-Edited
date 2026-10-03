@@ -32,14 +32,14 @@ public class ClientControlGUI : MonoBehaviour
     private float _panelAnimTarget;
     private const float PanelAnimSpeed = 8f;
 
-    private static float PlatformScale => OperatingSystem.IsAndroid() ? 0.6f : 0.5f;
+    private static float PlatformScale => OperatingSystem.IsWindows() ? 0.5f : 0.6f;
     private static float Scale => Screen.width / 1080f * PlatformScale;
     private static int FontSize => Mathf.Max(12, Mathf.RoundToInt(21f * Scale));
     private static float ButtonHeight => 66f * Scale;
-    private static float ButtonWidth => (OperatingSystem.IsAndroid() ? 360f : 340f) * Scale;
+    private static float ButtonWidth => (OperatingSystem.IsWindows() ? 340f : 360f) * Scale;
     private static float Padding => 10f * Scale;
     private static int ChipFontSize => Mathf.Max(10, FontSize - 4);
-    private static float ScrollbarColumnWidth => (OperatingSystem.IsAndroid() ? 42f : 22f) * Scale;
+    private static float ScrollbarColumnWidth => (OperatingSystem.IsWindows() ? 22f : 42f) * Scale;
     private float _lastScale = -1f;
 
     private GUIStyle _sAction, _sHost, _sDanger, _sSection, _sToggle, _sWindow, _sTitleBar, _sDragHint;
@@ -99,7 +99,7 @@ public class ClientControlGUI : MonoBehaviour
         };
 
         int winW = Mathf.Max(1, Mathf.RoundToInt(ButtonWidth + Padding * 4f + ScrollbarColumnWidth));
-        int winH = Mathf.Max(1, Mathf.RoundToInt(Screen.height * (OperatingSystem.IsAndroid() ? 0.82f : 0.65f)));
+        int winH = Mathf.Max(1, Mathf.RoundToInt(Screen.height * (OperatingSystem.IsWindows() ? 0.65f : 0.82f)));
 
         _sWindow = new GUIStyle
         {
@@ -214,7 +214,7 @@ public class ClientControlGUI : MonoBehaviour
     private void InitWindowRect()
     {
         float w = ButtonWidth + Padding * 4f + ScrollbarColumnWidth;
-        float h = Screen.height * (OperatingSystem.IsAndroid() ? 0.82f : 0.65f);
+        float h = Screen.height * (OperatingSystem.IsWindows() ? 0.65f : 0.82f);
         _windowRect = new Rect(20f * Scale, (Screen.height - h) * 0.5f, w, h);
         _windowInitialized = true;
     }
@@ -346,7 +346,7 @@ public class ClientControlGUI : MonoBehaviour
 
     private static string Label(string label, string shortcut = null)
     {
-        if (OperatingSystem.IsAndroid() || shortcut == null) return label;
+        if (!OperatingSystem.IsWindows() || shortcut == null) return label;
         return $"{label}\n<color=#7a9cbf><size={ChipFontSize}>{shortcut}</size></color>";
     }
 

@@ -81,7 +81,7 @@ public class ModUpdater
 
     private static void CheckCustomRegions()
     {
-        if (OperatingSystem.IsAndroid())
+        if (!OperatingSystem.IsWindows())
         {
             Logger.Info($"Skip check on Android platform", "CheckCustomRegions");
             return;
@@ -327,7 +327,7 @@ public class ModUpdater
     }
     public static void StartUpdate(string url)
     {
-        if (OperatingSystem.IsAndroid())
+        if (!OperatingSystem.IsWindows())
         {
             ShowPopup(GetString("AndroidUpdateNotSupported"), StringNames.Close, true, InfoPopup.Close);
             Logger.Warn("Update download is not supported on Android platform", "StartUpdate");
