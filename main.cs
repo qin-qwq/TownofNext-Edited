@@ -30,6 +30,7 @@ namespace TONE;
 [BepInIncompatibility("jp.ykundesu.supernewroles")]
 [BepInIncompatibility("com.ten.betteramongus")]
 [BepInIncompatibility("com.ten.thebetterroles")]
+[BepInIncompatibility("AUnlocker")]
 [BepInIncompatibility("xyz.crowdedmods.crowdedmod")]
 [BepInIncompatibility("com.slushiegoose.townofus")]
 [BepInIncompatibility("com.gurge44.endlesshostroles")]
@@ -55,7 +56,7 @@ public class Main : BasePlugin
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
     public const string PluginGuid = "com.qin-qwq.townofnextedited";
-    public const string PluginVersion = "26.10.04";
+    public const string PluginVersion = "26.10.06";
     public const string PluginDisplayVersion = "2.2.0";
     public const int ExtraPluginVersion = 0; // Add Beta version number × 100
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
@@ -249,16 +250,15 @@ public class Main : BasePlugin
             return utcNow >= t && utcNow <= t2;
         }
     }
-    public static bool IsSummer
+    public static bool ShouldActive
     {
         get
         {
-            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp)
+            if (DestroyableSingleton<EOSManager>.Instance.HasServerTimestamp && dbConnect.HasLimitedTime)
             {
+                LimitedTimeStartEnd aprilFoolLimitedTime = dbConnect.GameModeLimitedTime;
                 DateTime approximateServerTime = DestroyableSingleton<EOSManager>.Instance.ApproximateServerTime;
-                DateTime dateTime1 = new DateTime(approximateServerTime.Year, 9, 19, 7, 0, 0, 0, DateTimeKind.Utc);
-                DateTime dateTime2 = new DateTime(approximateServerTime.Year, 9, 28, 7, 0, 0, 0, DateTimeKind.Utc);
-                return approximateServerTime >= dateTime1 && approximateServerTime <= dateTime2;
+                return aprilFoolLimitedTime.timeStart.IsAfterThisTime(approximateServerTime) && aprilFoolLimitedTime.timeEnd.IsBeforeThisTime(approximateServerTime);
             }
             return false;
         }
@@ -784,14 +784,15 @@ public class Main : BasePlugin
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll(Assembly.GetExecutingAssembly());
+        Harmony.PatchAll(typeof(TextBoxPatch));
 
         if (OperatingSystem.IsWindows())
         {
             // there are some issues with TextBoxPatch and DiscordRPC on Android
-            Harmony.PatchAll(typeof(TextBoxPatch));
             Harmony.PatchAll(typeof(DiscordRPC));
         }
 
+        CurrentModRegistrationPatch.AddGuid();
         TextBoxPatch.AddChars();
 
         // ConsoleManager.DetachConsole();

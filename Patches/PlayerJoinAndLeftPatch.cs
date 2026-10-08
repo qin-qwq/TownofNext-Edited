@@ -405,11 +405,6 @@ class OnPlayerLeftPatch
                     Lovers.OnPartnerLeft(data.Character);
                 }
 
-                if (data.Character.Is(CustomRoles.Jackal) && !data.Character.Data.IsDead)
-                {
-                    Jackal.OnJackalLeft(data.Character);
-                }
-
                 if (data.Character.Is(CustomRoles.Sheriff) && !data.Character.Data.IsDead)
                 {
                     Sheriff.OnSheriffLeft();

@@ -1,4 +1,5 @@
 using System;
+using TONE.Patches;
 using UnityEngine;
 
 namespace TONE;
@@ -207,6 +208,7 @@ public static class OptionsMenuBehaviourStartPatch
             {
                 if (ClientControlGUI.Instance) Object.Destroy(ClientControlGUI.Instance);
                 if (UpdateFriendCodeUIPatch.VersionShower) Object.Destroy(UpdateFriendCodeUIPatch.VersionShower);
+                CurrentModRegistrationPatch.RemoveGuid();
                 Harmony.UnpatchAll();
                 Main.Instance.Unload();
             }

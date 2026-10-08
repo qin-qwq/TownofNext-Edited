@@ -183,7 +183,7 @@ internal class Enigma : RoleBase
                     return GetString("EnigmaClueHat1");
                 case 3:
                     if (showStageClue)
-                        return string.Format(GetString("EnigmaClueHat3"), killerOutfit.HatId);
+                        return string.Format(GetString("EnigmaClueHat3"), new RedeemCode().GetCosmetic(killerOutfit.HatId).GetItemName());
                     return GetString("EnigmaClueHat1");
             }
 
@@ -207,7 +207,7 @@ internal class Enigma : RoleBase
                     return GetString("EnigmaClueVisor1");
                 case 3:
                     if (showStageClue)
-                        return string.Format(GetString("EnigmaClueVisor3"), killerOutfit.VisorId);
+                        return string.Format(GetString("EnigmaClueVisor3"), new RedeemCode().GetCosmetic(killerOutfit.VisorId).GetItemName());
                     return GetString("EnigmaClueVisor1");
             }
 
@@ -231,7 +231,7 @@ internal class Enigma : RoleBase
                     return GetString("EnigmaClueSkin1");
                 case 3:
                     if (showStageClue)
-                        return string.Format(GetString("EnigmaClueSkin3"), killerOutfit.SkinId);
+                        return string.Format(GetString("EnigmaClueSkin3"), new RedeemCode().GetCosmetic(killerOutfit.SkinId).GetItemName());
                     return GetString("EnigmaClueSkin1");
             }
 
@@ -255,7 +255,7 @@ internal class Enigma : RoleBase
                     return GetString("EnigmaCluePet1");
                 case 3:
                     if (showStageClue)
-                        return string.Format(GetString("EnigmaCluePet3"), killerOutfit.PetId);
+                        return string.Format(GetString("EnigmaCluePet3"), new RedeemCode().GetCosmetic(killerOutfit.PetId).GetItemName());
                     return GetString("EnigmaCluePet1");
             }
 

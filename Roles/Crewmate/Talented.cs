@@ -37,15 +37,18 @@ internal class Talented : RoleBase
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)
     {
         if (!player.IsAlive()) return true;
-        if (addons.Count == 0)
+
+        var addonsList = addons.Where(x => CustomRolesHelper.CheckAddonConfilct(player.GetCustomRole(), player, false));
+
+        if (addonsList.Any())
         {
-            player.Notify(Translator.GetString("TaskManager_FailGetAddon"), time: 10);
+            var addon = addonsList.RandomElement();
+
+            player.RpcSetCustomRole(addon, false, false);
         }
         else
         {
-            CustomRoles addon = addons.RandomElement();
-
-            player.RpcSetCustomRole(addon, false, false);
+            player.Notify(Translator.GetString("TaskManager_FailGetAddon"), time: 10);
         }
         return true;
     }

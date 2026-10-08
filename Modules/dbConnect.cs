@@ -11,6 +11,8 @@ public class dbConnect
 {
     private static bool InitOnce = false;
     public static Dictionary<string, string> UserType = [];
+    public static LimitedTimeStartEnd GameModeLimitedTime;
+    public static bool HasLimitedTime = false;
 
     private const string ApiUrl = "https://raw.githubusercontent.com/qin-qwq/TONE-Record/main";
     private const string FallBackUrl = "https://ghproxy.net/https://raw.githubusercontent.com/qin-qwq/TONE-Record/main";
@@ -47,11 +49,19 @@ public class dbConnect
                 HandleFailure(FailedConnectReason.Error_Getting_EAC_List);
                 yield break;
             }
+
+            yield return GetLimitedTime();
+            if (!HasLimitedTime)
+            {
+                HandleFailure(FailedConnectReason.Error_Getting_LimitedTime);
+                yield break;
+            }
         }
         else
         {
             yield return GetRoleTable();
             yield return GetEACList();
+            yield return GetLimitedTime();
         }
 
         if (!InitOnce)
@@ -73,6 +83,7 @@ public class dbConnect
             FailedConnectReason.API_Token_Is_Empty => "API token is empty",
             FailedConnectReason.Error_Getting_User_Role_Table => "Error in fetching roletable",
             FailedConnectReason.Error_Getting_EAC_List => "Error in fetching EAC list",
+            FailedConnectReason.Error_Getting_LimitedTime => "Error in fetching Limited time",
             _ => "Reason not specified"
         };
 
@@ -249,7 +260,7 @@ public class dbConnect
             yield break;
         }
 
-        string[] apiUrls = { ApiUrl, FallBackUrl };
+        string[] apiUrls = [ApiUrl, FallBackUrl];
         int maxAttempts = !InitOnce ? 4 : 2;
         int attempt = 0;
         bool success = false;
@@ -298,6 +309,65 @@ public class dbConnect
         }
     }
 
+    private static IEnumerator GetLimitedTime()
+    {
+        string apiToken = GetToken();
+        if (apiToken == "")
+        {
+            Logger.Warn("Embedded resource not found.", "GetLimitedTime.error");
+            yield break;
+        }
+
+        string[] apiUrls = [ApiUrl, FallBackUrl];
+        int maxAttempts = !InitOnce ? 4 : 2;
+        int attempt = 0;
+        bool success = false;
+
+        while (attempt < maxAttempts && !success)
+        {
+            string apiUrl = apiUrls[attempt % 2];
+            string endpoint = $"{apiUrl}/LimitedTime.json";
+
+            Logger.Info($"Fetching Limited Time from {apiUrls[attempt % 2]}", "GetLimitedTime");
+            UnityWebRequest webRequest = UnityWebRequest.Get(endpoint);
+
+            // Send the request
+            yield return webRequest.SendWebRequest();
+
+            // Check for errors
+            if (webRequest.result == UnityWebRequest.Result.Success)
+            {
+                try
+                {
+                    var tempLimitedTime = JsonSerializer.Deserialize<LimitedTimeStartEnd>(webRequest.downloadHandler.text);
+                    GameModeLimitedTime = tempLimitedTime;
+                    success = true;
+                    HasLimitedTime = true;
+                }
+                catch (JsonException jsonEx)
+                {
+                    // If deserialization fails
+                    Logger.Error($"Error deserializing JSON: {jsonEx.Message}", "GetLimitedTime.error");
+                }
+                finally
+                {
+                    webRequest.Dispose();
+                }
+            }
+            else
+            {
+                Logger.Error($"Error in fetching the Limited Time: {webRequest.error}", "GetLimitedTime.error");
+            }
+
+            attempt++;
+        }
+
+        if (!success)
+        {
+            Logger.Error("Failed to fetch Limited Time from both primary and fallback URLs.", "GetLimitedTime.error");
+        }
+    }
+
     private static bool CanAccessDev(string friendCode)
     {
         if (!UserType.ContainsKey(friendCode))
@@ -321,5 +391,6 @@ public class dbConnect
         API_Token_Is_Empty,
         Error_Getting_User_Role_Table,
         Error_Getting_EAC_List,
+        Error_Getting_LimitedTime,
     }
 }

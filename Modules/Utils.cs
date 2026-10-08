@@ -1834,7 +1834,7 @@ public static class Utils
     private static readonly StringBuilder TargetDeathReason = new();
     private static readonly StringBuilder TargetSuffix = new();
     private static readonly StringBuilder TargetMark = new(20);
-    public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.Reliable)
+    public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = false, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.Reliable)
     {
         try
         {

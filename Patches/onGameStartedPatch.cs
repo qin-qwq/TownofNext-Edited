@@ -636,15 +636,18 @@ internal class StartGameHostPatch
             if (GameModeBase.GetGameMode() == CustomGameMode.Standard && overriden)
             {
                 if (pc.HasDesyncRole() && pc.IsPlayerCrewmateTeam()) roleType = RoleTypes.Crewmate;
-                if (!pc.IsPlayerCrewmateTeam() && RpcSetRoleReplacer.IsImpostorRoleTypes(roleType)) roleType = RoleTypes.Impostor;
             }
 
             if (!overriden && pc.Is(CustomRoles.GM)) continue;
 
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(pc.NetId, (byte)RpcCalls.SetRole, SendOption.Reliable, pc.OwnerId);
-            writer.Write((ushort)roleType);
-            writer.Write(true);
-            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            if (AmongUsClient.Instance.ClientId == pc.GetClientId())
+            {
+                pc.SetRole(roleType, true);
+                continue;
+            }
+
+            var message = new RpcSetRoleMessage(pc.NetId, roleType, true);
+            RpcUtils.SendMessageImmediately(message, pc.GetClientId(), SendOption.Reliable);
         }
     }
 

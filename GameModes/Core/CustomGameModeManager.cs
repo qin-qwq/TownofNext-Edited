@@ -33,6 +33,7 @@ public static class CustomGameModeManager
         "SpeedRun",
         "TagMode",
         "RoundUp",
+        "BonfireNight",
 
         "Hide&SeekTONE", // HidenSeekTONE must be after other game modes
     ];

@@ -425,7 +425,7 @@ class CheckForEndVotingPatch
                     foreach (var playerId in exileIds)
                         GetPlayerById(playerId).SetRealKiller(null);
                     TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);
-                    exiledPlayer = null;
+                    exiledPlayer = GetPlayerInfoById(exileIds.RandomElement());
                 }
             }
             if (Options.VoteMode.GetBool() && Options.WhenTie.GetBool() && tie)

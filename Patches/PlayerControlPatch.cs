@@ -1882,7 +1882,15 @@ class EnterVentPatch
             return;
         }
 
-        pc.GetRoleClass()?.OnEnterVent(pc, __instance);
+        // Penguin's victim unable to vent
+        List<Penguin> penguins = Utils.GetRoleBasesByType<Penguin>()?.ToList();
+        if (Penguin.HasEnabled && penguins != null)
+        {
+            if (!penguins.Any(x => pc.PlayerId == x?.AbductVictim?.PlayerId))
+            {
+                pc.GetRoleClass()?.OnEnterVent(pc, __instance);
+            }
+        }
 
         if (pc.Is(CustomRoles.Unlucky))
         {

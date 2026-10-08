@@ -57,6 +57,8 @@ public static class TextBoxPatch
     [HarmonyPostfix]
     public static void ShowCommandHelp(TextBoxTMP __instance)
     {
+        if (!OperatingSystem.IsWindows()) return;
+
         try
         {
             if (!HudManager.InstanceExists || !__instance.gameObject.HasParentInHierarchy("ChatScreenRoot/ChatScreenContainer")) return;
@@ -310,7 +312,7 @@ public static class TextBoxPatch
 
     public static void OnTabPress(ChatController __instance)
     {
-        if (!PlaceHolderText || PlaceHolderText.text == "") return;
+        if (!PlaceHolderText || PlaceHolderText.text == "" || !OperatingSystem.IsWindows()) return;
 
         __instance.freeChatField.textArea.SetText(PlaceHolderText.text);
         __instance.freeChatField.textArea.compoText = "";
@@ -318,6 +320,8 @@ public static class TextBoxPatch
 
     public static void CheckChatOpen()
     {
+        if (!OperatingSystem.IsWindows()) return;
+
         try
         {
             bool open = HudManager.InstanceExists && (HudManager.Instance?.Chat?.IsOpenOrOpening ?? false);
@@ -330,6 +334,8 @@ public static class TextBoxPatch
 
     public static void OnMeetingStart()
     {
+        if (!OperatingSystem.IsWindows()) return;
+
         if (PlaceHolderText) PlaceHolderText.transform.SetAsLastSibling();
         if (CommandInfoText) CommandInfoText.transform.SetAsLastSibling();
         if (AdditionalInfoText) AdditionalInfoText.transform.SetAsLastSibling();
