@@ -295,6 +295,7 @@ internal class Medic : RoleBase
     {
         hud.ReportButton?.OverrideText(GetString("ReportButtonText"));
         hud.KillButton?.OverrideText(GetString("MedicalerButtonText"));
+        hud.KillButton?.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Shield");
 }

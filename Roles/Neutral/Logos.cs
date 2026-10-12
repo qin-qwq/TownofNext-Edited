@@ -95,9 +95,15 @@ internal class Logos : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         if (_Player.GetAbilityUseLimit() > 0)
+        {
             hud.KillButton?.OverrideText($"{GetString("GangsterButtonText")}");
+            hud.KillButton?.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
+        }
         else
+        {
             hud.KillButton?.OverrideText($"{GetString("KillButtonText")}");
+            hud.KillButton?.SetInfiniteUses();
+        }
     }
 
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)

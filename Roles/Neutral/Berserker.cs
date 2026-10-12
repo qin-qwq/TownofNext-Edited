@@ -181,6 +181,10 @@ internal class Berserker : RoleBase
 
         return noScav;
     }
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+    }
 }
 internal class War : RoleBase
 {

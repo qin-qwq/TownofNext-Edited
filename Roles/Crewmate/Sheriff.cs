@@ -175,6 +175,7 @@ internal class Sheriff : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.KillButton.OverrideText(GetString("SheriffKillButtonText"));
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("CoPKill");
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)

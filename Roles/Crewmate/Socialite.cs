@@ -127,4 +127,8 @@ internal class Socialite : RoleBase
             PartiedPlayers.Clear();
         }
     }
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+    }
 }

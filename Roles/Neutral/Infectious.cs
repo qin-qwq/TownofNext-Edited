@@ -178,9 +178,15 @@ internal class Infectious : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         if (playerId.GetAbilityUseLimit() > 0)
+        {
             hud.KillButton.OverrideText(GetString("InfectiousKillButtonText"));
+            hud.KillButton.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
+        }
         else
+        {
             hud.KillButton.OverrideText($"{GetString("KillButtonText")}");
+            hud.KillButton.SetInfiniteUses();
+        }
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Infected");
 }

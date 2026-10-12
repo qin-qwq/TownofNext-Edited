@@ -72,6 +72,7 @@ internal class Catalyst : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.KillButton.OverrideText(GetString("CatalystCatalyzeText"));
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     // public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Catalyze");
 }

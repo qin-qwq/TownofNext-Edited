@@ -536,8 +536,7 @@ public static class NumberOptionPatch
                 __instance.ValidRange = new(0f, GameOptionsManager.Instance.CurrentGameOptions.MaxPlayers / 2);
                 break;
             case StringNames.CapacityLabel:
-                __instance.ValidRange = IsVanillaServer ? new(4, 15) : new(4, 127);
-                __instance.Value = Mathf.Clamp(__instance.Value, __instance.ValidRange.min, __instance.ValidRange.max);
+                __instance.ValidRange = new(4, 127);
                 break;
         }
 

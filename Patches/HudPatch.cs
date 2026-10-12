@@ -398,28 +398,6 @@ class RepairSender
     }
 }
 // Credit: EHR
-[HarmonyPatch(typeof(ActionButton), nameof(ActionButton.SetFillUp))]
-internal static class ActionButtonSetFillUpPatch
-{
-    public static void Postfix(ActionButton __instance, [HarmonyArgument(0)] float timer)
-    {
-        if (__instance.isCoolingDown && timer is <= 90f and > 0f && !PlayerControl.LocalPlayer.shapeshifting)
-        {
-            RoleTypes roleType = PlayerControl.LocalPlayer.GetCustomRole().GetRoleTypes();
-
-            bool usingAbility = roleType switch
-            {
-                RoleTypes.Engineer => PlayerControl.LocalPlayer.inVent,
-                RoleTypes.Shapeshifter => Main.CheckShapeshift.TryGetValue(PlayerControl.LocalPlayer.PlayerId, out bool shifted) && shifted,
-                _ => false
-            };
-
-            Color color = usingAbility ? new Color32(255, 129, 166, 255) : Color.white;
-            __instance.cooldownTimerText.text = Utils.ColorString(color, Mathf.CeilToInt(timer).ToString());
-            __instance.cooldownTimerText.gameObject.SetActive(true);
-        }
-    }
-}
 [HarmonyPatch(typeof(InfectedOverlay), nameof(InfectedOverlay.FixedUpdate))]
 internal static class SabotageMapPatch
 {

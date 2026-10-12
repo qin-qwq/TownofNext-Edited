@@ -184,5 +184,6 @@ internal class Admirer : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.KillButton?.OverrideText(GetString("AdmireButtonText"));
+        hud.KillButton?.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
     }
 }

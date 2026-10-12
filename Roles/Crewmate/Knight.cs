@@ -70,6 +70,11 @@ internal class Knight : RoleBase
         return false;
     }
 
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
+    }
+
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");
 }
 
@@ -128,6 +133,11 @@ internal class Requiter : RoleBase
         if (inMeeting || isSuicide) return;
         killer.RpcRemoveAbilityUse();
         target.SetDeathReason(PlayerState.DeathReason.Retribution);
+    }
+
+    public override void SetAbilityButtonText(HudManager hud, byte id)
+    {
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
 
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("JusticeKill");

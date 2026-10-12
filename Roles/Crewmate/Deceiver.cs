@@ -131,5 +131,6 @@ internal class Deceiver : RoleBase
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
         hud.KillButton.OverrideText(GetString("DeceiverButtonText"));
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
 }

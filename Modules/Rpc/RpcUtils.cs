@@ -60,9 +60,16 @@ public class RpcUtils
     [HarmonyPostfix]
     public static void PackAndSendQueuedMessagesPostfix(InnerNetClient __instance, [HarmonyArgument(0)] Queue<IGameDataMessage> queue, [HarmonyArgument(1)] SendOption sendOption)
     {
-        if (queue.Count > 0) return; // wait for vanilla to be done sending data
+        try
+        {
+            if (queue.Count > 0) return; // wait for vanilla to be done sending data
 
-        PackAndSendSpecificMessage(sendOption);
+            PackAndSendSpecificMessage(sendOption);
+        }
+        catch (Exception error)
+        {
+            Logger.Error($"Error: {error}", "Rpc.Utils.PackAndSendQueuedMessagesPostfix");
+        }
     }
 
     public static Dictionary<int, List<BaseGameDataMessage>> queuedReliableMessage = [];

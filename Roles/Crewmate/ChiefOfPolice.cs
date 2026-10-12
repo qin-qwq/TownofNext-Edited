@@ -164,6 +164,7 @@ internal class ChiefOfPolice : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.KillButton.OverrideText(GetString("ChiefOfPoliceKillButtonText"));
+        hud.KillButton.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("CoPKill");
 }

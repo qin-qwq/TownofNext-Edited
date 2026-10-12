@@ -105,5 +105,7 @@ internal class Monarch : RoleBase
     {
         if (playerId.GetAbilityUseLimit() > 0)
             hud.KillButton.OverrideText(GetString("MonarchKillButtonText"));
+
+        hud.KillButton.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
     }
 }

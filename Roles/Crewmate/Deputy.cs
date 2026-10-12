@@ -129,6 +129,7 @@ internal class Deputy : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte id)
     {
         hud.KillButton.OverrideText(GetString("DeputyHandcuffText"));
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
     public override Sprite GetKillButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("Handcuff");
 

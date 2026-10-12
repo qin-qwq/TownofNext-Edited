@@ -2444,7 +2444,7 @@
   "EraserEraseBaseImpostorOrNeutralRoleNotice": "哎呀，你的目标无法删除！",
   "EraserEraseSelf": "很抱歉，世界上最帅的人是无法被抹除的，就像真理永不泯灭一般。",
   "EraserTryingGuessErasedPlayer": "你无法猜出被你抹除玩家的职业，但附加职业除外",
-  "EraserCanGuessErasedPlayer": "可以猜测被抹除的玩家",
+  "EraserCanGuessErasedPlayer": "抹除者可以猜测被抹除的玩家",
   "LostRoleByEraser": "你的职业被<color=#ff1919>抹除者</color>抹除了",
   "KilledByScavenger": "清道夫把你杀了，因此你被传送到了地图外",
   "SnitchDoneTasks": "你已完成全部任务，启动会议以发动技能",

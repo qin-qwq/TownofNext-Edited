@@ -98,5 +98,6 @@ internal class Crusader : RoleBase
     {
         hud.ReportButton.OverrideText(GetString("ReportButtonText"));
         hud.KillButton.OverrideText(GetString("CrusaderKillButtonText"));
+        hud.KillButton.SetUsesRemaining((int)id.GetAbilityUseLimit());
     }
 }

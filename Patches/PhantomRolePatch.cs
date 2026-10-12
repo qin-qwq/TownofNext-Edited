@@ -95,7 +95,7 @@ public static class PhantomRolePatch
     public static bool CheckTrigger(PlayerControl phantom)
     {
         var role = phantom.GetRoleClass();
-        if (TimeMaster.Rewinding || role?.OnCheckVanish(phantom) == false || TimeAssassin.TimeStop || Pelican.IsEaten(phantom.PlayerId))
+        if (role?.OnCheckVanish(phantom) == false || TimeMaster.Rewinding || TimeAssassin.TimeStop || Pelican.IsEaten(phantom.PlayerId))
         {
             var killCooldown = phantom.GetKillTimer();
 

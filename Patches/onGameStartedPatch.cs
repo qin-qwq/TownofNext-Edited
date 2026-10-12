@@ -636,6 +636,7 @@ internal class StartGameHostPatch
             if (GameModeBase.GetGameMode() == CustomGameMode.Standard && overriden)
             {
                 if (pc.HasDesyncRole() && pc.IsPlayerCrewmateTeam()) roleType = RoleTypes.Crewmate;
+                if (!pc.IsPlayerCrewmateTeam() && RpcSetRoleReplacer.IsImpostorRoleTypes(roleType)) roleType = RoleTypes.Impostor;
             }
 
             if (!overriden && pc.Is(CustomRoles.GM)) continue;

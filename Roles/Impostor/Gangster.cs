@@ -54,9 +54,15 @@ internal class Gangster : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         if (CanRecruit(playerId))
-            HudManager.Instance.KillButton.OverrideText(GetString("GangsterButtonText"));
+        {
+            hud.KillButton.OverrideText(GetString("GangsterButtonText"));
+            hud.KillButton.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
+        }
         else
-            HudManager.Instance.KillButton.OverrideText(GetString("KillButtonText"));
+        {
+            hud.KillButton.OverrideText(GetString("KillButtonText"));
+            hud.KillButton.SetInfiniteUses();
+        }
     }
     public override bool OnCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
     {

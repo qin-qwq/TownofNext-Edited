@@ -99,6 +99,7 @@ internal class PlagueDoctor : RoleBase
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
         hud.KillButton.OverrideText(GetString("InfectiousKillButtonText"));
+        hud.KillButton.SetUsesRemaining((int)playerId.GetAbilityUseLimit());
     }
     public bool CanInfect(PlayerControl player)
     {
