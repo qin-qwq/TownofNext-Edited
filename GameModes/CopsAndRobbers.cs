@@ -18,7 +18,9 @@ internal class CopsAndRobbers : GameModeBase
 {
     public override CustomGameMode GameMode => CustomGameMode.CopsAndRobbers;
     public const int Id = 67_230_001;
-    public override bool OpeningHours => false;
+    public override bool ShowTimerBar => true;
+    public override int TotalTime => GameTime.GetInt();
+    public override bool OpeningHours => true;
 
     public static OptionItem GameTime;
     public static OptionItem ShowChatInGame;
@@ -269,7 +271,6 @@ internal class CopsAndRobbers : GameModeBase
         int RobberCount = RobberList.Count;
         int JewelCount = NumJewels;
         int CapturedCount = CaptureList.Count;
-        var time = StartedAt + GameTime.GetInt() - GetTimeStamp();
 
         if (!forGameEnd)
         {
@@ -285,11 +286,6 @@ internal class CopsAndRobbers : GameModeBase
         builder.Append(string.Format(GetString("Remaining.C&R.Jewel"), JewelCount, RobberJewels.GetInt()));
         builder.AppendLine();
         builder.Append(string.Format(GetString("Remaining.C&R.Capture"), CapturedCount, RobberCount));
-        if (!forGameEnd)
-        {
-            builder.AppendLine();
-            builder.Append($"{GetString("C&R_GameTime")}: {time}s");
-        }
 
         if (!forGameEnd) builder.Append("</size>");
 
@@ -339,14 +335,13 @@ internal class CopsAndRobbers : GameModeBase
         internal Bag Bag;
     }
 
-    private static long LastFixedUpdate;
-
-    public static void FixedUpdate()
+    public override void OnFixedUpdate(bool lowLoad, long nowTime, int timerLowLoad)
     {
-        var now = GetTimeStamp();
+        base.OnFixedUpdate(lowLoad, nowTime, timerLowLoad);
 
-        if (LastFixedUpdate == now) return;
-        LastFixedUpdate = now;
+        if (lowLoad) return;
+
+        if (!AmongUsClient.Instance.AmHost) return;
 
         if ((StartedAt + GameTime.GetInt() - TimeStamp) <= 60)
         {
@@ -356,9 +351,9 @@ internal class CopsAndRobbers : GameModeBase
         if (LastSpawnTime == 0) return;
         if (Jewel.Count >= MaxJewels) return;
 
-        if (LastSpawnTime + RefreshTime < now)
+        if (LastSpawnTime + RefreshTime < nowTime)
         {
-            LastSpawnTime = now;
+            LastSpawnTime = nowTime;
             if (!AllLocation.Any())
             {
                 var allPossible = GetAllRandomSpawnLocation();
@@ -381,7 +376,7 @@ class CopsAndRobbersGameEndPredicate : GameEndPredicate
 
         if (Main.AllPlayerControls.Count(x => x.Is(CustomRoles.Robber) || x.Is(CustomRoles.Disguiser)) == CopsAndRobbers.CaptureList.Count ||
             !Main.AllPlayerControls.Any(x => x.Is(CustomRoles.Robber) || x.Is(CustomRoles.Disguiser)) ||
-            CopsAndRobbers.StartedAt != 0 && GetTimeStamp() - CopsAndRobbers.StartedAt >= CopsAndRobbers.GameTime.GetInt())
+            GameModeBase.GetGameMode().GetGameModeClass().CurrentTime != -1 && GameModeBase.GetGameMode().GetGameModeClass().CurrentTime <= 0)
         {
             CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Cop);
             Main.EnumeratePlayerControls().Where(x => x.Is(CustomRoles.Cop)).Select(x => x.PlayerId).Do(x => CustomWinnerHolder.WinnerIds.Add(x));

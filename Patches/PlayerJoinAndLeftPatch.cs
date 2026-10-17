@@ -185,6 +185,7 @@ class DisconnectInternalPatch
         Logger.Info($"Disconnect (Reason:{reason}:{stringReason}, ping:{__instance.Ping})", "Reason Disconnect");
         RehostManager.OnDisconnectInternal(reason);
         DataFlagRateLimiter.DropQueue();
+        GameModeBase.GetGameMode().GetGameModeClass().StopBeep();
     }
 }
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))]

@@ -1,5 +1,6 @@
 using Hazel;
 using System.Text;
+using UnityEngine;
 
 namespace TONE;
 
@@ -11,7 +12,12 @@ public abstract class GameModeBase
     public virtual bool CanCloseDoors => false;
     public virtual bool CanReport => false;
     public virtual bool NormalTaskText => false;
+    public virtual bool ShowTimerBar => false;
     public virtual bool OpeningHours => true;
+
+    public virtual int TotalTime => 0;
+    public float CurrentTime = -1;
+    public Coroutine BeepCoroutine;
 
     public static CustomGameMode GetGameMode()
     {
@@ -72,5 +78,37 @@ public abstract class GameModeBase
             sub.Append(string.Format("\n\r" + Translator.GetString("Remaining.CovenCount"), covnum));
 
         sub.Append(string.Format("\n\r" + Translator.GetString("Remaining.NeutralCount"), neutralnum));
+    }
+
+    /// <summary>
+    /// A local method to check conditions during gameplay, 30 times each second
+    /// </summary>
+    public virtual void OnFixedUpdate(bool lowLoad, long nowTime, int timerLowLoad)
+    {
+        if (Main.IntroDestroyed)
+        {
+            if (ShowTimerBar && IntroCutsceneDestroyPatch.timerBar)
+            {
+                CurrentTime -= Time.fixedDeltaTime;
+                CurrentTime = Mathf.Max(CurrentTime, 0.0f);
+                if (CurrentTime <= 10.0 && BeepCoroutine == null)
+                    BeepCoroutine = Main.Instance.StartCoroutineV2(BeepAlmostEverySecond());
+                IntroCutsceneDestroyPatch.timerBar.UpdateTimer(CurrentTime, TotalTime);
+            }
+        }
+    }
+    private System.Collections.IEnumerator BeepAlmostEverySecond()
+    {
+        while (CurrentTime > 0.0)
+        {
+            SoundManager.Instance.PlaySoundImmediate(GameManagerCreator.Instance.HideAndSeekManagerPrefab.FinalHideCountdownSFX, false, pitch: 1.5f - CurrentTime / 10f / 2.0f);
+            yield return new WaitForSecondsRealtime(1f);
+        }
+    }
+    public void StopBeep()
+    {
+        if (BeepCoroutine != null)
+            Main.Instance.StopCoroutineV2(BeepCoroutine);
+        BeepCoroutine = null;
     }
 }

@@ -1324,6 +1324,7 @@ class FixedUpdateInNormalGamePatch
         if (inGame)
         {
             Sniper.OnFixedUpdateGlobal(player);
+            GameModeBase.GetGameMode().GetGameModeClass().OnFixedUpdate(lowLoad, nowTime, timerLowLoad);
 
             if (!lowLoad)
             {
@@ -1452,9 +1453,6 @@ class FixedUpdateInNormalGamePatch
                     CustomRoleManager.OnFixedUpdate(player, lowLoad, nowTime, timerLowLoad);
 
                     player.OnFixedAddonUpdate(lowLoad);
-
-                    if (GameModeBase.GetGameMode() == CustomGameMode.BonfireNight) BonfireNight.FixedUpdate();
-                    if (GameModeBase.GetGameMode() == CustomGameMode.CopsAndRobbers) CopsAndRobbers.FixedUpdate();
 
                     if (!lowLoad && Main.AllPlayerSpeed.TryGetValue(playerId, out var speed))
                     {

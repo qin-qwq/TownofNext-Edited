@@ -908,6 +908,7 @@ class BeginImpostorPatch
 internal static class IntroCutsceneDestroyPatch
 {
     public static long IntroDestroyTS;
+    public static HideAndSeekTimerBar timerBar;
 
     public static void Prefix()
     {
@@ -970,6 +971,24 @@ internal static class IntroCutsceneDestroyPatch
         }
 
         CustomRoleManager.Add();
+
+        if (GameModeBase.GetGameMode().GetGameModeClass().ShowTimerBar)
+        {
+            GameModeBase.GetGameMode().GetGameModeClass().CurrentTime = GameModeBase.GetGameMode().GetGameModeClass().TotalTime;
+
+            if (!timerBar)
+            {
+                var timerBarPrefab = GameManagerCreator.Instance.HideAndSeekManagerPrefab.TimerBarPrefab;
+                timerBar = Object.Instantiate(timerBarPrefab, DestroyableSingleton<HudManager>.Instance.transform.parent);
+            }
+            else timerBar.gameObject.SetActive(true);
+
+            if (GameModeBase.GetGameMode() != CustomGameMode.Standard)
+            {
+                timerBar.timerBarRenderer.material.SetColor("_Color", Main.GameModeColors[GameModeBase.GetGameMode()]);
+            }
+        }
+        else if (timerBar) timerBar.gameObject.SetActive(false);
 
         if (AmongUsClient.Instance.AmHost)
         {

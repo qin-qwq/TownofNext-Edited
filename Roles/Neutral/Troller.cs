@@ -77,7 +77,7 @@ internal class Troller : RoleBase
     {
         playerId.SetAbilityUseLimit(0);
     }
-    private void ResetAbility() => _state.PlayerId.SetAbilityUseLimit(TrollsPerRound.GetInt());
+    private void ResetAbility() => _state?.PlayerId.SetAbilityUseLimit(TrollsPerRound.GetInt());
     public override bool HasTasks(NetworkedPlayerInfo player, CustomRoles role, bool ForRecompute) => !ForRecompute;
 
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)

@@ -47,12 +47,12 @@ internal class Logos : RoleBase
             .SetParent(CustomRoleSpawnChances[CustomRoles.Logos]);
         CanUnlockStage1 = BooleanOptionItem.Create(Id + 12, "Logos.CanUnlockStage1", true, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Logos]);
-        Stage1Tasks = IntegerOptionItem.Create(Id + 13, "Logos.Stage1Tasks", new(0, 100, 5), 25, TabGroup.NeutralRoles, false)
+        Stage1Tasks = IntegerOptionItem.Create(Id + 13, "Logos.Stage1Tasks", new(5, 100, 5), 25, TabGroup.NeutralRoles, false)
             .SetParent(CanUnlockStage1)
             .SetValueFormat(OptionFormat.Percent);
         CanUnlockStage2 = BooleanOptionItem.Create(Id + 14, "Logos.CanUnlockStage2", true, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Logos]);
-        Stage2Tasks = IntegerOptionItem.Create(Id + 15, "Logos.Stage2Tasks", new(0, 100, 5), 50, TabGroup.NeutralRoles, false)
+        Stage2Tasks = IntegerOptionItem.Create(Id + 15, "Logos.Stage2Tasks", new(5, 100, 5), 50, TabGroup.NeutralRoles, false)
             .SetParent(CanUnlockStage2)
             .SetValueFormat(OptionFormat.Percent);
         Stage2KillCooldown = FloatOptionItem.Create(Id + 16, GeneralOption.MinKillCooldown, new(0f, 180f, 2.5f), 15f, TabGroup.NeutralRoles, false)
@@ -60,12 +60,12 @@ internal class Logos : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         CanUnlockStage3 = BooleanOptionItem.Create(Id + 17, "Logos.CanUnlockStage3", true, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Logos]);
-        Stage3Tasks = IntegerOptionItem.Create(Id + 18, "Logos.Stage3Tasks", new(0, 100, 5), 75, TabGroup.NeutralRoles, false)
+        Stage3Tasks = IntegerOptionItem.Create(Id + 18, "Logos.Stage3Tasks", new(5, 100, 5), 75, TabGroup.NeutralRoles, false)
             .SetParent(CanUnlockStage3)
             .SetValueFormat(OptionFormat.Percent);
         CanUnlockStage4 = BooleanOptionItem.Create(Id + 19, "Logos.CanUnlockStage4", true, TabGroup.NeutralRoles, false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Logos]);
-        Stage4Tasks = IntegerOptionItem.Create(Id + 20, "Logos.Stage4Tasks", new(0, 100, 5), 100, TabGroup.NeutralRoles, false)
+        Stage4Tasks = IntegerOptionItem.Create(Id + 20, "Logos.Stage4Tasks", new(5, 100, 5), 100, TabGroup.NeutralRoles, false)
             .SetParent(CanUnlockStage4)
             .SetValueFormat(OptionFormat.Percent);
         OverrideTasksData.Create(Id + 21, TabGroup.NeutralRoles, CustomRoles.Philosopher, CustomRoles.Logos);
@@ -314,7 +314,7 @@ internal class Philosopher : RoleBase
     {
         if (!player) return true;
 
-        var taskNum = (int)(((float)completedTaskCount / totalTaskCount) * 100);
+        var taskNum = (int)((float)completedTaskCount / totalTaskCount * 100);
 
         if (!Logos.Stage[0] && Logos.CanUnlockStage1.GetBool() && taskNum >= Logos.Stage1Tasks.GetInt())
         {

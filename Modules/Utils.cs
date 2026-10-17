@@ -2824,9 +2824,8 @@ public static class Utils
 
             foreach (var playerState in Main.PlayerStates.Values.ToArray())
             {
-                if (!playerState.Player) continue;
                 if (playerState.RoleClass == null) continue;
-                if (!playerState.RoleClass._Player) continue;
+
                 if (Balancer.Choose2)
                 {
                     Balancer.BalancerAfterMeetingTasks();

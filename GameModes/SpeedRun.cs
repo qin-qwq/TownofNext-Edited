@@ -16,6 +16,8 @@ internal class SpeedRun : GameModeBase
     private const int Id = 67_225_001;
     public override bool CanCloseDoors => SpeedRun_AllowCloseDoor.GetBool();
     public override bool NormalTaskText => true;
+    public override bool ShowTimerBar => true;
+    public override int TotalTime => SpeedRun_MaxTimeForTie.GetInt();
 
     public static OptionItem SpeedRun_NumCommonTasks;
     public static OptionItem SpeedRun_NumShortTasks;
@@ -41,7 +43,6 @@ internal class SpeedRun : GameModeBase
     public static OptionItem SpeedRun_ProtectOnlyOnce;
     public static OptionItem SpeedRun_ProtectKcd;
 
-    public static OptionItem SpeedRun_EndGameForTime;
     public static OptionItem SpeedRun_MaxTimeForTie;
 
     public static long StartedAt = 0;
@@ -135,15 +136,11 @@ internal class SpeedRun : GameModeBase
             .SetParent(SpeedRun_ProtectAfterTask, false)
             .SetValueFormat(OptionFormat.Seconds);
 
-        SpeedRun_EndGameForTime = BooleanOptionItem.Create(Id + 18, "SpeedRun_EndGameForTime", false, TabGroup.ModSettings, false)
+        SpeedRun_MaxTimeForTie = IntegerOptionItem.Create(Id + 18, "SpeedRun_MaxTimeForTie", new(30, 3600, 15), 600, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.SpeedRun)
             .SetColor(new Color32(255, 251, 0, byte.MaxValue))
+            .SetValueFormat(OptionFormat.Seconds)
             .SetHeader(true);
-        SpeedRun_MaxTimeForTie = IntegerOptionItem.Create(Id + 19, "SpeedRun_MaxTimeForTie", new(30, 3600, 15), 600, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.SpeedRun)
-            .SetColor(new Color32(255, 251, 0, byte.MaxValue))
-            .SetParent(SpeedRun_EndGameForTime, false)
-            .SetValueFormat(OptionFormat.Seconds);
     }
 
     public override void Init()
@@ -432,7 +429,7 @@ class SpeedRunGameEndPredicate : GameEndPredicate
             return true;
         }
 
-        if (SpeedRun.StartedAt != 0 && GetTimeStamp() - SpeedRun.StartedAt >= SpeedRun.SpeedRun_MaxTimeForTie.GetInt())
+        if (GameModeBase.GetGameMode().GetGameModeClass().CurrentTime != -1 && GameModeBase.GetGameMode().GetGameModeClass().CurrentTime <= 0)
         {
             reason = GameOverReason.CrewmatesByTask;
             CustomWinnerHolder.WinnerIds.Clear();

@@ -18,6 +18,8 @@ internal class BonfireNight : GameModeBase
 {
     public override CustomGameMode GameMode => CustomGameMode.BonfireNight;
     private const int Id = 67_228_001;
+    public override bool ShowTimerBar => true;
+    public override int TotalTime => GameTime.GetInt();
     public override bool OpeningHours => Main.ShouldActive;
 
     public static OptionItem GameTime;
@@ -417,14 +419,13 @@ internal class BonfireNight : GameModeBase
         public long Grow;
     }
 
-    private static long LastFixedUpdate;
-
-    public static void FixedUpdate()
+    public override void OnFixedUpdate(bool lowLoad, long nowTime, int timerLowLoad)
     {
-        var now = GetTimeStamp();
+        base.OnFixedUpdate(lowLoad, nowTime, timerLowLoad);
 
-        if (LastFixedUpdate == now) return;
-        LastFixedUpdate = now;
+        if (lowLoad) return;
+
+        if (!AmongUsClient.Instance.AmHost) return;
 
         if ((StartedAt + GameTime.GetInt() - TimeStamp) <= 60)
         {
@@ -518,7 +519,7 @@ class BonfireNightGameEndPredicate : GameEndPredicate
             return true;
         }
 
-        if (BonfireNight.StartedAt != 0 && GetTimeStamp() - BonfireNight.StartedAt >= BonfireNight.GameTime.GetInt())
+        if (GameModeBase.GetGameMode().GetGameModeClass().CurrentTime != -1 && GameModeBase.GetGameMode().GetGameModeClass().CurrentTime <= 0)
         {
             reason = GameOverReason.CrewmatesByTask;
             var (a, b, c) = BonfireNight.BonfireState;
@@ -762,7 +763,7 @@ public class FireThief : RoleBase
         var timeText = $"{GetString("BonfireNight_GameTime")}: {time}s";
         var gameState = new BonfireNight().GetGameState();
 
-        return seer.IsModded() ? timeText : $"{gameState}\n{timeText}";
+        return seer.IsModded() ? string.Empty : $"{gameState}\n{timeText}";
     }
 
     private BonfireNight.TreeState TryCollect(PlayerControl player, BonfireNight.TreeState tree, Vector2 pos, int max)

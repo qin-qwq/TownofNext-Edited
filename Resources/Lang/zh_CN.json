@@ -3998,7 +3998,6 @@
   "SpeedRun_ProtectDuration": "护盾失效还有最后*秒",
   "SpeedRun_ProtectOnlyOnce": "护盾在尝试单次击杀后破裂",
   "SpeedRun_ProtectKcd": "重置击杀者冷却时间为*秒",
-  "SpeedRun_EndGameForTime": "强制在*秒后结束游戏",
   "SpeedRun_MaxTimeForTie": "*秒后游戏结束",
   "TaskFinishedSeconds": "任务在{0}秒中完成",
   "SpeedRun_LeaderBoard": "★ 最佳奔跑者 ！★",

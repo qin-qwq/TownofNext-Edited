@@ -339,7 +339,7 @@ public class dbConnect
             {
                 try
                 {
-                    var tempLimitedTime = JsonSerializer.Deserialize<LimitedTimeStartEnd>(webRequest.downloadHandler.text);
+                    var tempLimitedTime = JsonSerializer.Deserialize<LimitedTimeStartEnd>(webRequest.downloadHandler.text, new JsonSerializerOptions{ IncludeFields = true, PropertyNameCaseInsensitive = true });
                     GameModeLimitedTime = tempLimitedTime;
                     success = true;
                     HasLimitedTime = true;

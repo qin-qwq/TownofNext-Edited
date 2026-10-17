@@ -23,6 +23,8 @@ class EndGamePatch
     {
         GameStates.InGame = false;
 
+        GameModeBase.GetGameMode().GetGameModeClass().StopBeep();
+
         // if game is H&S or Host no have mod
         if (!GameStates.IsModHost || GameStates.IsHideNSeek) return;
 

@@ -250,6 +250,8 @@ internal class ChangeRoleSettings
                 gm?.Init();
             }
 
+            GameModeBase.GetGameMode().GetGameModeClass().CurrentTime = -1;
+
             TargetArrow.Init();
             LocateArrow.Init();
             DoubleTrigger.Init();
