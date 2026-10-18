@@ -111,9 +111,8 @@ internal class Imitator : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("Imitator.AlreadyImitate"), ColorString(GetRoleColor(CustomRoles.Imitator), GetString("Imitator").ToUpper()));
                     return true;
                 }
-                var role = target.GetCustomRole();
-                if (role.IsGhostRole()) role = target.GetRoleMap().CustomRole;
-                if (!role.IsCrewmate() || role == CustomRoles.GM)
+                var role = target.GetPreviousRole();
+                if (!role.IsCrewmate() || role == CustomRoles.GM || role.IsGhostRole())
                 {
                     pc.ShowInfoMessage(isUI, GetString("Imitator.CantImitateNonCrewmate"), ColorString(GetRoleColor(CustomRoles.Imitator), GetString("Imitator").ToUpper()));
                     return true;

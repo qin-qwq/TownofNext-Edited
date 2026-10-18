@@ -5033,5 +5033,13 @@
   "Achievement.Title.PelicanSnake": "贪吃蛇",
   "Achievement.Desc.PelicanSnake": "作为鹈鹕一局内吞下 3 名玩家",
   "Achievement.Title.PelicanBigEater": "大胃王",
-  "Achievement.Desc.PelicanBigEater": "作为鹈鹕吞下 6 名玩家"
+  "Achievement.Desc.PelicanBigEater": "作为鹈鹕吞下 6 名玩家",
+  "Achievement.Title.VeteranLastStand": "一夫当关",
+  "Achievement.Desc.VeteranLastStand": "作为老兵在警戒状态下反杀 1 名玩家",
+  "Achievement.Title.BodyguardSacrifice": "舍身成仁",
+  "Achievement.Desc.BodyguardSacrifice": "作为保镖为保护他人牺牲 1 次",
+  "Achievement.Title.MedicShieldSaver": "妙手回春",
+  "Achievement.Desc.MedicShieldSaver": "作为医生用护盾阻挡 3 次击杀",
+  "Achievement.Title.WerewolfBloodbath": "月下血宴",
+  "Achievement.Desc.WerewolfBloodbath": "作为月下狼人一局内袭击 3 名玩家"
 }

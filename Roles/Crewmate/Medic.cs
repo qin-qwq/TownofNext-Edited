@@ -202,6 +202,7 @@ internal class Medic : RoleBase
         }
 
         Logger.Info($"{target.GetNameWithRole()} : Shield Shatter from the Medic", "Medic");
+        if (medic) AchievementManager.OnRoleAbility(CustomRoles.Medic, AchievementBase.AchievementEventType.MedicShieldBlocked, medic);
         return true;
     }
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl pc, CustomRoles role, ref bool guesserSuicide)

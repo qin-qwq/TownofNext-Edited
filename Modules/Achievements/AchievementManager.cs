@@ -174,7 +174,7 @@ public static class AchievementManager
     /// </summary>
     public static void ShowAchievements(byte playerId, string roleName = null)
     {
-        List<AchievementBase> list = AllAchievements;
+        List<AchievementBase> list = SortForDisplay(AllAchievements);
 
         if (!string.IsNullOrWhiteSpace(roleName))
         {
@@ -183,7 +183,7 @@ public static class AchievementManager
                 Utils.SendMessage(GetString("Message.CanNotFindRoleThePlayerEnter"), playerId);
                 return;
             }
-            list = achievementsByRole.TryGetValue(role, out List<AchievementBase> roleList) ? roleList : [];
+            list = SortForDisplay(achievementsByRole.TryGetValue(role, out List<AchievementBase> roleList) ? roleList : []);
         }
 
         List<AchievementBase> completed = [.. list.Where(a => a.IsCompleted)];
@@ -210,6 +210,43 @@ public static class AchievementManager
         }
 
         Utils.SendMessage(sb.ToString(), playerId, GetString("Achievement.Completed") + $" <#ffc0cb>(<#00ffa5>{completed.Count}</color>/{list.Count})</color>");
+    }
+
+    private static List<AchievementBase> SortForDisplay(IEnumerable<AchievementBase> achievements)
+    {
+        List<AchievementBase> list = [.. achievements];
+        Dictionary<CustomRoles, int> roleFirstId = list
+            .GroupBy(a => a.Role)
+            .ToDictionary(g => g.Key, g => g.Min(a => a.Id));
+
+        list.Sort((x, y) =>
+        {
+            var result = GetTeamSortOrder(x.Role).CompareTo(GetTeamSortOrder(y.Role));
+            if (result != 0) return result;
+
+            result = roleFirstId[x.Role].CompareTo(roleFirstId[y.Role]);
+            if (result != 0) return result;
+
+            result = x.Id.CompareTo(y.Id);
+            return result != 0 ? result : string.CompareOrdinal(x.Name, y.Name);
+        });
+
+        return list;
+    }
+
+    private static int GetTeamSortOrder(CustomRoles role)
+    {
+        if (role == CustomRoles.NotAssigned) return 6;
+        if (role.IsAdditionRole()) return 5;
+
+        return role.GetCustomRoleTeam() switch
+        {
+            Custom_Team.Impostor => 1,
+            Custom_Team.Crewmate => 2,
+            Custom_Team.Neutral => 3,
+            Custom_Team.Coven => 4,
+            _ => 5,
+        };
     }
 
     /// <summary>

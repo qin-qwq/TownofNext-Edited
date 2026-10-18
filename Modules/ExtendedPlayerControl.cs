@@ -13,6 +13,7 @@ using TONE.Patches;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Impostor;
 using TONE.Roles.Core;
+using TONE.Roles.Core.AssignManager;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using TONE.Roles.Impostor;
@@ -1440,6 +1441,7 @@ static class ExtendedPlayerControl
         else if (Virus.KnowRole(seer, target)) return true;
         else if (Admirer.CheckKnowRoleTarget(seer, target)) return true;
         else if (NarcManager.KnowRoleOfTarget(seer, target)) return true;
+        else if (Notary.KnowRole(seer, target)) return true;
         else if (Main.VisibleTasksCount && !seer.IsAlive())
         {
             if (Nemesis.PreventKnowRole(seer)) return false;
@@ -2143,5 +2145,21 @@ static class ExtendedPlayerControl
         player.RpcSetCustomRole(role);
         player.RpcChangeRoleBasis(role);
         if (add) player.GetRoleClass()?.OnAdd(player.PlayerId);
+    }
+
+    /// <summary>
+    /// If ghost role, get the previous role. Otherwise, get the current role
+    /// </summary>
+    public static CustomRoles GetPreviousRole(this PlayerControl player)
+    {
+        if (player.GetCustomRole().IsGhostRole())
+        {
+            if (GhostRoleAssign.GhostGetPreviousRole.TryGetValue(player.PlayerId, out var role))
+            {
+                return role;
+            }
+        }
+
+        return player.GetCustomRole();
     }
 }

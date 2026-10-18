@@ -1836,7 +1836,7 @@ public static class Utils
     private static readonly StringBuilder TargetDeathReason = new();
     private static readonly StringBuilder TargetSuffix = new();
     private static readonly StringBuilder TargetMark = new(20);
-    public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = false, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.Reliable)
+    public static void NotifyRoles(PlayerControl SpecifySeer = null, PlayerControl SpecifyTarget = null, bool isForMeeting = false, bool NoCache = false, bool ForceLoop = true, bool CamouflageIsForMeeting = false, bool MushroomMixupIsActive = false, bool GuesserIsForMeeting = false, SendOption SendOption = SendOption.Reliable)
     {
         try
         {
@@ -3497,5 +3497,38 @@ public static class Utils
         List<MeetingHud.VoterState> statesList = [];
         MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true, false, 0);
         MeetingHud.Instance.RpcClose();
+    }
+
+    public static CosmeticData GetCosmetic(string itemID)
+    {
+        string str1 = "hat_NoHat";
+        string str2 = "skin_None";
+        string str3 = "pet_EmptyPet";
+        string str4 = "visor_EmptyVisor";
+        string str5 = "nameplate_NoPlate";
+        CosmeticData hatById = DestroyableSingleton<HatManager>.Instance.GetHatById(itemID);
+        if (hatById != null && hatById.ProdId != str1)
+        {
+            return hatById;
+        }
+        CosmeticData skinById = DestroyableSingleton<HatManager>.Instance.GetSkinById(itemID);
+        if (skinById != null && skinById.ProdId != str2)
+        {
+            return skinById;
+        }
+        CosmeticData petById = DestroyableSingleton<HatManager>.Instance.GetPetById(itemID);
+        if (petById != null && petById.ProdId != str3)
+        {
+            return petById;
+        }
+        CosmeticData visorById = DestroyableSingleton<HatManager>.Instance.GetVisorById(itemID);
+        if (visorById != null && visorById.ProdId != str4)
+        {
+            return visorById;
+        }
+        CosmeticData namePlateById = DestroyableSingleton<HatManager>.Instance.GetNamePlateById(itemID);
+        if (namePlateById == null || !(namePlateById.ProdId != str5))
+            return null;
+        return namePlateById;
     }
 }

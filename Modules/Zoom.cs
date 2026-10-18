@@ -12,39 +12,43 @@ public static class Zoom
     private static bool ResetButtons = false;
     public static void Postfix()
     {
-        if (GameStates.IsShip && !GameStates.IsMeeting && GameStates.IsCanMove && PlayerControl.LocalPlayer.Data.IsDead || GameStates.IsLobby && GameStates.IsCanMove && !InGameRoleInfoMenu.Showing)
+        try
         {
-            if (Camera.main.orthographicSize > 3.0f)
-                ResetButtons = true;
-
-            if (Input.mouseScrollDelta.y > 0)
+            if (GameStates.IsShip && !GameStates.IsMeeting && GameStates.IsCanMove && PlayerControl.LocalPlayer.Data.IsDead || GameStates.IsLobby && GameStates.IsCanMove && !InGameRoleInfoMenu.Showing)
             {
                 if (Camera.main.orthographicSize > 3.0f)
-                {
-                    SetZoomSize(times: false);
-                }
+                    ResetButtons = true;
 
-            }
-            if (Input.mouseScrollDelta.y < 0)
-            {
-                if (GameStates.IsDead || GameStates.IsFreePlay || DebugModeManager.AmDebugger || GameStates.IsLobby ||
-                    PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug)
+                if (Input.mouseScrollDelta.y > 0)
                 {
-                    if (Camera.main.orthographicSize < 18.0f)
+                    if (Camera.main.orthographicSize > 3.0f)
                     {
-                        SetZoomSize(times: true);
+                        SetZoomSize(times: false);
+                    }
+
+                }
+                if (Input.mouseScrollDelta.y < 0)
+                {
+                    if (GameStates.IsDead || GameStates.IsFreePlay || DebugModeManager.AmDebugger || GameStates.IsLobby ||
+                        PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug)
+                    {
+                        if (Camera.main.orthographicSize < 18.0f)
+                        {
+                            SetZoomSize(times: true);
+                        }
                     }
                 }
+                Flag.NewFlag("Zoom");
             }
-            Flag.NewFlag("Zoom");
-        }
-        else
-        {
-            Flag.Run(() =>
+            else
             {
-                SetZoomSize(reset: true);
-            }, "Zoom");
+                Flag.Run(() =>
+                {
+                    SetZoomSize(reset: true);
+                }, "Zoom");
+            }
         }
+        catch { }
     }
 
     private static void SetZoomSize(bool times = false, bool reset = false)

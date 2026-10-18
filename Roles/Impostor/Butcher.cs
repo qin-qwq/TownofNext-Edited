@@ -98,6 +98,7 @@ internal class Butcher : RoleBase
     {
         if (!target.IsAlive()) return;
         if (!MurderTargetLateTask.TryGetValue(target.PlayerId, out var data)) return;
+        if (TimeMaster.Rewinding) return;
         var ops = data.Item3;
 
         if (data.Item1 > 19) //on fix update updates 30 times pre second

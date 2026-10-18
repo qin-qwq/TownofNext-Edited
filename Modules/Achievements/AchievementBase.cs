@@ -121,5 +121,8 @@ public abstract class AchievementBase
         SheriffMisfire, // 警长走火
         VeteranKilledAttacker, // 老兵警戒反杀
         PelicanEat, // 鹈鹕吞下
+        BodyguardSacrificed, // 保镖牺牲
+        MedicShieldBlocked, // 医生护盾阻挡击杀
+        WerewolfMauled, // 月下狼人袭击
     }
 }

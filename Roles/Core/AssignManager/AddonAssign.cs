@@ -224,7 +224,11 @@ public static class AddonAssign
         var candidates = new List<PlayerControl>();
         var validPlayers = Main.EnumerateAlivePlayerControls().Where(pc => CustomRolesHelper.CheckAddonConfilct(role, pc));
 
-        if (Options.AddonTeamMaximumSettings.TryGetValue(role, out var data))
+        if (!Options.AddonTeamMaximumSettings.TryGetValue(role, out var data))
+        {
+            return validPlayers.ToList();
+        }
+        else
         {
             var crewmateMaximum = data.Crew.GetInt();
             if (crewmateMaximum > 0)

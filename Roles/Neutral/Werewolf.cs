@@ -56,6 +56,7 @@ internal class Werewolf : RoleBase
                     player.SetDeathReason(PlayerState.DeathReason.Mauled);
                     player.RpcMurderPlayer(player);
                     player.SetRealKiller(killer);
+                    AchievementManager.OnRoleAbility(CustomRoles.Werewolf, AchievementBase.AchievementEventType.WerewolfMauled, killer);
                 }
             }
         }, 0.1f, "Werewolf Maul Bug Fix");

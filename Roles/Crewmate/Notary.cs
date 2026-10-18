@@ -230,7 +230,7 @@ internal class Notary : RoleBase
         RoleCommand(_Player, $"/nr {targetId} {GetString(role.ToString())}", true);
     }
 
-    public override bool KnowRoleTarget(PlayerControl seer, PlayerControl target) => NotarizeList.Contains(target.PlayerId);
+    public static bool KnowRole(PlayerControl seer, PlayerControl target) => NotarizeList.Contains(target.PlayerId);
 
     public override string GetMarkOthers(PlayerControl seer, PlayerControl seen, bool isForMeeting = false)
     {

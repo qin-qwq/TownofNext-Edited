@@ -1365,7 +1365,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Admirer)
                     || pc.Is(CustomRoles.JudgeTONE)
                     || pc.Is(CustomRoles.Mercenary)
-                    || pc.Is(CustomRoles.Mayor))
+                    || pc.Is(CustomRoles.Mayor)
+                    || pc.Is(CustomRoles.Notary))
                     return false;
                 break;
         }

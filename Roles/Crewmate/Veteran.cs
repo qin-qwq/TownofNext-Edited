@@ -77,6 +77,7 @@ internal class Veteran : RoleBase
                 {
                     target.RpcMurderPlayer(killer);
                     killer.SetRealKiller(target);
+                    AchievementManager.OnRoleAbility(CustomRoles.Veteran, AchievementBase.AchievementEventType.VeteranKilledAttacker, target);
                     Logger.Info($"{target.GetRealName()} kill {killer.GetRealName()}", "Veteran");
                     return false;
                 }

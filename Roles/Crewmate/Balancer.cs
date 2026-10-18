@@ -42,6 +42,10 @@ internal class Balancer : RoleBase
         Target1 = 253;
         Target2 = 253;
     }
+    public override void Remove(byte playerId)
+    {
+        AfterMeetingTasks();
+    }
 
     public override bool CheckVote(PlayerControl voter, PlayerControl target)
     {

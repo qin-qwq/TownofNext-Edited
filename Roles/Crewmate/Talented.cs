@@ -38,7 +38,7 @@ internal class Talented : RoleBase
     {
         if (!player.IsAlive()) return true;
 
-        var addonsList = addons.Where(x => CustomRolesHelper.CheckAddonConfilct(player.GetCustomRole(), player, false));
+        var addonsList = addons.Where(x => CustomRolesHelper.CheckAddonConfilct(x, player, false));
 
         if (addonsList.Any())
         {

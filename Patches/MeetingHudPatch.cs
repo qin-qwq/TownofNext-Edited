@@ -367,6 +367,7 @@ class CheckForEndVotingPatch
             var allPlayerCount = allPlayers.Count;
 
             bool braked = false;
+            bool balancer = false;
             if (tie)
             {
                 byte targetId = byte.MaxValue;
@@ -412,7 +413,6 @@ class CheckForEndVotingPatch
                 {
                     Logger.Info("Flat breakers cover expulsion of players", "Tiebreaker Vote");
                     exiledPlayer = GetPlayerInfoById(targetId);
-                    tie = false;
                     braked = true;
                 }
                 else
@@ -426,7 +426,9 @@ class CheckForEndVotingPatch
                         GetPlayerById(playerId).SetRealKiller(null);
                     TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Vote, exileIds);
                     exiledPlayer = GetPlayerInfoById(exileIds.RandomElement());
+                    balancer = true;
                 }
+                tie = false;
             }
             if (Options.VoteMode.GetBool() && Options.WhenTie.GetBool() && tie)
             {
@@ -448,7 +450,7 @@ class CheckForEndVotingPatch
                         break;
                 }
             }
-            else if (!braked)
+            else if (!braked && !balancer)
                 exiledPlayer = allPlayers.FirstOrDefault(info => !tie && info.PlayerId == exileId);
 
             if (Options.CurrentGameMode == CustomGameMode.RoundUp)

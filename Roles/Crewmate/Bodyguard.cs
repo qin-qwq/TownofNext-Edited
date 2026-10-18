@@ -62,6 +62,7 @@ internal class Bodyguard : RoleBase
             bodyguard.RpcMurderPlayer(killer);
             bodyguard.SetRealKiller(killer);
             bodyguard.RpcMurderPlayer(bodyguard);
+            AchievementManager.OnRoleAbility(CustomRoles.Bodyguard, AchievementBase.AchievementEventType.BodyguardSacrificed, bodyguard);
             Logger.Info($"{bodyguard.GetRealName()} Stand up and die with the gangster {killer.GetRealName()}", "Bodyguard");
             return true;
         }

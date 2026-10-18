@@ -1324,7 +1324,8 @@ class FixedUpdateInNormalGamePatch
         if (inGame)
         {
             Sniper.OnFixedUpdateGlobal(player);
-            GameModeBase.GetGameMode().GetGameModeClass().OnFixedUpdate(lowLoad, nowTime, timerLowLoad);
+            if (playerAmOwner)
+                GameModeBase.GetGameMode().GetGameModeClass().OnFixedUpdate(lowLoad, nowTime, timerLowLoad);
 
             if (!lowLoad)
             {

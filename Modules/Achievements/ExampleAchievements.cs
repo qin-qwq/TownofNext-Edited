@@ -143,7 +143,68 @@ public sealed class PelicanBigEater : AchievementBase
     }
 }
 
+// 一夫当关：作为老兵在警戒状态下反杀 1 名玩家
+public sealed class VeteranLastStand : AchievementBase
+{
+    public override int Id => 70;
+    public override string Name => "VeteranLastStand";
+    public override CustomRoles Role => CustomRoles.Veteran;
+    public override int TargetProgress => 1;
+
+    public override void OnRoleAbility(AchievementEventType type, PlayerControl player)
+    {
+        if (type == AchievementEventType.VeteranKilledAttacker && IsLocalPlayer(player))
+            AddProgress();
+    }
+}
+
+// 舍身成仁：作为保镖为保护他人牺牲 1 次
+public sealed class BodyguardSacrifice : AchievementBase
+{
+    public override int Id => 80;
+    public override string Name => "BodyguardSacrifice";
+    public override CustomRoles Role => CustomRoles.Bodyguard;
+    public override int TargetProgress => 1;
+
+    public override void OnRoleAbility(AchievementEventType type, PlayerControl player)
+    {
+        if (type == AchievementEventType.BodyguardSacrificed && IsLocalPlayer(player))
+            AddProgress();
+    }
+}
+
+// 妙手回春：作为医生用护盾挡下 3 次击杀
+public sealed class MedicShieldSaver : AchievementBase
+{
+    public override int Id => 90;
+    public override string Name => "MedicShieldSaver";
+    public override CustomRoles Role => CustomRoles.Medic;
+    public override int TargetProgress => 3;
+
+    public override void OnRoleAbility(AchievementEventType type, PlayerControl player)
+    {
+        if (type == AchievementEventType.MedicShieldBlocked && IsLocalPlayer(player))
+            AddProgress();
+    }
+}
+
+// 月下血宴：作为月下狼人一局内袭击 3 名玩家
+public sealed class WerewolfBloodbath : AchievementBase
+{
+    public override int Id => 100;
+    public override string Name => "WerewolfBloodbath";
+    public override CustomRoles Role => CustomRoles.Werewolf;
+    public override int TargetProgress => 3;
+    public override bool SaveProgress => false;
+
+    public override void OnRoleAbility(AchievementEventType type, PlayerControl player)
+    {
+        if (type == AchievementEventType.WerewolfMauled && IsLocalPlayer(player))
+            AddProgress();
+    }
+}
+
 //#######################################
-// 61 last id for achievements (Next use 70)
+// 100 last id for achievements (Next use 110)
 // Limit id for achievements --- Endless
 //#######################################

@@ -144,7 +144,7 @@ internal class Overseer : RoleBase
 
     public static bool IsRevealedPlayer(PlayerControl player, PlayerControl target)
     {
-        if (player == null || target == null || IsRevealed == null) return false;
+        if (!player || !target || IsRevealed == null) return false;
         IsRevealed.TryGetValue((player.PlayerId, target.PlayerId), out bool isRevealed);
         return isRevealed;
     }
