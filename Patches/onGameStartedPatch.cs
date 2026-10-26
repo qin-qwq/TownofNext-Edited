@@ -478,15 +478,15 @@ internal class StartGameHostPatch
             yield break;
         }
 
-        /*if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
+        if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
         {
             yield return RpcSetRoleReplacer.ReleaseVanilla();
         }
         else
-        {*/
-        // Send all RPC for modded region
-        RpcSetRoleReplacer.Release();
-        //}
+        {
+            // Send all RPC for modded region
+            RpcSetRoleReplacer.Release();
+        }
 
         try
         {

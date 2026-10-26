@@ -948,7 +948,7 @@ internal static class IntroCutsceneDestroyPatch
         }
     }
 
-    public static void Postfix(Il2CppObjectBase __instance)
+    public static void Postfix()
     {
         if (!GameStates.IsInGame) return;
 

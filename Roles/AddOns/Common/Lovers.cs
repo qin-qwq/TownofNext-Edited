@@ -135,19 +135,20 @@ public class Lovers : IAddon
 
                 if (isExiled)
                 {
-                    //if (Main.PlayersDiedInMeeting.Contains(deathId))
-                    //{
-                    partnerPlayer.RpcExileV3();
-                    if (MeetingHud.Instance?.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
+                    if (Main.PlayersDiedInMeeting.Contains(deathId))
                     {
-                        MeetingHud.Instance?.CheckForEndVoting();
+                        partnerPlayer.RpcExileV3();
+                        if (MeetingHud.Instance?.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
+                        {
+                            MeetingHud.Instance?.CheckForEndVoting();
+                        }
+                        _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
                     }
-                    _ = new LateTask(() => HudManager.Instance?.SetHudActive(false), 0.3f, "SetHudActive in LoversSuicide", shoudLog: false);
-                    //}
-                    //else
-                    //{
-                    //CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
-                    //}
+                    else
+                    {
+                        CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
+                        GameEndCheckerForNormal.ShouldNotCheck = true;
+                    }
                 }
                 else
                 {

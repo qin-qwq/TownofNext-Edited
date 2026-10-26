@@ -886,6 +886,11 @@ static class ExtendedPlayerControl
                 Logger.Warn($"Teleporting canceled - Target: ({player.GetNameWithRole().RemoveHtmlTags()}) use moving platform (Airship/Fungle)", "RpcTeleport");
                 cancelTeleport = true;
             }
+            else if (Scavenger.CancelTeleportPlayersId.Contains(player.PlayerId))
+            {
+                Logger.Warn($"Teleporting canceled - Target: ({player.GetNameWithRole().RemoveHtmlTags()}) Killed by the scavenger", "RpcTeleport");
+                cancelTeleport = true;
+            }
 
             if (cancelTeleport)
             {

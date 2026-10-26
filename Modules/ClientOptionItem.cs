@@ -12,6 +12,7 @@ public class ClientOptionItem
 
     public static SpriteRenderer CustomBackground;
     private static List<ToggleButtonBehaviour> OptionButtons;
+    private static readonly Dictionary<ToggleButtonBehaviour, string> OptionStrings = [];
 
     private ClientOptionItem(
         string name,
@@ -39,6 +40,7 @@ public class ClientOptionItem
                 closeButton.transform.localPosition = new(2.6f, -2.3f, -6f);
                 closeButton.name = "Back";
                 closeButton.Text.text = Translator.GetString("Back");
+                OptionStrings[closeButton] = "Back";
                 closeButton.Background.color = Palette.DisabledGrey;
                 var closePassiveButton = closeButton.GetComponent<PassiveButton>();
                 closePassiveButton.OnClick = new();
@@ -65,6 +67,7 @@ public class ClientOptionItem
                 modOptionsButton.transform.localPosition = leaveButton?.transform?.localPosition ?? new(0f, -2.4f, 1f);
                 modOptionsButton.name = "TONEOptions";
                 modOptionsButton.Text.text = Translator.GetString("TONEOptions");
+                OptionStrings[modOptionsButton] = "TONEOptions";
                 modOptionsButton.Background.color = new Color32(255, 129, 166, byte.MaxValue);
                 var modOptionsPassiveButton = modOptionsButton.GetComponent<PassiveButton>();
                 modOptionsPassiveButton.OnClick = new();
@@ -93,6 +96,7 @@ public class ClientOptionItem
                            -6f);
             ToggleButton.name = name;
             ToggleButton.Text.text = Translator.GetString(name);
+            OptionStrings[ToggleButton] = name;
             var passiveButton = ToggleButton.GetComponent<PassiveButton>();
             passiveButton.OnClick = new();
             passiveButton.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
@@ -152,5 +156,15 @@ public class ClientOptionItem
         var color = (Config != null && Config.Value) ? new Color32(255, 192, 203, byte.MaxValue) : new Color32(77, 77, 77, byte.MaxValue);
         ToggleButton.Background.color = color;
         ToggleButton.Rollover?.ChangeOutColor(color);
+    }
+
+    public static void RestoreText()
+    {
+        if (OptionStrings == null || OptionStrings.Count == 0) return;
+
+        foreach (var button in OptionStrings)
+        {
+            button.Key.Text.text = Translator.GetString(button.Value);
+        }
     }
 }

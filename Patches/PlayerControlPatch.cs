@@ -767,7 +767,7 @@ public static class CheckShapeshiftPatch
             logger.Info($"Cancel shapeshifting because TimeMaster Rewinding");
             return false;
         }
-        if (!Main.IntroDestroyed)
+        if (Utils.TimeStamp - IntroCutsceneDestroyPatch.IntroDestroyTS < 10)
         {
             logger.Info($"Cancel shapeshifting because Intro doesn't have Destroyed");
             return false;

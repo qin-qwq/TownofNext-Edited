@@ -242,3 +242,12 @@ public static class OptionsMenuBehaviourClosePatch
         ClientOptionItem.CustomBackground?.gameObject.SetActive(false);
     }
 }
+
+[HarmonyPatch(typeof(ToggleButtonBehaviour), nameof(ToggleButtonBehaviour.ResetText))]
+public static class ToggleButtonResetTextPatch
+{
+    public static void Postfix(ToggleButtonBehaviour __instance)
+    {
+        ClientOptionItem.RestoreText();
+    }
+}

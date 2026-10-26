@@ -13,6 +13,7 @@ internal class Scavenger : RoleBase
     private static OptionItem ScavengerHasCustomDeathReason;
 
     public static readonly HashSet<byte> KilledPlayersId = [];
+    public static readonly HashSet<byte> CancelTeleportPlayersId = [];
 
     public override void SetupCustomOption()
     {
@@ -26,6 +27,7 @@ internal class Scavenger : RoleBase
     public override void Init()
     {
         KilledPlayersId.Clear();
+        CancelTeleportPlayersId.Clear();
     }
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = ScavengerKillCooldown.GetFloat();
 
@@ -33,6 +35,7 @@ internal class Scavenger : RoleBase
     {
         target.RpcTeleport(ExtendedPlayerControl.GetBlackRoomPosition());
         KilledPlayersId.Add(target.PlayerId);
+        CancelTeleportPlayersId.Add(target.PlayerId);
 
         _ = new LateTask(
             () =>
@@ -45,6 +48,7 @@ internal class Scavenger : RoleBase
                 target.SetRealKiller(killer);
                 RPC.PlaySoundRPC(Sounds.KillSound, killer.PlayerId);
                 target.Notify(Utils.ColorString(Utils.GetRoleColor(CustomRoles.Scavenger), Translator.GetString("KilledByScavenger")), time: 8f);
+                CancelTeleportPlayersId.Remove(target.PlayerId);
             },
             0.5f, "Scavenger Kill");
 

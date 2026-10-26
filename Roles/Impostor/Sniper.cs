@@ -17,7 +17,7 @@ internal class Sniper : RoleBase
     private static readonly HashSet<byte> PlayerIdList = [];
     public static bool HasEnabled => PlayerIdList.Any();
 
-    public override CustomRoles ThisRoleBase => UsePhantomBasis.GetBool() ? CustomRoles.Phantom : CustomRoles.Shapeshifter;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\
 
@@ -187,15 +187,13 @@ internal class Sniper : RoleBase
         return targets;
 
     }
-    public override bool OnCheckVanish(PlayerControl phantom)
+    public static void OnAbility(PlayerControl phantom)
     {
-        if (!UsePhantomBasis.GetBool()) return false;
-
-        if (phantom.GetAbilityUseLimit() <= 0) return false;
+        if (phantom.GetAbilityUseLimit() <= 0) return;
 
         phantom.RpcRemoveAbilityUse();
 
-        if (!AmongUsClient.Instance.AmHost) return false;
+        if (!AmongUsClient.Instance.AmHost) return;
 
         phantom.RPCPlayCustomSound("AWP");
 
@@ -249,7 +247,6 @@ internal class Sniper : RoleBase
             }
             SendRPC(phantom.PlayerId);
         }, ArrowDuration.GetFloat(), "End Sniper Arrow");
-        return false;
     }
     public override string GetSuffixOthers(PlayerControl seer, PlayerControl target, bool isForMeeting = false)
     {
@@ -262,7 +259,11 @@ internal class Sniper : RoleBase
     }
     public override void OnShapeshift(PlayerControl shapeshifter, PlayerControl target, bool animate, bool shapeshifting)
     {
-        if (UsePhantomBasis.GetBool()) return;
+        if (UsePhantomBasis.GetBool())
+        {
+            OnAbility(shapeshifter);
+            return;
+        }
         var sniper = shapeshifter;
         var sniperId = sniper.PlayerId;
 

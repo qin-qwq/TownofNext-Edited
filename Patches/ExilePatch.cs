@@ -210,6 +210,8 @@ class ExileControllerWrapUpPatch
 
                 Main.AfterMeetingDeathPlayers.Clear();
 
+                GameEndCheckerForNormal.ShouldNotCheck = false;
+
                 Utils.AfterMeetingTasks();
                 Utils.SyncAllSettings();
                 Utils.CheckAndSetVentInteractions();
