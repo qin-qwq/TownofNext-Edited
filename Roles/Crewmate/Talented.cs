@@ -32,6 +32,8 @@ internal class Talented : RoleBase
         {
             addons = addons.Where(role => role.GetMode() != 0).Shuffle().ToList();
         }
+
+        addons = addons.Where(role => !role.IsAddonAssignedMidGame()).ToList();
     }
 
     public override bool OnTaskComplete(PlayerControl player, int completedTaskCount, int totalTaskCount)

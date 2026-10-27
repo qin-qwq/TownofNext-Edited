@@ -265,7 +265,7 @@ internal class ChatCommands
         if (CovenChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jackal.JackalChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
         if (Jailer.JailerChannel(PlayerControl.LocalPlayer, text)) goto Canceled;
-        if (RoundUp.DeputyCommand(PlayerControl.LocalPlayer, text)) goto Canceled;
+        if (RDeputy.DeputyCommand(PlayerControl.LocalPlayer, text)) goto Canceled;
         Directory.CreateDirectory(modTagsFiles);
         Directory.CreateDirectory(vipTagsFiles);
         Directory.CreateDirectory(sponsorTagsFiles);
@@ -533,7 +533,7 @@ internal class ChatCommands
         if (isUp)
         {
             if (result.IsGhostRole() || !shouldDevAssign || result.IsAddonAssignedMidGame() || (result.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) ||
-                (result.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp) || result.OtherGameModesRole())
+                result.OtherGameModesRole())
             {
                 Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId, sendOption: SendOption.None);
                 return;
@@ -619,7 +619,7 @@ internal class ChatCommands
             if (CovenChannel(player, text)) { canceled = true; Logger.Info($"Is Coven Channel", "OnReceiveChat"); return; }
             if (Jackal.JackalChannel(player, text)) { canceled = true; Logger.Info($"Is Jackal Channel", "OnReceiveChat"); return; }
             if (Jailer.JailerChannel(player, text)) { canceled = true; Logger.Info($"Is Jailer Channel", "OnReceiveChat"); return; }
-            if (RoundUp.DeputyCommand(player, text)) { canceled = true; Logger.Info($"Is RoundUp Command", "OnReceiveChat"); return; }
+            if (RDeputy.DeputyCommand(player, text)) { canceled = true; Logger.Info($"Is RoundUp Command", "OnReceiveChat"); return; }
         }
 
         Directory.CreateDirectory(modTagsFiles);
@@ -975,7 +975,7 @@ internal class ChatCommands
             Utils.SendMessage(GetString("UseVoteCommandDuringDiscussion"), player.PlayerId);
             return;
         }
-        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && PlayerControl.LocalPlayer.PlayerId == RoundUp.Deputy)
+        if (RDeputy.Deputy != byte.MaxValue && PlayerControl.LocalPlayer.PlayerId == RDeputy.Deputy)
         {
             Utils.SendMessage(GetString("RoundUp_Help"), player.PlayerId);
             return;

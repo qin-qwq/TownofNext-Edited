@@ -368,7 +368,7 @@ public static class CustomRoleManager
         // Check Suicide
         var isSuicide = killer.PlayerId == target.PlayerId;
 
-        if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
+        RDeputy.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
         // Target was murdered by Killer
         targetRoleClass.OnMurderPlayerAsTarget(killer, target, inMeeting, isSuicide);
 

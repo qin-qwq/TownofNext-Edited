@@ -149,7 +149,7 @@ class CheckForEndVotingPatch
                     return true;
                 }
 
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && pc.PlayerId == RoundUp.Deputy && pva.VotedForId < 254)
+                if (RDeputy.Deputy != byte.MaxValue && pc.PlayerId == RDeputy.Deputy && pva.VotedForId < 254)
                 {
                     __instance.UpdateForeground();
                     __instance.RpcClearVoteDelay(pva.PlayerId);
@@ -453,18 +453,15 @@ class CheckForEndVotingPatch
             else if (!braked && !balancer)
                 exiledPlayer = allPlayers.FirstOrDefault(info => !tie && info.PlayerId == exileId);
 
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp)
+            if (RDeputy.Deputy != byte.MaxValue)
             {
-                if (RoundUp.Deputy != byte.MaxValue)
-                {
-                    exileId = RoundUp.Deputy;
-                    exiledPlayer = GetPlayerInfoById(exileId);
-                }
-                else
-                {
-                    exileId = 0xff;
-                    exiledPlayer = GetPlayerInfoById(exileId);
-                }
+                exileId = RDeputy.Deputy;
+                exiledPlayer = GetPlayerInfoById(exileId);
+            }
+            else
+            {
+                exileId = 0xff;
+                exiledPlayer = GetPlayerInfoById(exileId);
             }
 
             if (Keeper.IsTargetExiled(exileId))
@@ -832,7 +829,7 @@ class CastVotePatch
                 return false;
             }
         }
-        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && voter.PlayerId == RoundUp.Deputy && suspectPlayerId < 254)
+        if (RDeputy.Deputy != byte.MaxValue && voter.PlayerId == RDeputy.Deputy && suspectPlayerId < 254)
         {
             __instance.RpcClearVoteDelay(srcPlayerId);
             return false;
@@ -977,7 +974,7 @@ class SetJudgeOverrulePatch
             return false;
         } //Vote a disconnect player
 
-        if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && voter.PlayerId == RoundUp.Deputy && suspectPlayerId < 254)
+        if (RDeputy.Deputy != byte.MaxValue && voter.PlayerId == RDeputy.Deputy && suspectPlayerId < 254)
         {
             __instance.RpcClearVoteDelay(srcPlayerId);
             return false;
@@ -1302,7 +1299,7 @@ class MeetingHudStartPatch
             }
         }
 
-        if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnMeetingHudStart();
+        RDeputy.OnMeetingHudStart();
 
         msgToSend.Do(x => Logger.Info($"To:{x.Item2} {x.Item3} => {x.Item1}", "Skill Notice OnMeeting Start"));
 

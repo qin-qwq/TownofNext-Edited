@@ -71,7 +71,7 @@ internal class TaskManager : RoleBase
             Addons.AddRange(GroupedAddons[AddonTypes.Mixed]);
         }
 
-        Addons = Addons.Where(role => role.GetMode() != 0).Shuffle().ToList();
+        Addons = Addons.Where(role => role.GetMode() != 0 && !role.IsAddonAssignedMidGame()).Shuffle().ToList();
     }
     public override void Add(byte playerId)
     {

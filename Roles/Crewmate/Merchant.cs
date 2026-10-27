@@ -81,6 +81,8 @@ internal class Merchant : RoleBase
         {
             addons = addons.Where(role => role.GetMode() != 0).ToList();
         }
+
+        addons = addons.Where(role => !role.IsAddonAssignedMidGame()).ToList();
     }
 
     public override void Add(byte playerId)

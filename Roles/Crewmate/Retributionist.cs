@@ -141,7 +141,7 @@ internal class Retributionist : RoleBase
             pc.ShowInfoMessage(isUI, GetString("ApocalypseImmune"));
             return true;
         }
-        else if (CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
+        else if (RDeputy.Deputy != byte.MaxValue && target.PlayerId == RDeputy.Deputy)
         {
             pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
             return true;

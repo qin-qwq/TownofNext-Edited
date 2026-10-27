@@ -1078,7 +1078,7 @@ class ReportDeadBodyPatch
                     }
                 }
 
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.OnReportDeadBody();
+                RDeputy.OnReportDeadBody();
 
                 Rebirth.OnReportDeadBody();
 

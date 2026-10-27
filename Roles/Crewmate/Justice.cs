@@ -161,14 +161,14 @@ internal class Justice : RoleBase
                     pc.ShowInfoMessage(isUI, GetString("UseAbilityDuringDiscussion"));
                     return true;
                 }
-                if (Options.CurrentGameMode == CustomGameMode.RoundUp && RoundUp.Deputy != byte.MaxValue && target.PlayerId == RoundUp.Deputy)
+                if (RDeputy.Deputy != byte.MaxValue && target.PlayerId == RDeputy.Deputy)
                 {
-                    if (target.PlayerId == RoundUp.Deputy)
+                    if (target.PlayerId == RDeputy.Deputy)
                     {
                         pc.ShowInfoMessage(isUI, GetString("RoundUp_TryKillDeputy"));
                         return true;
                     }
-                    if (pc.PlayerId == RoundUp.Deputy)
+                    if (pc.PlayerId == RDeputy.Deputy)
                     {
                         pc.ShowInfoMessage(isUI, GetString("RoundUp_DeputyCantUse"));
                         return true;

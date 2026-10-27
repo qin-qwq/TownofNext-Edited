@@ -535,7 +535,6 @@ public static class LobbyViewSettingsPanePatch
             switch (currentGameMode)
             {
                 case CustomGameMode.Standard:
-                case CustomGameMode.RoundUp:
                     buttonTab.gameObject.SetActive(true);
                     break;
                 case CustomGameMode.CopsAndRobbers:
@@ -795,7 +794,7 @@ public static class LobbyViewSettingsPanePatch
                 if (option.Tab != tabName) continue;
                 if (option.GameMode is not CustomGameMode.All && option.GameMode != LastGameModeSelected)
                 {
-                    if (!(LastGameModeSelected == CustomGameMode.RoundUp && option.GameMode == CustomGameMode.Standard))
+                    if (!(/*LastGameModeSelected == CustomGameMode.RoundUp && */option.GameMode == CustomGameMode.Standard))
                         continue;
                 }
 
@@ -1193,7 +1192,7 @@ public static class LobbyViewSettingsPanePatch
         if (role.OnlySpawnsWithPetsRole()) return GetString("RequiresPet");
         if (role.GetStaticRoleClass().IsMethodOverridden("OnPet") && !role.OnlySpawnsWithPetsRole()) return GetString("SupportsPet");
         if (role.GetStaticRoleClass().IsBalance) return GetString("SupportsBalance");
-        if (role.NotAssignInVanillaServer() || (LastGameModeSelected == CustomGameMode.RoundUp && role.NotSpawnInRoundUp())) return GetString("NotSupports");
+        if (role.NotAssignInVanillaServer()) return GetString("NotSupports");
 
         return string.Empty;
     }

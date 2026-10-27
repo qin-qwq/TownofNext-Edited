@@ -179,7 +179,6 @@ public class Main : BasePlugin
         [CustomGameMode.TagMode] = new Color32(44, 204, 0, byte.MaxValue),
         [CustomGameMode.CopsAndRobbers] = new Color32(135, 206, 250, byte.MaxValue),
         [CustomGameMode.HidenSeekTONE] = new Color32(255, 25, 25, byte.MaxValue),
-        [CustomGameMode.RoundUp] = new Color32(248, 216, 110, byte.MaxValue),
         [CustomGameMode.BonfireNight] = new Color32(255, 140, 0, byte.MaxValue),
     };
 
@@ -1129,9 +1128,6 @@ public enum CustomRoles
     TZombie,
     TCrewmate,
 
-    // Round Up
-    RDeputy,
-
     // Bonfire Night
     RWoodCollector,
     BWoodCollector,
@@ -1207,6 +1203,7 @@ public enum CustomRoles
     Radar,
     Rainbow,
     Rascal,
+    RDeputy,
     Reach,
     Rebound,
     Spurt,

@@ -124,7 +124,7 @@ public class RoleAssign
         {
             int chance = role.GetMode();
             if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) continue;
-            if ((role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) || (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) continue;
+            if (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) continue;
             if (role.OtherGameModesRole()) continue;
             switch (role)
             {

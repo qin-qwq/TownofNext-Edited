@@ -350,7 +350,7 @@ public static class DraftAssign
     {
         int chance = role.GetMode();
         if (role.IsVanilla() || chance == 0 || role.IsAdditionRole() || role.IsGhostRole() || (role.OnlySpawnsWithPetsRole() && !Options.UsePets.GetBool())) return true;
-        if (RoleAssign.SetRoles.ContainsValue(role) || (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) || (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp)) return true;
+        if (RoleAssign.SetRoles.ContainsValue(role) || (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla)) return true;
         if (role.OtherGameModesRole()) return true;
         switch (role)
         {

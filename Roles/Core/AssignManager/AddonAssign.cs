@@ -14,7 +14,6 @@ public static class AddonAssign
     private static bool NotAssignAddOnInGameStarted(CustomRoles role)
     {
         if (role.NotAssignInVanillaServer() && Main.CurrentServerIsVanilla) return true;
-        if (role.NotSpawnInRoundUp() && Options.CurrentGameMode == CustomGameMode.RoundUp) return true;
 
         switch (role)
         {
@@ -22,6 +21,7 @@ public static class AddonAssign
             case CustomRoles.Workhorse:
             case CustomRoles.LastImpostor:
             case CustomRoles.Narc:
+            case CustomRoles.RDeputy:
                 return true;
             case CustomRoles.Autopsy when Options.EveryoneCanSeeDeathReason.GetBool():
             case CustomRoles.Madmate when Madmate.MadmateSpawnMode.GetInt() != 0:

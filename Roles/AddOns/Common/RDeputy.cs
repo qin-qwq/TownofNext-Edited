@@ -1,69 +1,83 @@
 using System;
 using System.Text.RegularExpressions;
+using AmongUs.InnerNet.GameDataMessages;
 using TONE.Modules;
-using TONE.Roles.AddOns.Common;
+using TONE.Modules.Rpc;
 using TONE.Roles.Coven;
 using TONE.Roles.Crewmate;
 using UnityEngine;
-using static TONE.CheckForEndVotingPatch;
 using static TONE.Translator;
 using static TONE.Utils;
 
-namespace TONE;
+namespace TONE.Roles.AddOns.Common;
 
-internal class RoundUp : Standard
+public class RDeputy : IAddon
 {
-    public override CustomGameMode GameMode => CustomGameMode.RoundUp;
-    private const int Id = 67_229_001;
+    public CustomRoles Role => CustomRoles.RDeputy;
+    private const int Id = 34900;
+    public AddonTypes Type => AddonTypes.Experimental;
 
     public static OptionItem ImpostorCanBecomeDeputy;
+    public static OptionItem CrewmateCanBecomeDeputy;
     public static OptionItem NeutralCanBecomeDeputy;
     public static OptionItem CovenCanBecomeDeputy;
+    enum OptionName
+    {
+        RoundUp_ImpostorCanBecomeDeputy,
+        RoundUp_CrewmateCanBecomeDeputy,
+        RoundUp_NeutralCanBecomeDeputy,
+        RoundUp_CovenCanBecomeDeputy
+    }
 
     public static byte Deputy;
     public static NetworkedPlayerInfo.PlayerOutfit PlayerOutfit = null;
 
-    public override void SetupCustomOption()
+    public void SetupCustomOption()
     {
-        TextOptionItem.Create(10000038, "MenuTitle.RoundUp", TabGroup.ModSettings)
-            .SetGameMode(CustomGameMode.RoundUp)
+        Options.SetupAdtRoleOptions(Id, Role, tab: TabGroup.Addons);
+        ImpostorCanBecomeDeputy = BooleanOptionItem.Create(Role, Id + 20, OptionName.RoundUp_ImpostorCanBecomeDeputy, true, false)
             .SetColor(new Color32(248, 216, 110, byte.MaxValue));
-
-        ImpostorCanBecomeDeputy = BooleanOptionItem.Create(Id + 2, "RoundUp_ImpostorCanBecomeDeputy", true, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.RoundUp)
-            .SetColor(new Color32(248, 216, 110, byte.MaxValue))
-            .SetHeader(true);
-        NeutralCanBecomeDeputy = BooleanOptionItem.Create(Id + 3, "RoundUp_NeutralCanBecomeDeputy", true, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.RoundUp)
+        CrewmateCanBecomeDeputy = BooleanOptionItem.Create(Role, Id + 21, OptionName.RoundUp_CrewmateCanBecomeDeputy, true, false)
             .SetColor(new Color32(248, 216, 110, byte.MaxValue));
-        CovenCanBecomeDeputy = BooleanOptionItem.Create(Id + 4, "RoundUp_CovenCanBecomeDeputy", true, TabGroup.ModSettings, false)
-            .SetGameMode(CustomGameMode.RoundUp)
+        NeutralCanBecomeDeputy = BooleanOptionItem.Create(Role, Id + 22, OptionName.RoundUp_NeutralCanBecomeDeputy, true, false)
+            .SetColor(new Color32(248, 216, 110, byte.MaxValue));
+        CovenCanBecomeDeputy = BooleanOptionItem.Create(Role, Id + 23, OptionName.RoundUp_CovenCanBecomeDeputy, true, false)
             .SetColor(new Color32(248, 216, 110, byte.MaxValue));
     }
-
-    public override void Init()
+    public void Init()
     {
         Deputy = byte.MaxValue;
         PlayerOutfit = null;
     }
+    public void Add(byte playerId, bool gameIsLoading = true)
+    { }
+    public void Remove(byte playerId)
+    { }
 
     public static void OnReportDeadBody()
     {
-        var pcList = Main.EnumerateAlivePlayerControls().Where(x => x.IsPlayerCrewmateTeam() || (x.IsPlayerImpostorTeam() && ImpostorCanBecomeDeputy.GetBool()) ||
-        (x.IsPlayerNeutralTeam() && NeutralCanBecomeDeputy.GetBool() && !x.Is(CustomRoles.Jester) && !x.Is(CustomRoles.Executioner) && !x.Is(CustomRoles.Pixie) && !x.Is(CustomRoles.Solsticer)) ||
-        (x.IsPlayerCovenTeam() && CovenCanBecomeDeputy.GetBool())).ToList();
-
-        if (pcList.Any())
+        if (IRandom.Instance.Next(1, 101) <= (Options.CustomAdtRoleSpawnRate.TryGetValue(CustomRoles.RDeputy, out var sc) ? sc.GetFloat() : 0))
         {
-            var player = pcList.RandomElement();
-            Deputy = player.PlayerId;
-            PlayerOutfit = new NetworkedPlayerInfo.PlayerOutfit()
-            .Set(player.GetRealName(), player.CurrentOutfit.ColorId, player.CurrentOutfit.HatId, player.CurrentOutfit.SkinId, player.CurrentOutfit.VisorId, player.CurrentOutfit.PetId, player.CurrentOutfit.NamePlateId);
-            /*var tempOutfit = PlayerOutfit;
-            tempOutfit.HatId = "hat_pk02_TenGallonHat";
-            player.SetNewOutfit(tempOutfit, false, false);*/
-            if (AmongUsClient.Instance.AmHost) player.RpcSetHat("hat_pk02_TenGallonHat");
-            Logger.Info($"{player.GetNameWithRole()} Become RDeputy", "Round Up");
+            var pcList = Main.EnumerateAlivePlayerControls().Where(x => (x.IsPlayerCrewmateTeam() && CrewmateCanBecomeDeputy.GetBool()) || (x.IsPlayerImpostorTeam() && ImpostorCanBecomeDeputy.GetBool()) ||
+            (x.IsPlayerNeutralTeam() && NeutralCanBecomeDeputy.GetBool() && !x.Is(CustomRoles.Jester) && !x.Is(CustomRoles.Executioner) && !x.Is(CustomRoles.Pixie) && !x.Is(CustomRoles.Solsticer)) ||
+            (x.IsPlayerCovenTeam() && CovenCanBecomeDeputy.GetBool())).ToList();
+
+            if (pcList.Any())
+            {
+                var player = pcList.RandomElement();
+                Deputy = player.PlayerId;
+                PlayerOutfit = new NetworkedPlayerInfo.PlayerOutfit()
+                .Set(player.GetRealName(), player.CurrentOutfit.ColorId, player.CurrentOutfit.HatId, player.CurrentOutfit.SkinId, player.CurrentOutfit.VisorId, player.CurrentOutfit.PetId, player.CurrentOutfit.NamePlateId);
+                var hatId = "hat_pk02_TenGallonHat";
+                if (AmongUsClient.Instance.AmClient)
+                {
+                    int valueOrDefault = player.CurrentOutfit.ColorId;
+                    player.SetHat(hatId, valueOrDefault);
+                }
+                var rpcMessage = new RpcSetHatStrMessage(player.NetId, hatId, player.GetNextRpcSequenceId(RpcCalls.SetHatStr));
+                RpcUtils.SendMessageImmediately(rpcMessage);
+                Logger.Info($"{player.GetNameWithRole()} Become RDeputy", "Round Up");
+            }
         }
     }
 
@@ -96,7 +110,6 @@ internal class RoundUp : Standard
         if (Deputy == byte.MaxValue) return false;
         if (!GameStates.IsMeeting || !pc || GameStates.IsExilling) return false;
         if (pc.PlayerId != Deputy) return false;
-        if (Options.CurrentGameMode != CustomGameMode.RoundUp) return false;
         if (!pc.IsAlive()) return false;
         msg = msg.ToLower().Trim();
 
@@ -160,7 +173,7 @@ internal class RoundUp : Standard
 
                 List<MeetingHud.VoterState> statesList = [];
                 MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), target.Data, false, true, target.PlayerId);
-                ConfirmEjections(target.Data);
+                CheckForEndVotingPatch.ConfirmEjections(target.Data);
             }
         }
 

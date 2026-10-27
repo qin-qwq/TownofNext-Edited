@@ -2842,8 +2842,6 @@ public static class Utils
                 playerState.RoleClass.LastBlockedMoveInVentVents.Clear();
             }
 
-            if (Options.CurrentGameMode == CustomGameMode.RoundUp) RoundUp.AfterMeetingTasks();
-
             //Set kill timer
             foreach (var player in Main.EnumerateAlivePlayerControls())
             {
@@ -2861,6 +2859,7 @@ public static class Utils
 
             if (Statue.IsEnable) Statue.AfterMeetingTasks();
             if (Burst.IsEnable) Burst.AfterMeetingTasks();
+            RDeputy.AfterMeetingTasks();
 
             if (CustomRoles.CopyCat.HasEnabled()) CopyCat.UnAfterMeetingTasks(); // All crew hast to be before this
             if (CustomRoles.Necromancer.HasEnabled()) Necromancer.UnAfterMeetingTasks();
