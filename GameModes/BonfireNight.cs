@@ -85,7 +85,7 @@ internal class BonfireNight : GameModeBase
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
             .SetValueFormat(OptionFormat.Seconds);
-        PickUpWoodCooldown = IntegerOptionItem.Create(Id + 6, "BonfireNight_PickUpWoodCooldown", (1, 60, 1), 1, TabGroup.ModSettings, false)
+        PickUpWoodCooldown = IntegerOptionItem.Create(Id + 6, "BonfireNight_PickUpWoodCooldown", (3, 60, 1), 3, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.BonfireNight)
             .SetColor(new Color32(255, 140, 0, byte.MaxValue))
             .SetValueFormat(OptionFormat.Seconds);

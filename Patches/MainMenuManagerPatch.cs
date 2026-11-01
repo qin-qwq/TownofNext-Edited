@@ -228,6 +228,8 @@ public static class MainMenuManagerPatch
 
         buttonCollider.offset = new(0f, 0f);
 
+        MainMenuButtonHoverAnimation.QueueButton(button);
+
         return button;
     }
     public static void Modify(this PassiveButton passiveButton, UnityEngine.Events.UnityAction action)

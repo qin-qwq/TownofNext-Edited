@@ -2659,7 +2659,7 @@ public static class Utils
 
         AmongUsClient.Instance.SendAllStreamedObjects();
     }
-    public static System.Collections.IEnumerator SendGameDataToEveryone()
+    public static void SendGameDataToEveryone()
     {
         int messages = 0;
 
@@ -2667,38 +2667,42 @@ public static class Utils
         writer.StartMessage(5); //0x05 GameData
         writer.Write(AmongUsClient.Instance.GameId);
 
-        for (var index = 0; index < GameData.Instance.AllPlayers.Count; index++)
+        foreach (var playerInfo in GameData.Instance.AllPlayers)
         {
-            NetworkedPlayerInfo playerinfo = GameData.Instance.AllPlayers[index];
-
             if (writer.Length > 500 || messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
             {
-                messages = 0;
                 writer.EndMessage();
-                var qa = DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(writer));
-                yield return qa.Wait();
-                if (qa.Dropped)
+
+                var capturedWriter = writer;
+                DataFlagRateLimiter.Enqueue(() =>
                 {
-                    writer.Recycle();
-                    yield break;
-                }
-                writer.Clear(SendOption.Reliable);
+                    AmongUsClient.Instance.SendOrDisconnect(capturedWriter);
+                    capturedWriter.Recycle();
+                }, cleanup: capturedWriter.Recycle);
+
+                writer = MessageWriter.Get(SendOption.Reliable);
                 writer.StartMessage(5); //0x05 GameData
                 writer.Write(AmongUsClient.Instance.GameId);
+
+                messages = 0;
             }
 
             writer.StartMessage(1); //0x01 Data
-            writer.WritePacked(playerinfo.NetId);
-            playerinfo.Serialize(writer, false);
+            writer.WritePacked(playerInfo.NetId);
+            playerInfo.Serialize(writer, false);
             writer.EndMessage();
 
             messages++;
         }
 
         writer.EndMessage();
-        yield return DataFlagRateLimiter.Enqueue(() => AmongUsClient.Instance.SendOrDisconnect(writer)).Wait();
-        writer.Recycle();
-    }
+
+        DataFlagRateLimiter.Enqueue(() =>
+        {
+            AmongUsClient.Instance.SendOrDisconnect(writer);
+            writer.Recycle();
+        }, cleanup: writer.Recycle);
+    }    
     public static void SetAllVentInteractions()
     {
         VentSystemDeterioratePatch.SerializeV2(ShipStatus.Instance.Systems[SystemTypes.Ventilation].CastFast<VentilationSystem>());

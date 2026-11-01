@@ -3,59 +3,72 @@ using UnityEngine;
 
 namespace TONE;
 
-// 来源：https://github.com/TownOfNext/TownOfNext/blob/main/src/Patches/MainMenuButtonHoverAnimation.cs
 [HarmonyPatch]
 public class MainMenuButtonHoverAnimation
 {
+    private static readonly Dictionary<PassiveButton, MainMenuLiquidGlass> AllButtons = new();
+    private static readonly HashSet<PassiveButton> PendingButtons = new();
+
+    [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start)), HarmonyPrefix]
+    private static void Start_Prefix()
+    {
+        foreach (var glass in AllButtons.Values)
+            glass.Dispose();
+        AllButtons.Clear();
+        PendingButtons.Clear();
+    }
+
     [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start)), HarmonyPostfix]
     [HarmonyPriority(Priority.Last)]
     private static void Start_Postfix(MainMenuManager __instance)
     {
-        if (!OperatingSystem.IsWindows()) return;
-        var mainButtons = GameObject.Find("Main Buttons");
-        mainButtons.ForEachChild((Il2CppSystem.Action<GameObject>)Init);
+        RefreshButtons(GameObject.Find("Main Buttons"));
+        RegisterButton(__instance.creditsButton);
+        RegisterButton(__instance.howToPlayButton);
+        if (MainMenuManagerStartPatch.ToneLogo != null)
+            RefreshButtons(MainMenuManagerStartPatch.ToneLogo.gameObject);
     }
+
     public static void RefreshButtons(GameObject obj)
     {
-        if (!OperatingSystem.IsWindows()) return;
-        AllButtons = new();
-        obj.ForEachChild((Il2CppSystem.Action<GameObject>)Init);
-    }
-    static void Init(GameObject obj)
-    {
-        if (obj.name is "BottomButtonBounds" or "Divider") return;
-        if (AllButtons.ContainsKey(obj)) return;
-        if (!OperatingSystem.IsWindows()) return;
-        SetButtonStatus(obj, false);
-        var pb = obj.GetComponent<PassiveButton>();
-        pb.OnMouseOver = new();
-        pb.OnMouseOver.AddListener((Action)(() => SetButtonStatus(obj, true)));
-        pb.OnMouseOut = new();
-        pb.OnMouseOut.AddListener((Action)(() => SetButtonStatus(obj, false)));
+        if (obj == null) return;
+        foreach (var button in obj.GetComponentsInChildren<PassiveButton>(true))
+            RegisterButton(button);
     }
 
-    private static Dictionary<GameObject, (Vector3, bool)> AllButtons = new();
-    private static void SetButtonStatus(GameObject obj, bool active)
+    public static void RegisterButton(PassiveButton button)
     {
-        AllButtons.TryAdd(obj, (obj.transform.position, active));
-        AllButtons[obj] = (AllButtons[obj].Item1, active);
+        if (button == null || AllButtons.ContainsKey(button)) return;
+        var glass = MainMenuLiquidGlass.Create(button);
+        if (glass == null) return;
+
+        AllButtons.Add(button, glass);
+        // Keep the game's selection, sound and controller listeners intact.
+        button.OnMouseOver ??= new();
+        button.OnMouseOut ??= new();
+        button.OnClick ??= new();
+        button.OnMouseOver.AddListener((Action)(() => glass.Hovered = true));
+        button.OnMouseOut.AddListener((Action)(() => glass.Hovered = false));
+        button.OnClick.AddListener((Action)glass.Press);
     }
+
+    // Let callers finish changing the scale of dynamically created buttons first.
+    public static void QueueButton(PassiveButton button) => PendingButtons.Add(button);
 
     [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LateUpdate)), HarmonyPostfix]
-    private static void Update_Postfix(MainMenuManager __instance)
+    private static void Update_Postfix()
     {
-        if (GameObject.Find("MainUI") == null) return;
-        if (!OperatingSystem.IsWindows()) return;
+        foreach (var button in PendingButtons)
+            RegisterButton(button);
+        PendingButtons.Clear();
 
-        foreach (var kvp in AllButtons.Where(x => x.Key != null && x.Key.active))
+        var camera = Camera.main;
+        bool useMouse = OperatingSystem.IsWindows();
+        foreach (var entry in AllButtons)
         {
-            var button = kvp.Key;
-            var pos = button.transform.position;
-            var targetPos = kvp.Value.Item1 + new Vector3(kvp.Value.Item2 ? 0.35f : 0f, 0f, 0f);
-            if (kvp.Value.Item2 && pos.x > (kvp.Value.Item1.x + 0.2f)) continue;
-            button.transform.position = kvp.Value.Item2
-                ? Vector3.Lerp(pos, targetPos, Time.deltaTime * 2f)
-                : Vector3.MoveTowards(pos, targetPos, Time.deltaTime * 2f);
+            var button = entry.Key;
+            if (button == null) continue;
+            entry.Value.Update(camera, useMouse);
         }
     }
 }

@@ -675,7 +675,7 @@ internal class StartGameHostPatch
             }
         }
 
-        Utils.SendGameData();
+        Utils.SendGameDataToEveryone();
     }
 
     private static void AssignCustomRole(CustomRoles role, PlayerControl player)

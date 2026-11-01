@@ -56,7 +56,7 @@ public class RDeputy : IAddon
 
     public static void OnReportDeadBody()
     {
-        if (IRandom.Instance.Next(1, 101) <= (Options.CustomAdtRoleSpawnRate.TryGetValue(CustomRoles.RDeputy, out var sc) ? sc.GetFloat() : 0))
+        if (CustomRoles.RDeputy.IsEnable() && IRandom.Instance.Next(1, 101) <= (Options.CustomAdtRoleSpawnRate.TryGetValue(CustomRoles.RDeputy, out var sc) ? sc.GetFloat() : 0))
         {
             var pcList = Main.EnumerateAlivePlayerControls().Where(x => (x.IsPlayerCrewmateTeam() && CrewmateCanBecomeDeputy.GetBool()) || (x.IsPlayerImpostorTeam() && ImpostorCanBecomeDeputy.GetBool()) ||
             (x.IsPlayerNeutralTeam() && NeutralCanBecomeDeputy.GetBool() && !x.Is(CustomRoles.Jester) && !x.Is(CustomRoles.Executioner) && !x.Is(CustomRoles.Pixie) && !x.Is(CustomRoles.Solsticer)) ||

@@ -48,7 +48,7 @@ class GameEndCheckerForNormal
     {
         if (!AmongUsClient.Instance.AmHost) return true;
 
-        if (predicate == null || ShouldNotCheck) return false;
+        if (predicate == null || ShouldNotCheck || Lovers.IsLoversDead) return false;
 
         if (Options.NoGameEnd.GetBool() && WinnerTeam is not CustomWinner.Draw and not CustomWinner.Error) return false;
 

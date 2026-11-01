@@ -458,11 +458,6 @@ class CheckForEndVotingPatch
                 exileId = RDeputy.Deputy;
                 exiledPlayer = GetPlayerInfoById(exileId);
             }
-            else
-            {
-                exileId = 0xff;
-                exiledPlayer = GetPlayerInfoById(exileId);
-            }
 
             if (Keeper.IsTargetExiled(exileId))
             {

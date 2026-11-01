@@ -22,6 +22,7 @@ public class Lovers : IAddon
 
     public static PlayerControl loverless = null;
     public static readonly Dictionary<PlayerControl, PlayerControl> LoversPlayers = [];
+    public static bool IsLoversDead = false;
 
     public void SetupCustomOption()
     {
@@ -76,6 +77,7 @@ public class Lovers : IAddon
     {
         loverless = null;
         LoversPlayers.Clear();
+        IsLoversDead = false;
     }
     public void Add(byte playerId, bool gameIsLoading = true)
     {
@@ -147,7 +149,7 @@ public class Lovers : IAddon
                     else
                     {
                         CheckForEndVotingPatch.TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.FollowingSuicide, partnerPlayer.PlayerId);
-                        GameEndCheckerForNormal.ShouldNotCheck = true;
+                        IsLoversDead = true;
                     }
                 }
                 else

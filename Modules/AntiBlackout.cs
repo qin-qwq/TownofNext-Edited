@@ -210,7 +210,7 @@ public static class AntiBlackout
     public static void SendGameData([CallerMemberName] string callerMethodName = "")
     {
         logger.Info($"SendGameData is called from {callerMethodName}");
-        Utils.SendGameData();
+        Utils.SendGameDataToEveryone();
     }
     public static void OnDisconnect(NetworkedPlayerInfo player)
     {

@@ -210,7 +210,7 @@ class ExileControllerWrapUpPatch
 
                 Main.AfterMeetingDeathPlayers.Clear();
 
-                GameEndCheckerForNormal.ShouldNotCheck = false;
+                Lovers.IsLoversDead = false;
 
                 Utils.AfterMeetingTasks();
                 Utils.SyncAllSettings();
