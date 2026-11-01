@@ -17,6 +17,7 @@ using TONE.Modules;
 using TONE.Modules.ChatManager;
 using TONE.Modules.Rpc;
 using TONE.Patches;
+using TONE.Roles._Ghosts_.Impostor;
 using TONE.Roles.AddOns.Common;
 using TONE.Roles.AddOns.Crewmate;
 using TONE.Roles.AddOns.Impostor;
@@ -266,7 +267,7 @@ public static class Utils
 
         _ = new LateTask(() =>
         {
-            if (TimeAssassin.TimeStop) return;
+            if (TimeAssassin.TimeStop || Stealth.darkenedPlayers != null && Stealth.darkenedPlayers.Contains(player) || Minion.BlindedPlayers.Contains(player.PlayerId)) return;
             Main.PlayerStates[player.PlayerId].IsBlackOut = false; //Remove black out for player
             player.MarkDirtySettings();
         }, Options.KillFlashDuration.GetFloat(), "Remove Kill Flash");

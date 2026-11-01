@@ -179,14 +179,7 @@ public static class CustomRoleManager
         if (Bewilder.IsEnable) Bewilder.ApplyGameOptions(opt, player);
         if (Ghoul.IsEnable) Ghoul.ApplyGameOptions(player);
 
-        var playerstates = Main.PlayerStates[player.PlayerId];
-        if (playerstates.IsBlackOut)
-        {
-            opt.SetFloat(FloatOptionNames.ImpostorLightMod, 0);
-            opt.SetFloat(FloatOptionNames.CrewLightMod, 0);
-        }
-
-        if (AbilityTimeManager.ResetStartAbilityCooldown)
+        if (!player.Is(CustomRoles.BountyHunter) && !player.Is(CustomRoles.Mercenary) && AbilityTimeManager.ResetStartAbilityCooldown)
         {
             AURoleOptions.ScientistCooldown = 10f;
             AURoleOptions.EngineerCooldown = 10f;

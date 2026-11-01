@@ -82,6 +82,7 @@ internal class ChangeRoleSettings
             Main.UnShapeShifter.Clear();
             Main.DeadPassedMeetingPlayers.Clear();
             Main.OvverideOutfit.Clear();
+            Main.Invisible.Clear();
             Main.GameIsLoaded = false;
             Main.CurrentServerIsVanilla = GameStates.IsVanillaServer && !GameStates.IsLocalGame;
 
@@ -106,8 +107,6 @@ internal class ChangeRoleSettings
             GameStartManagerPatch.GameStartManagerUpdatePatch.AlredyBegin = false;
             OnPlayerLeftPatch.LeftPlayerId = byte.MaxValue;
             FixedUpdateInNormalGamePatch.RoleTextCache.Clear();
-            Main.Invisible.Clear();
-            ControllerManagerUpdatePatch.CompletedRepairingPlayer.Clear();
 
             VentSystemDeterioratePatch.LastClosestVent.Clear();
             VentSystemDeterioratePatch.PlayerHadBlockedVentLastTime.Clear();

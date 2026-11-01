@@ -19,6 +19,8 @@ internal class Minion : RoleBase
     public static OptionItem AbilityCooldown;
     public static OptionItem AbilityTime;
 
+    public static readonly HashSet<byte> BlindedPlayers = [];
+
     public override void SetupCustomOption()
     {
         SetupSingleRoleOptions(Id, TabGroup.ImpostorRoles, CustomRoles.Minion);
@@ -26,6 +28,10 @@ internal class Minion : RoleBase
             .SetValueFormat(OptionFormat.Seconds);
         AbilityTime = FloatOptionItem.Create(Id + 11, GeneralOption.AbilityDuration, new(1f, 10f, 1f), 5f, TabGroup.ImpostorRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Minion])
             .SetValueFormat(OptionFormat.Seconds);
+    }
+    public override void Init()
+    {
+        BlindedPlayers.Clear();
     }
     // EAC bans players when GA uses sabotage
     public override bool CanUseSabotage(PlayerControl pc) => false;
@@ -36,7 +42,7 @@ internal class Minion : RoleBase
     }
     public override string GetLowerTextOthers(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false, bool isForHud = false)
     {
-        if ((seer.GetCustomRole().IsImpostorTeam()) && Main.PlayerStates[target.PlayerId].IsBlackOut && !isForMeeting)
+        if (seer.GetCustomRole().IsImpostorTeam() && Main.PlayerStates[target.PlayerId].IsBlackOut && !isForMeeting)
         {
             var blinded = Translator.GetString("Minion_Blind");
             return ColorString(GetRoleColor(CustomRoles.Minion), $"<size=75%><alpha=#CC>『{blinded}』</size>");
@@ -51,12 +57,14 @@ internal class Minion : RoleBase
             Main.PlayerStates[target.PlayerId].IsBlackOut = true;
             target.RPCPlayCustomSound("FlashBang");
             target.MarkDirtySettings();
+            BlindedPlayers.Add(target.PlayerId);
 
             _ = new LateTask(() =>
             {
                 Main.PlayerStates[target.PlayerId].IsBlackOut = false;
                 RPC.PlaySoundRPC(Sounds.TaskComplete, target.PlayerId);
                 target.MarkDirtySettings();
+                BlindedPlayers.Remove(target.PlayerId);
             }, AbilityTime.GetFloat(), "Minion: return vision");
             killer.RpcResetAbilityCooldown();
         }

@@ -22,7 +22,7 @@ internal class Stealth : RoleBase
     private static bool excludeImpostors;
     private static float darkenDuration;
     private float darkenTimer;
-    private PlayerControl[] darkenedPlayers;
+    public static PlayerControl[] darkenedPlayers;
     private SystemTypes? darkenedRoom;
 
     public override void SetupCustomOption()

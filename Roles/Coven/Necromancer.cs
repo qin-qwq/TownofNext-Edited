@@ -146,9 +146,10 @@ internal class Necromancer : CovenManager
         List<CustomRoles> deadRoles = [];
         foreach (var deadPlayer in deadPlayers)
         {
-            if (BlackList(deadPlayer.GetCustomRole())) continue;
-            if (UsedRoles[nm.PlayerId].Contains(deadPlayer.GetCustomRole())) continue;
-            deadRoles.Add(deadPlayer.GetCustomRole());
+            var deadRole = deadPlayer.GetPreviousRole();
+            if (BlackList(deadRole)) continue;
+            if (UsedRoles[nm.PlayerId].Contains(deadRole)) continue;
+            deadRoles.Add(deadRole);
         }
         if (deadRoles.Count < 1)
         {

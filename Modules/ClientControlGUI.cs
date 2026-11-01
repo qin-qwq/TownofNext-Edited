@@ -371,12 +371,6 @@ public class ClientControlGUI : MonoBehaviour
             (Label(GetString("ReloadedFileColors"), "F5 + T"), _sAction, () => { Logger.Info("Reloaded Custom Translation File Colors", "ClientControlGUI"); LoadLangs(); Logger.SendInGame("Reloaded Custom Translation File"); }, true),
             (Label(GetString("ExportedCustomTranslation"), "F5 + X"), _sAction, () => { Logger.Info("Exported Custom Translation and Role File", "ClientControlGUI"); ExportCustomTranslation(); Logger.SendInGame("Exported Custom Translation File"); }, true),
             (Label(GetString("CopySettings"), "ALT + C"), _sAction, () => Utils.CopyCurrentSettings(), !notJoined),
-            (Label(GetString("FixBlackscreen"), "F5 + F"), _sAction, () =>
-            {
-                Logger.Info("Attempted to fix Black Screen", "ClientControlGUI");
-                ExileController.Instance?.ReEnableGameplay();
-                ControllerManagerUpdatePatch.CompletedRepairingPlayer.Add(PlayerControl.LocalPlayer.PlayerId);
-            }, !ControllerManagerUpdatePatch.CompletedRepairingPlayer.Contains(PlayerControl.LocalPlayer.PlayerId) && firstMeeting && inGame && !inMeeting),
             (InGameRoleInfoMenu.Showing ? GetString("HideRoleInfo") : GetString("ShowRoleInfo"), _sAction, () =>
             {
                 if (!InGameRoleInfoMenu.Showing)

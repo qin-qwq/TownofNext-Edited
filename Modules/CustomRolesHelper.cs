@@ -1266,6 +1266,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Cupid)
                     || pc.Is(CustomRoles.Wraith)
                     || pc.Is(CustomRoles.CopyCat)
+                    || pc.Is(CustomRoles.Necromancer)
+                    || pc.Is(CustomRoles.Imitator)
                 )
                     return false;
                 if ((pc.Is(Custom_Team.Impostor) && !Lovers.ImpCanBeInLove.GetBool()) || (pc.Is(Custom_Team.Crewmate) && !Lovers.CrewCanBeInLove.GetBool()) || (pc.Is(Custom_Team.Neutral) && !Lovers.NeutralCanBeInLove.GetBool()) || (pc.Is(Custom_Team.Coven) && !Lovers.CovenCanBeInLove.GetBool()))
