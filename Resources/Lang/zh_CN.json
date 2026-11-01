@@ -4163,7 +4163,7 @@
   "Summoner.SummonedThisMeeting": "你已经召唤过一名玩家了。每轮会议只能召唤一名玩家",
   "Summoner.SummonAnnouncement": "<size=3><b>死灵法师召唤了{0}！\n祝你好运！</b></size>",
   "Summoner.SummonAnnouncementNameless": "<size=3><b>死灵法师召唤了某人！\n祝你好运！</b></size>",
-  "Summoner.SummonAnnouncementAgain": "<size=3><b>死灵法师重新召唤了{0}！\n祝你好运！/b></size>",
+  "Summoner.SummonAnnouncementAgain": "<size=3><b>死灵法师重新召唤了{0}！\n祝你好运！</b></size>",
   "Summoner.NoMeetingWhileSummoned": "你以为你可以召开会议杀死被召唤者吗？\n被召唤者死亡后才能召开会议！",
   "Summoned.Notification": "死灵法师召唤了你！加入巫师阵营，杀死反对巫师阵营的人！",
   "GodfatherCloseMeeting": "教父叫停了会议",

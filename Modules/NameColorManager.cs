@@ -20,6 +20,8 @@ public static class NameColorManager
         {
             if (KnowTargetRoleColor(seer, target, isMeeting, out var color))
                 colorCode = color == "" ? target.GetRoleColorCode() : color;
+            else
+                colorCode = "#ffffff";
         }
         string openTag = "", closeTag = "";
         if (colorCode != "")
